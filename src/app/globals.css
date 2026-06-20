@@ -1,26 +1,145 @@
+/* ── Tailwind v4 entry point ─────────────────────────────────────────────── */
 @import "tailwindcss";
 
+/* ── T3D Custom Design Tokens (Tailwind v4 @theme) ──────────────────────── */
+@theme {
+  /* Fonts */
+  --font-display:  var(--font-fraunces), Georgia, serif;
+  --font-sans:     var(--font-hanken),   system-ui, sans-serif;
+  --font-mono:     var(--font-mono),     ui-monospace, monospace;
+
+  /* 60% Foundation */
+  --color-charcoal:      #121214;
+  --color-obsidian:      #0B0B0C;
+  --color-panel:         #161519;
+
+  /* 30% Structure */
+  --color-purple:        #2E1A47;
+  --color-purple-line:   #3d2a5c;
+  --color-purple-bright: #7d5fb8;
+  --color-amethyst:      #1F1235;
+
+  /* 10% Catalyst */
+  --color-gold:          #D4AF37;
+  --color-gold-soft:     #e8c969;
+  --color-gold-pale:     #fdf6dc;
+
+  /* Triad accents */
+  --color-amber:         #E5A93C;
+  --color-amber-text:    #f0bf66;
+  --color-emerald:       #1F8A4D;
+  --color-emerald-text:  #54c98a;
+  --color-crimson:       #C83E3E;
+  --color-crimson-text:  #e98080;
+
+  /* Ink */
+  --color-ink:           #F1EDE8;
+  --color-ink-dim:       #BDB7AC;
+  --color-ink-faint:     #8C877E;
+
+  /* Motion */
+  --ease-smooth:         cubic-bezier(.4, 0, .2, 1);
+  --ease-spring:         cubic-bezier(.34, 1.4, .64, 1);
+}
+
+/* ── CSS Custom Properties (for non-Tailwind usage) ─────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --charcoal:      #121214;
+  --obsidian:      #0B0B0C;
+  --panel:         #161519;
+  --purple:        #2E1A47;
+  --purple-line:   #3d2a5c;
+  --purple-bright: #7d5fb8;
+  --amethyst:      #1F1235;
+  --gold:          #D4AF37;
+  --gold-soft:     #e8c969;
+  --amber:         #E5A93C;
+  --amber-text:    #f0bf66;
+  --emerald:       #1F8A4D;
+  --emerald-text:  #54c98a;
+  --crimson:       #C83E3E;
+  --crimson-text:  #e98080;
+  --ink:           #F1EDE8;
+  --ink-dim:       #BDB7AC;
+  --ink-faint:     #8C877E;
+  --nav-h:         66px;
+  --ease:          cubic-bezier(.4, 0, .2, 1);
+  --spring:        cubic-bezier(.34, 1.4, .64, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ── Base styles ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 24px);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--charcoal);
+  color: var(--ink);
+  font-family: var(--font-hanken), system-ui, -apple-system, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Atmospheric background glow ────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(46,26,71,.55), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 8%,  rgba(212,175,55,.05), transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Typography helpers ──────────────────────────────────────────────────── */
+.font-display { font-family: var(--font-fraunces), Georgia, serif; }
+.font-mono    { font-family: var(--font-mono), ui-monospace, monospace; }
+
+/* ── Focus ring (WCAG 2.2 AAA) ──────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ── Skip link ───────────────────────────────────────────────────────────── */
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 200;
+  background: var(--gold); color: var(--obsidian);
+  font-weight: 700; padding: 10px 18px; border-radius: 8px;
+  transition: top 0.2s var(--ease);
+  text-decoration: none;
+}
+.skip-link:focus { top: 14px; }
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes pulse   { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(212,175,55,0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
