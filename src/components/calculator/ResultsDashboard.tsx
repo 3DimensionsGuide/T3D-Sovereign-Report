@@ -1,105 +1,117 @@
 'use client';
 
 /**
- * T3D Results Dashboard
- * Renders after the API responds. Reads from Zustand store.
- * Three side-by-side cards: Vehicle (amber), Road (emerald), Stoplight (crimson).
+ * T3D Results Dashboard — Design Polish · Surgical Upgrade
+ *
+ * UPGRADE 6 micro-interactions applied:
+ *   — Entry Animation: cards stagger in at 0ms / 80ms / 160ms (CSS only)
+ *   — Number Counters: Life Path and key numerology numbers count up 0→final (native JS, no library)
+ *   — System Color Flash: left border animates from transparent to triad color on mount
+ *
+ * UPGRADE 4: sharp card borders, zero radius, no shadows
+ * UPGRADE 1: DM Sans body, Playfair Display headlines
+ * UPGRADE 2: Results section spacing 120px/160px
  */
-import { useState } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-function formatLongitude(lon: unknown): string {
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function fmtLon(lon: unknown): string {
   if (typeof lon !== 'number') return '—';
   const signs = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo',
-                  'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
-  const norm = ((lon % 360) + 360) % 360;
-  const signIdx = Math.floor(norm / 30);
-  const deg = Math.floor(norm - signIdx * 30);
-  const min = Math.floor((norm - signIdx * 30 - deg) * 60);
-  return `${deg}°${String(min).padStart(2,'0')}' ${signs[signIdx]}`;
+                 'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+  const n   = ((lon % 360) + 360) % 360;
+  const si  = Math.floor(n / 30);
+  const deg = Math.floor(n - si * 30);
+  const min = Math.floor((n - si * 30 - deg) * 60);
+  return `${deg}°${String(min).padStart(2,'0')}' ${signs[si]}`;
 }
 
-function DataRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+// ─── UPGRADE 6 — Number Counter (native JS, no library) ──────────────────────
+function CountUp({ target, duration = 800 }: { target: number; duration?: number }) {
+  const [value, setValue] = useState(0);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!target || isNaN(target)) { setValue(target); return; }
+    const start     = performance.now();
+    const startVal  = 0;
+
+    function tick(now: number) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(startVal + (target - startVal) * eased));
+      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target, duration]);
+
+  return <span>{value}</span>;
+}
+
+// ─── DATA ROW ─────────────────────────────────────────────────────────────────
+function DataRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, padding: '7px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-      <dt style={{ fontSize: '0.78rem', color: 'var(--ink-faint)' }}>{label}</dt>
-      <dd style={{ fontSize: '0.85rem', fontWeight: 600, textAlign: 'right', fontFamily: mono ? 'var(--font-mono, monospace)' : 'inherit' }}>
+    <div style={{
+      display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+      gap: 12, padding: '9px 0',
+      borderTop: '1px solid rgba(245,245,243,0.08)',
+    }}>
+      <dt className="t3d-label" style={{ color: 'var(--parchment-40)', flexShrink: 0 }}>{label}</dt>
+      <dd style={{
+        fontFamily: mono ? "'DM Sans',monospace" : "'DM Sans',sans-serif",
+        fontSize: '0.9rem', fontWeight: 400,
+        color: 'var(--parchment)', textAlign: 'right',
+      }}>
         {value}
       </dd>
     </div>
   );
 }
 
-// ─── CARD WRAPPER ─────────────────────────────────────────────────────────────
-function DimCard({
-  id, kicker, title, meta, color, colorText, colorBg, colorBorder, colorGlow, icon, children,
+// ─── RESULT CARD ─────────────────────────────────────────────────────────────
+/**
+ * UPGRADE 4 — sharp border, zero radius, no shadow
+ * UPGRADE 6 — flash-vehicle / flash-road / flash-stoplight CSS class drives left border animation
+ */
+function ResultCard({
+  index, label, kicker, color, flashClass, children,
 }: {
-  id: string; kicker: string; title: string; meta: string;
-  color: string; colorText: string; colorBg: string; colorBorder: string; colorGlow: string;
-  icon: React.ReactNode; children: React.ReactNode;
+  index: number; label: string; kicker: string;
+  color: string; flashClass: string; children: React.ReactNode;
 }) {
-  const [hovered, setHovered] = useState(false);
-
   return (
     <article
-      id={id}
+      className={`results-card t3d-card ${flashClass}`}
       style={{
+        paddingLeft: 20,  // left border is handled by flash animation
+        padding: 'clamp(24px,3vw,36px)',
+        padding: 'clamp(24px,3vw,36px) clamp(24px,3vw,36px) clamp(24px,3vw,36px) 20px',
+        animationDelay: `${index * 80}ms`,
         position: 'relative',
-        background: 'var(--obsidian)',
-        border: `1.5px solid ${hovered ? color : 'var(--purple)'}`,
-        borderRadius: 18, padding: '28px 24px 26px',
-        overflow: 'hidden',
-        transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
-        boxShadow: hovered ? `0 16px 50px ${colorGlow}, 0 0 0 1px ${colorBorder}` : 'none',
-        transition: 'transform 0.4s var(--spring), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease)',
-        willChange: 'transform',
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
-      {/* Corner glow */}
-      <div style={{
-        position: 'absolute', top: -60, right: -60,
-        width: 160, height: 160, borderRadius: '50%',
-        background: `radial-gradient(circle, ${colorGlow}, transparent 70%)`,
-        opacity: hovered ? 1 : 0.4,
-        transition: 'opacity 0.4s var(--ease)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}>
-        <span style={{
-          flexShrink: 0, width: 56, height: 56, borderRadius: 14,
-          display: 'grid', placeItems: 'center',
-          background: colorBg, border: `1px solid ${colorBorder}`,
-          boxShadow: hovered ? `0 0 22px ${colorGlow}` : 'none',
-          transition: 'box-shadow 0.35s var(--ease)',
-        }}>
-          {icon}
-        </span>
-        <div>
-          <p style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: colorText, marginBottom: 3 }}>
-            {kicker}
-          </p>
-          <h3 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 500, lineHeight: 1.1 }}>
-            {title}
-          </h3>
-          <p style={{ color: 'var(--ink-faint)', fontSize: '0.8rem', marginTop: 2 }}>{meta}</p>
-        </div>
-      </div>
-
-      {/* Rule */}
-      <div style={{
-        height: 1, marginBottom: 18,
-        background: `linear-gradient(90deg, ${color}, transparent)`,
-        opacity: hovered ? 1 : 0.55,
-        transition: 'opacity 0.3s var(--ease)',
-      }} />
-
-      {/* Data */}
+      {/* UPGRADE 1 — system label: 10px DM Sans, tracking 0.15em, ALL CAPS */}
+      <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 10 }}>
+        {label}
+      </p>
+      {/* UPGRADE 1 — kicker: Playfair Display, weight 400 */}
+      <h3 style={{
+        fontFamily: "'Playfair Display', Georgia, serif",
+        fontSize: 'clamp(20px,2.5vw,30px)',
+        fontWeight: 400, color: color,
+        lineHeight: 1.15, marginBottom: 16,
+      }}>
+        {kicker}
+      </h3>
+      {/* Thin triad-color rule */}
+      <div style={{ height: 1, background: `linear-gradient(90deg, ${color}, transparent)`, marginBottom: 16, opacity: 0.5 }} />
       <dl style={{ margin: 0 }}>
         {children}
       </dl>
@@ -107,183 +119,172 @@ function DimCard({
   );
 }
 
-// ─── MAIN ─────────────────────────────────────────────────────────────────────
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function ResultsDashboard() {
   const { results, reset } = useT3DStore();
-
   if (!results) return null;
 
   const { humanDesign: hd, numerology: num, astrology: ast } = results;
 
-  // Safe accessors
-  const tropSun  = (ast?.tropicalSun  as { formatted?: string })?.formatted ?? formatLongitude((ast?.tropicalSun  as { longitude?: number })?.longitude);
-  const tropAsc  = typeof ast?.tropicalAscendant === 'number' ? formatLongitude(ast.tropicalAscendant) : '—';
-  const sidSun   = (ast?.siderealSun  as { formatted?: string })?.formatted ?? formatLongitude((ast?.siderealSun  as { longitude?: number })?.longitude);
-  const sidAsc   = typeof ast?.siderealAscendant === 'number' ? formatLongitude(ast.siderealAscendant) : '—';
+  // Astrology helpers
+  const tropSun  = (ast?.tropicalSun  as { formatted?: string })?.formatted ?? fmtLon((ast?.tropicalSun  as { longitude?: number })?.longitude);
+  const tropMoon = (ast?.tropicalMoon as { formatted?: string })?.formatted ?? fmtLon((ast?.tropicalMoon as { longitude?: number })?.longitude);
+  const tropAsc  = typeof ast?.tropicalAscendant === 'number' ? fmtLon(ast.tropicalAscendant) : '—';
+  const sidSun   = (ast?.siderealSun  as { formatted?: string })?.formatted ?? fmtLon((ast?.siderealSun  as { longitude?: number })?.longitude);
+  const sidAsc   = typeof ast?.siderealAscendant === 'number' ? fmtLon(ast.siderealAscendant) : '—';
+
+  const lifePath     = typeof num?.lifePath     === 'number' ? num.lifePath     : null;
+  const destiny      = typeof num?.destiny      === 'number' ? num.destiny      : null;
+  const personality  = typeof num?.personality  === 'number' ? num.personality  : null;
+  const soulUrge     = typeof num?.soulUrge     === 'number' ? num.soulUrge     : null;
+  const hiddenPassion= typeof num?.hiddenPassion=== 'number' ? num.hiddenPassion: null;
+  const karmicLessons= Array.isArray(num?.karmicLessons)    ? num.karmicLessons as number[] : [];
 
   return (
     <div>
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 40 }}>
-        <p style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 10 }}>
-          Your Sovereign T3D Profile
-        </p>
-        <h2 className="font-display" style={{ fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 500, lineHeight: 1.1 }}>
-          Your three dimensions, revealed
-        </h2>
-        <p style={{ color: 'var(--ink-dim)', marginTop: 12, fontSize: '0.95rem', maxWidth: '52ch', margin: '12px auto 0' }}>
-          Hover each card to explore the details. Scroll down to unlock the full 100-page report.
-        </p>
+      {/* ── HEADER ─────────────────────────────────────────────────────────── */}
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: 16, marginBottom: 40,
+      }}>
+        <div>
+          <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 10 }}>
+            SOVEREIGN PROFILE — CALCULATION COMPLETE
+          </p>
+          <h2 style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: 'clamp(28px,4vw,48px)',
+            fontWeight: 400, color: 'var(--parchment)',
+            lineHeight: 1.1,
+          }}>
+            Your three dimensions.
+          </h2>
+        </div>
+        <button
+          onClick={reset}
+          className="t3d-ghost"
+          style={{ marginTop: 4, padding: '10px 18px' }}
+        >
+          RECALCULATE
+        </button>
       </div>
 
-      {/* Three cards */}
+      {/*
+       * UPGRADE 6 — Three result cards
+       *   · Entry Animation: staggered via CSS class (globals.css results-card)
+       *   · Color Flash: flash-vehicle / flash-road / flash-stoplight on left border
+       *   UPGRADE 4 — sharp card borders, zero radius
+       */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: 20, marginBottom: 40,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))',
+        gap: 0,
       }}>
 
-        {/* ── VEHICLE (Human Design) ─────────────────────────────────────── */}
-        <DimCard
-          id="vehicle"
-          kicker="Human Design" title="The Vehicle" meta="How you're built to move"
-          color="var(--amber)" colorText="var(--amber-text)"
-          colorBg="rgba(229,169,60,0.08)" colorBorder="rgba(229,169,60,0.3)"
-          colorGlow="rgba(229,169,60,0.15)"
-          icon={
-            <svg viewBox="0 0 40 40" fill="none" width={30} height={30}>
-              <circle cx="20" cy="20" r="17" stroke="#E5A93C" strokeWidth="1.5" opacity=".35" />
-              <circle cx="20" cy="20" r="12.5" stroke="#E5A93C" strokeWidth="1" opacity=".18" />
-              <polygon points="20,5 23,20 20,17.5 17,20" fill="#E5A93C" />
-              <polygon points="20,35 23,20 20,22.5 17,20" fill="#E5A93C" opacity=".4" />
-              <circle cx="20" cy="20" r="2.4" fill="#E5A93C" />
-            </svg>
-          }
-        >
-          <div style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--amber-text)', fontFamily: 'var(--font-display, serif)', lineHeight: 1.1 }}>
+        {/* ── VEHICLE — Human Design ──────────────────────────────────────── */}
+        <ResultCard index={0} label="THE VEHICLE" kicker="Human Design"
+          color="var(--amber)" flashClass="flash-vehicle">
+          {/* Large type display for HD Type */}
+          <div style={{ padding: '12px 0 16px' }}>
+            <p style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 'clamp(1.5rem,2.5vw,2.2rem)',
+              fontWeight: 400, color: 'var(--amber)',
+              lineHeight: 1.1, marginBottom: 4,
+            }}>
               {String(hd?.type ?? '—')}
             </p>
-            <p style={{ color: 'var(--ink-dim)', fontSize: '0.84rem', marginTop: 2 }}>
-              Energy Type
-            </p>
+            <p className="t3d-body" style={{ fontSize: 13, color: 'var(--parchment-40)' }}>Energy Type</p>
           </div>
-          <DataRow label="Authority" value={String(hd?.authority ?? '—')} />
-          <DataRow label="Profile"   value={String(hd?.profile ?? '—')} mono />
-          <DataRow label="Strategy"  value={String(hd?.strategy ?? '—')} />
-        </DimCard>
+          <DataRow label="AUTHORITY" value={String(hd?.authority ?? '—')} />
+          <DataRow label="PROFILE"   value={String(hd?.profile   ?? '—')} mono />
+          <DataRow label="STRATEGY"  value={String(hd?.strategy  ?? '—')} />
+        </ResultCard>
 
-        {/* ── ROAD (Numerology) ──────────────────────────────────────────── */}
-        <DimCard
-          id="road"
-          kicker="Numerology" title="The Road" meta="Where the numbers lead"
-          color="var(--emerald)" colorText="var(--emerald-text)"
-          colorBg="rgba(31,138,77,0.08)" colorBorder="rgba(31,138,77,0.3)"
-          colorGlow="rgba(31,138,77,0.15)"
-          icon={
-            <svg viewBox="0 0 40 40" fill="none" width={30} height={30}>
-              <path d="M8 36 Q10 27 16 23 Q22 19 20 13 Q18 7 24 5" stroke="#1F8A4D" strokeWidth="2" strokeLinecap="round" />
-              <path d="M13 36 Q15 27 21 23 Q27 19 25 13 Q23 7 29 5" stroke="#1F8A4D" strokeWidth="2" strokeLinecap="round" opacity=".35" />
-              <circle cx="26" cy="5" r="3" fill="#1F8A4D" />
-            </svg>
-          }
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 14 }}>
-            <span style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--emerald-text)', fontFamily: 'var(--font-mono, monospace)', lineHeight: 1 }}>
-              {num?.lifePath ?? '—'}
+        {/* ── ROAD — Numerology ───────────────────────────────────────────── */}
+        <ResultCard index={1} label="THE ROAD" kicker="Numerology"
+          color="var(--emerald)" flashClass="flash-road">
+          {/*
+           * UPGRADE 6 — Number Counter: Life Path counts up 0 → final value
+           * Native JS requestAnimationFrame, no library
+           */}
+          <div style={{ padding: '12px 0 16px', display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <span style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 'clamp(2.4rem,4vw,3.6rem)',
+              fontWeight: 700, color: 'var(--emerald)', lineHeight: 1,
+            }}>
+              {lifePath !== null ? <CountUp target={lifePath} duration={800} /> : '—'}
             </span>
-            <span style={{ color: 'var(--ink-dim)', fontSize: '0.88rem', fontWeight: 600 }}>
-              Life Path
-            </span>
+            <p className="t3d-label" style={{ color: 'var(--parchment-40)' }}>LIFE PATH</p>
           </div>
-          <DataRow label="Destiny"       value={String(num?.destiny ?? '—')} mono />
-          <DataRow label="Personality"   value={String(num?.personality ?? '—')} mono />
-          <DataRow label="Soul Urge"     value={String(num?.soulUrge ?? '—')} mono />
-          <DataRow label="Hidden Passion" value={String(num?.hiddenPassion ?? '—')} mono />
-          {num?.karmicLessons?.length > 0 && (
-            <DataRow label="Karmic Lessons" value={(num.karmicLessons as number[]).join(', ')} mono />
+          <DataRow label="DESTINY"        value={destiny      !== null ? String(destiny)      : '—'} mono />
+          <DataRow label="PERSONALITY"    value={personality  !== null ? String(personality)  : '—'} mono />
+          <DataRow label="SOUL URGE"      value={soulUrge     !== null ? String(soulUrge)     : '—'} mono />
+          <DataRow label="HIDDEN PASSION" value={hiddenPassion!== null ? String(hiddenPassion): '—'} mono />
+          {karmicLessons.length > 0 && (
+            <DataRow label="KARMIC LESSONS" value={karmicLessons.join(', ')} mono />
           )}
-        </DimCard>
+        </ResultCard>
 
-        {/* ── STOPLIGHT (Astrology) ──────────────────────────────────────── */}
-        <DimCard
-          id="stoplight"
-          kicker="Astrology" title="The Stoplight" meta="When the timing is right"
-          color="var(--crimson)" colorText="var(--crimson-text)"
-          colorBg="rgba(200,62,62,0.08)" colorBorder="rgba(200,62,62,0.3)"
-          colorGlow="rgba(200,62,62,0.15)"
-          icon={
-            <svg viewBox="0 0 40 40" fill="none" width={30} height={30}>
-              <rect x="13" y="3" width="14" height="34" rx="7" fill="#161519" stroke="#C83E3E" strokeWidth="1.3" />
-              <circle cx="20" cy="11" r="4.2" fill="#C83E3E" opacity=".22" />
-              <circle cx="20" cy="20" r="4.2" fill="#E5A93C" opacity=".22" />
-              <circle cx="20" cy="29" r="4.2" fill="#1F8A4D" />
-            </svg>
-          }
-        >
-          <div style={{ marginBottom: 14 }}>
-            <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--ink)' }}>
-              Tropical Sun
-            </p>
-            <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--crimson-text)', fontFamily: 'var(--font-mono, monospace)', marginTop: 2 }}>
+        {/* ── STOPLIGHT — Astrology ───────────────────────────────────────── */}
+        <ResultCard index={2} label="THE STOPLIGHT" kicker="Astrology"
+          color="var(--crimson)" flashClass="flash-stoplight">
+          <div style={{ padding: '12px 0 16px' }}>
+            <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 6 }}>TROPICAL SUN</p>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 'clamp(1rem,1.8vw,1.3rem)',
+              fontWeight: 500, color: 'var(--crimson-hi)', lineHeight: 1.2,
+            }}>
               {tropSun}
             </p>
           </div>
-          <DataRow label="Tropical ASC"  value={tropAsc} mono />
-          <DataRow label="Sidereal Sun"  value={sidSun}  mono />
-          <DataRow label="Sidereal ASC"  value={sidAsc}  mono />
-          <DataRow label="House System"  value={String(ast?.houseSystem ?? 'Whole Sign')} />
-        </DimCard>
+          <DataRow label="TROPICAL MOON" value={tropMoon} mono />
+          <DataRow label="TROPICAL ASC"  value={tropAsc}  mono />
+          <DataRow label="SIDEREAL SUN"  value={sidSun}   mono />
+          <DataRow label="SIDEREAL ASC"  value={sidAsc}   mono />
+          <DataRow label="HOUSE SYSTEM"  value="Whole Sign" />
+        </ResultCard>
       </div>
 
-      {/* ── GOLD CTA ──────────────────────────────────────────────────────── */}
+      {/* ── DIVIDER ────────────────────────────────────────────────────────── */}
+      <div className="t3d-divider" style={{ marginTop: 48 }} />
+
+      {/* ── UPGRADE 5 CTA — Crimson banner with report offer ───────────────── */}
       <div style={{
-        borderRadius: 24, textAlign: 'center',
-        border: '1px solid var(--purple-line)',
-        background: 'radial-gradient(ellipse 70% 90% at 50% 0%, rgba(46,26,71,.6), transparent 70%), var(--obsidian)',
-        padding: 'clamp(36px,5vw,60px) clamp(20px,5vw,56px)',
+        paddingTop:    'var(--results-pt)',
+        paddingBottom: 'var(--results-pb)',
+        display: 'flex', flexDirection: 'column', gap: 16,
       }}>
-        <p style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 12 }}>
-          Go deeper
+        <p className="t3d-label" style={{ color: 'var(--parchment-40)' }}>
+          SOVEREIGN REPORT — COMPLETE NATAL ANALYSIS
         </p>
-        <h3 className="font-display" style={{ fontSize: 'clamp(1.6rem,3.5vw,2.4rem)', fontWeight: 500, maxWidth: '20ch', margin: '0 auto', lineHeight: 1.1 }}>
-          Your profile is just the surface
+        <h3 style={{
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontSize: 'clamp(28px,4vw,52px)',
+          fontWeight: 400, color: 'var(--parchment)',
+          lineHeight: 1.1, maxWidth: '18ch',
+        }}>
+          Your profile is just the surface.
         </h3>
-        <p style={{ color: 'var(--ink-dim)', maxWidth: '50ch', margin: '14px auto 0', fontSize: '0.95rem', lineHeight: 1.65 }}>
-          The full Sovereign Report gives you 100 pages of your complete Human Design
-          bodygraph, all numerology cycles, 12-month transit calendar, and an integrated
-          decision-making guide — all from your exact birth data.
+        <p className="t3d-body" style={{ maxWidth: '50ch' }}>
+          100 pages built from your exact birth data — every gate, every number,
+          every transit. One integrated guide for every decision that matters.
         </p>
 
-        <Link
-          href="/checkout"
-          style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-            minHeight: 60, padding: '18px clamp(28px,5vw,48px)', marginTop: 28,
-            background: 'linear-gradient(135deg, var(--gold-soft), var(--gold) 55%, #b8931f)',
-            color: 'var(--obsidian)', fontWeight: 700,
-            fontSize: 'clamp(0.95rem,1.8vw,1.1rem)',
-            borderRadius: 14, textDecoration: 'none',
-            animation: 'goldPulse 2.8s var(--ease) infinite',
-          }}
-        >
-          <span aria-hidden>✦</span>
-          Unlock Your Full 100-Page Sovereign Report — $97
-          <span aria-hidden>✦</span>
-        </Link>
-        <p style={{ marginTop: 12, fontSize: '0.78rem', color: 'var(--ink-faint)' }}>
-          One-time purchase · Instant delivery · Built from your exact birth data
+        {/* UPGRADE 5 — CTA: crimson, zero radius, ALL CAPS 11px DM Sans */}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
+          <Link href="/checkout" className="t3d-cta" style={{ maxWidth: 320, width: 'auto', padding: '16px 40px' }}>
+            UNLOCK FULL REPORT — $97
+          </Link>
+          <button onClick={reset} className="t3d-ghost">
+            RECALCULATE
+          </button>
+        </div>
+        <p className="t3d-label" style={{ color: 'var(--parchment-40)' }}>
+          ONE-TIME PURCHASE · INSTANT DELIVERY · BUILT FROM YOUR BIRTH DATA
         </p>
-      </div>
-
-      {/* Reset */}
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <button
-          onClick={reset}
-          style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}
-        >
-          Start over with different details
-        </button>
       </div>
     </div>
   );

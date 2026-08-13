@@ -1,111 +1,307 @@
-/* ── Tailwind v4 entry point ─────────────────────────────────────────────── */
+/* ── Tailwind v4 ─────────────────────────────────────────────────────────── */
 @import "tailwindcss";
 
-/* ── T3D Custom Design Tokens (Tailwind v4 @theme) ──────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   T3D Design System — Design Polish · Surgical Upgrade · Mobile Update
+   ══════════════════════════════════════════════════════════════════════════ */
+
 @theme {
-  /* Fonts */
-  --font-display:  var(--font-fraunces), Georgia, serif;
-  --font-sans:     var(--font-hanken),   system-ui, sans-serif;
-  --font-mono:     var(--font-mono),     ui-monospace, monospace;
+  --font-display: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-sans:    var(--font-dm-sans),  'DM Sans', system-ui, sans-serif;
 
-  /* 60% Foundation */
-  --color-charcoal:      #121214;
-  --color-obsidian:      #0B0B0C;
-  --color-panel:         #161519;
+  --color-base:        #0D0D0E;
+  --color-surface:     #111113;
+  --color-overlay:     #18181B;
+  --color-parchment:   #F5F5F3;
+  --color-crimson:     #991B1B;
+  --color-crimson-hi:  #B91C1C;
+  --color-amber:       #E5A93C;
+  --color-emerald:     #1F8A4D;
 
-  /* 30% Structure */
-  --color-purple:        #2E1A47;
-  --color-purple-line:   #3d2a5c;
-  --color-purple-bright: #7d5fb8;
-  --color-amethyst:      #1F1235;
-
-  /* 10% Catalyst */
-  --color-gold:          #D4AF37;
-  --color-gold-soft:     #e8c969;
-  --color-gold-pale:     #fdf6dc;
-
-  /* Triad accents */
-  --color-amber:         #E5A93C;
-  --color-amber-text:    #f0bf66;
-  --color-emerald:       #1F8A4D;
-  --color-emerald-text:  #54c98a;
-  --color-crimson:       #C83E3E;
-  --color-crimson-text:  #e98080;
-
-  /* Ink */
-  --color-ink:           #F1EDE8;
-  --color-ink-dim:       #BDB7AC;
-  --color-ink-faint:     #8C877E;
-
-  /* Motion */
-  --ease-smooth:         cubic-bezier(.4, 0, .2, 1);
-  --ease-spring:         cubic-bezier(.34, 1.4, .64, 1);
+  --color-grid:        rgba(245,245,243,0.12);
+  --color-card-border: rgba(245,245,243,0.15);
+  --color-card-hover:  rgba(245,245,243,0.35);
+  --color-card-bg:     rgba(245,245,243,0.03);
+  --color-input-line:  rgba(245,245,243,0.30);
+  --color-step-off:    rgba(245,245,243,0.15);
 }
 
-/* ── CSS Custom Properties (for non-Tailwind usage) ─────────────────────── */
 :root {
-  --charcoal:      #121214;
-  --obsidian:      #0B0B0C;
-  --panel:         #161519;
-  --purple:        #2E1A47;
-  --purple-line:   #3d2a5c;
-  --purple-bright: #7d5fb8;
-  --amethyst:      #1F1235;
-  --gold:          #D4AF37;
-  --gold-soft:     #e8c969;
-  --amber:         #E5A93C;
-  --amber-text:    #f0bf66;
-  --emerald:       #1F8A4D;
-  --emerald-text:  #54c98a;
-  --crimson:       #C83E3E;
-  --crimson-text:  #e98080;
-  --ink:           #F1EDE8;
-  --ink-dim:       #BDB7AC;
-  --ink-faint:     #8C877E;
-  --nav-h:         66px;
-  --ease:          cubic-bezier(.4, 0, .2, 1);
-  --spring:        cubic-bezier(.34, 1.4, .64, 1);
+  --base:           #0D0D0E;
+  --surface:        #111113;
+  --overlay:        #18181B;
+  --parchment:      #F5F5F3;
+  --parchment-70:   rgba(245,245,243,0.70);
+  --parchment-40:   rgba(245,245,243,0.40);
+  --parchment-15:   rgba(245,245,243,0.15);
+  --crimson:        #991B1B;
+  --crimson-hi:     #B91C1C;
+  --amber:          #E5A93C;
+  --emerald:        #1F8A4D;
+  --card-border:    rgba(245,245,243,0.15);
+  --card-hover:     rgba(245,245,243,0.35);
+  --card-bg:        rgba(245,245,243,0.03);
+  --input-line:     rgba(245,245,243,0.30);
+  --step-off:       rgba(245,245,243,0.15);
+  --grid-line:      rgba(245,245,243,0.12);
+
+  /* Spacing — desktop */
+  --hero-pt:        160px;
+  --hero-pb:        200px;
+  --calc-py:        80px;
+  --results-pt:     120px;
+  --results-pb:     160px;
+
+  --ease:   cubic-bezier(.4,0,.2,1);
+  --spring: cubic-bezier(.34,1.4,.64,1);
 }
 
-/* ── Base styles ─────────────────────────────────────────────────────────── */
+/* ── Base Reset ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--nav-h) + 24px);
-  -webkit-text-size-adjust: 100%;
-}
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
-  background: var(--charcoal);
-  color: var(--ink);
-  font-family: var(--font-hanken), system-ui, -apple-system, sans-serif;
-  line-height: 1.65;
+  background: var(--base);
+  color: var(--parchment-70);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* ── Atmospheric background glow ────────────────────────────────────────── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(46,26,71,.55), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 85% 8%,  rgba(212,175,55,.05), transparent 55%);
-  pointer-events: none;
-  z-index: 0;
+:focus-visible { outline: 1px solid var(--crimson); outline-offset: 3px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 200;
+  background: var(--crimson); color: var(--parchment);
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 10px 18px; text-decoration: none;
+  transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 14px; }
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+.font-display { font-family: 'Playfair Display', Georgia, serif; }
+.font-sans    { font-family: 'DM Sans', system-ui, sans-serif; }
+
+/* H1 — Desktop */
+.t3d-h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(72px, 10vw, 140px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--parchment);
+  text-align: left;
 }
 
-/* ── Typography helpers ──────────────────────────────────────────────────── */
-.font-display { font-family: var(--font-fraunces), Georgia, serif; }
-.font-mono    { font-family: var(--font-mono), ui-monospace, monospace; }
+/* H2 — Desktop */
+.t3d-h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--parchment);
+  text-align: left;
+}
 
-/* ── Focus ring (WCAG 2.2 AAA) ──────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 3px;
-  border-radius: 4px;
+.t3d-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--parchment-40);
+}
+
+.t3d-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--parchment-70);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.t3d-card {
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  border-radius: 0;
+  transition: border-color 0.25s var(--ease);
+}
+.t3d-card:hover { border-color: var(--card-hover); }
+
+.t3d-divider { border-top: 1px solid var(--grid-line); }
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+.t3d-input {
+  width: 100%; padding: 12px 0;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 300;
+  color: var(--parchment); background: transparent;
+  border: none; border-radius: 0;
+  border-bottom: 1px solid var(--input-line);
+  outline: none; min-height: 48px;
+  transition: border-color 0.2s var(--ease);
+  /* Prevent iOS zoom on focus — font-size must be ≥16px */
+  font-size: max(16px, 1rem);
+}
+.t3d-input::placeholder { color: var(--parchment-40); }
+.t3d-input:focus  { border-bottom-color: var(--parchment); }
+.t3d-input.error  { border-bottom-color: var(--crimson-hi); }
+.t3d-input.valid  { border-bottom-color: var(--emerald); }
+
+.t3d-select {
+  width: 100%; padding: 12px 0;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 300;
+  color: var(--parchment); background: transparent;
+  border: none; border-radius: 0;
+  border-bottom: 1px solid var(--input-line);
+  outline: none; cursor: pointer; min-height: 48px;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(245,245,243,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  padding-right: 20px;
+  transition: border-color 0.2s var(--ease);
+  /* Prevent iOS zoom */
+  font-size: max(16px, 1rem);
+}
+.t3d-select:focus { border-bottom-color: var(--parchment); }
+.t3d-select option { background: #18181B; color: var(--parchment); }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.t3d-cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 52px; padding: 16px 24px;
+  background: var(--crimson); color: var(--parchment);
+  border: 1px solid var(--crimson); border-radius: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 11px;
+  font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  /* Large touch target on mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+.t3d-cta:hover  { background: var(--parchment); color: var(--base); }
+.t3d-cta:active { background: var(--crimson-hi); color: var(--parchment); }
+
+.t3d-ghost {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 14px 24px;
+  background: transparent; color: var(--parchment-70);
+  border: 1px solid var(--card-border); border-radius: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 11px;
+  font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+  cursor: pointer; text-decoration: none;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.t3d-ghost:hover  { border-color: var(--card-hover); color: var(--parchment); }
+.t3d-ghost:active { border-color: var(--parchment); }
+
+/* ── Step Indicator ──────────────────────────────────────────────────────── */
+.t3d-step-track {
+  display: flex; gap: 6px; width: 100%; margin-bottom: 16px;
+}
+.t3d-step-seg {
+  flex: 1; height: 2px; background: var(--step-off);
+  transition: background 0.4s var(--ease);
+}
+.t3d-step-seg.active { background: var(--amber); }
+.t3d-step-seg.done   { background: rgba(229,169,60,0.45); }
+
+/* ── Results animations ──────────────────────────────────────────────────── */
+@keyframes cardEntry {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.results-card { animation: cardEntry 0.5s var(--ease) both; }
+.results-card:nth-child(1) { animation-delay: 0ms;   }
+.results-card:nth-child(2) { animation-delay: 80ms;  }
+.results-card:nth-child(3) { animation-delay: 160ms; }
+
+@keyframes vehicleFlash   { from { border-left-color: transparent; } to { border-left-color: var(--amber);   } }
+@keyframes roadFlash      { from { border-left-color: transparent; } to { border-left-color: var(--emerald); } }
+@keyframes stoplightFlash { from { border-left-color: transparent; } to { border-left-color: var(--crimson); } }
+
+.flash-vehicle   { animation: vehicleFlash   0.6s var(--ease) 0.2s both; border-left: 3px solid transparent; }
+.flash-road      { animation: roadFlash      0.6s var(--ease) 0.3s both; border-left: 3px solid transparent; }
+.flash-stoplight { animation: stoplightFlash 0.6s var(--ease) 0.4s both; border-left: 3px solid transparent; }
+
+/* ── Base animations ─────────────────────────────────────────────────────── */
+@keyframes rise     { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin     { to { transform: rotate(360deg);  } }
+@keyframes spinRev  { to { transform: rotate(-360deg); } }
+@keyframes pulse    { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+@keyframes crimsonPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(153,27,27,0.5); }
+  50%     { box-shadow: 0 0 0 8px rgba(153,27,27,0); }
+}
+@keyframes slideRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — < 768px
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── Typography ───────────────────────────────────────────────────────── */
+
+  /* H1: smaller on mobile — 40px instead of 72px minimum */
+  .t3d-h1 {
+    font-size: clamp(40px, 11vw, 56px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+  }
+
+  /* H2: tighter on mobile */
+  .t3d-h2 {
+    font-size: clamp(26px, 7vw, 36px);
+    line-height: 1.15;
+  }
+
+  /* Body: slightly smaller */
+  .t3d-body { font-size: 15px; }
+
+  /* ── Spacing overrides ────────────────────────────────────────────────── */
+  :root {
+    --hero-pt:    48px;
+    --hero-pb:    48px;
+    --calc-py:    32px;
+    --results-pt: 48px;
+    --results-pb: 64px;
+  }
+
+  /* ── Buttons: larger tap targets ──────────────────────────────────────── */
+  .t3d-cta   { min-height: 56px; font-size: 12px; }
+  .t3d-ghost { min-height: 52px; font-size: 12px; }
+
+  /* ── Form elements ────────────────────────────────────────────────────── */
+  .t3d-input,
+  .t3d-select { padding: 14px 0; min-height: 52px; }
+
+  /* ── Step labels: hide on very small screens ──────────────────────────── */
+  .t3d-step-track { margin-bottom: 12px; }
+
+  /* ── Calculator 2-col grid → single column ─────────────────────────────
+     These classes are set inline in CalculatorForm.tsx.
+     The component already handles isMobile via JS.
+     These CSS rules provide a safety net for edge cases. */
+  .calc-2col { grid-template-columns: 1fr !important; }
+  .calc-3col { grid-template-columns: 1fr !important; }
+
+  /* ── Cards: reduce padding on mobile ─────────────────────────────────── */
+  .t3d-card { padding: 16px !important; }
+
+  /* ── Results cards: full width stacked ───────────────────────────────── */
+  .results-card {
+    border-right: none !important;
+  }
 }
 
 /* ── Reduced motion ──────────────────────────────────────────────────────── */
@@ -118,28 +314,10 @@ body::before {
   html { scroll-behavior: auto; }
 }
 
-/* ── Skip link ───────────────────────────────────────────────────────────── */
-.skip-link {
-  position: absolute; left: 16px; top: -60px; z-index: 200;
-  background: var(--gold); color: var(--obsidian);
-  font-weight: 700; padding: 10px 18px; border-radius: 8px;
-  transition: top 0.2s var(--ease);
-  text-decoration: none;
-}
-.skip-link:focus { top: 14px; }
-
-/* ── Animations ──────────────────────────────────────────────────────────── */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-@keyframes spin    { to { transform: rotate(360deg); } }
-@keyframes pulse   { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-@keyframes goldPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,.4); }
-  50%       { box-shadow: 0 0 0 12px rgba(212,175,55,0); }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
+/* ── Touch device improvements ───────────────────────────────────────────── */
+@media (hover: none) {
+  /* On touch devices, remove hover states that don't apply */
+  .t3d-card:hover       { border-color: var(--card-border); }
+  .t3d-cta:hover        { background: var(--crimson); color: var(--parchment); }
+  .t3d-ghost:hover      { border-color: var(--card-border); color: var(--parchment-70); }
 }

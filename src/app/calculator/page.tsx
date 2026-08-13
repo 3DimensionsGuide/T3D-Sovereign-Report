@@ -12,30 +12,24 @@ export default function CalculatorPage() {
   return (
     <>
       <Nav />
-      <main id="calculator" style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{
-          maxWidth: 1140, margin: '0 auto',
-          padding: 'clamp(48px,8vh,88px) clamp(20px,5vw,48px) clamp(64px,10vh,120px)',
-        }}>
-          <div style={{ textAlign: 'center', maxWidth: '54ch', margin: '0 auto clamp(40px,6vh,64px)' }}>
-            <p style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 14 }}>
-              The T3D Calculator
-            </p>
-            <h1 className="font-display" style={{ fontSize: 'clamp(2rem,4.5vw,3.2rem)', fontWeight: 500, letterSpacing: '-0.015em', lineHeight: 1.08, marginBottom: 16 }}>
-              Discover your three dimensions
+      <main style={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 64px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ borderBottom: '1px solid var(--grid)', padding: 'clamp(32px,5vh,56px) clamp(16px,4vw,40px) clamp(24px,4vh,40px)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+              <span style={{ width: 6, height: 6, background: 'var(--crimson)', display: 'block' }} aria-hidden />
+              <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--parchment-faint)', letterSpacing: '0.18em' }}>
+                [T3D.CALCULATOR] — THREE DIMENSIONS · ONE SUBMISSION
+              </span>
+            </div>
+            <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(2rem,5vw,3.8rem)', fontWeight: 400, letterSpacing: '-0.02em', color: 'var(--parchment)', lineHeight: 1.08, maxWidth: '18ch' }}>
+              Discover your sovereign profile.
             </h1>
-            <p style={{ color: 'var(--ink-dim)', fontSize: 'clamp(0.95rem,1.6vw,1.1rem)', lineHeight: 1.65 }}>
-              Enter your birth details below. All calculations run server-side in seconds.
-              Your profile is free — no credit card required.
+            <p style={{ color: 'var(--parchment-faint)', marginTop: 14, fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.02em', fontSize: '0.82rem', lineHeight: 1.7, maxWidth: '52ch' }}>
+              All calculations run server-side. Your proprietary data never leaves the engine.
+              Free · Instant · No credit card required.
             </p>
           </div>
-          <div style={{
-            maxWidth: 800, margin: '0 auto',
-            background: 'var(--obsidian)',
-            border: '1px solid var(--purple-line)',
-            borderRadius: 24,
-            padding: 'clamp(28px,4vw,52px)',
-          }}>
+          <div style={{ border: '1px solid var(--grid)', borderTop: 'none', background: 'var(--surface)' }}>
             <CalculatorForm />
           </div>
         </div>

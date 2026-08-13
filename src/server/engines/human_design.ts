@@ -40,7 +40,7 @@ const GATE_SEQUENCE: readonly number[] = [
 ] as const;
 
 /** Starting longitude of gate 41 (0° Aquarius = 300° in tropical zodiac) */
-const MANDALA_START_LON = 300.0;
+const MANDALA_START_LON = 301.875; // Calibrated: 300° + 5.625°/3 offset
 
 /** Degrees per gate segment */
 const DEGREES_PER_GATE = 360 / 64; // 5.625°

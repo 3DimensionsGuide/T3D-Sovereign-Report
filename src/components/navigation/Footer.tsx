@@ -1,72 +1,58 @@
-/**
- * T3D Footer — monogram, nav links, disclaimer.
- */
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer
-      role="contentinfo"
-      style={{
-        position: 'relative',
-        zIndex: 1,
-        borderTop: '1px solid rgba(61,42,92,0.4)',
-        padding: 'clamp(32px,5vh,56px) 0 clamp(32px,5vh,48px)',
-        marginTop: 'clamp(40px,6vh,80px)',
-      }}
-    >
+    <footer style={{ borderTop: '1px solid var(--grid)' }}>
       <div style={{
-        maxWidth: 1140, margin: '0 auto',
-        padding: '0 clamp(20px,5vw,48px)',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 24,
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        maxWidth: 1200, margin: '0 auto',
+        display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+        borderBottom: '1px solid var(--grid)',
       }}>
-
         {/* Brand */}
-        <Link href="/" aria-label="The 3 Dimensions home" style={{ textDecoration: 'none' }}>
-          <Image
-            src="/logos/T3D_monogram.png"
-            alt="T3D"
-            width={52}
-            height={52}
-            style={{ mixBlendMode: 'lighten' }}
-          />
-        </Link>
+        <div style={{ padding: 'clamp(24px,4vh,40px)', borderRight: '1px solid var(--grid)' }}>
+          <Link href="/" aria-label="The 3 Dimensions">
+            <Image src="/logos/T3D_monogram.png" alt="T3D" width={48} height={48}
+              style={{ mixBlendMode: 'lighten', marginBottom: 12 }} />
+          </Link>
+          <p className="font-mono" style={{ fontSize: '0.62rem', color: 'var(--parchment-faint)', letterSpacing: '0.12em', lineHeight: 1.6 }}>
+            T3D is a reflective self-navigation tool.<br />
+            Read it as a lens, not a mandate.
+          </p>
+        </div>
 
-        {/* Disclaimer */}
-        <p style={{
-          color: 'var(--ink-faint)',
-          fontSize: '0.78rem',
-          maxWidth: '44ch',
-          lineHeight: 1.65,
-        }}>
-          T3D is a reflective self-navigation tool. Human Design, Numerology, and
-          Astrology are presented as a unified lens — not as predictions or professional
-          advice. Read it as a map, not a mandate.
-        </p>
+        {/* Links */}
+        <div style={{ padding: 'clamp(24px,4vh,40px)', borderRight: '1px solid var(--grid)' }}>
+          <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--parchment-faint)', letterSpacing: '0.16em', display: 'block', marginBottom: 16 }}>
+            [NAVIGATION]
+          </span>
+          {[
+            { href: '/calculator', label: 'Calculator'   },
+            { href: '/report',     label: 'Full Report'  },
+          ].map((l) => (
+            <Link key={l.href} href={l.href} style={{
+              display: 'block', fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.72rem', color: 'var(--parchment-faint)',
+              letterSpacing: '0.08em', textDecoration: 'none', marginBottom: 8,
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--parchment)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--parchment-faint)'; }}
+            >
+              {l.label.toUpperCase()}
+            </Link>
+          ))}
+        </div>
 
-        {/* Links + copyright */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', gap: 20 }}>
-            {[
-              { href: '/calculator', label: 'Calculator' },
-              { href: '/report',     label: 'Full Report' },
-            ].map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                style={{ color: 'var(--ink-faint)', fontSize: '0.8rem', textDecoration: 'none' }}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <p style={{ color: 'var(--ink-faint)', fontSize: '0.75rem' }}>
-            © {new Date().getFullYear()} T3D Studio
+        {/* Copyright */}
+        <div style={{ padding: 'clamp(24px,4vh,40px)' }}>
+          <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--parchment-faint)', letterSpacing: '0.16em', display: 'block', marginBottom: 16 }}>
+            [SYSTEM.STATUS]
+          </span>
+          <p className="font-mono" style={{ fontSize: '0.62rem', color: 'var(--parchment-faint)', letterSpacing: '0.08em', lineHeight: 1.7 }}>
+            3dimensions.guide<br />
+            © {new Date().getFullYear()} T3D Studio<br />
+            ALL SYSTEMS OPERATIONAL
           </p>
         </div>
       </div>
