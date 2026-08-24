@@ -15,7 +15,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
-import SovereignCompassCanvas, { type SovereignCompassHandle } from '@/components/SovereignCompassCanvas';
+import type { SovereignCompassHandle } from '@/components/SovereignCompassCanvas';
 import { useT3DStore } from '@/store/useT3DStore';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
 
@@ -101,9 +101,6 @@ export default function HomePage() {
   return (
     <>
       <Nav />
-
-      {/* ── Fixed 3D Compass Layer ─────────────────────────────────────────── */}
-      <SovereignCompassCanvas ref={compassRef} scrollProgress={scrollProgress} />
 
       <main style={{ position: 'relative', zIndex: 10, paddingTop: isMobile ? 220 : 0 }}>
 
