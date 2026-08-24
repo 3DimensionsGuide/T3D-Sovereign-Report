@@ -23,7 +23,7 @@ import { leads } from '@/server/db/schema';
 import { eq }    from 'drizzle-orm';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-05-27.dahlia',
+  apiVersion: '2026-07-29.dahlia',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
