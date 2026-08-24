@@ -10,12 +10,13 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE, PERSONAL_YEAR_THEMES } from '../tokens';
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
   page: {
-    backgroundColor: '#FAFAF9',
+    backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
   },
@@ -37,7 +38,7 @@ const S = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────────────────────
   sectionTag: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.5,
     color: C.parchmentFaint,
@@ -54,7 +55,7 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.parchmentFaint,
     marginBottom: 24,
@@ -98,7 +99,7 @@ const S = StyleSheet.create({
   },
   pyLabel: {
     fontFamily: F.sans,
-    fontSize: 6.5,
+    fontSize: 8,
     fontWeight: 500,
     letterSpacing: 2,
     color: C.parchmentFaint,
@@ -113,10 +114,10 @@ const S = StyleSheet.create({
   },
   pyEssence: {
     fontFamily: F.sans,
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.65,
+    lineHeight: 1.5,
     opacity: 0.85,
     marginTop: 4,
   },
@@ -124,7 +125,7 @@ const S = StyleSheet.create({
   // ── Four themes ────────────────────────────────────────────────────────────
   themesLabel: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.2,
     color: C.parchmentFaint,
@@ -172,10 +173,10 @@ const S = StyleSheet.create({
   },
   cautionText: {
     fontFamily: F.sans,
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.65,
+    lineHeight: 1.5,
   },
 
   // ── Astrological context note ─────────────────────────────────────────────
@@ -188,7 +189,7 @@ const S = StyleSheet.create({
   },
   astroLabel: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2,
     color: C.crimson,
@@ -196,15 +197,15 @@ const S = StyleSheet.create({
   },
   astroText: {
     fontFamily: F.sans,
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.65,
+    lineHeight: 1.5,
     opacity: 0.82,
   },
   astroDisclaimer: {
     fontFamily: F.sans,
-    fontSize: 7.5,
+    fontSize: 8.5,
     fontWeight: 400,
     color: C.parchmentFaint,
     lineHeight: 1.55,
@@ -245,6 +246,8 @@ export default function Page8CurrentSeason({ data }: Props) {
 
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
+
 
       {/* Three hairline rules */}
       <View style={S.topRuleRow}>

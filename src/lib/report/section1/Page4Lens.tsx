@@ -1,343 +1,146 @@
 /**
  * Page 4 — The T3D Lens
  *
- * Reader need: "How Do These Systems Work Together?"
+ * Visual #4 — T3D System Diagram implemented here.
+ * Explains the distinct job of each dimension before the reader
+ * encounters any of the three system sections.
  *
- * Establishes the core metaphor:
- *   Vehicle  = Human Design  (Amber)
- *   Road     = Numerology    (Emerald)
- *   Stoplight = Astrology    (Crimson)
- *
- * Key message: No dimension outranks another. Each answers a different question.
- * Includes: system descriptions, question each answers, color legend.
+ * The diagram is functional, not decorative:
+ *   "Each dimension answers a distinct question.
+ *    Vehicle decides. Road contextualizes. Stoplight informs timing."
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { C, F, PAGE } from '../tokens';
+import { TechnicalLines } from '../shared/PageComponents';
+import { T3DSystemDiagram, ChartCaption, CHART_CAPTIONS } from '../shared/ChartComponents';
 
 const S = StyleSheet.create({
-  page: {
-    backgroundColor: '#FAFAF9',
-    padding: 0,
-    fontFamily: F.sans,
-  },
-  topRule: {
-    width: PAGE.width,
-    height: 1.5,
-    backgroundColor: C.crimson,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: PAGE.marginH,
-    paddingTop: 52,
-    paddingBottom: PAGE.marginV,
-  },
+  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
 
-  // ── Header ────────────────────────────────────────────────────────────────
+  triBar: { flexDirection: 'row', width: PAGE.width },
+  barA:   { flex: 1, height: 1.5, backgroundColor: C.amber },
+  barE:   { flex: 1, height: 1.5, backgroundColor: C.emerald },
+  barC:   { flex: 1, height: 1.5, backgroundColor: C.crimson },
+
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 44, paddingBottom: PAGE.marginV },
+
   sectionTag: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    fontWeight: 500,
-    letterSpacing: 2.5,
-    color: C.parchmentFaint,
-    textTransform: 'uppercase',
-    marginBottom: 12,
+    fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
+    letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8,
   },
   heading: {
-    fontFamily: F.display,
-    fontSize: 28,
-    fontWeight: 400,
-    color: C.base,
-    lineHeight: 1.15,
-    marginBottom: 8,
+    fontFamily: F.display, fontSize: 22, fontWeight: 400,
+    color: C.base, lineHeight: 1.15, marginBottom: 6,
   },
-  intro: {
-    fontFamily: F.sans,
-    fontSize: 10.5,
-    fontWeight: 300,
-    color: C.base,
-    lineHeight: 1.7,
-    opacity: 0.8,
-    marginBottom: 28,
-    maxWidth: 420,
+  sub: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 300,
+    color: C.parchmentFaint, lineHeight: 1.5, marginBottom: 20, maxWidth: 440,
   },
-  headingRule: {
-    width: PAGE.contentWidth,
-    height: 0.5,
-    backgroundColor: C.base,
-    opacity: 0.12,
-    marginBottom: 28,
+  rule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 20 },
+
+  // Diagram spacing
+  diagramContainer: { marginBottom: 16 },
+
+  // Reading key below the diagram
+  keyBlock: {
+    flexDirection: 'row', gap: 12, marginTop: 16,
+    paddingTop: 14, borderTopWidth: 0.5, borderTopColor: 'rgba(13,13,14,0.1)',
+  },
+  keyItem: { flex: 1, gap: 4 },
+  keyNumber: {
+    fontFamily: F.sans, fontSize: 7, fontWeight: 700,
+    letterSpacing: 1.5, color: C.parchmentFaint, textTransform: 'uppercase',
+  },
+  keyText: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 300,
+    color: C.base, lineHeight: 1.5, opacity: 0.82,
   },
 
-  // ── Dimension blocks ──────────────────────────────────────────────────────
-  dimensionsContainer: {
-    gap: 0,
-    marginBottom: 28,
+  // Tone of report note
+  toneBlock: {
+    marginTop: 20, padding: 14,
+    backgroundColor: 'rgba(13,13,14,0.03)',
+    borderWidth: 0.5, borderColor: 'rgba(13,13,14,0.1)',
+    gap: 5,
+  },
+  toneLabel: {
+    fontFamily: F.sans, fontSize: 7, fontWeight: 500,
+    letterSpacing: 2, textTransform: 'uppercase', color: C.parchmentFaint,
+  },
+  toneText: {
+    fontFamily: F.display, fontSize: 10.5, fontWeight: 400,
+    fontStyle: 'italic', color: C.base, lineHeight: 1.5, opacity: 0.8,
   },
 
-  dimensionBlock: {
-    paddingVertical: 18,
-    borderBottomWidth: 0.5,
-    borderBottomColor: C.base,
-    borderBottomStyle: 'solid',
-    flexDirection: 'row',
-    gap: 16,
-    opacity: 0.95,
-  },
-  dimensionBlockLast: {
-    paddingVertical: 18,
-    flexDirection: 'row',
-    gap: 16,
-  },
-
-  // Color bar on left side
-  colorBar: {
-    width: 2,
-    flexShrink: 0,
-    borderRadius: 1,
-  },
-
-  dimensionBody: {
-    flex: 1,
-    gap: 4,
-  },
-
-  // System name row
-  dimensionNameRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-    marginBottom: 2,
-  },
-  dimensionKeyword: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    fontWeight: 500,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  dimensionSep: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    color: C.parchmentFaint,
-  },
-  dimensionSystem: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    fontWeight: 400,
-    letterSpacing: 1.2,
-    color: C.parchmentFaint,
-    textTransform: 'uppercase',
-  },
-
-  // The "name" in Playfair Display
-  dimensionName: {
-    fontFamily: F.display,
-    fontSize: 16,
-    fontWeight: 400,
-    color: C.base,
-    lineHeight: 1.1,
-    marginBottom: 6,
-  },
-
-  // Question it answers
-  dimensionQuestion: {
-    fontFamily: F.sans,
-    fontSize: 8,
-    fontWeight: 500,
-    letterSpacing: 0.4,
-    color: C.parchmentFaint,
-    fontStyle: 'italic',
-    marginBottom: 6,
-  },
-
-  // Description
-  dimensionDesc: {
-    fontFamily: F.sans,
-    fontSize: 9.5,
-    fontWeight: 300,
-    color: C.base,
-    lineHeight: 1.65,
-    opacity: 0.8,
-  },
-
-  // ── No dimension outranks another — key statement ─────────────────────────
-  keyStatement: {
-    padding: 16,
-    backgroundColor: '#F0EEE9',
-    marginBottom: 24,
-  },
-  keyStatementText: {
-    fontFamily: F.display,
-    fontSize: 11,
-    fontWeight: 400,
-    fontStyle: 'italic',
-    color: C.base,
-    lineHeight: 1.55,
-    textAlign: 'center',
-  },
-
-  // ── Color legend ──────────────────────────────────────────────────────────
-  legendLabel: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    fontWeight: 500,
-    letterSpacing: 2.5,
-    color: C.parchmentFaint,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  legendRow: {
-    flexDirection: 'row',
-    gap: 24,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  legendSwatch: {
-    width: 12,
-    height: 12,
-  },
-  legendText: {
-    fontFamily: F.sans,
-    fontSize: 8,
-    fontWeight: 400,
-    color: C.base,
-    letterSpacing: 0.3,
-  },
-
-  // ── Footer ────────────────────────────────────────────────────────────────
   footer: {
-    paddingHorizontal: PAGE.marginH,
-    paddingBottom: 28,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingHorizontal: PAGE.marginH, paddingBottom: 24,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
-  footerText: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    fontWeight: 400,
-    letterSpacing: 1.2,
-    color: C.parchmentFaint,
-    textTransform: 'uppercase',
-  },
-  pageNumber: {
-    fontFamily: F.sans,
-    fontSize: 7,
-    fontWeight: 400,
-    color: C.parchmentFaint,
-  },
+  footerText: { fontFamily: F.sans, fontSize: 7, letterSpacing: 1.2, color: C.parchmentFaint, textTransform: 'uppercase' },
+  pageNum: { fontFamily: F.sans, fontSize: 7, color: C.parchmentFaint },
 });
 
-const DIMENSIONS = [
-  {
-    keyword:  'The Vehicle',
-    system:   'Human Design',
-    name:     'The Vehicle',
-    question: 'How am I built to move through the world?',
-    desc:     'Your energy type, inner authority, and defined centers. The structural architecture beneath every decision you make — the machinery that was set at birth and doesn\'t change.',
-    color:    C.amber,
-  },
-  {
-    keyword:  'The Road',
-    system:   'Numerology',
-    name:     'The Road',
-    question: 'Where are my numbers pointing?',
-    desc:     'Your life path, expression number, and active pinnacle cycle. The geometric trajectory your numbers have been tracing since birth — where the route is headed and what phase of it you\'re currently in.',
-    color:    C.emerald,
-  },
-  {
-    keyword:  'The Stoplight',
-    system:   'Astrology',
-    name:     'The Stoplight',
-    question: 'What are the current conditions?',
-    desc:     'Your natal chart positions and active planetary transits. The environmental signals that shift with time and season — telling you when to move, when to wait, and what the terrain looks like right now.',
-    color:    C.crimson,
-  },
-] as const;
-
 export default function Page4Lens() {
+  const howToRead = [
+    {
+      num: 'Section III',
+      text: 'The Vehicle (Pages 10–17) — your energy type, authority, profile, defined centers. The decision mechanism is here.',
+    },
+    {
+      num: 'Section IV',
+      text: 'The Road (Pages 18–25) — your life path, developmental phases, inner drivers. The developmental arc is here.',
+    },
+    {
+      num: 'Section V',
+      text: 'The Stoplight (Pages 26–33) — your Sun, Moon, Rising, element pattern. The environmental reading is here.',
+    },
+  ];
+
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
 
-      {/* Crimson hairline at top */}
-      <View style={S.topRule} />
+      <View style={S.triBar}><View style={S.barA} /><View style={S.barE} /><View style={S.barC} /></View>
 
       <View style={S.content}>
-
         <Text style={S.sectionTag}>Section 1 — Arrival</Text>
-        <Text style={S.heading}>The T3D Lens</Text>
-        <Text style={S.intro}>
-          Three systems. Three questions. One subject.{'\n'}
-          Each dimension describes the same person from a different angle — none of them ranks above the others.
+        <Text style={S.heading}>How To Use The T3D Lens</Text>
+        <Text style={S.sub}>
+          Three systems. Three distinct questions. One navigation instrument.
         </Text>
-        <View style={S.headingRule} />
+        <View style={S.rule} />
 
-        {/* Three dimension blocks */}
-        <View style={S.dimensionsContainer}>
-          {DIMENSIONS.map((dim, i) => (
-            <View
-              key={dim.keyword}
-              style={i === DIMENSIONS.length - 1 ? S.dimensionBlockLast : S.dimensionBlock}
-            >
-              {/* Color bar */}
-              <View style={[S.colorBar, { backgroundColor: dim.color }]} />
+        {/* Visual #4 — T3D System Diagram */}
+        <View style={S.diagramContainer}>
+          <T3DSystemDiagram variant="full" />
+          <ChartCaption text={CHART_CAPTIONS.systemDiagram} />
+        </View>
 
-              {/* Content */}
-              <View style={S.dimensionBody}>
-                <View style={S.dimensionNameRow}>
-                  <Text style={[S.dimensionKeyword, { color: dim.color }]}>
-                    {dim.keyword}
-                  </Text>
-                  <Text style={S.dimensionSep}>·</Text>
-                  <Text style={S.dimensionSystem}>{dim.system}</Text>
-                </View>
-                <Text style={S.dimensionQuestion}>"{dim.question}"</Text>
-                <Text style={S.dimensionDesc}>{dim.desc}</Text>
-              </View>
+        {/* Where to find each system */}
+        <View style={S.keyBlock}>
+          {howToRead.map(item => (
+            <View key={item.num} style={S.keyItem}>
+              <Text style={S.keyNumber}>{item.num}</Text>
+              <Text style={S.keyText}>{item.text}</Text>
             </View>
           ))}
         </View>
 
-        {/* Key statement */}
-        <View style={S.keyStatement}>
-          <Text style={S.keyStatementText}>
-            Human Design shows you the vehicle.{'\n'}
-            Numerology maps the road.{'\n'}
-            Astrology reads the current signal.{'\n'}
-            All three are required for full navigation.
+        {/* Tone note */}
+        <View style={S.toneBlock}>
+          <Text style={S.toneLabel}>On The Tone Of This Report</Text>
+          <Text style={S.toneText}>
+            None of these systems produce verdicts. They produce lenses — useful, testable, correctable ways of looking at the same person. What serves you, keep. What doesn't, set aside. The report is not asking for belief. It is offering orientation.
           </Text>
         </View>
-
-        {/* Color legend */}
-        <Text style={S.legendLabel}>System Color Legend</Text>
-        <View style={S.legendRow}>
-          <View style={S.legendItem}>
-            <View style={[S.legendSwatch, { backgroundColor: C.amber }]} />
-            <Text style={S.legendText}>Amber — Human Design</Text>
-          </View>
-          <View style={S.legendItem}>
-            <View style={[S.legendSwatch, { backgroundColor: C.emerald }]} />
-            <Text style={S.legendText}>Emerald — Numerology</Text>
-          </View>
-          <View style={S.legendItem}>
-            <View style={[S.legendSwatch, { backgroundColor: C.crimson }]} />
-            <Text style={S.legendText}>Crimson — Astrology</Text>
-          </View>
-        </View>
-
       </View>
 
-      {/* Footer */}
       <View style={S.footer}>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNumber}>4</Text>
+        <Text style={S.pageNum}>4</Text>
       </View>
-
     </Page>
   );
 }

@@ -40,7 +40,7 @@ const GATE_SEQUENCE: readonly number[] = [
 ] as const;
 
 /** Starting longitude of gate 41 (0° Aquarius = 300° in tropical zodiac) */
-const MANDALA_START_LON = 301.875; // Calibrated: 300° + 5.625°/3 offset
+const MANDALA_START_LON = 302.0; // 2°00' Aquarius — canonical Rave Mandala start point
 
 /** Degrees per gate segment */
 const DEGREES_PER_GATE = 360 / 64; // 5.625°
@@ -516,4 +516,4 @@ export function calculateHumanDesign(input: HumanDesignInput): HumanDesignResult
 }
 
 // ─── NAMED EXPORTS FOR TESTING ────────────────────────────────────────────────
-export { longitudeToGate, GATE_SEQUENCE, GATE_CENTER_MAP, UNIQUE_CHANNELS };
+export { GATE_SEQUENCE, GATE_CENTER_MAP, UNIQUE_CHANNELS };

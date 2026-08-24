@@ -14,11 +14,12 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE } from '../tokens';
 
 const S = StyleSheet.create({
   page: {
-    backgroundColor: '#FAFAF9',
+    backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
   },
@@ -37,7 +38,7 @@ const S = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────────────────────
   sectionTag: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.5,
     color: C.parchmentFaint,
@@ -54,10 +55,10 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans,
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.parchmentFaint,
-    lineHeight: 1.6,
+    lineHeight: 1.5,
     marginBottom: 28,
   },
   headingRule: {
@@ -141,7 +142,7 @@ const S = StyleSheet.create({
 
   modeWhen: {
     fontFamily: F.sans,
-    fontSize: 7.5,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 1.2,
     color: C.parchmentFaint,
@@ -150,10 +151,10 @@ const S = StyleSheet.create({
   },
   modeDesc: {
     fontFamily: F.sans,
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.65,
+    lineHeight: 1.5,
     opacity: 0.8,
     marginTop: 4,
   },
@@ -161,7 +162,7 @@ const S = StyleSheet.create({
   // ── Three-step path diagram ───────────────────────────────────────────────
   pathLabel: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.5,
     color: C.parchmentFaint,
@@ -204,13 +205,13 @@ const S = StyleSheet.create({
   },
   pathArrowText: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     color: C.parchmentFaint,
   },
 
   stepNumber: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2,
     color: C.parchmentFaint,
@@ -225,7 +226,7 @@ const S = StyleSheet.create({
   },
   stepPages: {
     fontFamily: F.sans,
-    fontSize: 7.5,
+    fontSize: 8.5,
     fontWeight: 400,
     color: C.parchmentFaint,
     marginTop: 2,
@@ -292,6 +293,8 @@ const MODES = [
 export default function Page3HowTo() {
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
+
 
       {/* Emerald hairline at top */}
       <View style={S.topRule} />

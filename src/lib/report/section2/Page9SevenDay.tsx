@@ -11,12 +11,13 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE, TYPE_EXPERIMENT } from '../tokens';
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
   page: {
-    backgroundColor: '#FAFAF9',
+    backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
   },
@@ -36,7 +37,7 @@ const S = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────────────────────
   sectionTag: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.5,
     color: C.parchmentFaint,
@@ -51,7 +52,7 @@ const S = StyleSheet.create({
   },
   headingPrefix: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 400,
     color: C.parchmentFaint,
     letterSpacing: 0.5,
@@ -65,7 +66,7 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.parchmentFaint,
     marginBottom: 20,
@@ -89,7 +90,7 @@ const S = StyleSheet.create({
   },
   experimentBannerLabel: {
     fontFamily: F.sans,
-    fontSize: 6.5,
+    fontSize: 8,
     fontWeight: 500,
     letterSpacing: 2,
     color: C.parchmentFaint,
@@ -106,10 +107,10 @@ const S = StyleSheet.create({
   // ── Premise ────────────────────────────────────────────────────────────────
   premise: {
     fontFamily: F.sans,
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.7,
+    lineHeight: 1.5,
     opacity: 0.85,
     marginBottom: 20,
   },
@@ -117,7 +118,7 @@ const S = StyleSheet.create({
   // ── Daily check-ins ────────────────────────────────────────────────────────
   checkinsLabel: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.2,
     color: C.parchmentFaint,
@@ -164,17 +165,17 @@ const S = StyleSheet.create({
   checkinText: {
     flex: 1,
     fontFamily: F.sans,
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.6,
+    lineHeight: 1.5,
     opacity: 0.85,
   },
 
   // ── Notes area ─────────────────────────────────────────────────────────────
   notesLabel: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.2,
     color: C.parchmentFaint,
@@ -198,7 +199,7 @@ const S = StyleSheet.create({
   },
   footerNoteText: {
     fontFamily: F.sans,
-    fontSize: 7.5,
+    fontSize: 8.5,
     fontWeight: 300,
     fontStyle: 'italic',
     color: C.parchmentFaint,
@@ -249,6 +250,8 @@ export default function Page9SevenDay({ data }: Props) {
 
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
+
 
       {/* Dark top rule */}
       <View style={[S.topRule]} />

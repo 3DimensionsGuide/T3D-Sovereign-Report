@@ -15,12 +15,13 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE } from '../tokens';
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
   page: {
-    backgroundColor: '#FAFAF9',
+    backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
   },
@@ -43,7 +44,7 @@ const S = StyleSheet.create({
   // ── Section tag ───────────────────────────────────────────────────────────
   sectionTag: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.5,
     color: C.parchmentFaint,
@@ -54,7 +55,7 @@ const S = StyleSheet.create({
   // ── Heading: "A Note to" ─────────────────────────────────────────────────
   headingSmall: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 400,
     letterSpacing: 1.8,
     color: C.parchmentFaint,
@@ -88,7 +89,7 @@ const S = StyleSheet.create({
     fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.75,
+    lineHeight: 1.5,
     marginBottom: 14,
     opacity: 0.85,
   },
@@ -119,7 +120,7 @@ const S = StyleSheet.create({
   },
   instructionLabel: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2,
     color: C.amberDim,
@@ -128,10 +129,10 @@ const S = StyleSheet.create({
   },
   instructionText: {
     fontFamily: F.sans,
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: 400,
     color: C.base,
-    lineHeight: 1.6,
+    lineHeight: 1.5,
   },
 
   // ── Signature block ───────────────────────────────────────────────────────
@@ -141,7 +142,7 @@ const S = StyleSheet.create({
   },
   signatureDash: {
     fontFamily: F.sans,
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.parchmentFaint,
     marginBottom: 2,
@@ -194,6 +195,8 @@ interface Props {
 export default function Page2Note({ data }: Props) {
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
+
 
       {/* Amber hairline at top */}
       <View style={S.topRule} />

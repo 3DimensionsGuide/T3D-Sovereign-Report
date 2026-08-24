@@ -10,12 +10,13 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE, AUTHORITY_PROTOCOL } from '../tokens';
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
   page: {
-    backgroundColor: '#FAFAF9',
+    backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
   },
@@ -35,7 +36,7 @@ const S = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────────────────────
   sectionTag: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.5,
     color: C.parchmentFaint,
@@ -52,10 +53,10 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.parchmentFaint,
-    lineHeight: 1.6,
+    lineHeight: 1.5,
     marginBottom: 24,
     maxWidth: 380,
   },
@@ -97,7 +98,7 @@ const S = StyleSheet.create({
   },
   stepNumber: {
     fontFamily: F.sans,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 500,
     color: C.parchment,
   },
@@ -118,7 +119,7 @@ const S = StyleSheet.create({
   },
   stepSystem: {
     fontFamily: F.sans,
-    fontSize: 6.5,
+    fontSize: 8,
     fontWeight: 500,
     letterSpacing: 2,
     textTransform: 'uppercase',
@@ -149,10 +150,10 @@ const S = StyleSheet.create({
 
   stepInstruction: {
     fontFamily: F.sans,
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.65,
+    lineHeight: 1.5,
     opacity: 0.82,
     marginBottom: 6,
   },
@@ -250,6 +251,8 @@ export default function Page7DecisionProtocol({ data }: Props) {
 
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
+
 
       {/* Dark top rule */}
       <View style={[S.topRule, { opacity: 0.85 }]} />

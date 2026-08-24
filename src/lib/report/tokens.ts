@@ -1,8 +1,12 @@
 /**
- * T3D Report — Shared Design Tokens, Types & Data Helpers
+ * T3D Report — Design Tokens, Types & Calculation Helpers
+ * Updated for Section 4: Road numerology fields
  */
 
-// ─── COLORS ───────────────────────────────────────────────────────────────────
+// DataQualityReport is imported from schema/dataIntegrity
+// and added to ReportData below
+export type { DataQualityReport, BirthTimeCertainty } from './schema/dataIntegrity';
+
 export const C = {
   base:          '#0D0D0E',
   baseSoft:      '#141416',
@@ -23,13 +27,11 @@ export const C = {
   ruleFaint:     '#EDEBE8',
 } as const;
 
-// ─── TYPOGRAPHY ───────────────────────────────────────────────────────────────
 export const F = {
   display: 'Playfair Display',
   sans:    'DM Sans',
 } as const;
 
-// ─── PAGE DIMENSIONS (Letter — 612 × 792 pt) ─────────────────────────────────
 export const PAGE = {
   width:        612,
   height:       792,
@@ -39,13 +41,19 @@ export const PAGE = {
 } as const;
 
 // ─── REPORT DATA TYPE ─────────────────────────────────────────────────────────
+export interface ReportConsent {
+  reportStorageConsented: boolean;
+  emailSequenceConsented: boolean;
+  dataCollectedAt:        string;
+}
+
 export interface ReportData {
   // Personal
-  firstName:    string;
-  lastName:     string;
-  email:        string;
-  birthDate:    string;
-  generatedAt:  string;
+  firstName:   string;
+  lastName:    string;
+  email:       string;
+  birthDate:   string;
+  generatedAt: string;
 
   // Human Design
   hdType:           string;
@@ -56,60 +64,190 @@ export interface ReportData {
   hdDefinedCenters: string[];
   hdChannels:       { name: string; gates: number[]; activatedBy: string }[];
 
-  // Numerology
-  lifePath:      number;
-  destiny:       number;
-  personality:   number;
-  soulUrge:      number;
-  hiddenPassion: number;
-  karmicLessons: number[];
-  personalYear:  number;
-  pinnacles:     { number: number; label: string; startAge: number; endAge: number | null }[];
+  // Numerology — core
+  lifePath:         number;
+  lifePathDisplay:  string;   // e.g., "34/7" — compound/reduced form
+  lifePathCompound: number;   // e.g., 34 — intermediate sum before final reduction
+  destiny:          number;
+  personality:      number;
+  soulUrge:         number;
+  hiddenPassion:    number;
+  karmicLessons:    number[];
+  personalYear:     number;
+  hasFullName:      boolean;  // true if full birth name was provided & calculated
+
+  // Numerology — birthday & attitude
+  birthdayNumber:   number;   // birth day reduced (e.g., 30 → 3)
+  birthdayDisplay:  string;   // compound/reduced (e.g., "30/3")
+  attitudeNumber:   number;   // month + day reduced
+  attitudeDisplay:  string;   // compound/reduced (e.g., "12/3")
+
+  // Numerology — pinnacles & challenges
+  pinnacles:           { number: number; label: string; startAge: number; endAge: number | null }[];
+  currentPinnacleIndex: number;       // 0–3, which pinnacle is active now
+  challenges:          number[];      // [c1, c2, c3, c4]
 
   // Astrology
-  tropicalSun:   string;
-  tropicalMoon:  string;
-  tropicalAsc:   string;
-  tropicalMC:    string;
-  siderealSun:   string;
-  siderealAsc:   string;
+  tropicalSun:  string;
+  tropicalMoon: string;
+  tropicalAsc:  string;
+  tropicalMC:   string;
+  siderealSun:  string;
+  siderealMoon: string;
+  siderealAsc:  string;
+  ayanamsha:    string;   // e.g., "Lahiri" — always named explicitly
 
-  // Extracted signs (for dashboard display)
+  // Extracted signs
   sunSign:    string;
   moonSign:   string;
   risingSign: string;
+  consent:     ReportConsent;
+
+  // Data Quality Report — output of runIntegrityCheck()
+  // Surfaced on Page 43 and Birth-Time Sensitivity notices
+  dataQuality: import('./schema/dataIntegrity').DataQualityReport;
 }
 
-// ─── PERSONAL YEAR CALCULATION ────────────────────────────────────────────────
+// ─── PERSONAL YEAR ────────────────────────────────────────────────────────────
 export function calculatePersonalYear(birthDate: string): number {
   const parts = birthDate.split('-');
   const month = parseInt(parts[1] ?? '1', 10);
   const day   = parseInt(parts[2] ?? '1', 10);
   const currentYear = new Date().getFullYear();
+  function digitSum(n: number): number {
+    return n.toString().split('').reduce((a, b) => a + parseInt(b, 10), 0);
+  }
+  function reduce(n: number): number {
+    if (n === 11 || n === 22 || n === 33) return n;
+    if (n <= 9) return n;
+    return reduce(digitSum(n));
+  }
+  const total = digitSum(month) + digitSum(day) + digitSum(currentYear);
+  return reduce(total);
+}
+
+// ─── COMPOUND LIFE PATH ───────────────────────────────────────────────────────
+export function calculateLifePathFull(birthDate: string): {
+  compound: number; reduced: number; display: string;
+} {
+  const parts = birthDate.split('-');
+  const month = parseInt(parts[1] ?? '1', 10);
+  const day   = parseInt(parts[2] ?? '1', 10);
+  const year  = parseInt(parts[0] ?? '1990', 10);
 
   function digitSum(n: number): number {
     return n.toString().split('').reduce((a, b) => a + parseInt(b, 10), 0);
   }
-
   function reduce(n: number): number {
     if (n === 11 || n === 22 || n === 33) return n;
     if (n <= 9) return n;
     return reduce(digitSum(n));
   }
 
-  const total = digitSum(month) + digitSum(day) + digitSum(currentYear);
-  return reduce(total);
+  const mR = reduce(digitSum(month));
+  const dR = reduce(digitSum(day));
+  const yR = reduce(digitSum(year));
+
+  const compound = mR + dR + yR;
+  const reduced  = reduce(compound);
+  const display  = (compound !== reduced && compound > 9)
+    ? `${compound}/${reduced}`
+    : String(reduced);
+
+  return { compound, reduced, display };
+}
+
+// ─── BIRTHDAY NUMBER ──────────────────────────────────────────────────────────
+export function calculateBirthday(birthDate: string): { number: number; display: string } {
+  const day = parseInt(birthDate.split('-')[2] ?? '1', 10);
+  function digitSum(n: number): number {
+    return n.toString().split('').reduce((a, b) => a + parseInt(b, 10), 0);
+  }
+  function reduce(n: number): number {
+    if (n === 11 || n === 22) return n;
+    if (n <= 9) return n;
+    return reduce(digitSum(n));
+  }
+  const reduced = reduce(day);
+  const display = (day !== reduced && day > 9) ? `${day}/${reduced}` : String(reduced);
+  return { number: reduced, display };
+}
+
+// ─── ATTITUDE NUMBER ──────────────────────────────────────────────────────────
+export function calculateAttitude(birthDate: string): { number: number; display: string } {
+  const parts = birthDate.split('-');
+  const month = parseInt(parts[1] ?? '1', 10);
+  const day   = parseInt(parts[2] ?? '1', 10);
+
+  function digitSum(n: number): number {
+    return n.toString().split('').reduce((a, b) => a + parseInt(b, 10), 0);
+  }
+  function reduce(n: number): number {
+    if (n === 11 || n === 22) return n;
+    if (n <= 9) return n;
+    return reduce(digitSum(n));
+  }
+
+  const mR = digitSum(month);
+  const dR = digitSum(day);
+  const compound = mR + dR;
+  const reduced  = reduce(compound);
+  const display  = (compound !== reduced && compound > 9) ? `${compound}/${reduced}` : String(reduced);
+  return { number: reduced, display };
+}
+
+// ─── CURRENT PINNACLE INDEX ───────────────────────────────────────────────────
+export function getCurrentPinnacleIndex(
+  pinnacles: { startAge: number; endAge: number | null }[],
+  birthDate: string
+): number {
+  const parts = birthDate.split('-');
+  const birthYear = parseInt(parts[0] ?? '1990', 10);
+  const currentAge = new Date().getFullYear() - birthYear;
+
+  for (let i = 0; i < pinnacles.length; i++) {
+    const p = pinnacles[i]!;
+    if (p.endAge === null || currentAge <= p.endAge) return i;
+  }
+  return pinnacles.length - 1;
+}
+
+// ─── CHALLENGES ───────────────────────────────────────────────────────────────
+export function calculateChallenges(birthDate: string): number[] {
+  const parts = birthDate.split('-');
+  const month = parseInt(parts[1] ?? '1', 10);
+  const day   = parseInt(parts[2] ?? '1', 10);
+  const year  = parseInt(parts[0] ?? '1990', 10);
+
+  function digitSum(n: number): number {
+    return n.toString().split('').reduce((a, b) => a + parseInt(b, 10), 0);
+  }
+  function reduce(n: number): number {
+    // Challenges reduce fully (no master numbers preserved)
+    if (n <= 9) return n;
+    return reduce(digitSum(n));
+  }
+
+  const mR = reduce(digitSum(month));
+  const dR = reduce(digitSum(day));
+  const yR = reduce(digitSum(year));
+
+  const c1 = Math.abs(mR - dR);
+  const c2 = Math.abs(dR - yR);
+  const c3 = Math.abs(c1 - c2);
+  const c4 = Math.abs(mR - yR);
+
+  return [c1, c2, c3, c4];
 }
 
 // ─── SIGN EXTRACTOR ───────────────────────────────────────────────────────────
-/** Extracts the sign name from a formatted position string e.g. "7°24' Libra" → "Libra" */
 export function extractSign(formatted: string): string {
   if (!formatted || formatted === '—') return '—';
   const parts = formatted.trim().split(' ');
   return parts[parts.length - 1] ?? '—';
 }
 
-// ─── HD TYPE → SYNTHESIS SENTENCE ────────────────────────────────────────────
+// ─── HD TYPE SYNTHESIS ────────────────────────────────────────────────────────
 const HD_TYPE_SYNTHESIS: Record<string, string> = {
   'Manifesting Generator': 'Built to respond, move fast, and multitask — your power multiplies when you skip steps the gut approves.',
   'Generator':             'Built to respond and sustain — your energy is magnetic when you\'re doing what genuinely lights you up.',
@@ -117,12 +255,11 @@ const HD_TYPE_SYNTHESIS: Record<string, string> = {
   'Manifestor':            'Built to initiate and inform — you move first and bring others into what you\'ve already set in motion.',
   'Reflector':             'Built to sample and reflect the health of your environment — your wisdom deepens across the full lunar cycle.',
 };
-
 export function hdTypeSynthesis(type: string): string {
   return HD_TYPE_SYNTHESIS[type] ?? `As a ${type}, your design carries specific instructions for how to engage with life.`;
 }
 
-// ─── LIFE PATH → SYNTHESIS SENTENCE ──────────────────────────────────────────
+// ─── LIFE PATH SYNTHESIS ─────────────────────────────────────────────────────
 const LIFE_PATH_SYNTHESIS: Record<number, string> = {
   1:  'Yours is a lifetime of self-definition and leadership — you learn through stepping into your own authority.',
   2:  'Yours is a lifetime of partnership and patience — you learn through listening deeply before you act.',
@@ -137,12 +274,11 @@ const LIFE_PATH_SYNTHESIS: Record<number, string> = {
   22: 'Yours is a Master Path of large-scale building — you learn by marrying vision with the discipline to bring it to ground.',
   33: 'Yours is a Master Path of compassionate service — you learn through giving without losing yourself in the giving.',
 };
-
 export function lifePathSynthesis(lifePath: number): string {
   return LIFE_PATH_SYNTHESIS[lifePath] ?? `Your Life Path ${lifePath} carries its own unique teaching.`;
 }
 
-// ─── SUN SIGN → SYNTHESIS SENTENCE ───────────────────────────────────────────
+// ─── SUN SIGN SYNTHESIS ───────────────────────────────────────────────────────
 const SUN_SIGN_SYNTHESIS: Record<string, string> = {
   'Aries':       'You meet the world through initiative and directness — the first to arrive and the first to act.',
   'Taurus':      'You meet the world through steadiness and presence — what you build with care is built to last.',
@@ -157,16 +293,27 @@ const SUN_SIGN_SYNTHESIS: Record<string, string> = {
   'Aquarius':    'You meet the world through innovation and collective vision — you tend to be a version ahead of the room.',
   'Pisces':      'You meet the world through feeling and fluidity — your sensitivity is the instrument, not the obstacle.',
 };
-
 export function sunSignSynthesis(sign: string): string {
   return SUN_SIGN_SYNTHESIS[sign] ?? `Your ${sign} Sun shapes how you meet and engage with the world around you.`;
 }
 
-// ─── AUTHORITY → DECISION STEP TEXT ─────────────────────────────────────────
+// ─── PERSONAL YEAR THEMES ─────────────────────────────────────────────────────
+export const PERSONAL_YEAR_THEMES: Record<number, { title: string; essence: string; themes: string[]; caution: string }> = {
+  1: { title: 'Year of New Beginnings', essence: 'Seeds planted now carry unusual weight. This is a year to define direction, not to harvest it.', themes: ['Self-definition', 'New ventures', 'Independence', 'Clarity of identity'], caution: 'Resist the urge to finish what belongs to last cycle. The energy is for starting, not completing.' },
+  2: { title: 'Year of Patience and Partnership', essence: 'Progress arrives through relationship and cooperation this year — not through solo effort.', themes: ['Partnership', 'Listening', 'Diplomacy', 'Gathering before acting'], caution: 'Avoid forcing timelines. What arrives slowly this year is often more durable.' },
+  3: { title: 'Year of Creative Expression', essence: 'A year when self-expression and social connection carry genuine momentum.', themes: ['Creativity', 'Communication', 'Joy', 'Social expansion'], caution: 'Scattered attention is the risk. Channel the energy into one or two things that matter.' },
+  4: { title: 'Year of Building and Foundation', essence: 'Discipline, structure, and steady work are rewarded this year.', themes: ['Discipline', 'Structure', 'Practicality', 'Long-term investment'], caution: 'Tedium is part of the process. The year rewards patience, not speed.' },
+  5: { title: 'Year of Change and Freedom', essence: 'Movement, release, and new experience define this year.', themes: ['Change', 'Freedom', 'Travel', 'Release', 'Adaptability'], caution: 'Not all change that appears is progress. Discern before releasing what still has value.' },
+  6: { title: 'Year of Responsibility and Home', essence: 'Relationships, home, family, and community take center stage.', themes: ['Relationships', 'Home', 'Service', 'Responsibility', 'Healing'], caution: 'The risk is over-giving. Service that depletes you does not serve anyone well.' },
+  7: { title: 'Year of Reflection and Depth', essence: 'A year for inner work, solitude, and investigation.', themes: ['Solitude', 'Depth', 'Spiritual inquiry', 'Research', 'Inner clarity'], caution: 'Isolation differs from solitude. Stay connected while protecting your inner space.' },
+  8: { title: 'Year of Power and Harvest', essence: 'What you built in previous years now becomes visible.', themes: ['Authority', 'Financial focus', 'Power', 'Harvest', 'Recognition'], caution: 'Force and manipulation block the year\'s natural flow. Power is available; grasping repels it.' },
+  9: { title: 'Year of Completion and Release', essence: 'A nine-year cycle closes.', themes: ['Completion', 'Release', 'Endings', 'Integration', 'Compassion'], caution: 'Do not start major new projects this year. Close, complete, and integrate before the next cycle opens.' },
+  11: { title: 'Master Year of Illumination', essence: 'A year of heightened intuition, spiritual alignment, and unusual clarity.', themes: ['Intuition', 'Spiritual alignment', 'Illumination', 'Inspiration'], caution: 'The intensity of this year is real. Rest and integration are not optional — they are part of the work.' },
+  22: { title: 'Master Year of the Builder', essence: 'A year for large-scale vision and the discipline to bring it to ground.', themes: ['Legacy', 'Mastery', 'Large-scale building', 'Discipline'], caution: 'The scope of this year can be overwhelming. Build the next thing, not all the things.' },
+};
+// ─── AUTHORITY PROTOCOL (used by Page7DecisionProtocol) ──────────────────────
 export const AUTHORITY_PROTOCOL: Record<string, {
-  prompt:    string;
-  instruction: string;
-  signal:    string;
+  prompt: string; instruction: string; signal: string;
 }> = {
   'Sacral': {
     prompt:      'What does your gut say right now?',
@@ -200,11 +347,9 @@ export const AUTHORITY_PROTOCOL: Record<string, {
   },
 };
 
-// ─── HD TYPE → EXPERIMENT ────────────────────────────────────────────────────
+// ─── TYPE EXPERIMENT (used by Page9SevenDay) ──────────────────────────────────
 export const TYPE_EXPERIMENT: Record<string, {
-  title:       string;
-  premise:     string;
-  checkins:    string[];
+  title: string; premise: string; checkins: string[];
 }> = {
   'Manifesting Generator': {
     title:   'The Response Experiment',
@@ -217,7 +362,7 @@ export const TYPE_EXPERIMENT: Record<string, {
   },
   'Generator': {
     title:   'The Response Experiment',
-    premise: 'For seven days, commit to responding rather than initiating. Each time something appears in your environment — an opportunity, a question, a request — notice your Sacral response before your mind has a chance to override it. A full yes is different from a polite yes.',
+    premise: 'For seven days, commit to responding rather than initiating. Each time something appears in your environment — an opportunity, a question, a request — notice your Sacral response before your mind has a chance to override it.',
     checkins: [
       'Morning: What am I being invited to respond to today?',
       'Midday: Did I say yes from genuine enthusiasm, or from obligation?',
@@ -226,7 +371,7 @@ export const TYPE_EXPERIMENT: Record<string, {
   },
   'Projector': {
     title:   'The Recognition Experiment',
-    premise: 'For seven days, practice waiting for genuine recognition before offering your insight — even casually. Notice how often you reach to share before being asked. Notice what happens when you hold the insight until invited. This is not withholding. It is correct timing.',
+    premise: 'For seven days, practice waiting for genuine recognition before offering your insight — even casually. Notice how often you reach to share before being asked. Notice what happens when you hold the insight until invited.',
     checkins: [
       'Morning: Where might I be invited to guide today?',
       'Midday: Did I offer unsolicited advice? How was it received?',
@@ -235,7 +380,7 @@ export const TYPE_EXPERIMENT: Record<string, {
   },
   'Manifestor': {
     title:   'The Inform Experiment',
-    premise: 'For seven days, practice informing the people who will be affected by your actions before you take them — not to ask permission, but to remove resistance. Notice the difference in how decisions land when others are brought along versus surprised.',
+    premise: 'For seven days, practice informing the people who will be affected by your actions before you take them — not to ask permission, but to remove resistance.',
     checkins: [
       'Morning: What am I planning to initiate today? Who needs to know?',
       'Midday: Where did I move without informing? What was the result?',
@@ -244,86 +389,11 @@ export const TYPE_EXPERIMENT: Record<string, {
   },
   'Reflector': {
     title:   'The Environment Experiment',
-    premise: 'For seven days, pay close attention to how different environments, people, and spaces affect your energy, clarity, and sense of self. You are designed to sample and reflect — your clearest data about any situation comes from your felt sense across time and context.',
+    premise: 'For seven days, pay close attention to how different environments, people, and spaces affect your energy, clarity, and sense of self.',
     checkins: [
       'Morning: What environment am I moving into today, and how does it feel?',
       'Midday: What am I amplifying or reflecting from the people around me?',
       'Evening: Where did I feel most like myself today? Least like myself?',
     ],
-  },
-};
-
-// ─── PERSONAL YEAR THEMES ─────────────────────────────────────────────────────
-export const PERSONAL_YEAR_THEMES: Record<number, {
-  title:   string;
-  essence: string;
-  themes:  string[];
-  caution: string;
-}> = {
-  1: {
-    title:   'Year of New Beginnings',
-    essence: 'Seeds planted now carry unusual weight. This is a year to define direction, not to harvest it.',
-    themes:  ['Self-definition', 'New ventures', 'Independence', 'Clarity of identity'],
-    caution: 'Resist the urge to finish what belongs to last cycle. The energy is for starting, not completing.',
-  },
-  2: {
-    title:   'Year of Patience and Partnership',
-    essence: 'Progress arrives through relationship and cooperation this year — not through solo effort.',
-    themes:  ['Partnership', 'Listening', 'Diplomacy', 'Gathering before acting'],
-    caution: 'Avoid forcing timelines. What arrives slowly this year is often more durable.',
-  },
-  3: {
-    title:   'Year of Creative Expression',
-    essence: 'A year when self-expression and social connection carry genuine momentum.',
-    themes:  ['Creativity', 'Communication', 'Joy', 'Social expansion'],
-    caution: 'Scattered attention is the risk. Channel the energy into one or two things that matter.',
-  },
-  4: {
-    title:   'Year of Building and Foundation',
-    essence: 'Discipline, structure, and steady work are rewarded this year. The foundation you build now supports what comes in years 5 through 9.',
-    themes:  ['Discipline', 'Structure', 'Practicality', 'Long-term investment'],
-    caution: 'Tedium is part of the process. The year rewards patience, not speed.',
-  },
-  5: {
-    title:   'Year of Change and Freedom',
-    essence: 'Movement, release, and new experience define this year. What no longer fits will make itself obvious.',
-    themes:  ['Change', 'Freedom', 'Travel', 'Release', 'Adaptability'],
-    caution: 'Not all change that appears is progress. Discern before releasing what still has value.',
-  },
-  6: {
-    title:   'Year of Responsibility and Home',
-    essence: 'Relationships, home, family, and community take center stage. Giving and receiving care are both part of the lesson.',
-    themes:  ['Relationships', 'Home', 'Service', 'Responsibility', 'Healing'],
-    caution: 'The risk is over-giving. Service that depletes you does not serve anyone well.',
-  },
-  7: {
-    title:   'Year of Reflection and Depth',
-    essence: 'A year for inner work, solitude, and investigation. Clarity arrives through reflection, not through action.',
-    themes:  ['Solitude', 'Depth', 'Spiritual inquiry', 'Research', 'Inner clarity'],
-    caution: 'Isolation differs from solitude. Stay connected while protecting your inner space.',
-  },
-  8: {
-    title:   'Year of Power and Harvest',
-    essence: 'What you built in previous years now becomes visible. Authority, abundance, and recognition are available — if claimed.',
-    themes:  ['Authority', 'Financial focus', 'Power', 'Harvest', 'Recognition'],
-    caution: 'Force and manipulation block the year\'s natural flow. Power is available; grasping repels it.',
-  },
-  9: {
-    title:   'Year of Completion and Release',
-    essence: 'A nine-year cycle closes. What no longer serves — relationships, projects, identities — is ready to be released.',
-    themes:  ['Completion', 'Release', 'Endings', 'Integration', 'Compassion'],
-    caution: 'Do not start major new projects this year. Close, complete, and integrate before the next cycle opens.',
-  },
-  11: {
-    title:   'Master Year of Illumination',
-    essence: 'A year of heightened intuition, spiritual alignment, and unusual clarity. The insights arriving this year carry long-term significance.',
-    themes:  ['Intuition', 'Spiritual alignment', 'Illumination', 'Inspiration'],
-    caution: 'The intensity of this year is real. Rest and integration are not optional — they are part of the work.',
-  },
-  22: {
-    title:   'Master Year of the Builder',
-    essence: 'A year for large-scale vision and the discipline to bring it to ground. What you build this year can outlast you.',
-    themes:  ['Legacy', 'Mastery', 'Large-scale building', 'Discipline'],
-    caution: 'The scope of this year can be overwhelming. Build the next thing, not all the things.',
   },
 };

@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
+import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE } from '../tokens';
 import type { ReportData } from '../tokens';
 
@@ -71,7 +72,7 @@ const S = StyleSheet.create({
   },
   classificationText: {
     fontFamily: F.sans,
-    fontSize: 7,
+    fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 2.8,
     color: C.parchmentFaint,
@@ -82,7 +83,7 @@ const S = StyleSheet.create({
   // Large but not enormous. The name should feel private, not branded.
   firstName: {
     fontFamily: F.display,
-    fontSize: 64,
+    fontSize: 38,
     fontWeight: 400,
     color: C.parchment,
     lineHeight: 1.0,
@@ -129,7 +130,7 @@ const S = StyleSheet.create({
   },
   triadLabel: {
     fontFamily: F.sans,
-    fontSize: 6.5,
+    fontSize: 8,
     fontWeight: 400,
     letterSpacing: 1.8,
     color: C.parchmentFaint,
@@ -165,7 +166,7 @@ const S = StyleSheet.create({
   },
   t3dMark: {
     fontFamily: F.display,
-    fontSize: 9,
+    fontSize: 10.5,
     fontWeight: 400,
     color: C.parchmentFaint,
     letterSpacing: 1.6,
@@ -173,7 +174,7 @@ const S = StyleSheet.create({
   },
   pageRef: {
     fontFamily: F.sans,
-    fontSize: 6.5,
+    fontSize: 8,
     fontWeight: 400,
     color: C.parchmentFaint,
     letterSpacing: 1.5,
@@ -194,6 +195,8 @@ export default function Page1Cover({ data }: Props) {
 
   return (
     <Page size="LETTER" style={S.page}>
+      <TechnicalLines variant="dark" />
+
 
       {/* Three hairline triad rules — full width */}
       <View style={S.rulesRow}>
@@ -218,7 +221,7 @@ export default function Page1Cover({ data }: Props) {
         <View style={S.nameRule} />
 
         {/* Report title */}
-        <Text style={S.reportTitle}>The Sovereign Report</Text>
+        <Text style={S.reportTitle}>The T3D Sovereign Report</Text>
 
         {/* Three dimension labels */}
         <View style={S.triadRow}>

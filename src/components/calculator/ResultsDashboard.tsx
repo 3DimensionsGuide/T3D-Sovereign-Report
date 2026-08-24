@@ -90,9 +90,7 @@ function ResultCard({
     <article
       className={`results-card t3d-card ${flashClass}`}
       style={{
-        paddingLeft: 20,  // left border is handled by flash animation
-        padding: 'clamp(24px,3vw,36px)',
-        padding: 'clamp(24px,3vw,36px) clamp(24px,3vw,36px) clamp(24px,3vw,36px) 20px',
+        padding: 'clamp(24px,3vw,36px) clamp(24px,3vw,36px) clamp(24px,3vw,36px) 20px',  // left pinned at 20px; border handled by flash animation
         animationDelay: `${index * 80}ms`,
         position: 'relative',
       }}

@@ -1,27 +1,30 @@
 /**
  * GET /api/generate-report?leadId=123
  *
- * Generates the T3D Sovereign Report PDF for a given lead.
- * Looks up calculation results from the database,
- * builds the PDF using @react-pdf/renderer, and returns it
- * as a downloadable PDF.
+ * Pipeline:
+ *   1. Fetch raw lead record
+ *   2. buildReportData()   → normalize + validate → clean ReportData
+ *   3. generateSynthesis() → T3D Signature paragraph (API or fallback)
+ *   4. SovereignReport()   → PDF render
  *
- * SKIP_PURCHASE_CHECK=true in .env.local bypasses the purchase check for testing.
+ * The synthesis paragraph is generated in parallel with any other
+ * pre-render work to minimize added latency.
  */
 
 import React from 'react';
-import { NextResponse } from 'next/server';
+import { NextResponse }   from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
-import { db }    from '@/server/db';
-import { leads } from '@/server/db/schema';
-import { eq }    from 'drizzle-orm';
+import { db }             from '@/server/db';
+import { leads }          from '@/server/db/schema';
+import { eq }             from 'drizzle-orm';
 
-import { registerFonts }          from '@/lib/report/fonts';
-import { SovereignReport }        from '@/lib/report/SovereignReport';
-import { calculatePersonalYear, extractSign } from '@/lib/report/tokens';
-import type { ReportData }        from '@/lib/report/tokens';
+import { registerFonts }     from '@/lib/report/fonts';
+import { SovereignReport }   from '@/lib/report/SovereignReport';
+import { buildReportData }   from '@/lib/report/schema/buildReportData';
+import { runQAChecklist, formatQAReport } from '@/lib/report/schema/qaChecklist';
+import { generateStoplightSynthesis } from '@/lib/report/schema/stoplightSynthesis';
+import { generateSynthesis } from '@/lib/report/schema/synthesisEngine';
 
-// Register fonts once on module load
 registerFonts();
 
 export async function GET(request: Request) {
@@ -29,11 +32,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const leadId = searchParams.get('leadId');
 
-    if (!leadId) {
-      return NextResponse.json({ error: 'leadId is required.' }, { status: 400 });
+    if (!leadId || isNaN(parseInt(leadId, 10))) {
+      return NextResponse.json({ error: 'leadId must be a valid integer.' }, { status: 400 });
     }
 
-    // ── Look up lead ───────────────────────────────────────────────────────
+    // ── 1. Fetch raw lead record ───────────────────────────────────────────
     const rows = await db
       .select()
       .from(leads)
@@ -42,123 +45,88 @@ export async function GET(request: Request) {
 
     const lead = rows[0];
     if (!lead) {
-      return NextResponse.json({ error: 'Lead not found.' }, { status: 404 });
+      return NextResponse.json({ error: `Lead ${leadId} not found.` }, { status: 404 });
     }
 
-    // ── Purchase check ─────────────────────────────────────────────────────
     const skipCheck = process.env.SKIP_PURCHASE_CHECK === 'true';
     if (!skipCheck && !lead.reportPurchased) {
-      return NextResponse.json(
-        { error: 'Report not purchased for this lead.' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Report not purchased.' }, { status: 403 });
     }
 
-    // ── Extract stored results ─────────────────────────────────────────────
-    const results = lead.results as {
-      astrology:   Record<string, unknown>;
-      numerology:  Record<string, unknown>;
-      humanDesign: Record<string, unknown>;
-    } | null;
-
-    const hd  = (results?.humanDesign  ?? {}) as Record<string, unknown>;
-    const num = (results?.numerology   ?? {}) as Record<string, unknown>;
-    const ast = (results?.astrology    ?? {}) as Record<string, unknown>;
-
-    // ── Astrology formatters ───────────────────────────────────────────────
-    function fmtPlanet(planet: unknown): string {
-      const obj = planet as { formatted?: string } | null;
-      return obj?.formatted ?? '—';
-    }
-
-    const tropSun  = fmtPlanet(ast.tropicalSun);
-    const tropMoon = fmtPlanet(ast.tropicalMoon);
-    const tropAsc  = typeof ast.tropicalAscendant === 'number'
-      ? String(Math.floor(ast.tropicalAscendant)) + '°'
-      : '—';
-
-    // ── Birth date from stored birth data ──────────────────────────────────
-    const birthData = lead.birthData as { date?: string } | null;
-    const birthDate = birthData?.date ?? '';
-
-    // ── Personal Year ──────────────────────────────────────────────────────
-    const personalYear = birthDate
-      ? calculatePersonalYear(birthDate)
-      : 1;
-
-    // ── Extract sun/moon/rising signs ─────────────────────────────────────
-    const sunSign    = extractSign(tropSun);
-    const moonSign   = extractSign(tropMoon);
-    const risingSign = extractSign(tropAsc);
-
-    // ── Build ReportData ───────────────────────────────────────────────────
-    const reportData: ReportData = {
-      // Personal
-      firstName:   lead.firstName ?? '',
-      lastName:    lead.lastName  ?? '',
-      email:       lead.email     ?? '',
-      birthDate,
-      generatedAt: new Date().toISOString(),
-
-      // Human Design
-      hdType:           String(hd.type      ?? 'Unknown'),
-      hdAuthority:      String(hd.authority ?? 'Unknown'),
-      hdProfile:        String(hd.profile   ?? '—'),
-      hdStrategy:       String(hd.strategy  ?? '—'),
-      hdNotSelf:        String(hd.notSelf   ?? '—'),
-      hdDefinedCenters: (hd.definedCenters  as string[]) ?? [],
-      hdChannels:       (hd.activeChannels  as ReportData['hdChannels']) ?? [],
-
-      // Numerology
-      lifePath:      Number(num.lifePath      ?? 1),
-      destiny:       Number(num.destiny       ?? 1),
-      personality:   Number(num.personality   ?? 1),
-      soulUrge:      Number(num.soulUrge      ?? 1),
-      hiddenPassion: Number(num.hiddenPassion  ?? 1),
-      karmicLessons: (num.karmicLessons       as number[]) ?? [],
-      personalYear,
-      pinnacles:     (num.pinnacles           as ReportData['pinnacles']) ?? [],
-
-      // Astrology — formatted positions
-      tropicalSun:   tropSun,
-      tropicalMoon:  tropMoon,
-      tropicalAsc:   tropAsc,
-      tropicalMC:    typeof ast.tropicalMC === 'number'
-        ? String(Math.floor(ast.tropicalMC)) + '°'
-        : '—',
-      siderealSun:   fmtPlanet(ast.siderealSun),
-      siderealAsc:   typeof ast.siderealAscendant === 'number'
-        ? String(Math.floor(ast.siderealAscendant)) + '°'
-        : '—',
-
-      // Extracted signs
-      sunSign,
-      moonSign,
-      risingSign,
-    };
-
-    // ── Generate PDF ───────────────────────────────────────────────────────
-    const pdfBuffer = await renderToBuffer(
-      React.createElement(SovereignReport, { data: reportData })
+    // ── 2. Normalize and validate ─────────────────────────────────────────
+    const reportData = buildReportData(
+      lead as Parameters<typeof buildReportData>[0]
     );
 
-    // ── Return downloadable PDF ────────────────────────────────────────────
-    const filename = `T3D-Sovereign-Report-${reportData.firstName}-${reportData.lastName}.pdf`
-      .replace(/\s+/g, '-');
+    // ── 3. Generate T3D Signature synthesis ───────────────────────────────
+    // Runs before render — 20s timeout, falls back to template if needed.
+    const synthesis = await generateSynthesis(reportData);
 
-    return new NextResponse(pdfBuffer, {
+    // ── 3b. Generate Stoplight synthesis (six-placement, for Page 30) ──────
+    const stoplightSynth = await generateStoplightSynthesis(
+      { ...reportData, siderealMoon: (reportData as any).siderealMoon } as Parameters<typeof generateStoplightSynthesis>[0]
+    );
+    console.log(`[Report ${leadId}] Stoplight: ${stoplightSynth.wordCount}w via ${stoplightSynth.source}`);
+
+    // Attach synthesis to report data
+    const reportDataWithSynthesis = {
+      ...reportData,
+      synthesis:          synthesis.text,
+      synthesisSource:    synthesis.source,
+      stoplightSynthesis: stoplightSynth,
+    };
+
+    console.log(
+      `[Report ${leadId}] Synthesis: ${synthesis.wordCount}w via ${synthesis.source}` +
+      (synthesis.valid ? '' : ' (validation warnings)')
+    );
+
+
+    // ── 4. Run QA checklist ───────────────────────────────────────────────
+    const qaReport = runQAChecklist(reportDataWithSynthesis as any);
+    console.log(formatQAReport(qaReport));
+    if (!qaReport.passed) {
+      console.error('[QA] Critical failures detected — review before delivery');
+      // Non-blocking in production: report generates with warnings logged
+      // To block on failure, uncomment:
+      // return NextResponse.json({ error: 'Report failed QA checks.', issues: qaReport.blockingIssues }, { status: 422 });
+    }
+
+    // ── 5. Render PDF ─────────────────────────────────────────────────────
+    const pdfBuffer = await renderToBuffer(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      React.createElement(SovereignReport, { data: reportDataWithSynthesis }) as any
+    );
+
+    // ── 5. Return downloadable PDF ────────────────────────────────────────
+    const safeName = `${reportData.firstName}-${reportData.lastName}`
+      .replace(/[^a-zA-Z0-9-]/g, '-')
+      .replace(/-+/g, '-');
+    const filename = `T3D-Sovereign-Report-${safeName}.pdf`;
+
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
-        'Content-Type':        'application/pdf',
-        'Content-Disposition': `attachment; filename="${filename}"`,
-        'Content-Length':      String(pdfBuffer.length),
-        'Cache-Control':       'no-store',
+        'Content-Type':              'application/pdf',
+        'Content-Disposition':       `attachment; filename="${filename}"`,
+        'Content-Length':            String(pdfBuffer.length),
+        'Cache-Control':             'no-store',
+        'X-Synthesis-Source':        synthesis.source,
+        'X-Synthesis-Words':         String(synthesis.wordCount),
       },
     });
 
   } catch (error: unknown) {
-    console.error('[Report Generation Error]', error);
     const message = error instanceof Error ? error.message : 'Report generation failed.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[Report] Error:', message);
+    return NextResponse.json(
+      {
+        error:   message.includes('buildReportData')
+          ? 'Report data is incomplete or invalid.'
+          : 'Report generation failed.',
+        details: process.env.NODE_ENV === 'development' ? message : undefined,
+      },
+      { status: message.includes('buildReportData') ? 422 : 500 }
+    );
   }
 }
