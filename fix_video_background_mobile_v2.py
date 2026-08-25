@@ -1,4 +1,36 @@
-'use client';
+#!/usr/bin/env python3
+"""
+T3D Mobile Video Autoplay Fix (v2)
+=====================================
+The v1 fix called .play() immediately on mount — but on a mobile
+network, the video's actual data may not have downloaded yet at that
+exact moment, so the play attempt can fail simply because there's
+nothing to play, independent of any autoplay policy. That attempt was
+never retried.
+
+This version keeps the original mount-time attempt (harmless, may
+succeed on fast connections) and ADDS listeners for 'loadedmetadata'
+and 'canplay' that also attempt playback once the browser confirms it
+actually has data — giving the video multiple real chances to start
+once it's genuinely ready, rather than one single early attempt.
+
+Also adds preload="auto" to encourage the browser to fetch video data
+sooner rather than waiting.
+
+Run from project root:
+  python3 fix_video_background_mobile_v2.py
+"""
+
+import os, sys
+
+PROJECT_ROOT = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser(
+    '~/Developer/3dimensions.guide'
+)
+path = os.path.join(
+    PROJECT_ROOT, 'src', 'components', 'VideoBackground.tsx'
+)
+
+NEW_CONTENT = """'use client';
 
 /**
  * VideoBackground
@@ -106,3 +138,14 @@ export default function VideoBackground() {
     </>
   );
 }
+"""
+
+with open(path, 'w') as f:
+    f.write(NEW_CONTENT)
+
+print('✓ VideoBackground.tsx updated with retry-on-data-ready logic')
+print()
+print('─' * 56)
+print('Restart: rm -rf .next && npm run dev')
+print('Then: npm run build, commit, push, and test on your phone again')
+print('AFTER checking the two device settings mentioned in chat.')
