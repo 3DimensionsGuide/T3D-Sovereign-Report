@@ -1,4 +1,50 @@
-'use client';
+#!/usr/bin/env python3
+"""
+T3D Mobile Video Autoplay Fix
+================================
+The background video worked on desktop but not mobile — the classic
+signature of a React/SSR autoplay timing bug.
+
+Root cause: in server-rendered React apps, the `muted` JSX attribute
+doesn't always make it into the actual initial HTML sent to the
+browser — React can instead set it as a live JS property only after
+the page hydrates on the client. iOS Safari (and often mobile Chrome)
+checks whether a video is genuinely muted at the exact moment it
+decides whether to allow autoplay, and that check can happen before
+hydration finishes setting `.muted = true`. Once blocked, it doesn't
+retry. Desktop browsers are far more lenient about this timing gap,
+which is exactly why it worked there and not on mobile.
+
+Fix: attach a ref to the video element and, in a useEffect, explicitly
+set videoRef.current.muted = true and call videoRef.current.play()
+right after mount — this guarantees correct muted state before
+attempting playback, regardless of any SSR/hydration timing.
+
+Also adds the legacy `webkit-playsinline` attribute as a defensive
+addition for older iOS Safari versions that predate the standard
+`playsInline` prop.
+
+This REPLACES the entire VideoBackground.tsx file content — it's short
+enough that a full rewrite is cleaner and safer than a partial patch.
+
+Run from project root:
+  python3 fix_video_background_mobile.py
+"""
+
+import os, sys
+
+PROJECT_ROOT = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser(
+    '~/Developer/3dimensions.guide'
+)
+path = os.path.join(
+    PROJECT_ROOT, 'src', 'components', 'VideoBackground.tsx'
+)
+
+if not os.path.exists(path):
+    print(f'ERROR: File not found at {path}')
+    sys.exit(1)
+
+NEW_CONTENT = """'use client';
 
 /**
  * VideoBackground
@@ -101,3 +147,15 @@ export default function VideoBackground() {
     </>
   );
 }
+"""
+
+with open(path, 'w') as f:
+    f.write(NEW_CONTENT)
+
+print('✓ VideoBackground.tsx rewritten with mobile autoplay fix')
+print()
+print('─' * 56)
+print('Restart: rm -rf .next && npm run dev')
+print('Test on your actual phone (not just desktop responsive mode)')
+print('after this deploys — desktop dev tools cannot reproduce this')
+print('exact bug since it is specific to real mobile Safari behavior.')
