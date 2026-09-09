@@ -154,7 +154,7 @@ export default function HomePage() {
               justifyContent: isMobile ? 'center' : 'flex-start',
             }}>
               <Image
-                src="/logos/T3D_seal_hero.png"
+                src="/logos/T3D_seal_translucent.png"
                 alt="The 3 Dimensions — Align Your Vehicle. Follow Your Road. Obey The Signals."
                 width={420} height={420}
                 priority
