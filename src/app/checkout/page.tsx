@@ -64,10 +64,10 @@ const APPEARANCE = {
 
 // ─── What's included ──────────────────────────────────────────────────────────
 const INCLUDES = [
-  { label: '[HD.FULL]',  text: 'Complete Human Design Bodygraph — all 9 centers, 36 channels, 64 gates' },
-  { label: '[NUM.FULL]', text: 'Full Numerology Blueprint — life path, expression, soul urge, all pinnacles' },
-  { label: '[AST.FULL]', text: '12-Month Transit Calendar — go, caution, and stop windows mapped to your chart' },
-  { label: '[INT.FULL]', text: 'Integrated Navigation Guide — how all three dimensions read together' },
+  { label: '[VEHICLE]',   text: 'Human Design — your Type, Strategy, Authority, and Profile, plus the centers that shape how you make decisions.' },
+  { label: '[ROAD]',      text: 'Numerology — your Life Path, current Pinnacle, Challenges, and (with your full name) your complete name-based blueprint.' },
+  { label: '[STOPLIGHT]', text: 'Dual-Zodiac Astrology — your Tropical and Sidereal Big Three, read together as two complementary lenses on the same chart.' },
+  { label: '[SYNTHESIS]', text: 'A synthesis written specifically for your exact configuration, plus a printable Sovereign Navigation Card for quick reference.' },
 ] as const;
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
@@ -187,7 +187,7 @@ export default function CheckoutPage() {
             <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 12 }}>
               [CHECKOUT] — SOVEREIGN REPORT
             </p>
-            <h1 className="t3d-h2">Unlock your full 100-page report.</h1>
+            <h1 className="t3d-h2">Unlock your full 44-page report.</h1>
           </div>
 
           <div className="t3d-divider" style={{ marginBottom: 'clamp(32px,5vh,52px)' }} />
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
                     T3D Sovereign Report
                   </p>
                   <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginTop: 4 }}>
-                    100 PAGES · INSTANT DELIVERY · ONE-TIME
+                    44 PAGES · INSTANT DELIVERY · ONE-TIME
                   </p>
                 </div>
                 <span style={{
