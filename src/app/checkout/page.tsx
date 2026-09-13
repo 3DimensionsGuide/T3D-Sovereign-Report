@@ -71,7 +71,7 @@ const INCLUDES = [
 ] as const;
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
-function CheckoutForm({ email }: { email: string }) {
+function CheckoutForm({ email, leadId }: { email: string; leadId: number | null }) {
   const stripe   = useStripe();
   const elements = useElements();
   const [busy,  setBusy]  = useState(false);
@@ -83,7 +83,7 @@ function CheckoutForm({ email }: { email: string }) {
     setBusy(true);
     setError('');
 
-    const returnUrl = window.location.origin + '/report';
+    const returnUrl = `${window.location.origin}/report?leadId=${leadId ?? ''}`;
 
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
@@ -334,7 +334,7 @@ export default function CheckoutPage() {
                     stripe={stripePromise}
                     options={{ clientSecret, ...APPEARANCE }}
                   >
-                    <CheckoutForm email={email} />
+                    <CheckoutForm email={email} leadId={leadId} />
                   </Elements>
                 )}
               </div>

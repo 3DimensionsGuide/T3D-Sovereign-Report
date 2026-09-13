@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
       // Stripe sends a receipt email automatically when provided
       receipt_email: email || undefined,
-      description:   'T3D Sovereign Report — Complete Natal Analysis (100 pages)',
+      description:   'T3D Sovereign Report — Complete Natal Analysis (44 pages)',
 
       automatic_payment_methods: { enabled: true },
     });
