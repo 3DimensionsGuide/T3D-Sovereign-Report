@@ -1,17 +1,22 @@
 'use client';
 
 /**
- * T3D Checkout Page — /checkout
- * Price: $44.00
+ * T3D Checkout Page — /checkout?product=<slug>
+ *
+ * Product-agnostic: defaults to the Sovereign Report ('sovereign-report')
+ * when no ?product= param is present, so existing links keep working.
+ * Name/price/description come back from /api/stripe/create-payment-intent
+ * (looked up server-side by product slug) rather than being hardcoded here.
  *
  * Flow:
  *   1. Page mounts → reads email from localStorage (saved by calculator)
- *   2. Calls /api/stripe/create-payment-intent → gets clientSecret
+ *   2. Calls /api/stripe/create-payment-intent → gets clientSecret + product info
  *   3. Stripe Elements renders the payment form
  *   4. User pays → Stripe redirects to /report on success
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
@@ -62,6 +67,14 @@ const APPEARANCE = {
   },
 };
 
+// ─── Product info returned by /api/stripe/create-payment-intent ──────────────
+interface ProductInfo {
+  slug:        string;
+  name:        string;
+  description: string;
+  priceCents:  number;
+}
+
 // ─── What's included ──────────────────────────────────────────────────────────
 const INCLUDES = [
   { label: '[VEHICLE]',   text: 'Human Design — your Type, Strategy, Authority, and Profile, plus the centers that shape how you make decisions.' },
@@ -71,7 +84,7 @@ const INCLUDES = [
 ] as const;
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
-function CheckoutForm({ email, leadId }: { email: string; leadId: number | null }) {
+function CheckoutForm({ email, leadId, priceLabel }: { email: string; leadId: number | null; priceLabel: string }) {
   const stripe   = useStripe();
   const elements = useElements();
   const [busy,  setBusy]  = useState(false);
@@ -120,7 +133,7 @@ function CheckoutForm({ email, leadId }: { email: string; leadId: number | null 
         className="t3d-cta"
         style={{ opacity: busy ? 0.65 : 1, cursor: busy ? 'not-allowed' : 'pointer' }}
       >
-        {busy ? 'PROCESSING…' : 'PAY $44 — UNLOCK MY REPORT'}
+        {busy ? 'PROCESSING…' : `PAY ${priceLabel} — UNLOCK MY REPORT`}
       </button>
 
       <p className="t3d-label" style={{ textAlign: 'center', color: 'var(--parchment-40)' }}>
@@ -131,14 +144,33 @@ function CheckoutForm({ email, leadId }: { email: string; leadId: number | null 
 }
 
 // ─── Main checkout page ────────────────────────────────────────────────────────
+// useSearchParams() requires a Suspense boundary in the App Router, or the
+// whole route silently deopts to client-only rendering — so the actual page
+// body lives in CheckoutPageInner and this just wraps it.
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckoutPageInner />
+    </Suspense>
+  );
+}
+
+function CheckoutPageInner() {
   const { results } = useT3DStore();
   const leadId = results?.leadId ?? null;
+
+  const searchParams = useSearchParams();
+  const productSlug   = searchParams.get('product') || 'sovereign-report';
 
   const [clientSecret, setClientSecret] = useState('');
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
   const [email,        setEmail]        = useState('');
+  const [product,      setProduct]      = useState<ProductInfo | null>(null);
+
+  const priceDollars = Math.round((product?.priceCents ?? 4400) / 100);
+  const priceLabel   = `$${priceDollars}`;
+  const productName  = product?.name ?? 'Sovereign Report';
 
   useEffect(() => {
     // Read from localStorage inside useEffect — localStorage is unavailable during SSR
@@ -155,6 +187,7 @@ export default function CheckoutPage() {
             leadId,
             email: savedEmail,
             name:  savedName,
+            productSlug,
           }),
         });
         const data = await res.json();
@@ -162,6 +195,7 @@ export default function CheckoutPage() {
           throw new Error(data.error ?? 'Failed to initialize checkout.');
         }
         setClientSecret(data.clientSecret);
+        if (data.product) setProduct(data.product as ProductInfo);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong.');
       } finally {
@@ -170,7 +204,7 @@ export default function CheckoutPage() {
     }
 
     createIntent();
-  }, [leadId]);
+  }, [leadId, productSlug]);
 
   return (
     <>
@@ -185,9 +219,13 @@ export default function CheckoutPage() {
           {/* Page header */}
           <div style={{ marginBottom: 'clamp(32px,5vh,52px)' }}>
             <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 12 }}>
-              [CHECKOUT] — SOVEREIGN REPORT
+              [CHECKOUT] — {productName.toUpperCase()}
             </p>
-            <h1 className="t3d-h2">Unlock your full 40+ page report.</h1>
+            <h1 className="t3d-h2">
+              {productSlug === 'sovereign-report'
+                ? 'Unlock your full 40+ page report.'
+                : `Unlock your ${productName}.`}
+            </h1>
           </div>
 
           <div className="t3d-divider" style={{ marginBottom: 'clamp(32px,5vh,52px)' }} />
@@ -223,10 +261,12 @@ export default function CheckoutPage() {
                     color: 'var(--parchment)',
                     fontWeight: 400,
                   }}>
-                    T3D Sovereign Report
+                    T3D {productName}
                   </p>
                   <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginTop: 4 }}>
-                    40+ PAGES · INSTANT DELIVERY · ONE-TIME
+                    {productSlug === 'sovereign-report'
+                      ? '40+ PAGES · INSTANT DELIVERY · ONE-TIME'
+                      : 'INSTANT DELIVERY · ONE-TIME'}
                   </p>
                 </div>
                 <span style={{
@@ -235,7 +275,7 @@ export default function CheckoutPage() {
                   color: 'var(--amber)',
                   fontWeight: 400,
                 }}>
-                  $44
+                  {priceLabel}
                 </span>
               </div>
 
@@ -334,7 +374,7 @@ export default function CheckoutPage() {
                     stripe={stripePromise}
                     options={{ clientSecret, ...APPEARANCE }}
                   >
-                    <CheckoutForm email={email} leadId={leadId} />
+                    <CheckoutForm email={email} leadId={leadId} priceLabel={priceLabel} />
                   </Elements>
                 )}
               </div>

@@ -1,118 +1,95 @@
 /**
- * GET /api/generate-report?leadId=123
+ * GET /api/generate-report?orderId=123
+ * GET /api/generate-report?leadId=123   (legacy — pre-orders-table links)
  *
- * Pipeline:
- *   1. Fetch raw lead record
- *   2. buildReportData()   → normalize + validate → clean ReportData
- *   3. generateSynthesis() → T3D Signature paragraph (API or fallback)
- *   4. SovereignReport()   → PDF render
- *
- * The synthesis paragraph is generated in parallel with any other
- * pre-render work to minimize added latency.
+ * Looks up which product was purchased (via the order, or via the legacy
+ * leads.reportPurchased flag for links generated before the orders table
+ * existed) and generates that product's deliverable through the registry.
+ * Product-agnostic: this route never imports a specific report component.
  */
 
-import React from 'react';
 import { NextResponse }   from 'next/server';
-import { renderToBuffer } from '@react-pdf/renderer';
 import { db }             from '@/server/db';
 import { leads }          from '@/server/db/schema';
-import { eq }             from 'drizzle-orm';
+import { eq }              from 'drizzle-orm';
 
-import { registerFonts }     from '@/lib/report/fonts';
-import { SovereignReport }   from '@/lib/report/SovereignReport';
-import { buildReportData }   from '@/lib/report/schema/buildReportData';
-import { runQAChecklist, formatQAReport } from '@/lib/report/schema/qaChecklist';
-import { generateStoplightSynthesis } from '@/lib/report/schema/stoplightSynthesis';
-import { generateSynthesis } from '@/lib/report/schema/synthesisEngine';
+import { getOrderById, getProductBySlug, getProductById } from '@/lib/products/queries';
+import { getGenerator } from '@/lib/products/registry';
+import type { Lead } from '@/server/db/schema';
 
-registerFonts();
+const LEGACY_PRODUCT_SLUG = 'sovereign-report';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const leadId = searchParams.get('leadId');
-
-    if (!leadId || isNaN(parseInt(leadId, 10))) {
-      return NextResponse.json({ error: 'leadId must be a valid integer.' }, { status: 400 });
-    }
-
-    // ── 1. Fetch raw lead record ───────────────────────────────────────────
-    const rows = await db
-      .select()
-      .from(leads)
-      .where(eq(leads.id, parseInt(leadId, 10)))
-      .limit(1);
-
-    const lead = rows[0];
-    if (!lead) {
-      return NextResponse.json({ error: `Lead ${leadId} not found.` }, { status: 404 });
-    }
-
+    const orderIdParam = searchParams.get('orderId');
+    const leadIdParam  = searchParams.get('leadId');
     const skipCheck = process.env.SKIP_PURCHASE_CHECK === 'true';
-    if (!skipCheck && !lead.reportPurchased) {
-      return NextResponse.json({ error: 'Report not purchased.' }, { status: 403 });
+
+    let lead: Lead | undefined;
+    let generatorKey: string;
+    let productLabel: string;
+
+    if (orderIdParam) {
+      if (isNaN(parseInt(orderIdParam, 10))) {
+        return NextResponse.json({ error: 'orderId must be a valid integer.' }, { status: 400 });
+      }
+      const order = await getOrderById(parseInt(orderIdParam, 10));
+      if (!order) {
+        return NextResponse.json({ error: `Order ${orderIdParam} not found.` }, { status: 404 });
+      }
+      if (!skipCheck && order.status !== 'paid') {
+        return NextResponse.json({ error: 'Order not paid.' }, { status: 403 });
+      }
+
+      const rows = await db.select().from(leads).where(eq(leads.id, order.leadId)).limit(1);
+      lead = rows[0];
+      if (!lead) {
+        return NextResponse.json({ error: `Lead ${order.leadId} not found.` }, { status: 404 });
+      }
+
+      const product = await getProductById(order.productId);
+      if (!product) {
+        return NextResponse.json({ error: `Product ${order.productId} not found.` }, { status: 404 });
+      }
+      generatorKey = product.generatorKey;
+      productLabel = product.name;
+
+    } else if (leadIdParam) {
+      // Legacy path: links emailed before the orders table existed only
+      // ever pointed at a lead, and only ever meant the Sovereign Report.
+      if (isNaN(parseInt(leadIdParam, 10))) {
+        return NextResponse.json({ error: 'leadId must be a valid integer.' }, { status: 400 });
+      }
+      const rows = await db.select().from(leads).where(eq(leads.id, parseInt(leadIdParam, 10))).limit(1);
+      lead = rows[0];
+      if (!lead) {
+        return NextResponse.json({ error: `Lead ${leadIdParam} not found.` }, { status: 404 });
+      }
+      if (!skipCheck && !lead.reportPurchased) {
+        return NextResponse.json({ error: 'Report not purchased.' }, { status: 403 });
+      }
+
+      const product = await getProductBySlug(LEGACY_PRODUCT_SLUG);
+      generatorKey = product?.generatorKey ?? LEGACY_PRODUCT_SLUG;
+      productLabel = product?.name ?? 'Sovereign Report';
+
+    } else {
+      return NextResponse.json({ error: 'orderId or leadId is required.' }, { status: 400 });
     }
 
-    // ── 2. Normalize and validate ─────────────────────────────────────────
-    const reportData = buildReportData(
-      lead as Parameters<typeof buildReportData>[0]
-    );
+    const generator = getGenerator(generatorKey);
+    const deliverable = await generator.generate(lead);
 
-    // ── 3. Generate T3D Signature synthesis ───────────────────────────────
-    // Runs before render — 20s timeout, falls back to template if needed.
-    const synthesis = await generateSynthesis(reportData);
+    console.log(`[Report] Generated "${productLabel}" for lead ${lead.id}`);
 
-    // ── 3b. Generate Stoplight synthesis (six-placement, for Page 30) ──────
-    const stoplightSynth = await generateStoplightSynthesis(
-      { ...reportData, siderealMoon: (reportData as any).siderealMoon } as Parameters<typeof generateStoplightSynthesis>[0]
-    );
-    console.log(`[Report ${leadId}] Stoplight: ${stoplightSynth.wordCount}w via ${stoplightSynth.source}`);
-
-    // Attach synthesis to report data
-    const reportDataWithSynthesis = {
-      ...reportData,
-      synthesis:          synthesis.text,
-      synthesisSource:    synthesis.source,
-      stoplightSynthesis: stoplightSynth,
-    };
-
-    console.log(
-      `[Report ${leadId}] Synthesis: ${synthesis.wordCount}w via ${synthesis.source}` +
-      (synthesis.valid ? '' : ' (validation warnings)')
-    );
-
-
-    // ── 4. Run QA checklist ───────────────────────────────────────────────
-    const qaReport = runQAChecklist(reportDataWithSynthesis as any);
-    console.log(formatQAReport(qaReport));
-    if (!qaReport.passed) {
-      console.error('[QA] Critical failures detected — review before delivery');
-      // Non-blocking in production: report generates with warnings logged
-      // To block on failure, uncomment:
-      // return NextResponse.json({ error: 'Report failed QA checks.', issues: qaReport.blockingIssues }, { status: 422 });
-    }
-
-    // ── 5. Render PDF ─────────────────────────────────────────────────────
-    const pdfBuffer = await renderToBuffer(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      React.createElement(SovereignReport, { data: reportDataWithSynthesis }) as any
-    );
-
-    // ── 5. Return downloadable PDF ────────────────────────────────────────
-    const safeName = `${reportData.firstName}-${reportData.lastName}`
-      .replace(/[^a-zA-Z0-9-]/g, '-')
-      .replace(/-+/g, '-');
-    const filename = `T3D-Sovereign-Report-${safeName}.pdf`;
-
-    return new NextResponse(new Uint8Array(pdfBuffer), {
+    return new NextResponse(new Uint8Array(deliverable.buffer), {
       status: 200,
       headers: {
-        'Content-Type':              'application/pdf',
-        'Content-Disposition':       `attachment; filename="${filename}"`,
-        'Content-Length':            String(pdfBuffer.length),
-        'Cache-Control':             'no-store',
-        'X-Synthesis-Source':        synthesis.source,
-        'X-Synthesis-Words':         String(synthesis.wordCount),
+        'Content-Type':        deliverable.contentType,
+        'Content-Disposition': `attachment; filename="${deliverable.filename}"`,
+        'Content-Length':      String(deliverable.buffer.length),
+        'Cache-Control':       'no-store',
       },
     });
 

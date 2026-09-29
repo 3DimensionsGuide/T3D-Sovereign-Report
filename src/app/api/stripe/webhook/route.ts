@@ -1,14 +1,14 @@
 /**
  * POST /api/stripe/webhook
  *
- * Listens for Stripe payment events and updates the corresponding lead's
- * purchase status in the database. This is the piece that actually lets
- * a paying customer access their report — without it, reportPurchased
- * never flips to true and /api/generate-report blocks everyone.
+ * Listens for Stripe payment events and updates the corresponding order's
+ * status in the database. This is the piece that actually lets a paying
+ * customer receive their product — without it, no order ever reaches
+ * 'paid' and nothing gets generated or emailed.
  *
  * Handles:
- *   payment_intent.succeeded      → marks lead as purchased
- *   payment_intent.payment_failed → logs the failure (no DB change)
+ *   payment_intent.succeeded      → marks the order 'paid', triggers delivery
+ *   payment_intent.payment_failed → marks the order 'failed'
  *
  * IMPORTANT: This route reads the raw request body (via request.text())
  * rather than request.json(), because Stripe's signature verification
@@ -20,8 +20,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { waitUntil } from '@vercel/functions';
 import { db }    from '@/server/db';
-import { leads } from '@/server/db/schema';
+import { leads, orders } from '@/server/db/schema';
 import { eq }    from 'drizzle-orm';
+import { getOrderByPaymentIntentId, getProductById } from '@/lib/products/queries';
 import { generateAndEmailReport } from '@/lib/report/generateAndEmailReport';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -65,40 +66,47 @@ export async function POST(request: Request) {
 
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        const leadIdRaw = paymentIntent.metadata?.leadId;
 
-        if (!leadIdRaw) {
+        const order = await getOrderByPaymentIntentId(paymentIntent.id);
+        if (!order) {
           console.warn(
-            '[Stripe Webhook] payment_intent.succeeded has no leadId in metadata:',
+            '[Stripe Webhook] payment_intent.succeeded has no matching order:',
             paymentIntent.id
           );
           break;
         }
 
-        const leadId = parseInt(leadIdRaw, 10);
-        if (isNaN(leadId)) {
-          console.warn('[Stripe Webhook] leadId metadata is not a valid number:', leadIdRaw);
-          break;
+        // Idempotent: safe to run even if Stripe sends this event more
+        // than once (which it does occasionally, by design) — re-marking
+        // an already-'paid' order and re-triggering delivery is harmless
+        // aside from a possible duplicate email, which is an acceptable
+        // trade-off against ever missing delivery.
+        await db.update(orders)
+          .set({ status: 'paid', updatedAt: new Date() })
+          .where(eq(orders.id, order.id));
+
+        // Legacy mirror: rows/routes that pre-date the orders table still
+        // read leads.reportPurchased directly. Only set for the Sovereign
+        // Report so it keeps meaning what it always meant.
+        const product = await getProductById(order.productId);
+        if (product?.slug === 'sovereign-report') {
+          await db.update(leads)
+            .set({ reportPurchased: true })
+            .where(eq(leads.id, order.leadId));
         }
 
-        // Idempotent: safe to run even if Stripe sends this event more
-        // than once (which it does occasionally, by design).
-        await db.update(leads)
-          .set({ reportPurchased: true })
-          .where(eq(leads.id, leadId));
-
         console.log(
-          `[Stripe Webhook] ✓ Lead ${leadId} marked as purchased ` +
+          `[Stripe Webhook] ✓ Order ${order.id} (lead ${order.leadId}, ${product?.name ?? 'unknown product'}) marked paid ` +
           `(PaymentIntent ${paymentIntent.id}, $${(paymentIntent.amount / 100).toFixed(2)})`
         );
 
-        // Generate the PDF and email it, in the background — AFTER this
-        // handler has already returned its response to Stripe below.
+        // Generate the deliverable and email it, in the background — AFTER
+        // this handler has already returned its response to Stripe below.
         // waitUntil() keeps the serverless function alive long enough to
         // finish this work without delaying or risking Stripe's expected
         // fast response (PDF generation + synthesis can take several
         // seconds, which would otherwise risk a timeout/retry).
-        waitUntil(generateAndEmailReport(leadId));
+        waitUntil(generateAndEmailReport(order.id));
 
         break;
       }
@@ -109,7 +117,14 @@ export async function POST(request: Request) {
           `[Stripe Webhook] ✗ Payment failed for PaymentIntent ${paymentIntent.id}: ` +
           `${paymentIntent.last_payment_error?.message ?? 'no error message'}`
         );
-        // No DB change — reportPurchased stays false, customer can retry checkout.
+
+        const order = await getOrderByPaymentIntentId(paymentIntent.id);
+        if (order) {
+          await db.update(orders)
+            .set({ status: 'failed', updatedAt: new Date() })
+            .where(eq(orders.id, order.id));
+        }
+        // Customer can retry checkout, which opens a fresh order.
         break;
       }
 

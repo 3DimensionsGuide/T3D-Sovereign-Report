@@ -13,6 +13,10 @@ interface SendReportEmailInput {
   firstName:   string;
   pdfBuffer:   Buffer;
   downloadUrl: string;
+  /** e.g. "Sovereign Report", "Advanced Sovereign Report" — defaults to the Sovereign Report for backward compatibility. */
+  productName?: string;
+  /** Attachment filename, e.g. "T3D-Sovereign-Report-Jane.pdf" — defaults to the Sovereign Report's naming pattern. */
+  filename?:    string;
 }
 
 export async function sendReportEmail({
@@ -20,6 +24,8 @@ export async function sendReportEmail({
   firstName,
   pdfBuffer,
   downloadUrl,
+  productName = 'Sovereign Report',
+  filename,
 }: SendReportEmailInput): Promise<void> {
   // Constructed here, not at module scope — this ensures Resend is only
   // instantiated at actual send time, never as a side effect of Next.js
@@ -31,7 +37,7 @@ export async function sendReportEmail({
     <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #0D0D0E;">
       <div style="background-color: #0D0D0E; padding: 32px 24px; text-align: center;">
         <p style="color: #F5F5F3; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin: 0; opacity: 0.6;">
-          T3D · The Sovereign Report
+          T3D · The ${productName}
         </p>
       </div>
       <div style="padding: 32px 24px;">
@@ -39,7 +45,7 @@ export async function sendReportEmail({
           Dear ${firstName},
         </p>
         <p style="font-size: 15px; line-height: 1.7; color: #333; margin-bottom: 20px;">
-          Your complete Sovereign Report is ready — Human Design, Numerology,
+          Your complete ${productName} is ready — Human Design, Numerology,
           and Astrology, woven into one navigation guide built specifically
           for your exact configuration.
         </p>
@@ -66,11 +72,11 @@ export async function sendReportEmail({
   await resend.emails.send({
     from:    fromAddress,
     to,
-    subject: 'Your T3D Sovereign Report is ready',
+    subject: `Your T3D ${productName} is ready`,
     html,
     attachments: [
       {
-        filename: `T3D-Sovereign-Report-${firstName}.pdf`,
+        filename: filename || `T3D-Sovereign-Report-${firstName}.pdf`,
         content:  pdfBuffer.toString('base64'),
       },
     ],

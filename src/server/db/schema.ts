@@ -13,11 +13,13 @@
 import {
   pgTable,
   serial,
+  integer,
   text,
   timestamp,
   jsonb,
   boolean,
   index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // ─── LEADS TABLE ─────────────────────────────────────────────────────────────
@@ -71,3 +73,87 @@ export const leads = pgTable(
 
 export type Lead        = typeof leads.$inferSelect;
 export type NewLead     = typeof leads.$inferInsert;
+
+// ─── PRODUCTS TABLE ──────────────────────────────────────────────────────────
+//
+// One row per purchasable product (the Sovereign Report, Advanced Sovereign
+// Report, Astrocartography, Relationship Dynamics, ...). Checkout, Stripe,
+// and report generation all look products up by `slug` instead of having
+// any one product hardcoded into the pipeline.
+
+export const products = pgTable(
+  'products',
+  {
+    id: serial('id').primaryKey(),
+
+    // Stable identifier used in URLs, Stripe metadata, and the generator
+    // registry (src/lib/products/registry.ts) — e.g. 'sovereign-report'.
+    slug: text('slug').notNull(),
+
+    // Customer-facing name and description (also used as the Stripe
+    // PaymentIntent description).
+    name:        text('name').notNull(),
+    description: text('description').notNull(),
+
+    priceCents: integer('price_cents').notNull(),
+
+    // Key into PRODUCT_GENERATORS — which generator function builds this
+    // product's deliverable (PDF today; could be other formats later).
+    generatorKey: text('generator_key').notNull(),
+
+    active: boolean('active').default(true).notNull(),
+
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    slugIdx: uniqueIndex('products_slug_idx').on(table.slug),
+  }),
+);
+
+export type Product    = typeof products.$inferSelect;
+export type NewProduct = typeof products.$inferInsert;
+
+// ─── ORDERS TABLE ────────────────────────────────────────────────────────────
+//
+// One row per purchase attempt, tying a lead to a product through a Stripe
+// PaymentIntent. Replaces the old single `leads.reportPurchased` boolean as
+// the source of truth once a lead can buy more than one product; that
+// column is kept in place (and still set for Sovereign Report purchases)
+// for backward compatibility with rows/routes that pre-date this table.
+
+export const orders = pgTable(
+  'orders',
+  {
+    id: serial('id').primaryKey(),
+
+    leadId:    integer('lead_id').notNull().references(() => leads.id),
+    productId: integer('product_id').notNull().references(() => products.id),
+
+    // 'pending' → PaymentIntent created, not yet confirmed
+    // 'paid'    → payment_intent.succeeded received
+    // 'failed'  → payment_intent.payment_failed received
+    // 'refunded' → manually marked after a Stripe refund
+    status: text('status').$type<'pending' | 'paid' | 'failed' | 'refunded'>()
+      .default('pending').notNull(),
+
+    stripePaymentIntentId: text('stripe_payment_intent_id').notNull(),
+
+    // Snapshot of what was actually charged, independent of the product's
+    // current price (which may change after this order was placed).
+    amountCents: integer('amount_cents').notNull(),
+
+    // Set once the PDF has been generated and emailed successfully.
+    deliveredAt: timestamp('delivered_at', { withTimezone: true }),
+
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    leadIdx:            index('orders_lead_idx').on(table.leadId),
+    paymentIntentIdx:   uniqueIndex('orders_payment_intent_idx').on(table.stripePaymentIntentId),
+  }),
+);
+
+export type Order    = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
