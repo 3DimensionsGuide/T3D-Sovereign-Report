@@ -119,7 +119,10 @@ function defaultPinnacles(): ReportData['pinnacles'] {
   ];
 }
 
-type RawChannel = { name?: unknown; gates?: unknown; activatedBy?: unknown };
+type RawChannel = {
+  name?: unknown; gates?: unknown; activatedBy?: unknown;
+  fromCenter?: unknown; toCenter?: unknown;
+};
 
 function normalizeChannels(raw: unknown): ReportData['hdChannels'] {
   return asArray(raw).map(ch => {
@@ -128,6 +131,25 @@ function normalizeChannels(raw: unknown): ReportData['hdChannels'] {
       name:        String(rc.name ?? ''),
       gates:       asArray(rc.gates).map(g => Number(g)),
       activatedBy: String(rc.activatedBy ?? ''),
+      fromCenter:  String(rc.fromCenter ?? ''),
+      toCenter:    String(rc.toCenter ?? ''),
+    };
+  });
+}
+
+type RawGateActivation = {
+  gate?: unknown; line?: unknown; center?: unknown; planet?: unknown; epoch?: unknown;
+};
+
+function normalizeActiveGates(raw: unknown): ReportData['hdActiveGates'] {
+  return asArray(raw).map(g => {
+    const rg = asRecord(g) as RawGateActivation;
+    return {
+      gate:   Number(rg.gate ?? 0),
+      line:   Number(rg.line ?? 0),
+      center: String(rg.center ?? ''),
+      planet: String(rg.planet ?? ''),
+      epoch:  String(rg.epoch ?? ''),
     };
   });
 }
@@ -163,6 +185,10 @@ export function buildReportData(lead: LeadRecord): ReportData {
   );
   const hdChannels = normalizeChannels(
     rawHD['activeChannels'] ?? rawHD['channels'] ?? []
+  );
+  const hdIncarnationCross = String(rawHD['incarnationCross'] ?? '');
+  const hdActiveGates = normalizeActiveGates(
+    rawHD['activeGates'] ?? rawHD['active_gates'] ?? []
   );
 
   // ── 4. Extract all six astrology placements ────────────────────────────────
@@ -268,6 +294,8 @@ export function buildReportData(lead: LeadRecord): ReportData {
     hdNotSelf,
     hdDefinedCenters,
     hdChannels,
+    hdIncarnationCross,
+    hdActiveGates,
 
     // Numerology — core
     lifePath:            lp.reduced,

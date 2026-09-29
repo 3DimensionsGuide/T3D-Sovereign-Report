@@ -62,7 +62,9 @@ export interface ReportData {
   hdStrategy:       string;
   hdNotSelf:        string;
   hdDefinedCenters: string[];
-  hdChannels:       { name: string; gates: number[]; activatedBy: string }[];
+  hdChannels:       { name: string; gates: number[]; activatedBy: string; fromCenter: string; toCenter: string }[];
+  hdIncarnationCross: string;   // e.g. "Right Angle Cross of Laws (41/31 | 44/24)" or generic fallback
+  hdActiveGates: { gate: number; line: number; center: string; planet: string; epoch: string }[];
 
   // Numerology — core
   lifePath:         number;
@@ -571,5 +573,83 @@ export function calculateProfection(birthDate: string, ascSign: string): Profect
     house,
     sign,
     lord: TRADITIONAL_RULERS[sign] ?? sign,
+  };
+}
+
+// ─── DEFINITION TYPE — Single / Split / Triple Split / Quadruple Split ────────
+//
+// Definition describes how a person's defined Centers connect to each other.
+// It's the connectivity of the graph whose nodes are the defined Centers and
+// whose edges are the active (defined) Channels between them — the number of
+// connected components is the Definition Type. This is pure graph math over
+// data the Human Design engine already computes (hdDefinedCenters + hdChannels
+// with their fromCenter/toCenter); no external formula or lookup table needed.
+
+export type DefinitionType = 'Single' | 'Split' | 'Triple Split' | 'Quadruple Split' | 'No Definition';
+
+export interface DefinitionResult {
+  type: DefinitionType;
+  circuitCount: number;       // number of connected groups of defined Centers
+  groups: string[][];         // each connected group's Center names
+}
+
+const DEFINITION_LABELS: Record<number, DefinitionType> = {
+  0: 'No Definition',   // Reflectors — no defined Centers at all
+  1: 'Single',
+  2: 'Split',
+  3: 'Triple Split',
+  4: 'Quadruple Split',
+};
+
+export const DEFINITION_MEANING: Record<DefinitionType, string> = {
+  'Single': 'All your defined Centers connect in one continuous circuit. Consistent, self-contained energy — you don’t need another person to feel whole. Can read as fixed or set in your ways.',
+  'Split': 'Two separate circuits that don’t connect on their own. You’re built to seek people who "bridge" the split and complete your circuitry — relationships carry real energetic weight for you.',
+  'Triple Split': 'Three separate circuits. Highly adaptable — you draw on different people to bridge different splits. You tend to thrive in groups, and decisions benefit from time and outside input.',
+  'Quadruple Split': 'Four separate circuits — the rarest Definition. Extremely flexible and environment-dependent. A stable, consistent community does more for your grounding and clarity than it does for most people.',
+  'No Definition': 'No Centers are defined — every Center is open. This is the Reflector configuration: a different mechanic entirely, sampling and reflecting the energy of whoever and wherever you are.',
+};
+
+export function calculateDefinition(
+  definedCenters: string[],
+  channels: { fromCenter: string; toCenter: string }[]
+): DefinitionResult {
+  if (definedCenters.length === 0) {
+    return { type: 'No Definition', circuitCount: 0, groups: [] };
+  }
+
+  // Union-Find over the defined Centers, connected by edges from active channels
+  const parent = new Map<string, string>();
+  const find = (c: string): string => {
+    let root = c;
+    while (parent.get(root) && parent.get(root) !== root) root = parent.get(root)!;
+    parent.set(c, root);
+    return root;
+  };
+  const union = (a: string, b: string) => {
+    const ra = find(a), rb = find(b);
+    if (ra !== rb) parent.set(ra, rb);
+  };
+
+  for (const center of definedCenters) parent.set(center, center);
+  for (const ch of channels) {
+    if (definedCenters.includes(ch.fromCenter) && definedCenters.includes(ch.toCenter)) {
+      union(ch.fromCenter, ch.toCenter);
+    }
+  }
+
+  const groupMap = new Map<string, string[]>();
+  for (const center of definedCenters) {
+    const root = find(center);
+    if (!groupMap.has(root)) groupMap.set(root, []);
+    groupMap.get(root)!.push(center);
+  }
+
+  const groups = [...groupMap.values()];
+  const circuitCount = groups.length;
+
+  return {
+    type: DEFINITION_LABELS[circuitCount] ?? 'Quadruple Split',
+    circuitCount,
+    groups,
   };
 }
