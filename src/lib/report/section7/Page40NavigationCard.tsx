@@ -316,9 +316,9 @@ export default function Page40NavigationCard({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footerStamp}>
+      <View style={S.footerStamp} fixed>
         <Text style={S.stampText}>T3D Sovereign Report · {data.firstName} {data.lastName} · {genDate}</Text>
-        <Text style={S.pageNum}>40</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

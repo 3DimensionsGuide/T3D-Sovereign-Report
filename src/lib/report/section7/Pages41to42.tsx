@@ -166,9 +166,9 @@ export function Page41Leave({ data }: Props) {
         ))}
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>41</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );
@@ -234,9 +234,9 @@ export function Page42Keep({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>42</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

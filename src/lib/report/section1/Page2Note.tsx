@@ -256,9 +256,9 @@ export default function Page2Note({ data }: Props) {
       </View>
 
       {/* Footer */}
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNumber}>2</Text>
+        <Text style={S.pageNumber} render={({ pageNumber }) => pageNumber} />
       </View>
 
     </Page>

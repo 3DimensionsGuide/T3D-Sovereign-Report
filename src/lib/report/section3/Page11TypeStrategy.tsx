@@ -10,6 +10,7 @@ import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE } from '../tokens';
 import { TYPE_CONTENT } from './hd-content';
 import type { ReportData } from '../tokens';
+import { T3DSystemDiagram, ChartCaption, FieldLibraryCallout, CHART_CAPTIONS, NumerologyRoadCaption } from '../shared/ChartComponents';
 
 const S = StyleSheet.create({
   page: {
@@ -152,6 +153,13 @@ export default function Page11TypeStrategy({ data }: Props) {
         <Text style={S.sectionTag}>Section 3 — The Vehicle</Text>
         <Text style={S.heading}>Your Type & Strategy</Text>
         <View style={S.headingRule} />
+        {/* Visual Chart Reference — Field Library */}
+        <FieldLibraryCallout
+          chartType="Human Design BodyGraph"
+          caption="This is your energy map. Pages 11–17 translate the parts most relevant to daily use."
+          accentColor={C.amber}
+        />
+
 
         {/* Type + Strategy header */}
         <View style={S.headerRow}>
@@ -206,9 +214,9 @@ export default function Page11TypeStrategy({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>11</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

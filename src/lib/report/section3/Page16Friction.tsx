@@ -143,9 +143,9 @@ export default function Page16Friction({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>16</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

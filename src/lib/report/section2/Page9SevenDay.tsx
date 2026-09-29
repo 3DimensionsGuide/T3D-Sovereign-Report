@@ -316,9 +316,9 @@ export default function Page9SevenDay({ data }: Props) {
         </Text>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNumber}>9</Text>
+        <Text style={S.pageNumber} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

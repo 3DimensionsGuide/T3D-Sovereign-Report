@@ -86,9 +86,9 @@ export default function Page34SOSDivider({ data }: Props) {
         </Text>
       </View>
 
-      <View style={S.bottom}>
+      <View style={S.bottom} fixed>
         <Text style={S.footerLeft}>T3D Sovereign Report</Text>
-        <Text style={S.pageNum}>34</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

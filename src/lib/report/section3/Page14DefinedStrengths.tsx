@@ -137,9 +137,9 @@ export function Page14DefinedStrengths({ data }: Page14Props) {
         </View>
       </View>
 
-      <View style={S14.footer}>
+      <View style={S14.footer} fixed>
         <Text style={S14.footerText}>The Sovereign Report</Text>
-        <Text style={S14.pageNum}>14</Text>
+        <Text style={S14.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

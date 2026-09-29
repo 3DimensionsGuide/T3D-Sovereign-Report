@@ -172,8 +172,8 @@ export default function Page17VehiclePractice({ data }: Props) {
           Continue to The Road — page 18
         </Text>
       </View>
-      <View style={S.amberPageNum}>
-        <Text style={S.pageNum}>17</Text>
+      <View style={S.amberPageNum} fixed>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

@@ -80,9 +80,9 @@ export default function Page18RoadDivider({ data }: Props) {
         <Text style={S.pagesNote}>Numerology · Life Path {data.lifePath}</Text>
       </View>
 
-      <View style={S.bottom}>
+      <View style={S.bottom} fixed>
         <Text style={S.typeLabel}>T3D Sovereign Report</Text>
-        <Text style={S.pageNum}>18</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

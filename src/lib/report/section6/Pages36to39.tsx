@@ -164,7 +164,7 @@ export function Page36CreativeWork({ data }: P36Props) {
           </Text>
         </View>
       </View>
-      <View style={BASE.footer}><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum}>36</Text></View>
+      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
     </Page>
   );
 }
@@ -233,7 +233,7 @@ export function Page37Relate({ data }: P37Props) {
           </Text>
         </View>
       </View>
-      <View style={BASE.footer}><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum}>37</Text></View>
+      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
     </Page>
   );
 }
@@ -287,7 +287,7 @@ export function Page38Recalibration({ data }: P38Props) {
           </View>
         ))}
       </View>
-      <View style={BASE.footer}><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum}>38</Text></View>
+      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
     </Page>
   );
 }
@@ -361,9 +361,9 @@ export function Page39SevenDay({ data }: P39Props) {
           <Text style={{ fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 1.5, textTransform: 'uppercase', color: C.parchment, opacity: 0.7 }}>Stoplight</Text>
         </View>
       </View>
-      <View style={{ paddingHorizontal: PAGE.marginH, paddingBottom: 10, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View style={{ paddingHorizontal: PAGE.marginH, paddingBottom: 10, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} fixed>
         <Text style={BASE.footerT}>The Sovereign Report</Text>
-        <Text style={BASE.pageNum}>39</Text>
+        <Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

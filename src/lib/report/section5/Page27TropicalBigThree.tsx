@@ -22,6 +22,7 @@ import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { C, F, PAGE } from '../tokens';
 import { TechnicalLines } from '../shared/PageComponents';
 import { BirthTimeSensitivityBanner } from '../shared/BirthTimeSensitivity';
+import { FieldLibraryCallout } from '../shared/ChartComponents';
 import type { ReportData } from '../tokens';
 
 // ─── Content maps ─────────────────────────────────────────────────────────────
@@ -546,6 +547,13 @@ export default function Page27TropicalBigThree({ data }: Props) {
         </Text>
         <View style={S.rule} />
 
+        {/* Visual Chart Reference — Field Library (Visual #3, Natal Chart) */}
+        <FieldLibraryCallout
+          chartType="Natal Chart"
+          caption="This is your full natal chart. Pages 27–33 translate the placements most relevant to how you move through time."
+          accentColor={C.crimson}
+        />
+
         {/* Three panels */}
         <View style={S.columns}>
           {panels.map(p => (
@@ -561,9 +569,9 @@ export default function Page27TropicalBigThree({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>27</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

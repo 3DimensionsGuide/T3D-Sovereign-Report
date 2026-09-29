@@ -251,9 +251,9 @@ export default function Page43DataNotes({ data }: Props) {
           </View>
         </View>
       </View>
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerT}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>43</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

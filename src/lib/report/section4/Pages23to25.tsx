@@ -102,9 +102,9 @@ export function Page23Challenges({ data }: Page23Props) {
           </Text>
         </View>
       </View>
-      <View style={S23.footer}>
+      <View style={S23.footer} fixed>
         <Text style={S23.footerText}>The Sovereign Report</Text>
-        <Text style={S23.pageNum}>23</Text>
+        <Text style={S23.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );
@@ -190,9 +190,9 @@ export function Page24RoadFriction({ data }: Page24Props) {
           <Text style={S24.resetText}>{lp.reset.instruction}</Text>
         </View>
       </View>
-      <View style={S24.footer}>
+      <View style={S24.footer} fixed>
         <Text style={S24.footerText}>The Sovereign Report</Text>
-        <Text style={S24.pageNum}>24</Text>
+        <Text style={S24.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );
@@ -312,8 +312,8 @@ export function Page25RoadPractice({ data }: Page25Props) {
         <Text style={S25.emeraldFooterLeft}>The Road · Section 4 Complete</Text>
         <Text style={S25.emeraldFooterRight}>Continue to The Stoplight — page 26</Text>
       </View>
-      <View style={S25.emeraldPageNum}>
-        <Text style={S25.pageNum}>25</Text>
+      <View style={S25.emeraldPageNum} fixed>
+        <Text style={S25.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

@@ -304,9 +304,9 @@ export default function Page8CurrentSeason({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNumber}>8</Text>
+        <Text style={S.pageNumber} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

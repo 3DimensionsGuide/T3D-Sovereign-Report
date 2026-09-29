@@ -10,6 +10,7 @@ import { TechnicalLines } from '../shared/PageComponents';
 import { C, F, PAGE } from '../tokens';
 import { PINNACLE_THEMES } from './road-content';
 import type { ReportData } from '../tokens';
+import { T3DSystemDiagram, ChartCaption, FieldLibraryCallout, CHART_CAPTIONS, NumerologyRoadCaption } from '../shared/ChartComponents';
 
 const S = StyleSheet.create({
   page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
@@ -166,6 +167,9 @@ export default function Page22Pinnacles({ data }: Props) {
           </View>
         )}
 
+        {/* Visual #2 Caption — Numerology Road Map */}
+        <NumerologyRoadCaption />
+
         {/* Context note */}
         <View style={S.contextNote}>
           <Text style={S.contextNoteText}>
@@ -174,9 +178,9 @@ export default function Page22Pinnacles({ data }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>22</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );
