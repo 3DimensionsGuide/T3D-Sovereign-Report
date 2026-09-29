@@ -653,3 +653,53 @@ export function calculateDefinition(
     groups,
   };
 }
+
+// ─── CIRCUIT BALANCE — Individual / Collective / Tribal ───────────────────────
+//
+// Tallies each of the user's active (defined) Channels against the full
+// 36-channel circuit classification (src/lib/report/section3/gate-content.ts,
+// sourced from a practitioner reference) to find which Circuit Group(s)
+// dominate their design. A channel not found in the table (shouldn't happen
+// with valid chart data, but data can be messy) is skipped rather than
+// guessed at.
+
+import { CHANNELS, findChannelCircuit, type CircuitGroup, type ChannelCircuit } from './section3/gate-content';
+
+export interface CircuitBalanceResult {
+  matched: ChannelCircuit[];           // the user's active channels, resolved to circuit info
+  counts: Record<CircuitGroup | 'Integration', number>;
+  dominant: CircuitGroup | 'Integration' | 'None' | 'Even';
+}
+
+export function calculateCircuitBalance(
+  activeChannels: { gates: number[] }[]
+): CircuitBalanceResult {
+  const matched: ChannelCircuit[] = [];
+  const counts: Record<CircuitGroup | 'Integration', number> = {
+    Individual: 0, Collective: 0, Tribal: 0, Integration: 0,
+  };
+
+  for (const ch of activeChannels) {
+    const [a, b] = ch.gates;
+    if (a === undefined || b === undefined) continue;
+    const found = findChannelCircuit(a, b);
+    if (found) {
+      matched.push(found);
+      counts[found.group] += 1;
+    }
+  }
+
+  if (matched.length === 0) {
+    return { matched, counts, dominant: 'None' };
+  }
+
+  const max = Math.max(counts.Individual, counts.Collective, counts.Tribal, counts.Integration);
+  const topGroups = (Object.keys(counts) as (CircuitGroup | 'Integration')[])
+    .filter(g => counts[g] === max);
+
+  return {
+    matched,
+    counts,
+    dominant: topGroups.length === 1 ? topGroups[0]! : 'Even',
+  };
+}
