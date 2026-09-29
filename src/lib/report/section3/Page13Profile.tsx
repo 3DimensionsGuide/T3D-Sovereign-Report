@@ -12,12 +12,12 @@ import { PROFILE_CONTENT } from './hd-content';
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
 
   content: {
     flex: 1, paddingHorizontal: PAGE.marginH,
-    paddingTop: 40, paddingBottom: PAGE.marginV,
+    paddingTop: 40,
   },
 
   sectionTag: {

@@ -21,7 +21,7 @@ import {
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
-  page: {
+  page: { paddingBottom: PAGE.marginV,
     backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
@@ -38,7 +38,6 @@ const S = StyleSheet.create({
     flex: 1,
     paddingHorizontal: PAGE.marginH,
     paddingTop: 44,
-    paddingBottom: PAGE.marginV,
   },
 
   // ── Header ────────────────────────────────────────────────────────────────

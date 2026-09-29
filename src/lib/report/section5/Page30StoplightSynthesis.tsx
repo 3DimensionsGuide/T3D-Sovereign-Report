@@ -24,7 +24,7 @@ import type { StoplightSynthesis } from '../schema/stoplightSynthesis';
 const STAR_SLATE = '#6D7797';
 
 const S = StyleSheet.create({
-  page:   { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page:   { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   triBar: { flexDirection: 'row', width: PAGE.width },
   barA:   { flex: 1, height: 1.5, backgroundColor: C.amber },
   barE:   { flex: 1, height: 1.5, backgroundColor: C.emerald },
@@ -34,7 +34,6 @@ const S = StyleSheet.create({
     flex: 1,
     paddingHorizontal: PAGE.marginH,
     paddingTop: 36,
-    paddingBottom: PAGE.marginV,
   },
 
   eyebrow: {

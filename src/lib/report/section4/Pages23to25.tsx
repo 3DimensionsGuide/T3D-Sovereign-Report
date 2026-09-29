@@ -12,9 +12,9 @@ import { CHALLENGE_THEMES } from './road-content';
 import type { ReportData } from '../tokens';
 
 const S23 = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   emeraldLine: { width: PAGE.width, height: 1.5, backgroundColor: C.emerald },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40, paddingBottom: PAGE.marginV },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40,},
   sectionTag: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8 },
   heading: { fontFamily: F.display, fontSize: 22, fontWeight: 400, color: C.base, lineHeight: 1.15, marginBottom: 8 },
   subheading: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint, lineHeight: 1.5, marginBottom: 20, maxWidth: 440 },
@@ -137,9 +137,9 @@ export function Page23Challenges({ data }: Page23Props) {
  */
 
 const S24 = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   emeraldLine: { width: PAGE.width, height: 1.5, backgroundColor: C.emerald },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40, paddingBottom: PAGE.marginV },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40,},
   sectionTag: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8 },
   heading: { fontFamily: F.display, fontSize: 22, fontWeight: 400, color: C.base, lineHeight: 1.15, marginBottom: 20 },
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 20 },
@@ -224,9 +224,9 @@ export function Page24RoadFriction({ data }: Page24Props) {
  */
 
 const S25 = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: 20, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   emeraldLine: { width: PAGE.width, height: 2, backgroundColor: C.emerald },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40, paddingBottom: 20 },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40,},
   sectionTag: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8 },
   headingRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 },
   headingPrefix: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 400, color: C.parchmentFaint },

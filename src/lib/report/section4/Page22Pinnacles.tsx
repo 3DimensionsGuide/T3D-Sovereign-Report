@@ -13,9 +13,9 @@ import type { ReportData } from '../tokens';
 import { T3DSystemDiagram, ChartCaption, FieldLibraryCallout, CHART_CAPTIONS, NumerologyRoadCaption } from '../shared/ChartComponents';
 
 const S = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   emeraldLine: { width: PAGE.width, height: 1.5, backgroundColor: C.emerald },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40, paddingBottom: PAGE.marginV },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40,},
   sectionTag: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8 },
   heading: { fontFamily: F.display, fontSize: 22, fontWeight: 400, color: C.base, lineHeight: 1.15, marginBottom: 8 },
   subheading: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint, lineHeight: 1.5, marginBottom: 20, maxWidth: 420 },

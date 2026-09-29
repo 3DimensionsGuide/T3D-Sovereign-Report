@@ -19,12 +19,12 @@ import { AUTHORITY_PROTOCOL } from '../tokens';
 import type { ReportData } from '../tokens';
 
 const S = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   triBar: { flexDirection: 'row', width: PAGE.width },
   barAmber:   { flex: 1, height: 2, backgroundColor: C.amber },
   barEmerald: { flex: 1, height: 2, backgroundColor: C.emerald },
   barCrimson: { flex: 1, height: 2, backgroundColor: C.crimson },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 36, paddingBottom: PAGE.marginV },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 36,},
   sectionTag: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8 },
   heading: { fontFamily: F.display, fontSize: 22, fontWeight: 400, color: C.base, lineHeight: 1.15, marginBottom: 6 },
   subheading: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint, lineHeight: 1.5, marginBottom: 20, maxWidth: 440 },

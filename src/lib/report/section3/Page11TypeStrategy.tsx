@@ -13,7 +13,7 @@ import type { ReportData } from '../tokens';
 import { T3DSystemDiagram, ChartCaption, FieldLibraryCallout, CHART_CAPTIONS, NumerologyRoadCaption } from '../shared/ChartComponents';
 
 const S = StyleSheet.create({
-  page: {
+  page: { paddingBottom: PAGE.marginV,
     backgroundColor: '#F5F5F3',
     padding: 0,
     fontFamily: F.sans,
@@ -24,7 +24,6 @@ const S = StyleSheet.create({
     flex: 1,
     paddingHorizontal: PAGE.marginH,
     paddingTop: 40,
-    paddingBottom: PAGE.marginV,
   },
 
   sectionTag: {

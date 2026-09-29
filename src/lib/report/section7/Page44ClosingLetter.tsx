@@ -20,7 +20,7 @@ import type { ReportData } from '../tokens';
 const BG_IMAGE_PATH = path.join(process.cwd(), 'src/lib/report/assets/page44-bg.jpg');
 
 const S = StyleSheet.create({
-  page: { backgroundColor: C.base, padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV, backgroundColor: C.base, padding: 0, fontFamily: F.sans },
 
   // Full-bleed background image — pre-processed, sits behind all content
   bgImage: {
@@ -39,7 +39,7 @@ const S = StyleSheet.create({
 
   content: {
     flex: 1, paddingHorizontal: PAGE.marginH,
-    paddingTop: 48, paddingBottom: PAGE.marginV,
+    paddingTop: 48,
     justifyContent: 'center',
   },
 
