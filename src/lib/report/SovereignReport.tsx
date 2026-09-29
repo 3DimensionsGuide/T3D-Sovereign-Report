@@ -90,7 +90,7 @@ export function SovereignReport({ data }: Props) {
       {/* ── SECTION 2: YOUR COORDINATES ────────────────────────── Pages 5–9 */}
       <Page5Dashboard        data={data} />
       <Page6PersonalMap      data={data} />
-      <PageSynthesis         data={data as any} pageNumber={7} />
+      <PageSynthesis         data={data as any} />
       <Page7DecisionProtocol data={data} />
       <Page8CurrentSeason    data={data} />
       <Page9SevenDay         data={data} />

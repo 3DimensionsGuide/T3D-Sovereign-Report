@@ -77,6 +77,15 @@ export function Page23Challenges({ data }: Page23Props) {
           {challenges.map((num, i) => {
             const theme = CHALLENGE_THEMES[num] ?? CHALLENGE_THEMES[0]!;
             const isCurrent = i === currentIdx || (i === 3);
+            // The standard 4-Challenges formula can legitimately produce the
+            // same number twice for a given birth date (Challenge 3 = |C1-C2|,
+            // Challenge 4 = |month-year|). When that happens, repeating the
+            // full interpretive copy verbatim under a second phase label reads
+            // as a rendering bug rather than a genuine numerology coincidence
+            // — so a repeat cross-references the earlier phase instead.
+            const earlierMatchIdx = challenges.findIndex((n, j) => j < i && n === num);
+            const isRepeat = earlierMatchIdx !== -1;
+
             return (
               <View key={i} style={i === challenges.length - 1 ? S23.challengeRowLast : S23.challengeRow}>
                 <View style={S23.challengeLeft}>
@@ -86,10 +95,21 @@ export function Page23Challenges({ data }: Page23Props) {
                   <Text style={S23.challengePhaseLabel}>{PHASE_LABELS[i]}</Text>
                 </View>
                 <View style={S23.challengeBody}>
-                  <Text style={S23.challengeTerrain}>{theme.terrain}</Text>
-                  <Text style={S23.challengeSkillLabel}>Skill Being Developed</Text>
-                  <Text style={S23.challengeSkillText}>{theme.skill}</Text>
-                  <Text style={S23.challengeReframe}>{theme.reframe}</Text>
+                  {isRepeat ? (
+                    <>
+                      <Text style={S23.challengeTerrain}>The same terrain returns.</Text>
+                      <Text style={S23.challengeSkillText}>
+                        Challenge {num} also appeared in your {PHASE_LABELS[earlierMatchIdx]} phase (above) — a number reduction shared by two of your four Challenge positions. That repetition is a real feature of your numbers, not a different terrain: the skill being developed here is the same one described above, now recurring in this phase of life.
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text style={S23.challengeTerrain}>{theme.terrain}</Text>
+                      <Text style={S23.challengeSkillLabel}>Skill Being Developed</Text>
+                      <Text style={S23.challengeSkillText}>{theme.skill}</Text>
+                      <Text style={S23.challengeReframe}>{theme.reframe}</Text>
+                    </>
+                  )}
                 </View>
               </View>
             );

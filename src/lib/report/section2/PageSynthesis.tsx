@@ -129,10 +129,9 @@ const S = StyleSheet.create({
 
 interface Props {
   data: ReportData & { synthesis: string; synthesisSource?: 'api' | 'fallback' };
-  pageNumber: number;
 }
 
-export default function PageSynthesis({ data, pageNumber }: Props) {
+export default function PageSynthesis({ data }: Props) {
   const isApiGenerated = data.synthesisSource !== 'fallback';
 
   return (
@@ -200,9 +199,9 @@ export default function PageSynthesis({ data, pageNumber }: Props) {
         </View>
       </View>
 
-      <View style={S.footer}>
+      <View style={S.footer} fixed>
         <Text style={S.footerText}>The Sovereign Report</Text>
-        <Text style={S.pageNum}>{pageNumber}</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );
