@@ -516,4 +516,4 @@ export function calculateHumanDesign(input: HumanDesignInput): HumanDesignResult
 }
 
 // ─── NAMED EXPORTS FOR TESTING ────────────────────────────────────────────────
-export { GATE_SEQUENCE, GATE_CENTER_MAP, UNIQUE_CHANNELS };
+export { GATE_SEQUENCE, GATE_CENTER_MAP, UNIQUE_CHANNELS, MANDALA_START_LON, DEGREES_PER_GATE };

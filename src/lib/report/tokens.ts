@@ -64,7 +64,7 @@ export interface ReportData {
   hdDefinedCenters: string[];
   hdChannels:       { name: string; gates: number[]; activatedBy: string; fromCenter: string; toCenter: string }[];
   hdIncarnationCross: string;   // e.g. "Right Angle Cross of Laws (41/31 | 44/24)" or generic fallback
-  hdActiveGates: { gate: number; line: number; center: string; planet: string; epoch: string }[];
+  hdActiveGates: { gate: number; line: number; center: string; planet: string; epoch: string; longitude: number }[];
 
   // Numerology — core
   lifePath:         number;
@@ -664,6 +664,8 @@ export function calculateDefinition(
 // guessed at.
 
 import { CHANNELS, findChannelCircuit, type CircuitGroup, type ChannelCircuit } from './section3/gate-content';
+import { findGodheadByGate, type GodheadInfo } from './section3/godhead-content';
+import { MANDALA_START_LON, DEGREES_PER_GATE } from '@/server/engines/human_design';
 
 export interface CircuitBalanceResult {
   matched: ChannelCircuit[];           // the user's active channels, resolved to circuit info
@@ -703,3 +705,109 @@ export function calculateCircuitBalance(
     dominant: topGroups.length === 1 ? topGroups[0]! : 'Even',
   };
 }
+
+// ─── GODHEAD — the 16 faces governing the Incarnation Cross ──────────────────
+//
+// Determined SOLELY by the gate of the Personality (conscious) Sun — never
+// the Earth, never the Design side. Looks up hdActiveGates for the one
+// matching activation and resolves it against the verified 64-gate
+// partition in section3/godhead-content.ts.
+
+export interface GodheadResult {
+  godhead: GodheadInfo | null;
+  personalitySunGate: number | null;
+}
+
+export function calculateGodhead(
+  activeGates: { gate: number; planet: string; epoch: string }[]
+): GodheadResult {
+  const pSun = activeGates.find(g => g.planet === 'sun' && g.epoch === 'personality');
+  if (!pSun) {
+    return { godhead: null, personalitySunGate: null };
+  }
+  const godhead = findGodheadByGate(pSun.gate) ?? null;
+  return { godhead, personalitySunGate: pSun.gate };
+}
+
+// ─── VARIABLES (PHS) — Digestion / Environment / Perspective / Motivation ────
+//
+// Each Variable's Left/Right arrow is set by the Tone (1-6) of one chart
+// point's activation — NOT by its Gate or Line. Tone is the third level of
+// subdivision beneath Gate → Line → Color → Tone → Base, so it's derived
+// from the same ecliptic-longitude math already used for longitudeToGate()
+// in the HD engine (src/server/engines/human_design.ts), just carried two
+// levels deeper: Color = Line / 6, Tone = Color / 6.
+//
+// Sun/Earth and the two Nodes are always exactly 180° apart on the wheel —
+// an exact multiple of every subdivision level down to Tone — so either
+// point of a pair always yields the identical Tone. Only one point per
+// Variable needs to be read (source-verified: T3D PHILOSOPHER notebook,
+// Ra Uru Hu — "The Substructure of Tone" / "10 Minute Lecture About
+// Variable").
+//
+// The 4 Variables and their source points:
+//   Digestion   (Design Sun)         — dietary/cognitive processing style
+//   Environment (Design Node)        — the physical setting that supports you
+//   Perspective (Personality Node)   — the vantage point you're here to see from
+//   Motivation  (Personality Sun)    — what drives the conscious mind
+
+const DEGREES_PER_LINE  = DEGREES_PER_GATE / 6;   // 0.9375°
+const DEGREES_PER_COLOR = DEGREES_PER_LINE / 6;   // 0.15625°
+const DEGREES_PER_TONE  = DEGREES_PER_COLOR / 6;  // 0.026041666...°
+
+export type ArrowDirection = 'Left' | 'Right';
+
+export interface VariableReading {
+  tone: number; // 1-6
+  arrow: ArrowDirection;
+}
+
+export interface VariablesResult {
+  digestion: VariableReading | null;
+  environment: VariableReading | null;
+  perspective: VariableReading | null;
+  motivation: VariableReading | null;
+}
+
+export const VARIABLE_MEANING: Record<'digestion' | 'environment' | 'perspective' | 'motivation', string> = {
+  digestion: 'How you take in and process — food, information, and experience alike. This is your Primary Health System: the conditions under which you digest correctly and nourish the mind that runs your design.',
+  environment: 'The physical setting your design actually thrives in — not a place in the abstract, but the conditions your body was built to be grounded by.',
+  perspective: 'The vantage point you are here to see from — the specific, correct framework through which your conscious mind is meant to view the world.',
+  motivation: 'What drives your conscious mind to act — the frequency underneath your outer, "who I think I am" awareness.',
+};
+
+/** Longitude → Tone (1-6), via the same mandala math as longitudeToGate(). */
+function longitudeToTone(longitude: number): number {
+  const adjusted = ((longitude - MANDALA_START_LON) % 360 + 360) % 360;
+  const posInGate = adjusted % DEGREES_PER_GATE;
+  const posInLine = posInGate % DEGREES_PER_LINE;
+  const posInColor = posInLine % DEGREES_PER_COLOR;
+  return Math.min(Math.floor(posInColor / DEGREES_PER_TONE) + 1, 6);
+}
+
+function toneToArrow(tone: number): ArrowDirection {
+  return tone <= 3 ? 'Left' : 'Right';
+}
+
+function readVariable(
+  activeGates: { planet: string; epoch: string; longitude: number }[],
+  planet: string,
+  epoch: string
+): VariableReading | null {
+  const point = activeGates.find(g => g.planet === planet && g.epoch === epoch);
+  if (!point) return null;
+  const tone = longitudeToTone(point.longitude);
+  return { tone, arrow: toneToArrow(tone) };
+}
+
+export function calculateVariables(
+  activeGates: { planet: string; epoch: string; longitude: number }[]
+): VariablesResult {
+  return {
+    digestion:   readVariable(activeGates, 'sun', 'design'),
+    environment: readVariable(activeGates, 'northNode', 'design'),
+    perspective: readVariable(activeGates, 'northNode', 'personality'),
+    motivation:  readVariable(activeGates, 'sun', 'personality'),
+  };
+}
+

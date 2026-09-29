@@ -138,18 +138,19 @@ function normalizeChannels(raw: unknown): ReportData['hdChannels'] {
 }
 
 type RawGateActivation = {
-  gate?: unknown; line?: unknown; center?: unknown; planet?: unknown; epoch?: unknown;
+  gate?: unknown; line?: unknown; center?: unknown; planet?: unknown; epoch?: unknown; longitude?: unknown;
 };
 
 function normalizeActiveGates(raw: unknown): ReportData['hdActiveGates'] {
   return asArray(raw).map(g => {
     const rg = asRecord(g) as RawGateActivation;
     return {
-      gate:   Number(rg.gate ?? 0),
-      line:   Number(rg.line ?? 0),
-      center: String(rg.center ?? ''),
-      planet: String(rg.planet ?? ''),
-      epoch:  String(rg.epoch ?? ''),
+      gate:      Number(rg.gate ?? 0),
+      line:      Number(rg.line ?? 0),
+      center:    String(rg.center ?? ''),
+      planet:    String(rg.planet ?? ''),
+      epoch:     String(rg.epoch ?? ''),
+      longitude: Number(rg.longitude ?? 0),
     };
   });
 }
