@@ -267,7 +267,7 @@ export default function ResultsDashboard() {
           Your profile is just the surface.
         </h3>
         <p className="t3d-body" style={{ maxWidth: '50ch' }}>
-          100 pages built from your exact birth data — every gate, every number,
+          40+ pages built from your exact birth data — every gate, every number,
           every transit. One integrated guide for every decision that matters.
         </p>
 

@@ -187,7 +187,7 @@ export default function CheckoutPage() {
             <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 12 }}>
               [CHECKOUT] — SOVEREIGN REPORT
             </p>
-            <h1 className="t3d-h2">Unlock your full 44-page report.</h1>
+            <h1 className="t3d-h2">Unlock your full 40+ page report.</h1>
           </div>
 
           <div className="t3d-divider" style={{ marginBottom: 'clamp(32px,5vh,52px)' }} />
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
                     T3D Sovereign Report
                   </p>
                   <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginTop: 4 }}>
-                    44 PAGES · INSTANT DELIVERY · ONE-TIME
+                    40+ PAGES · INSTANT DELIVERY · ONE-TIME
                   </p>
                 </div>
                 <span style={{
