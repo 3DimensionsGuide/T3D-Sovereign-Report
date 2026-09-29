@@ -30,7 +30,7 @@ const S = StyleSheet.create({
 
   content: {
     flex: 1, paddingHorizontal: PAGE.marginH,
-    paddingTop: 44,
+    paddingTop: 36,
   },
 
   sectionTag: {
@@ -47,13 +47,13 @@ const S = StyleSheet.create({
   },
   rule: {
     width: PAGE.contentWidth, height: 0.5,
-    backgroundColor: C.base, opacity: 0.1, marginBottom: 24,
+    backgroundColor: C.base, opacity: 0.1, marginBottom: 16,
   },
 
   // ── System identifier bar ─────────────────────────────────────────────────
   systemBar: {
     flexDirection: 'row', alignItems: 'center', gap: 16,
-    marginBottom: 20,
+    marginBottom: 14,
   },
   systemDot: { width: 4, height: 4 },
   systemLabel: {
@@ -66,19 +66,19 @@ const S = StyleSheet.create({
 
   // ── The synthesis paragraph ───────────────────────────────────────────────
   synthesisContainer: {
-    padding: 24,
+    padding: 18,
     borderLeftWidth: 3,
     borderLeftStyle: 'solid',
     borderLeftColor: 'rgba(13,13,14,0.12)',
     backgroundColor: 'rgba(13,13,14,0.025)',
-    marginBottom: 20,
+    marginBottom: 14,
   },
   synthesisText: {
     fontFamily: F.sans,
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: 300,
     color: C.base,
-    lineHeight: 1.75,
+    lineHeight: 1.6,
     maxWidth: 440,
   },
 
@@ -103,7 +103,7 @@ const S = StyleSheet.create({
 
   // ── Configuration reference (small) ──────────────────────────────────────
   configRef: {
-    marginTop: 20, paddingTop: 14,
+    marginTop: 14, paddingTop: 10,
     borderTopWidth: 0.5, borderTopColor: 'rgba(13,13,14,0.1)',
     flexDirection: 'row', gap: 24,
   },

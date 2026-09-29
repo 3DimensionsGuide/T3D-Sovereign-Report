@@ -193,8 +193,10 @@ const S = StyleSheet.create({
 
   // ── Footer note ────────────────────────────────────────────────────────────
   footerNote: {
-    paddingHorizontal: PAGE.marginH,
-    paddingBottom: 20,
+    marginTop: 16,
+    paddingTop: 14,
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(13,13,14,0.1)',
   },
   footerNoteText: {
     fontFamily: F.sans,
@@ -306,13 +308,15 @@ export default function Page9SevenDay({ data }: Props) {
             <View key={i} style={S.notesLine} />
           ))}
         </View>
-      </View>
 
-      {/* Footer note */}
-      <View style={S.footerNote}>
-        <Text style={S.footerNoteText}>
-          After seven days, return to page 5. Notice what shifted. That is more useful data than any insight written in this report.
-        </Text>
+        {/* Footer note — kept inside the flex:1 content block so it stays
+            bounded by the page's reserved bottom margin instead of flowing
+            past it into the fixed footer's zone. */}
+        <View style={S.footerNote}>
+          <Text style={S.footerNoteText}>
+            After seven days, return to page 5. Notice what shifted. That is more useful data than any insight written in this report.
+          </Text>
+        </View>
       </View>
 
       <View style={S.footer} fixed>

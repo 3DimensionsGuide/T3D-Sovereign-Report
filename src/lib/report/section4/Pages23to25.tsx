@@ -22,10 +22,10 @@ const S23 = StyleSheet.create({
 
   challengeList: { flexDirection: 'column', gap: 0 },
   challengeRow: {
-    paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: C.base,
+    paddingVertical: 10, borderBottomWidth: 0.5, borderBottomColor: C.base,
     borderBottomStyle: 'solid', flexDirection: 'row', gap: 14, alignItems: 'flex-start',
   },
-  challengeRowLast: { paddingVertical: 14, flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
+  challengeRowLast: { paddingVertical: 10, flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
 
   challengeLeft: { width: 56, flexShrink: 0, alignItems: 'center', gap: 4 },
   challengeNumber: {
@@ -42,7 +42,7 @@ const S23 = StyleSheet.create({
   challengeSkillText: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.85 },
   challengeReframe: { fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base, lineHeight: 1.5, opacity: 0.65 },
 
-  note: { marginTop: 16, paddingTop: 14, borderTopWidth: 0.5, borderTopColor: C.base, borderTopStyle: 'solid' },
+  note: { marginTop: 10, paddingTop: 10, borderTopWidth: 0.5, borderTopColor: C.base, borderTopStyle: 'solid' },
   noteText: { fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base, lineHeight: 1.5, opacity: 0.65 },
 
   footer: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -99,7 +99,7 @@ export function Page23Challenges({ data }: Page23Props) {
                     <>
                       <Text style={S23.challengeTerrain}>The same terrain returns.</Text>
                       <Text style={S23.challengeSkillText}>
-                        Challenge {num} also appeared in your {PHASE_LABELS[earlierMatchIdx]} phase (above) — a number reduction shared by two of your four Challenge positions. That repetition is a real feature of your numbers, not a different terrain: the skill being developed here is the same one described above, now recurring in this phase of life.
+                        Challenge {num} also appeared in your {PHASE_LABELS[earlierMatchIdx]} phase above — a real feature of your numbers, not a different terrain. The skill described there is simply recurring in this phase of life.
                       </Text>
                     </>
                   ) : (
