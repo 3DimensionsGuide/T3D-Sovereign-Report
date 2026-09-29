@@ -18,9 +18,11 @@
 
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { waitUntil } from '@vercel/functions';
 import { db }    from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { eq }    from 'drizzle-orm';
+import { generateAndEmailReport } from '@/lib/report/generateAndEmailReport';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-07-29.dahlia',
@@ -89,6 +91,15 @@ export async function POST(request: Request) {
           `[Stripe Webhook] ✓ Lead ${leadId} marked as purchased ` +
           `(PaymentIntent ${paymentIntent.id}, $${(paymentIntent.amount / 100).toFixed(2)})`
         );
+
+        // Generate the PDF and email it, in the background — AFTER this
+        // handler has already returned its response to Stripe below.
+        // waitUntil() keeps the serverless function alive long enough to
+        // finish this work without delaying or risking Stripe's expected
+        // fast response (PDF generation + synthesis can take several
+        // seconds, which would otherwise risk a timeout/retry).
+        waitUntil(generateAndEmailReport(leadId));
+
         break;
       }
 

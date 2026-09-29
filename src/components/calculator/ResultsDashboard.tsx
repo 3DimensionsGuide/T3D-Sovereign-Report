@@ -274,7 +274,7 @@ export default function ResultsDashboard() {
         {/* UPGRADE 5 — CTA: crimson, zero radius, ALL CAPS 11px DM Sans */}
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
           <Link href="/checkout" className="t3d-cta" style={{ maxWidth: 320, width: 'auto', padding: '16px 40px' }}>
-            UNLOCK FULL REPORT — $97
+            UNLOCK FULL REPORT — $44
           </Link>
           <button onClick={reset} className="t3d-ghost">
             RECALCULATE

@@ -1,7 +1,7 @@
 /**
  * POST /api/stripe/create-payment-intent
  *
- * Creates a Stripe PaymentIntent for the $97 Sovereign Report.
+ * Creates a Stripe PaymentIntent for the $44 Sovereign Report.
  * Called by the checkout page on mount.
  * Returns the clientSecret needed to confirm payment client-side.
  */
