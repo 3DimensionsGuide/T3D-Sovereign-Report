@@ -12,7 +12,7 @@ import { CHALLENGE_THEMES } from './road-content';
 import type { ReportData } from '../tokens';
 
 const S23 = StyleSheet.create({
-  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: PAGE.marginV + 40, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
   emeraldLine: { width: PAGE.width, height: 1.5, backgroundColor: C.emerald },
   content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40,},
   sectionTag: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2.5, color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 8 },
@@ -264,8 +264,6 @@ const S25 = StyleSheet.create({
   },
   emeraldFooterLeft: { fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 1.5, textTransform: 'uppercase', color: C.base, opacity: 0.7 },
   emeraldFooterRight: { fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base },
-  emeraldPageNum: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 12, flexDirection: 'row', justifyContent: 'flex-end', backgroundColor: C.emerald },
-  pageNum: { fontFamily: F.sans, fontSize: 7, color: C.baseSoft, opacity: 0.5 },
 });
 
 const AUDIT_QUESTIONS = [
@@ -331,9 +329,6 @@ export function Page25RoadPractice({ data }: Page25Props) {
       <View style={S25.emeraldFooter}>
         <Text style={S25.emeraldFooterLeft}>The Road · Section 4 Complete</Text>
         <Text style={S25.emeraldFooterRight}>Continue to The Stoplight — page 26</Text>
-      </View>
-      <View style={S25.emeraldPageNum} fixed>
-        <Text style={S25.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );

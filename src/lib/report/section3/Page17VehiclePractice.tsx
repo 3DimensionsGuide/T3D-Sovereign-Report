@@ -88,12 +88,6 @@ const S = StyleSheet.create({
   amberFooterRight: {
     fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base,
   },
-  amberPageNum: { position: 'absolute', bottom: 0, left: 0, right: 0,
-    paddingHorizontal: PAGE.marginH, paddingBottom: 12,
-    flexDirection: 'row', justifyContent: 'flex-end',
-    backgroundColor: C.amber,
-  },
-  pageNum: { fontFamily: F.sans, fontSize: 7, color: C.baseSoft, opacity: 0.5 },
 });
 
 const DAYS = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
@@ -171,9 +165,6 @@ export default function Page17VehiclePractice({ data }: Props) {
         <Text style={S.amberFooterRight}>
           Continue to The Road — page 18
         </Text>
-      </View>
-      <View style={S.amberPageNum} fixed>
-        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
   );
