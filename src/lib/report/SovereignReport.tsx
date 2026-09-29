@@ -1,13 +1,13 @@
 /**
- * T3D Sovereign Report — Complete 44-Page Document
+ * T3D Sovereign Report — Complete 46-Page Document
  *
  * Section 1 — Arrival              (Pages 1–4)   ✅
  * Section 2 — Your Coordinates     (Pages 5–9)   ✅
  * Section 3 — The Vehicle          (Pages 10–17) ✅
  * Section 4 — The Road             (Pages 18–25) ✅
- * Section 5 — The Stoplight        (Pages 26–33) ✅
- * Section 6 — Sovereign OS         (Pages 34–39) ✅
- * Section 7 — Integration & Close  (Pages 40–44) ✅
+ * Section 5 — The Stoplight        (Pages 26–35) ✅
+ * Section 6 — Sovereign OS         (Pages 36–41) ✅
+ * Section 7 — Integration & Close  (Pages 42–46) ✅
  */
 
 import React from 'react';
@@ -50,6 +50,8 @@ import Page26StoplightDivider from './section5/Page26StoplightDivider';
 import Page33TwoSkyFieldPractice from './section5/Page33TwoSkyFieldPractice';
 import Page32StoplightFriction   from './section5/Page32StoplightFriction';
 import Page31RulerElementsArenas from './section5/Page31RulerElementsArenas';
+import Page31bTimeLord           from './section5/Page31bTimeLord';
+import Page31cActivatedYear      from './section5/Page31cActivatedYear';
 import Page30StoplightSynthesis from './section5/Page30StoplightSynthesis';
 import Page29DualLensProtocol   from './section5/Page29DualLensProtocol';
 import Page28SiderealBigThree  from './section5/Page28SiderealBigThree';
@@ -115,17 +117,19 @@ export function SovereignReport({ data }: Props) {
       <Page24RoadFriction     data={data} />
       <Page25RoadPractice     data={data} />
 
-      {/* ── SECTION 5: THE STOPLIGHT ────────────────────────── Pages 26–33 */}
+      {/* ── SECTION 5: THE STOPLIGHT ────────────────────────── Pages 26–35 */}
       <Page26StoplightDivider data={data} />
       <Page27TropicalBigThree data={data} />
       <Page28SiderealBigThree  data={data as any} />
       <Page29DualLensProtocol />
       <Page30StoplightSynthesis data={data as any} />
       <Page31RulerElementsArenas  data={data as any} />
+      <Page31bTimeLord            data={data} />
+      <Page31cActivatedYear       data={data} />
       <Page32StoplightFriction    data={data} />
       <Page33TwoSkyFieldPractice />
 
-      {/* ── SECTION 6: SOVEREIGN OS ─────────────────────────── Pages 34–39 */}
+      {/* ── SECTION 6: SOVEREIGN OS ─────────────────────────── Pages 36–41 */}
       <Page34SOSDivider    data={data} />
       <Page35Decisions     data={data} />
       <Page36CreativeWork  data={data} />
@@ -133,7 +137,7 @@ export function SovereignReport({ data }: Props) {
       <Page38Recalibration data={data} />
       <Page39SevenDay      data={data} />
 
-      {/* ── SECTION 7: INTEGRATION & CLOSE ─────────────────── Pages 40–44 */}
+      {/* ── SECTION 7: INTEGRATION & CLOSE ─────────────────── Pages 42–46 */}
       <Page40NavigationCard data={data} />
       <Page41Leave         data={data} />
       <Page42Keep          data={data} />

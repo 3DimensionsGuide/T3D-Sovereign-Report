@@ -397,3 +397,179 @@ export const TYPE_EXPERIMENT: Record<string, {
     ],
   },
 };
+
+// ─── FIRDARIA TIME LORD & ANNUAL PROFECTIONS (used by Section 5 Stoplight timing pages) ───
+
+export type FirdariaPlanet =
+  | 'Sun' | 'Venus' | 'Mercury' | 'Moon' | 'Saturn'
+  | 'Jupiter' | 'Mars' | 'North Node' | 'South Node';
+
+interface FirdariaSlot { planet: FirdariaPlanet; years: number; }
+
+const FIRDARIA_DAY_SEQUENCE: FirdariaSlot[] = [
+  { planet: 'Sun',        years: 10 },
+  { planet: 'Venus',      years: 8  },
+  { planet: 'Mercury',    years: 13 },
+  { planet: 'Moon',       years: 9  },
+  { planet: 'Saturn',     years: 11 },
+  { planet: 'Jupiter',    years: 12 },
+  { planet: 'Mars',       years: 7  },
+  { planet: 'North Node', years: 3  },
+  { planet: 'South Node', years: 2  },
+];
+
+const FIRDARIA_NIGHT_SEQUENCE: FirdariaSlot[] = [
+  { planet: 'Moon',       years: 9  },
+  { planet: 'Saturn',     years: 11 },
+  { planet: 'Jupiter',    years: 12 },
+  { planet: 'Mars',       years: 7  },
+  { planet: 'Sun',        years: 10 },
+  { planet: 'Venus',      years: 8  },
+  { planet: 'Mercury',    years: 13 },
+  { planet: 'North Node', years: 3  },
+  { planet: 'South Node', years: 2  },
+];
+
+export const FIRDARIA_TAGLINES: Record<FirdariaPlanet, string> = {
+  Sun:          'Vitality, visibility, and leading from the front',
+  Venus:        'Harmony, attraction, and relational ease',
+  Mercury:      'Analysis, exchange, and gathering information',
+  Moon:         'Receptivity, rhythm, and emotional foundation',
+  Saturn:       'Structure, mastery, and consolidation',
+  Jupiter:      'Expansion, opportunity, and growth',
+  Mars:         'Initiative, drive, and direct action',
+  'North Node': 'Momentum toward unfamiliar, forward-facing terrain',
+  'South Node': 'Release, integration, and closing loops',
+};
+
+/** Traditional (whole-sign) planetary rulers — mirrors the Chart Ruler table on Page 31. */
+export const TRADITIONAL_RULERS: Record<string, string> = {
+  Aries: 'Mars', Taurus: 'Venus', Gemini: 'Mercury', Cancer: 'Moon',
+  Leo: 'Sun', Virgo: 'Mercury', Libra: 'Venus', Scorpio: 'Mars',
+  Sagittarius: 'Jupiter', Capricorn: 'Saturn', Aquarius: 'Saturn', Pisces: 'Jupiter',
+};
+
+const FIRDARIA_ZODIAC_ORDER = [
+  'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+  'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
+];
+
+/** Whole Sign house number (1–12) of a planet's sign, counted from the Ascendant sign. */
+function firdariaWholeSignHouse(planetSign: string, ascSign: string): number | null {
+  const p = FIRDARIA_ZODIAC_ORDER.indexOf(planetSign);
+  const a = FIRDARIA_ZODIAC_ORDER.indexOf(ascSign);
+  if (p === -1 || a === -1) return null;
+  return 1 + ((p - a + 12) % 12);
+}
+
+/** Day chart (diurnal) when the Sun falls in houses 7–12 (above the horizon). */
+function isDiurnalChart(sunSign: string, ascSign: string): boolean {
+  const house = firdariaWholeSignHouse(sunSign, ascSign);
+  if (house === null) return true; // default to a day chart when Rising is unconfirmed
+  return house >= 7 && house <= 12;
+}
+
+function ageInYears(birthDate: string): { exact: number; completed: number } {
+  const parts = birthDate.split('-');
+  const y = parseInt(parts[0] ?? '1990', 10);
+  const m = parseInt(parts[1] ?? '1', 10);
+  const d = parseInt(parts[2] ?? '1', 10);
+  const birth = Date.UTC(y, m - 1, d);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const MS_PER_YEAR = 365.2425 * 24 * 60 * 60 * 1000;
+  const exact = (today - birth) / MS_PER_YEAR;
+  return { exact, completed: Math.floor(exact) };
+}
+
+export interface FirdariaPeriod {
+  planet:    FirdariaPlanet;
+  startAge:  number;
+  endAge:    number;
+  startYear: number;
+  endYear:   number;
+  tagline:   string;
+}
+
+export interface FirdariaResult {
+  isDayChart:     boolean;
+  sequence:       FirdariaPeriod[];   // the full 75-year cycle, in order
+  currentIndex:   number;
+  previous:       FirdariaPeriod | null;
+  current:        FirdariaPeriod;
+  next:           FirdariaPeriod | null;
+  ageExact:       number;
+  yearsElapsed:   number;
+  yearsRemaining: number;
+}
+
+/**
+ * Firdaria — classical (Persian) system of sequential planetary ruling periods across
+ * a 75-year cycle. Sect (day/night) is set by the Sun's Whole Sign house: day charts
+ * begin with the Sun, night charts begin with the Moon. Falls back to a day chart when
+ * the Rising sign is unconfirmed (sect cannot be determined without it).
+ */
+export function calculateFirdaria(birthDate: string, sunSign: string, ascSign: string): FirdariaResult {
+  const isDayChart = isDiurnalChart(sunSign, ascSign);
+  const order = isDayChart ? FIRDARIA_DAY_SEQUENCE : FIRDARIA_NIGHT_SEQUENCE;
+  const birthYear = parseInt(birthDate.split('-')[0] ?? '1990', 10);
+
+  let cursor = 0;
+  const sequence: FirdariaPeriod[] = order.map(({ planet, years }) => {
+    const startAge = cursor;
+    const endAge = cursor + years;
+    cursor = endAge;
+    return {
+      planet,
+      startAge,
+      endAge,
+      startYear: birthYear + startAge,
+      endYear:   birthYear + endAge,
+      tagline:   FIRDARIA_TAGLINES[planet],
+    };
+  });
+
+  const { exact } = ageInYears(birthDate);
+  let currentIndex = sequence.findIndex(p => exact >= p.startAge && exact < p.endAge);
+  if (currentIndex === -1) currentIndex = exact < 0 ? 0 : sequence.length - 1;
+
+  const current = sequence[currentIndex]!;
+
+  return {
+    isDayChart,
+    sequence,
+    currentIndex,
+    previous: currentIndex > 0 ? sequence[currentIndex - 1]! : null,
+    current,
+    next: currentIndex < sequence.length - 1 ? sequence[currentIndex + 1]! : null,
+    ageExact: exact,
+    yearsElapsed: Math.max(0, exact - current.startAge),
+    yearsRemaining: Math.max(0, current.endAge - exact),
+  };
+}
+
+export interface ProfectionResult {
+  age:   number;   // completed age for this profection year
+  house: number;   // 1–12, Whole Sign, counted from the natal Ascendant
+  sign:  string;
+  lord:  string;   // traditional ruler of that sign — the "Lord of the Year"
+}
+
+/**
+ * Annual Profections — advances one Whole Sign house per year of life from the natal
+ * Ascendant (age 0 → House 1, age 1 → House 2, …). The ruling planet of that year's
+ * house is the "Lord of the Year" — the single-year companion to the Firdaria major period.
+ */
+export function calculateProfection(birthDate: string, ascSign: string): ProfectionResult {
+  const { completed } = ageInYears(birthDate);
+  const house = (completed % 12) + 1;
+  const ascIndex = FIRDARIA_ZODIAC_ORDER.indexOf(ascSign);
+  const signIndex = ascIndex === -1 ? house - 1 : (ascIndex + house - 1) % 12;
+  const sign = FIRDARIA_ZODIAC_ORDER[signIndex]!;
+  return {
+    age: completed,
+    house,
+    sign,
+    lord: TRADITIONAL_RULERS[sign] ?? sign,
+  };
+}

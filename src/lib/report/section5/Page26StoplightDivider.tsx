@@ -28,7 +28,7 @@ export default function Page26StoplightDivider({ data }: Props) {
 
       <View style={S.crimsonLine} />
       <View style={S.content}>
-        <Text style={S.sectionNum}>Section V · Pages 26–33</Text>
+        <Text style={S.sectionNum}>Section V · Pages 26–35</Text>
         <Text style={S.sectionTitle}>The</Text>
         <Text style={S.sectionSubtitle}>Stoplight</Text>
         <View style={S.rule} />

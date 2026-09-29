@@ -53,7 +53,7 @@ export default function Page34SOSDivider({ data }: Props) {
       </View>
 
       <View style={S.content}>
-        <Text style={S.sectionNum}>Section VI · Pages 34–39</Text>
+        <Text style={S.sectionNum}>Section VI · Pages 36–41</Text>
         <Text style={S.title}>The</Text>
         <Text style={S.mainTitle}>Sovereign{'\n'}Operating{'\n'}System</Text>
         <View style={S.rule} />

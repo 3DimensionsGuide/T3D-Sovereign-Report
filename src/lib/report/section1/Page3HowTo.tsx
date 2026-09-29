@@ -4,9 +4,9 @@
  * Reader need: "Where Do I Start?"
  *
  * Three reading modes:
- *   1. "Read in one sitting"       — Pages 1–44
+ *   1. "Read in one sitting"       — Pages 1–46
  *   2. "Use before a decision"     — Pages 5–9, then relevant dimension
- *   3. "Return during friction"    — Pages 10–44
+ *   3. "Return during friction"    — Pages 10–46
  *
  * Three-step path diagram:
  *   ORIENT → LOCATE → APPLY
@@ -270,21 +270,21 @@ const MODES = [
     num:   '01',
     title: 'Read in one sitting',
     when:  'For · First encounter',
-    pages: 'Pages 1–44',
+    pages: 'Pages 1–46',
     desc:  'Set aside 90 minutes and read linearly from the beginning. Don\'t stop to research unfamiliar terms — let the complete picture land before you interrogate any part of it. Comprehension compounds as you go.',
   },
   {
     num:   '02',
     title: 'Use before a decision',
     when:  'For · A specific choice',
-    pages: 'Pages 5–9, then 10–44',
+    pages: 'Pages 5–9, then 10–46',
     desc:  'Start with The T3D Lens (pages 5–9), then navigate to the dimension most relevant to your question. Human Design when the question is about how to act. Numerology when it\'s about timing. Astrology when it\'s about external conditions.',
   },
   {
     num:   '03',
     title: 'Return during friction',
     when:  'For · When something isn\'t working',
-    pages: 'Pages 10–44',
+    pages: 'Pages 10–46',
     desc:  'Open to the section that speaks to the friction and read slowly. The insights in this report tend to reorganize themselves when you\'re in the middle of something — they mean more when there\'s something specific at stake.',
   },
 ];
@@ -352,7 +352,7 @@ export default function Page3HowTo() {
           <View style={S.pathStep}>
             <Text style={S.stepNumber}>Step 2</Text>
             <Text style={S.stepTitle}>Locate</Text>
-            <Text style={S.stepPages}>Pages 10–44</Text>
+            <Text style={S.stepPages}>Pages 10–46</Text>
             <Text style={S.stepDesc}>Find the dimension most relevant to your question.</Text>
           </View>
 

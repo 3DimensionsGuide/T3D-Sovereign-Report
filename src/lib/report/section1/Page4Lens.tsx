@@ -94,7 +94,7 @@ export default function Page4Lens() {
     },
     {
       num: 'Section V',
-      text: 'The Stoplight (Pages 26–33) — your Sun, Moon, Rising, element pattern. The environmental reading is here.',
+      text: 'The Stoplight (Pages 26–35) — your Sun, Moon, Rising, element pattern. The environmental reading is here.',
     },
   ];
 

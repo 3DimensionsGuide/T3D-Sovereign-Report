@@ -1,6 +1,6 @@
 /**
  * T3D Report — Astrology Content Library
- * Section 5: The Stoplight (Pages 26–33)
+ * Section 5: The Stoplight (Pages 26–35)
  *
  * Selection rule: only placements that change the reader's
  * behavior or self-understanding. This is a navigation system,
