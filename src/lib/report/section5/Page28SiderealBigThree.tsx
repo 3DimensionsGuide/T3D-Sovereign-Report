@@ -332,7 +332,7 @@ const S = StyleSheet.create({
     color: C.parchmentFaint, lineHeight: 1.5, fontStyle: 'italic', marginBottom: 8,
   },
 
-  footer: {
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH, paddingBottom: 22,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },

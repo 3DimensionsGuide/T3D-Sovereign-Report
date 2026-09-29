@@ -72,7 +72,7 @@ const S = StyleSheet.create({
   outcomeBlock: { flex: 1, padding: '9 10', borderWidth: 0.5, borderColor: 'rgba(13,13,14,0.15)', alignItems: 'center' },
   outcomeText: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 1, textTransform: 'uppercase', color: C.base, textAlign: 'center' },
 
-  footer: { paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerText: { fontFamily: F.sans, fontSize: 7, letterSpacing: 1.2, color: C.parchmentFaint, textTransform: 'uppercase' },
   pageNum: { fontFamily: F.sans, fontSize: 7, color: C.parchmentFaint },
 });

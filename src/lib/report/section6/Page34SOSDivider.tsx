@@ -32,7 +32,7 @@ const S = StyleSheet.create({
   statement: { fontFamily: F.display, fontSize: 16, fontWeight: 400, fontStyle: 'italic', color: C.parchment, lineHeight: 1.5, maxWidth: 380, opacity: 0.85 },
   pagesNote: { fontFamily: F.sans, fontSize: 7, fontWeight: 400, letterSpacing: 1.8, color: C.parchmentFaint, textTransform: 'uppercase', marginTop: 36, opacity: 0.5 },
 
-  bottom: { paddingHorizontal: PAGE.marginH, paddingBottom: 36, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  bottom: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 36, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   footerLeft: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 2, color: C.parchmentFaint, textTransform: 'uppercase', opacity: 0.45 },
   pageNum: { fontFamily: F.sans, fontSize: 8.5, color: C.parchmentFaint, opacity: 0.45 },
 });

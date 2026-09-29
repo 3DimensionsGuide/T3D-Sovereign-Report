@@ -46,7 +46,7 @@ const S = StyleSheet.create({
     textTransform: 'uppercase', marginTop: 36, opacity: 0.5,
   },
 
-  bottom: {
+  bottom: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH, paddingBottom: 36,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
   },

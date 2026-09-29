@@ -136,7 +136,7 @@ const S = StyleSheet.create({
     color: C.base,
   },
 
-  footer: {
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH, paddingBottom: 24,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },

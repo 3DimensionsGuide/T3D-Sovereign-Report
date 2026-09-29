@@ -88,7 +88,7 @@ const S = StyleSheet.create({
   amberFooterRight: {
     fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base,
   },
-  amberPageNum: {
+  amberPageNum: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH, paddingBottom: 12,
     flexDirection: 'row', justifyContent: 'flex-end',
     backgroundColor: C.amber,

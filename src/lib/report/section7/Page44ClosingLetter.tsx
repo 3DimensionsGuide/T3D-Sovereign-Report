@@ -106,7 +106,7 @@ const S = StyleSheet.create({
   bottomBar: { flexDirection: 'row', width: PAGE.width },
   bottomBarInner: { flex: 1, height: 1.5, opacity: 0.4 },
 
-  bottomStamp: {
+  bottomStamp: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH, paddingVertical: 14,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },

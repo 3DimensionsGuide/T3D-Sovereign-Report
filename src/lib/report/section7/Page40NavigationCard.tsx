@@ -121,7 +121,7 @@ const S = StyleSheet.create({
   frictionKey:   { fontFamily: F.sans, fontSize: 6, fontWeight: 500, letterSpacing: 1.2, textTransform: 'uppercase', color: C.parchmentFaint },
   frictionVal:   { fontFamily: F.sans, fontSize: 8, fontWeight: 300, color: C.base, lineHeight: 1.45, opacity: 0.82 },
 
-  footerStamp: {
+  footerStamp: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: 36, paddingBottom: 14, paddingTop: 8,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     borderTopWidth: 0.5, borderTopColor: 'rgba(13,13,14,0.08)',

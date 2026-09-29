@@ -138,7 +138,7 @@ const S = StyleSheet.create({
   },
 
   // Footer
-  footer: {
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH, paddingBottom: 22,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },

@@ -29,7 +29,7 @@ const BASE = StyleSheet.create({
   label:    { fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 2, textTransform: 'uppercase' },
   body:     { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.85 },
   italic:   { fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base, lineHeight: 1.5, opacity: 0.7 },
-  footer:   { paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer:   { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerT:  { fontFamily: F.sans, fontSize: 7, letterSpacing: 1.2, color: C.parchmentFaint, textTransform: 'uppercase' },
   pageNum:  { fontFamily: F.sans, fontSize: 7, color: C.parchmentFaint },
   block:    { padding: 14, gap: 5, marginBottom: 12 },
@@ -361,7 +361,7 @@ export function Page39SevenDay({ data }: P39Props) {
           <Text style={{ fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 1.5, textTransform: 'uppercase', color: C.parchment, opacity: 0.7 }}>Stoplight</Text>
         </View>
       </View>
-      <View style={{ paddingHorizontal: PAGE.marginH, paddingBottom: 10, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} fixed>
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 10, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} fixed>
         <Text style={BASE.footerT}>The Sovereign Report</Text>
         <Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>

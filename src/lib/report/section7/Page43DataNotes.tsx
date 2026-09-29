@@ -42,7 +42,7 @@ const S = StyleSheet.create({
   linkText: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 400, color: C.emerald, lineHeight: 1.5 },
   smallText: { fontFamily: F.sans, fontSize: 8.5, fontWeight: 300, color: C.parchmentFaint, lineHeight: 1.5, opacity: 0.8 },
 
-  footer: { paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerT: { fontFamily: F.sans, fontSize: 7, letterSpacing: 1.2, color: C.parchmentFaint, textTransform: 'uppercase' },
   pageNum: { fontFamily: F.sans, fontSize: 7, color: C.parchmentFaint },
 });

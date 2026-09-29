@@ -165,7 +165,7 @@ const S = StyleSheet.create({
   },
 
   // ── Bottom page number ────────────────────────────────────────────────────
-  footer: {
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH,
     paddingBottom: 28,
     flexDirection: 'row',

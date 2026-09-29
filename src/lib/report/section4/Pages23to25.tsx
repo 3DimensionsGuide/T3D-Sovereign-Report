@@ -45,7 +45,7 @@ const S23 = StyleSheet.create({
   note: { marginTop: 16, paddingTop: 14, borderTopWidth: 0.5, borderTopColor: C.base, borderTopStyle: 'solid' },
   noteText: { fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base, lineHeight: 1.5, opacity: 0.65 },
 
-  footer: { paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerText: { fontFamily: F.sans, fontSize: 7, letterSpacing: 1.2, color: C.parchmentFaint, textTransform: 'uppercase' },
   pageNum: { fontFamily: F.sans, fontSize: 7, color: C.parchmentFaint },
 });
@@ -161,7 +161,7 @@ const S24 = StyleSheet.create({
   resetTitle: { fontFamily: F.display, fontSize: 13, fontWeight: 400, color: C.parchment },
   resetText: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchment, lineHeight: 1.5, opacity: 0.75 },
 
-  footer: { paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   footerText: { fontFamily: F.sans, fontSize: 7, letterSpacing: 1.2, color: C.parchmentFaint, textTransform: 'uppercase' },
   pageNum: { fontFamily: F.sans, fontSize: 7, color: C.parchmentFaint },
 });
@@ -264,7 +264,7 @@ const S25 = StyleSheet.create({
   },
   emeraldFooterLeft: { fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 1.5, textTransform: 'uppercase', color: C.base, opacity: 0.7 },
   emeraldFooterRight: { fontFamily: F.display, fontSize: 10.5, fontWeight: 400, fontStyle: 'italic', color: C.base },
-  emeraldPageNum: { paddingHorizontal: PAGE.marginH, paddingBottom: 12, flexDirection: 'row', justifyContent: 'flex-end', backgroundColor: C.emerald },
+  emeraldPageNum: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 12, flexDirection: 'row', justifyContent: 'flex-end', backgroundColor: C.emerald },
   pageNum: { fontFamily: F.sans, fontSize: 7, color: C.baseSoft, opacity: 0.5 },
 });
 

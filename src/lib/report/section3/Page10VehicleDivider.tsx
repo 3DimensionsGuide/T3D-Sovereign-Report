@@ -96,7 +96,7 @@ const S = StyleSheet.create({
   },
 
   // Bottom — reader's type
-  bottom: {
+  bottom: { position: 'absolute', bottom: 0, left: 0, right: 0,
     paddingHorizontal: PAGE.marginH,
     paddingBottom: 36,
     flexDirection: 'row',
