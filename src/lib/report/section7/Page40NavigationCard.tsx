@@ -38,7 +38,7 @@ const S = StyleSheet.create({
   headerRight: { gap: 2, alignItems: 'flex-end' },
   dateText:    { fontFamily: F.sans, fontSize: 7, fontWeight: 300, letterSpacing: 0.8, color: C.parchmentFaint },
 
-  columnsRow: { flexDirection: 'row', flex: 1 },
+  columnsRow: { flexDirection: 'row' },
   column:     { flex: 1, paddingHorizontal: 16, paddingVertical: 14, gap: 0 },
   colDivider: { width: 0.5, backgroundColor: C.base, opacity: 0.1 },
 
