@@ -361,10 +361,6 @@ export function Page39SevenDay({ data }: P39Props) {
           <Text style={{ fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 1.5, textTransform: 'uppercase', color: C.parchment, opacity: 0.7 }}>Stoplight</Text>
         </View>
       </View>
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: PAGE.marginH, paddingBottom: 10, paddingTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} fixed>
-        <Text style={BASE.footerT}>The Sovereign Report</Text>
-        <Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} />
-      </View>
     </Page>
   );
 }

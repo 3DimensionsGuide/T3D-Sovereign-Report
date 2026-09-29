@@ -20,7 +20,7 @@ import type { ReportData } from '../tokens';
 const STAR_SLATE = '#6D7797';
 
 const S = StyleSheet.create({
-  page: { backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingBottom: 44, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
 
   triBar: { flexDirection: 'row', width: PAGE.width },
   barA:   { flex: 1, height: 3, backgroundColor: C.amber },
