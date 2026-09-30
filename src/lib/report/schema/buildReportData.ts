@@ -91,6 +91,19 @@ function getSignFromRaw(raw: unknown, formatted: string): string {
   return extractSign(formatted);
 }
 
+// Raw exact longitude (0–360°) off the stored planet object — needed by
+// Transits, which has to compare a moving planet's current degree against
+// a fixed natal degree. Falls back to 0 (still renders, just as an inert
+// 0° Aries placement) rather than throwing when a legacy record predates
+// this field.
+function getLongitudeFromRaw(raw: unknown): number {
+  if (raw && typeof raw === 'object') {
+    const lon = (raw as RawRecord)['longitude'];
+    if (typeof lon === 'number' && !Number.isNaN(lon)) return lon;
+  }
+  return 0;
+}
+
 // ─── Pinnacle normalization ───────────────────────────────────────────────────
 
 type RawPinnacle = { number?: unknown; label?: unknown; startAge?: unknown; endAge?: unknown };
@@ -240,6 +253,11 @@ export function buildReportData(lead: LeadRecord): ReportData {
   const moonSign   = getSignFromRaw(tropMoonRaw, tropicalMoon);
   const risingSign = getSignFromRaw(tropAscRaw,  tropicalAsc);
 
+  // Exact tropical degrees (Advanced Stoplight Transits only)
+  const tropicalSunLongitude  = getLongitudeFromRaw(tropSunRaw);
+  const tropicalMoonLongitude = getLongitudeFromRaw(tropMoonRaw);
+  const tropicalAscLongitude  = getLongitudeFromRaw(tropAscRaw);
+
   // Remaining planets (Advanced Stoplight section only) — sign name per
   // planet, per lens. Same "mapping-only, zero calculations" rule as above;
   // the raw {sign, formatted, ...} objects are already stored from the same
@@ -363,6 +381,11 @@ export function buildReportData(lead: LeadRecord): ReportData {
     siderealUranus:  siderealPlanetSigns['uranus'] ?? '',
     siderealNeptune: siderealPlanetSigns['neptune'] ?? '',
     siderealPluto:   siderealPlanetSigns['pluto'] ?? '',
+
+    // Exact tropical degrees (Advanced Stoplight Transits only)
+    tropicalSunLongitude,
+    tropicalMoonLongitude,
+    tropicalAscLongitude,
 
     // Extracted signs
     sunSign,

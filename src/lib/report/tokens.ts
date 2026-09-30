@@ -121,6 +121,18 @@ export interface ReportData {
   siderealNeptune: string;
   siderealPluto:   string;
 
+  // Astrology — exact tropical degrees (Advanced Stoplight Transits only).
+  // Everything else in this report works from sign names, which is enough
+  // for natal placements — but Transits has to compare the CURRENT degree
+  // of a moving planet against a fixed natal degree to tell whether an
+  // aspect is exact, applying, or separating, so the sign alone isn't
+  // enough here. Transits are read tropically (the mainstream Western
+  // convention the source material itself uses), so only tropical degrees
+  // are needed, not a sidereal pair.
+  tropicalSunLongitude:  number;  // 0–360°
+  tropicalMoonLongitude: number;  // 0–360°
+  tropicalAscLongitude:  number;  // 0–360°
+
   // Extracted signs
   sunSign:    string;
   moonSign:   string;

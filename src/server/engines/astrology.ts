@@ -279,3 +279,15 @@ export function calculateAstrology(input: AstrologyInput): AstrologyResult {
 
   return { tropical, sidereal, julianDay: jd };
 }
+
+// ─── TRANSITS ─────────────────────────────────────────────────────────────────
+//
+// Moved to ./transits.ts — deliberately NOT re-exported from here. Transits
+// use the cross-platform `sweph` package specifically so that importing
+// them never has to touch `swisseph`, which this file `require()`s at the
+// top (see the SWISSEPH IMPORT & CONSTANTS section above) and which
+// crashes module evaluation anywhere its compiled-per-platform binary
+// doesn't match the current platform. A re-export from this file would
+// import this whole module to get there and reintroduce that exact crash,
+// defeating the split. Import Transits code directly from './transits'
+// (or '@/server/engines/transits') instead — never through this file.
