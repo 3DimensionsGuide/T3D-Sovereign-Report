@@ -302,6 +302,13 @@ function calculatePinnacles(
  *  2nd Challenge: |D − Y|
  *  3rd Challenge: |1st − 2nd|  (The Main Challenge)
  *  4th Challenge: |M − Y|
+ *
+ * Unlike Pinnacles, Challenges always reduce to a single digit (0-8) —
+ * Master Numbers are NOT preserved in M/D/Y here. Callers must pass
+ * digitReduceRaw()-reduced values, not the digitReduceMaster()-reduced
+ * values used for Pinnacles, or a difference like |9 - 22| = 13 produces
+ * an out-of-range Challenge number with no corresponding interpretive
+ * content (CHALLENGE_THEMES only covers 0-8).
  */
 function calculateChallenges(
   M: number,
@@ -356,8 +363,16 @@ export function calculateNumerology(input: NumerologyInput): NumerologyResult {
     String(rawYear).split('').reduce((sum, d) => sum + parseInt(d, 10), 0),
   );
 
+  // Challenges use fully-reduced M/D/Y (no Master Number preservation) —
+  // see calculateChallenges' docstring above.
+  const Mc = digitReduceRaw(rawMonth);
+  const Dc = digitReduceRaw(rawDay);
+  const Yc = digitReduceRaw(
+    String(rawYear).split('').reduce((sum, d) => sum + parseInt(d, 10), 0),
+  );
+
   const pinnacles  = calculatePinnacles(M, D, Y, lifePath);
-  const challenges = calculateChallenges(M, D, Y, lifePath);
+  const challenges = calculateChallenges(Mc, Dc, Yc, lifePath);
 
   return {
     lifePath,
