@@ -795,6 +795,55 @@ export const VARIABLE_MEANING: Record<'digestion' | 'environment' | 'perspective
   motivation: 'What drives your conscious mind to act — the frequency underneath your outer, "who I think I am" awareness.',
 };
 
+// General mechanism explainer for the Variables page — independent of any
+// one reader's arrows. Paraphrased from the T3D PHILOSOPHER notebook
+// (Ra Uru Hu, "10 Minute Lecture About Variable"; Dr. Lvina Archers,
+// "Introduction to Human Design Variables"; Leann Wolff, "Human Design
+// Storyline | Variables Explained").
+export const VARIABLES_MECHANISM =
+  "Variables — also called PHS, Primary Health System — are four Left/Right arrows built " +
+  "into every chart: Digestion, Environment, Perspective, and Motivation, each read off a " +
+  "different pair of planetary activations. Left is rooted in an older, more strategic, " +
+  "focused evolutionary pattern; Right is rooted in a newer, more receptive, peripheral " +
+  "one. Neither side is better than the other — they're simply different operating " +
+  "conditions your Vehicle actually runs on, quietly shaping how you eat and process " +
+  "information, where your body physically thrives, how you naturally see, and how your " +
+  "conscious mind takes things in.";
+
+/** The named Left/Right label T3D uses for each Variable, per source terminology. */
+export const VARIABLE_ARROW_LABEL: Record<
+  'digestion' | 'environment' | 'perspective' | 'motivation',
+  Record<ArrowDirection, string>
+> = {
+  digestion:   { Left: 'Active Brain',    Right: 'Passive Brain' },
+  environment: { Left: 'Observed',        Right: 'Observer' },
+  perspective: { Left: 'Focused View',    Right: 'Peripheral View' },
+  motivation:  { Left: 'Strategic Mind',  Right: 'Receptive Mind' },
+};
+
+/** The T3D-voiced practical reading for each Variable's Left/Right arrow. */
+export const VARIABLE_ARROW_MEANING: Record<
+  'digestion' | 'environment' | 'perspective' | 'motivation',
+  Record<ArrowDirection, string>
+> = {
+  digestion: {
+    Left: "Your brain runs hot and needs steady fuel — skipping meals brings on fog and a real ‘hangry’ edge fast. Keep something to eat within reach, and eat on a regular rhythm rather than waiting until you're starving.",
+    Right: "Your brain runs as a quiet, receptive sponge that doesn't need heavy, constant fuel to function well. Three forced meals a day dulls you down — keep food simple, and eat only when you're genuinely hungry.",
+  },
+  environment: {
+    Left: "Your body is built to be active and visible — moving, doing, working in a space where people can see you in motion. A place that makes you sleepy or still is the wrong one; the right one energizes you.",
+    Right: "Your body is built to stay low-key and take everything in from the sidelines, not perform for anyone. Calm, unpressured spaces recharge you — high-stress, high-visibility environments quietly drain you instead.",
+  },
+  perspective: {
+    Left: "You see life through a narrow, precise lens — zeroing in on one specific detail or target at a time. Trying to take in everything at once just scatters your attention; depth is where your clarity actually lives.",
+    Right: "You see life through a wide, soft-focus lens — the whole room, the whole mood, all at once, rather than any one thing. Forcing yourself into tunnel vision on a single detail works against how you actually see.",
+  },
+  motivation: {
+    Left: "Your conscious mind runs on a clear agenda — linear, structured, and good at holding onto specific facts and sequences. You're built to think things through and offer that structured logic to others when it's asked for.",
+    Right: "Your conscious mind works like a deep well — you don't always know what you know until someone asks the right question and draws it out of you. That's not a gap; it's a different, valid kind of intelligence, one that surrenders rather than pushes.",
+  },
+};
+
 /** Longitude → Tone (1-6), via the same mandala math as longitudeToGate(). */
 function longitudeToTone(longitude: number): number {
   const adjusted = ((longitude - MANDALA_START_LON) % 360 + 360) % 360;
