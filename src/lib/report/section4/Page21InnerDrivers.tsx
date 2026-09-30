@@ -194,6 +194,7 @@ function soulUrgeDesc(n: number): string {
     9: 'At the deepest level, you crave to contribute to something larger than yourself.',
     11: 'At the deepest level, you crave spiritual alignment and the ability to inspire.',
     22: 'At the deepest level, you crave to build something that genuinely matters and lasts.',
+    33: 'At the deepest level, you crave to heal and uplift through devoted, hands-on service — love expressed as tireless care for the people around you.',
   };
   return map[n] ?? `Your Soul Urge Number ${n} reflects what drives you from the inside.`;
 }
@@ -211,6 +212,7 @@ function personalityDesc(n: number): string {
     9: 'Others encounter you as compassionate, wise, and generous.',
     11: 'Others encounter you as sensitive, intuitive, and quietly intense.',
     22: 'Others encounter you as capable of something unusually large.',
+    33: 'Others encounter you as deeply nurturing and quietly authoritative — people sense, often quickly, that you can be trusted with their hardest problems.',
   };
   return map[n] ?? `Your Personality Number ${n} shapes how others experience you in initial encounters.`;
 }

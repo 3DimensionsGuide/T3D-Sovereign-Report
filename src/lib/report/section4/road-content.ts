@@ -322,6 +322,7 @@ export const PINNACLE_THEMES: Record<number, { theme: string; terrain: string }>
   9: { theme: 'Completion and Release', terrain: 'A phase of endings, harvesting, and integration. What no longer serves is meant to be released. What has been built is ready to be assessed.' },
   11: { theme: 'Heightened Intuition and Spiritual Development', terrain: 'A phase of amplified sensitivity and unusual insight. The learning is in trusting what you sense before you can explain it.' },
   22: { theme: 'Large-Scale Building', terrain: 'A phase in which vision and discipline converge. What you build during this period has unusual reach and durability.' },
+  33: { theme: 'Compassionate Mastery', terrain: 'A phase of service through embodiment rather than instruction. What you model during this period teaches more than what you say.' },
 };
 
 // ─── CHALLENGE THEMES ─────────────────────────────────────────────────────────
