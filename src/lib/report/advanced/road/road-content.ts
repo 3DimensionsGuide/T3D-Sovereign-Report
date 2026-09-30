@@ -26,6 +26,9 @@
  *   reference numerologists — Hans Decoz, Faith Javane & Dusty Bunker, and
  *   others), per Tyler's explicit direction to use leading-expert general
  *   knowledge where the notebook has nothing to draw from.
+ * - Pinnacles/Challenges (all values): fully sourced from the T3D
+ *   PHILOSOPHER notebook (Felicia Bender, "The Practical Numerologist";
+ *   Hans Decoz for the four phase names and the timing model).
  */
 
 export interface NameNumberContent {
@@ -378,3 +381,191 @@ export const KARMIC_LESSON_CONTENT: Record<number, KarmicLessonContent> = {
     practice: 'Practice release on purpose: generosity that expects nothing back, and letting go of what’s finished before you’re forced to.',
   },
 };
+
+// ─── PINNACLES ───────────────────────────────────────────────────────────────
+// Four life phases, each with its own governing number: the environmental
+// climate, opportunity set, and "degree program" you're enrolled in during
+// that stretch of years. Timing: Phase 1 runs birth to (36 − Life Path);
+// Phases 2 and 3 are each a following 9-year cycle; Phase 4 runs from the
+// end of Phase 3 for the rest of life. Pinnacles preserve Master Numbers
+// (11, 22, 33) — they run on their root number's timeline (11→2, 22→4,
+// 33→6) at a higher, more demanding voltage.
+export interface PinnacleContent {
+  coreMandate: string;       // the overall lesson this number's Pinnacle asks for
+  phases?: [string, string, string, string]; // lived experience in Phase 1–4, in order; Master Numbers use coreMandate only
+}
+
+export const PINNACLE_CONTENT: Record<number, PinnacleContent> = {
+  1: {
+    coreMandate: 'Independence, self-reliance, and leadership — the demand to build real self-confidence, break free of codependence, and lead in a direction that’s actually your own.',
+    phases: [
+      'Separating your own identity from your birth family — through quiet compliance or open rebellion, whichever it takes to find out who you are apart from them.',
+      'Developing a thicker skin: learning to fail forward and take the entrepreneurial risks nobody hands you a safety net for.',
+      'Learning co-creation — holding your independence while actually accounting for the people working alongside you.',
+      'Standing up and being counted on your own terms — marching to your own drum without steamrolling the people around you.',
+    ],
+  },
+  2: {
+    coreMandate: 'Harmony, partnership, and sensitivity — cooperation, diplomacy, and mastering your own emotional and energetic landscape.',
+    phases: [
+      'Managing a hair-trigger sensitivity — learning to mediate conflict without absorbing everyone else’s emotional weight as your own.',
+      'Relationships, marriage, and family move to the center — practicing "us before me" and the patience that takes.',
+      'Setting genuinely clean energetic and emotional boundaries while still practicing real tact and diplomacy.',
+      'A deep, earned fulfillment through group connection and family — finally feeling valued rather than just useful.',
+    ],
+  },
+  3: {
+    coreMandate: 'Creativity, expression, and communication — cultivating artistic talent, real emotional intelligence, and an authentic voice.',
+    phases: [
+      'Developing your creative or artistic talents — or working through the feeling of being blocked, unheard, or misunderstood.',
+      'Stepping into performance, writing, or public presentation, and healing old emotional wounds through honest self-expression.',
+      'Inspiring the people around you, bringing real lightness and humor to your environment, and raising your own emotional intelligence.',
+      'A lighter, freer era — joy, travel, uninhibited creative pursuit, and actually letting yourself enjoy what you built.',
+    ],
+  },
+  4: {
+    coreMandate: 'Hard work, organization, and building foundations — practical effort, systematic planning, and tangible security earned the slow way.',
+    phases: [
+      'Taking on adult responsibility early, or working with limited resources, while learning methodical, step-by-step execution.',
+      'Putting down physical roots — home, family, structure — and building genuine order out of whatever chaos came before.',
+      'Climbing steadily through your field via practical, patient, frugal, long-range planning rather than any shortcut.',
+      'Harvesting decades of labor into a lasting legacy — with a real requirement to schedule rest before your body forces the issue.',
+    ],
+  },
+  5: {
+    coreMandate: 'Freedom, change, and adaptability — rapid shifts, travel, and the paradox of finding freedom through self-discipline.',
+    phases: [
+      'Discovering freedom through adventure or travel, or by breaking out of restrictive home or social circumstances.',
+      'Adapting to shifts you didn’t choose, resisting the pull toward escapism, and genuinely expanding your horizons.',
+      'Reaching real financial or health freedom, walking away from outdated structures, and a real spiritual expansion.',
+      'A fast-paced, freewheeling era of adventure and travel, backed for once by solid ground underneath it.',
+    ],
+  },
+  6: {
+    coreMandate: 'Responsibility, family, and service — domestic duty, caretaking, and accepting the "perfection of imperfection."',
+    phases: [
+      'Early family duty — caretaking siblings or parents — while adjusting expectations that started out too idealistic.',
+      'A domestic focus: marriage, children, and the ongoing work of balancing duty with actual personal boundaries.',
+      'Home and family become the central pillar — caretaking elders or children, and real community or artistic service.',
+      'Reward through unconditional love, mentorship, and a genuinely nurturing home life.',
+    ],
+  },
+  7: {
+    coreMandate: 'Spiritual development, introspection, and specialization — slow internal growth, deep expertise, and trust in what can’t be proven.',
+    phases: [
+      'Feeling like an observer who doesn’t quite fit — turning to study, research, or alternative paths when the standard answers fail.',
+      'Refining a specialized skill or analytical depth, introverted reflection, and integrating logic with the less provable kind of wisdom.',
+      'A deep spiritual foundation — contemplation, nature, and real inner mastery built in relative quiet.',
+      'Gathering and passing on what you’ve learned — higher learning, contemplative practice, and hard-won peace.',
+    ],
+  },
+  8: {
+    coreMandate: 'Empowerment, authority, and financial mastery — stepping into real power over the material world, ethically.',
+    phases: [
+      'Step up or get stepped on: learning empowerment through early hardship, scarcity, or a fight for authority that toughens you.',
+      'Real traction — business, organizational responsibility, career expansion — and learning to balance ambition with the rest of your life.',
+      'Establishing real financial and executive influence, thinking long-range, and starting to give back what you’ve built.',
+      'Wealth and executive power meeting a genuine ethical center — the chance to leave a legacy you’d actually stand behind.',
+    ],
+  },
+  9: {
+    coreMandate: 'Compassion, universal service, and letting go — selfless contribution at scale, and mastering impermanence.',
+    phases: [
+      'High sensitivity to the world’s pain, championing whoever’s been overlooked, and slowly releasing ego and arrogance.',
+      'Family and marriage blending with social cause and community service — care that extends past your own front door.',
+      'Global interests, travel, and real selfless service — plus learning to read loss as a lesson in letting go rather than only grief.',
+      'Clearing out what’s just facade and keeping only what brings real joy — forgiveness, generosity, and a heart-led final chapter.',
+    ],
+  },
+  11: {
+    coreMandate: 'Intuitive illumination and spiritual diplomacy — Pinnacle 2’s partnership theme, amplified by a heightened, almost channel-like intuition. Runs on the 2 timeline, at Master Number voltage.',
+  },
+  22: {
+    coreMandate: 'Master-scale building — Pinnacle 4’s organization and discipline, amplified into the capacity to turn an outsized, idealistic vision into concrete, global reality. Runs on the 4 timeline, at Master Number voltage.',
+  },
+  33: {
+    coreMandate: 'Universal nurturing and master teaching — Pinnacle 6’s caretaking, amplified into selfless devotion, spiritual mentorship, and the ability to lift an entire community through unconditional love. Runs on the 6 timeline, at Master Number voltage.',
+  },
+};
+
+// ─── CHALLENGES ──────────────────────────────────────────────────────────────
+// The internal friction, blind spot, or character test active during each of
+// the same four life phases as the Pinnacles — always a single digit 0–8;
+// Master Numbers never apply here. The Third Challenge is the "main"
+// lifelong challenge, running as a persistent background theme throughout
+// life in addition to its own phase.
+export interface ChallengeContent {
+  test: string;  // the recurring friction pattern / blind spot
+  key: string;   // the resolving skill — the "key to the castle"
+}
+
+export const CHALLENGE_CONTENT: Record<number, ChallengeContent> = {
+  0: {
+    test: 'The Challenge of Choice — this one mathematically stands in for a 9. It can feel like staring into a void: overwhelm, no clear boundary to hold onto, or paralysis from having too many directions available at once.',
+    key: 'Cultivating intentional clarity — choosing a genuinely noble purpose and letting that choice, not endless options, organize your energy.',
+  },
+  1: {
+    test: 'Either a dependency on others and a fear of standing alone, or the opposite: overactive stubbornness and bucking every authority out of a well-hidden insecurity.',
+    key: 'Building real, healthy willpower — defining your own values and taking assertive leadership of your own life, without needing anyone’s permission first.',
+  },
+  2: {
+    test: 'Hypersensitivity to criticism, chronic approval-seeking, and codependency — or, at the other extreme, a flat emotional insensitivity that keeps real intimacy at a distance.',
+    key: 'Disciplining your emotional sensitivity into genuinely clean boundaries, and using it instead as a gift for diplomacy and mediation.',
+  },
+  3: {
+    test: 'Debilitating self-doubt and a fear of criticism that blocks your voice — or a superficial, gossipy over-talkativeness that’s really just covering what you actually feel.',
+    key: 'Clearing the block and speaking the unvarnished, authentic version of what you feel — using creative expression on purpose rather than as a leak.',
+  },
+  4: {
+    test: 'Disorganization and expecting results without doing the work — or the mirror image: work-martyrdom and workaholism that manufactures its own hardship.',
+    key: 'Building a real step-by-step plan, sticking to routine, and scheduling actual self-care before burnout schedules it for you.',
+  },
+  5: {
+    test: 'Restlessness that runs from anything difficult, or the opposite — feeling suffocated and paralyzed by any restriction at all.',
+    key: 'Finding freedom through self-discipline: real follow-through, adapting to change constructively instead of fleeing or freezing.',
+  },
+  6: {
+    test: 'Perfectionism, controlling behavior, crushing idealism, over-enabling the people you love, or quietly martyring yourself for them.',
+    key: 'Understanding the perfection of imperfection — offering real help without judgment or control, and setting boundaries even with family.',
+  },
+  7: {
+    test: 'Intellectual cynicism, over-analyzing everything, rejecting anything spiritual, or a felt betrayal by life itself that curdles into isolation.',
+    key: 'Moving past cold intellect into real faith — opening to intuition, developing humility, and trusting what can’t be fully proven.',
+  },
+  8: {
+    test: 'Financial volatility — windfalls followed by busts — a victim mentality, legal trouble, or the abuse of whatever power you do have.',
+    key: 'Empowering yourself from the ground up: managing money ethically, riding the cycles with resilience, and using influence for something bigger than yourself.',
+  },
+};
+
+/**
+ * Generates the Pinnacle/Challenge interaction insight for the reader's
+ * currently active phase. When the Pinnacle and Challenge share the same
+ * root number, that lesson is drawn to the front of the line — mastering
+ * the Challenge unlocks the Pinnacle directly, since both ask for the exact
+ * same skill. When they differ, the Pinnacle opens a door the Challenge
+ * doesn't automatically let you walk through — succeeding usually means
+ * deliberately borrowing the Challenge's skill and applying it to what the
+ * Pinnacle is inviting.
+ */
+export function getPinnacleChallengeInteraction(pinnacleNumber: number, challengeNumber: number): string {
+  // Master Number pinnacles (11/22/33) share a root with 2/4/6 respectively.
+  const root = pinnacleNumber === 11 ? 2 : pinnacleNumber === 22 ? 4 : pinnacleNumber === 33 ? 6 : pinnacleNumber;
+
+  if (root === challengeNumber) {
+    return (
+      `Right now, your Pinnacle and Challenge are drawing on the same root number (${pinnacleNumber} / ` +
+      `${challengeNumber}). That pulls this one lesson to the absolute front of the line — it can feel like a ` +
+      `repeated, pointed nudge rather than a single test. The upside: because the environment and the test are ` +
+      `asking for the exact same skill, mastering the Challenge unlocks the Pinnacle directly, with nothing lost ` +
+      `in translation between them.`
+    );
+  }
+
+  return (
+    `Right now, your Pinnacle (${pinnacleNumber}) and Challenge (${challengeNumber}) are pulling in different ` +
+    `directions — a real, productive tension. The Pinnacle opens a door the Challenge doesn’t automatically let ` +
+    `you walk through. Succeeding here usually means deliberately borrowing the Challenge’s resolving skill and ` +
+    `applying it on purpose to whatever the Pinnacle is inviting you toward.`
+  );
+}
