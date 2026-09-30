@@ -7,14 +7,18 @@
  * mastery eventually comes because of that testing, not in spite of it).
  * Same card grammar as Page02, just two cards instead of three, with more
  * room given to each since Saturn in particular rewards a fuller read.
+ * Also shows each planet's house (via getPlanetHouse(), same as Page02 and
+ * Page04OuterPlanets.tsx) for consistency across the whole section.
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { TechnicalLines } from '../../shared/PageComponents';
 import { C, F, PAGE } from '../../tokens';
-import { JUPITER_CONTENT, SATURN_CONTENT } from './stoplight-content';
+import { JUPITER_CONTENT, SATURN_CONTENT, getPlanetHouse } from './stoplight-content';
 import type { ReportData } from '../../tokens';
+
+const ORDINAL = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
 
 const S = StyleSheet.create({
   page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
@@ -46,10 +50,16 @@ const S = StyleSheet.create({
     paddingVertical: 5, paddingHorizontal: 9, width: 70, textAlign: 'center',
   },
   headerText: { flex: 1 },
+  signRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
   signLabel: {
     fontFamily: F.display, fontSize: 15, fontWeight: 400, color: C.base, lineHeight: 1.2,
   },
-  siderealNote: { fontFamily: F.sans, fontSize: 7.5, fontWeight: 300, color: C.parchmentFaint, marginTop: 1 },
+  housePill: {
+    fontFamily: F.sans, fontSize: 7, fontWeight: 500, letterSpacing: 1,
+    textTransform: 'uppercase', color: C.crimsonDim, backgroundColor: C.crimsonLight,
+    paddingVertical: 3, paddingHorizontal: 7,
+  },
+  siderealNote: { fontFamily: F.sans, fontSize: 7.5, fontWeight: 300, color: C.parchmentFaint, marginTop: 2 },
 
   themeText: {
     fontFamily: F.sans, fontSize: 9.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.9, marginBottom: 8,
@@ -82,19 +92,35 @@ interface PlanetRow {
   badge: string;
   tropicalSign: string;
   siderealSign: string;
+  tropicalHouse: number | null;
+  siderealHouse: number | null;
   content: { theme: string; gift: string; friction: string } | undefined;
 }
 
 interface Props {
-  data: Pick<ReportData, 'tropicalJupiter' | 'tropicalSaturn' | 'siderealJupiter' | 'siderealSaturn'>;
+  data: Pick<
+    ReportData,
+    'tropicalJupiter' | 'tropicalSaturn' | 'tropicalAsc' |
+    'siderealJupiter' | 'siderealSaturn' | 'siderealAsc'
+  >;
 }
 
 export default function Page03SocialPlanets({ data }: Props) {
   const rows: PlanetRow[] = [
-    { badge: 'Jupiter', tropicalSign: data.tropicalJupiter, siderealSign: data.siderealJupiter, content: JUPITER_CONTENT[data.tropicalJupiter] },
-    { badge: 'Saturn', tropicalSign: data.tropicalSaturn, siderealSign: data.siderealSaturn, content: SATURN_CONTENT[data.tropicalSaturn] },
+    {
+      badge: 'Jupiter', tropicalSign: data.tropicalJupiter, siderealSign: data.siderealJupiter,
+      tropicalHouse: getPlanetHouse(data.tropicalJupiter, data.tropicalAsc),
+      siderealHouse: getPlanetHouse(data.siderealJupiter, data.siderealAsc),
+      content: JUPITER_CONTENT[data.tropicalJupiter],
+    },
+    {
+      badge: 'Saturn', tropicalSign: data.tropicalSaturn, siderealSign: data.siderealSaturn,
+      tropicalHouse: getPlanetHouse(data.tropicalSaturn, data.tropicalAsc),
+      siderealHouse: getPlanetHouse(data.siderealSaturn, data.siderealAsc),
+      content: SATURN_CONTENT[data.tropicalSaturn],
+    },
   ];
-  const hasData = rows.every(r => r.tropicalSign && r.content);
+  const hasData = rows.every(r => r.tropicalSign && r.tropicalHouse !== null && r.content);
 
   return (
     <Page size="LETTER" style={S.page}>
@@ -113,14 +139,21 @@ export default function Page03SocialPlanets({ data }: Props) {
         {hasData ? (
           <View style={S.stack}>
             {rows.map((r) => {
-              const differs = r.siderealSign && r.siderealSign !== r.tropicalSign;
+              const differs = (r.siderealSign && r.siderealSign !== r.tropicalSign) || r.siderealHouse !== r.tropicalHouse;
               return (
                 <View style={S.card} key={r.badge}>
                   <View style={S.cardHeaderRow}>
                     <Text style={S.planetBadge}>{r.badge}</Text>
                     <View style={S.headerText}>
-                      <Text style={S.signLabel}>{r.tropicalSign}</Text>
-                      {differs && <Text style={S.siderealNote}>Sidereal lens: {r.siderealSign}</Text>}
+                      <View style={S.signRow}>
+                        <Text style={S.signLabel}>{r.tropicalSign}</Text>
+                        <Text style={S.housePill}>{ORDINAL[r.tropicalHouse!]} House</Text>
+                      </View>
+                      {differs && (
+                        <Text style={S.siderealNote}>
+                          Sidereal lens: {r.siderealSign} · {ORDINAL[r.siderealHouse!]} House
+                        </Text>
+                      )}
                     </View>
                   </View>
                   <Text style={S.themeText}>{r.content!.theme}</Text>

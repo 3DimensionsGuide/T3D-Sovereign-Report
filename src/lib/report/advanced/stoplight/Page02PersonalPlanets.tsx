@@ -15,14 +15,21 @@
  * kept to one interpretive pass per planet rather than a full duplicate
  * page per lens, to keep this section's density in line with the Road
  * section's card-stack pages.
+ *
+ * Also surfaces which house each planet falls in (via getPlanetHouse(),
+ * the same Whole-Sign math Page04OuterPlanets.tsx uses), for consistency
+ * with that page — every placement in this section now shows a house,
+ * not just the ones where house is the primary lens.
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { TechnicalLines } from '../../shared/PageComponents';
 import { C, F, PAGE } from '../../tokens';
-import { MERCURY_CONTENT, VENUS_CONTENT, MARS_CONTENT, PERSONAL_PLANETS_MECHANISM } from './stoplight-content';
+import { MERCURY_CONTENT, VENUS_CONTENT, MARS_CONTENT, PERSONAL_PLANETS_MECHANISM, getPlanetHouse } from './stoplight-content';
 import type { ReportData } from '../../tokens';
+
+const ORDINAL = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
 
 const S = StyleSheet.create({
   page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
@@ -63,10 +70,16 @@ const S = StyleSheet.create({
     paddingVertical: 4, paddingHorizontal: 8, width: 62, textAlign: 'center',
   },
   headerText: { flex: 1 },
+  signRow: { flexDirection: 'row', alignItems: 'baseline', gap: 7 },
   signLabel: {
     fontFamily: F.display, fontSize: 13, fontWeight: 400, color: C.base, lineHeight: 1.2,
   },
-  siderealNote: { fontFamily: F.sans, fontSize: 7.5, fontWeight: 300, color: C.parchmentFaint, marginTop: 1 },
+  housePill: {
+    fontFamily: F.sans, fontSize: 6.5, fontWeight: 500, letterSpacing: 1,
+    textTransform: 'uppercase', color: C.crimsonDim, backgroundColor: C.crimsonLight,
+    paddingVertical: 2.5, paddingHorizontal: 6,
+  },
+  siderealNote: { fontFamily: F.sans, fontSize: 7.5, fontWeight: 300, color: C.parchmentFaint, marginTop: 2 },
 
   themeText: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 300, color: C.base, lineHeight: 1.42, opacity: 0.9, marginBottom: 5,
@@ -99,20 +112,41 @@ interface PlanetRow {
   badge: string;
   tropicalSign: string;
   siderealSign: string;
+  tropicalHouse: number | null;
+  siderealHouse: number | null;
   content: { theme: string; gift: string; friction: string } | undefined;
 }
 
 interface Props {
-  data: Pick<ReportData, 'tropicalMercury' | 'tropicalVenus' | 'tropicalMars' | 'siderealMercury' | 'siderealVenus' | 'siderealMars'>;
+  data: Pick<
+    ReportData,
+    'tropicalMercury' | 'tropicalVenus' | 'tropicalMars' | 'tropicalAsc' |
+    'siderealMercury' | 'siderealVenus' | 'siderealMars' | 'siderealAsc'
+  >;
 }
 
 export default function Page02PersonalPlanets({ data }: Props) {
   const rows: PlanetRow[] = [
-    { badge: 'Mercury', tropicalSign: data.tropicalMercury, siderealSign: data.siderealMercury, content: MERCURY_CONTENT[data.tropicalMercury] },
-    { badge: 'Venus', tropicalSign: data.tropicalVenus, siderealSign: data.siderealVenus, content: VENUS_CONTENT[data.tropicalVenus] },
-    { badge: 'Mars', tropicalSign: data.tropicalMars, siderealSign: data.siderealMars, content: MARS_CONTENT[data.tropicalMars] },
+    {
+      badge: 'Mercury', tropicalSign: data.tropicalMercury, siderealSign: data.siderealMercury,
+      tropicalHouse: getPlanetHouse(data.tropicalMercury, data.tropicalAsc),
+      siderealHouse: getPlanetHouse(data.siderealMercury, data.siderealAsc),
+      content: MERCURY_CONTENT[data.tropicalMercury],
+    },
+    {
+      badge: 'Venus', tropicalSign: data.tropicalVenus, siderealSign: data.siderealVenus,
+      tropicalHouse: getPlanetHouse(data.tropicalVenus, data.tropicalAsc),
+      siderealHouse: getPlanetHouse(data.siderealVenus, data.siderealAsc),
+      content: VENUS_CONTENT[data.tropicalVenus],
+    },
+    {
+      badge: 'Mars', tropicalSign: data.tropicalMars, siderealSign: data.siderealMars,
+      tropicalHouse: getPlanetHouse(data.tropicalMars, data.tropicalAsc),
+      siderealHouse: getPlanetHouse(data.siderealMars, data.siderealAsc),
+      content: MARS_CONTENT[data.tropicalMars],
+    },
   ];
-  const hasData = rows.every(r => r.tropicalSign && r.content);
+  const hasData = rows.every(r => r.tropicalSign && r.tropicalHouse !== null && r.content);
 
   return (
     <Page size="LETTER" style={S.page}>
@@ -136,14 +170,21 @@ export default function Page02PersonalPlanets({ data }: Props) {
         {hasData ? (
           <View style={S.stack}>
             {rows.map((r) => {
-              const differs = r.siderealSign && r.siderealSign !== r.tropicalSign;
+              const differs = (r.siderealSign && r.siderealSign !== r.tropicalSign) || r.siderealHouse !== r.tropicalHouse;
               return (
                 <View style={S.card} key={r.badge}>
                   <View style={S.cardHeaderRow}>
                     <Text style={S.planetBadge}>{r.badge}</Text>
                     <View style={S.headerText}>
-                      <Text style={S.signLabel}>{r.tropicalSign}</Text>
-                      {differs && <Text style={S.siderealNote}>Sidereal lens: {r.siderealSign}</Text>}
+                      <View style={S.signRow}>
+                        <Text style={S.signLabel}>{r.tropicalSign}</Text>
+                        <Text style={S.housePill}>{ORDINAL[r.tropicalHouse!]} House</Text>
+                      </View>
+                      {differs && (
+                        <Text style={S.siderealNote}>
+                          Sidereal lens: {r.siderealSign} · {ORDINAL[r.siderealHouse!]} House
+                        </Text>
+                      )}
                     </View>
                   </View>
                   <Text style={S.themeText}>{r.content!.theme}</Text>
