@@ -16,6 +16,34 @@ export interface GateKeynote {
   center: HDCenter;
 }
 
+// ─── HANGING GATE AURIC DETAIL ───────────────────────────────────────────────
+//
+// An optional deeper layer for the Bridges page's per-gate "Your Bridge
+// Gate" block: where the gate physically sits, which channel(s) it's part
+// of, and — sourced from the T3D PHILOSOPHER notebook rather than invented —
+// what it actually feels like to be in the aura of someone with that gate
+// active. Deliberately a PARTIAL record: only gates that have been
+// genuinely researched get an entry. A reader whose bridge gate isn't in
+// here yet still gets the existing ichingName/coreMeaning line from
+// GATE_KEYNOTES — no placeholder or fabricated depth stands in for gates
+// not yet researched.
+export interface HangingGateAuricDetail {
+  location: string;    // where it sits + what kind of Center that is
+  channels: string;    // the channel(s) it's part of, in plain language
+  experience: string;  // what it feels like to be near someone with it active
+}
+
+export const HANGING_GATE_AURIC_DETAIL: Partial<Record<number, HangingGateAuricDetail>> = {
+  57: {
+    location:
+      'The Spleen Center — humanity’s oldest awareness center, reading instinctive, body-level truth in the present moment rather than anything visual or logical.',
+    channels:
+      'Gate 57 sits at the center of three channels at once: 57–10 (Perfected Form), 57–20 (The Brainwave), and 57–34 (Power) — together with Gates 10, 20, and 34, the structural core of the Integration circuitry, the body’s survival backbone.',
+    experience:
+      'Being around someone with Gate 57 active feels like standing in a gentle, steady wind: barely noticeable at first, but it keeps penetrating until you feel quietly, thoroughly read — not analyzed, just registered, the way an animal senses a shift in a room before anyone has said anything. The read is acoustic and instinctive, not visual or mental: it’s picking up the vibrational truth underneath whatever is actually being said. It tends to arrive as a single, quiet signal rather than a repeated nudge, so it’s genuinely easy to miss if your attention is elsewhere — there’s no second alarm.',
+  },
+};
+
 export const GATE_KEYNOTES: Record<number, GateKeynote> = {
   // Head Center
   64: { ichingName: 'Before Completion', coreMeaning: 'The pressure of confusion, to make sense of the past.', center: 'head' },

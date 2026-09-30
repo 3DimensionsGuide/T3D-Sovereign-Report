@@ -17,7 +17,7 @@ import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { TechnicalLines } from '../../shared/PageComponents';
 import { C, F, PAGE, calculateDefinition, calculateSplitBridges } from '../../tokens';
 import { CENTER_DISPLAY_NAME } from '../../section3/hd-content';
-import { GATE_KEYNOTES } from '../../section3/gate-content';
+import { GATE_KEYNOTES, HANGING_GATE_AURIC_DETAIL } from '../../section3/gate-content';
 import type { ReportData } from '../../tokens';
 
 const S = StyleSheet.create({
@@ -37,6 +37,19 @@ const S = StyleSheet.create({
     lineHeight: 1.5, marginBottom: 20, maxWidth: 420,
   },
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
+
+  mechanismBlock: {
+    padding: 16, backgroundColor: '#F5F3EE',
+    borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
+    marginBottom: 20,
+  },
+  mechanismLabel: {
+    fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
+    color: C.amberDim, textTransform: 'uppercase', marginBottom: 6,
+  },
+  mechanismText: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.88,
+  },
 
   bridgeDetail: { flexDirection: 'column', gap: 16 },
   bridgeCard: {
@@ -65,6 +78,13 @@ const S = StyleSheet.create({
   },
   hangingGateText: {
     fontFamily: F.sans, fontSize: 10, fontWeight: 400, color: C.base, lineHeight: 1.5, marginTop: 4,
+  },
+  auricSubLabel: {
+    fontFamily: F.sans, fontSize: 7, fontWeight: 700, letterSpacing: 0.8, color: C.base, opacity: 0.5,
+    textTransform: 'uppercase', marginTop: 8,
+  },
+  auricText: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.88, marginTop: 3,
   },
 
   footer: {
@@ -112,6 +132,20 @@ export default function Page03Bridges({ data }: Props) {
         </Text>
         <View style={S.headingRule} />
 
+        <View style={S.mechanismBlock}>
+          <Text style={S.mechanismLabel}>What Is A Hanging Gate?</Text>
+          <Text style={S.mechanismText}>
+            A hanging gate is a gate that&rsquo;s active on your side of a channel while its
+            partner gate, on the other end, stays open. On its own it can&rsquo;t finish the
+            connection — but it works as a live receptor instead. Step into the aura of someone
+            (or somewhere) carrying that missing partner gate, and the channel completes for as
+            long as you&rsquo;re in range: an electromagnetic bridge closes the gap and lets
+            energy move freely between your two islands. That&rsquo;s the actual mechanism
+            behind why a specific kind of person, or even just a public space, can make you feel
+            suddenly whole in a way you can&rsquo;t produce alone.
+          </Text>
+        </View>
+
         <View style={S.bridgeDetail}>
           {bridges.map((bridge, i) => (
             <View key={i} style={S.bridgeCard}>
@@ -131,13 +165,31 @@ export default function Page03Bridges({ data }: Props) {
               {bridge.classification === 'narrow' && bridge.hangingGates.length > 0 && (
                 <View style={S.hangingGateRow}>
                   <Text style={S.hangingGateLabel}>Your Bridge Gate</Text>
-                  {bridge.hangingGates.slice(0, 2).map((hg, hi) => {
+                  {/* The same physical partner gate can hang off more than one channel at
+                      once (e.g. Gate 57 completing both 57-20 and 57-34) — dedupe by
+                      partnerGate so its detail renders once, not once per channel. */}
+                  {Array.from(
+                    new Map(bridge.hangingGates.map(hg => [hg.partnerGate, hg])).values()
+                  ).slice(0, 2).map((hg, hi) => {
                     const partnerKeynote = GATE_KEYNOTES[hg.partnerGate];
+                    const auric = HANGING_GATE_AURIC_DETAIL[hg.partnerGate];
                     return (
-                      <Text key={hi} style={S.hangingGateText}>
-                        Gate {hg.partnerGate}{partnerKeynote ? ` — ${partnerKeynote.ichingName}` : ''}
-                        {partnerKeynote ? `: ${partnerKeynote.coreMeaning}` : ''}
-                      </Text>
+                      <View key={hi}>
+                        <Text style={S.hangingGateText}>
+                          Gate {hg.partnerGate}{partnerKeynote ? ` — ${partnerKeynote.ichingName}` : ''}
+                          {partnerKeynote ? `: ${partnerKeynote.coreMeaning}` : ''}
+                        </Text>
+                        {auric && (
+                          <>
+                            <Text style={S.auricSubLabel}>Where It Sits</Text>
+                            <Text style={S.auricText}>{auric.location}</Text>
+                            <Text style={S.auricSubLabel}>Its Channels</Text>
+                            <Text style={S.auricText}>{auric.channels}</Text>
+                            <Text style={S.auricSubLabel}>What You&rsquo;d Feel Around It</Text>
+                            <Text style={S.auricText}>{auric.experience}</Text>
+                          </>
+                        )}
+                      </View>
                     );
                   })}
                 </View>
