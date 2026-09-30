@@ -154,26 +154,131 @@ const UNIQUE_CHANNELS = ((): readonly ChannelDefinition[] => {
   });
 })();
 
-// ─── INCARNATION CROSS NAMES (selected key crosses) ─────────────────────────
-// Maps "P.Sun/P.Earth|D.Sun/D.Earth" to the traditional cross name.
-// A complete list has 192 entries; this covers the most common ones encountered.
+// ─── INCARNATION CROSS NAMES — full 64-gate coverage ─────────────────────────
+//
+// A cross's name is fixed by two facts: which of the 3 geometry families the
+// chart belongs to (determined entirely by Profile), and the Personality Sun
+// gate. Personality Earth / Design Sun / Design Earth don't need their own
+// lookup — Earth is always exactly opposite its Sun on the wheel, so once
+// family + P.Sun gate are known, the cross name is determined.
+//
+// Family is set by Profile:
+//   Right Angle    (Personal Destiny)     — 1/3, 1/4, 2/4, 2/5, 3/5, 3/6, 4/6
+//   Juxtaposition  (Fixed Fate)           — 4/1 only
+//   Left Angle     (Transpersonal Karma)  — 5/1, 5/2, 6/2, 6/3
+//
+// Source: T3D PHILOSOPHER notebook — Leann Wolff's gate-by-gate cross series,
+// cross-referenced against Richard Beaumont and Ra Uru Hu/Chetan Parkyn
+// material for every one of the 64 possible Personality Sun gates. This
+// supersedes the previous 10-entry sample table.
 
-const INCARNATION_CROSS_NAMES: Record<string, string> = {
-  '1/2|4/49':   'Right Angle Cross of Sphinx',
-  '2/1|49/4':   'Right Angle Cross of Sphinx',
-  '3/50|41/31': 'Right Angle Cross of Laws',
-  '4/49|23/43': 'Right Angle Cross of Explanation',
-  '13/7|1/2':   'Right Angle Cross of the Vessel of Love',
-  '25/46|10/15': 'Right Angle Cross of the Vessel of Love',
-  '21/48|54/53': 'Right Angle Cross of Service',
-  '57/51|62/61': 'Left Angle Cross of Confusion',
-  '10/15|18/17': 'Left Angle Cross of Prevention',
-  '64/63|61/62': 'Juxtaposition Cross of Confusion',
+type CrossFamily = 'rightAngle' | 'juxtaposition' | 'leftAngle';
+
+interface CrossNamesByGate {
+  rightAngle: string;
+  juxtaposition: string;
+  leftAngle: string;
+}
+
+const RIGHT_ANGLE_PROFILES = new Set(['1/3', '1/4', '2/4', '2/5', '3/5', '3/6', '4/6']);
+const JUXTAPOSITION_PROFILES = new Set(['4/1']);
+const LEFT_ANGLE_PROFILES = new Set(['5/1', '5/2', '6/2', '6/3']);
+
+const CROSS_FAMILY_LABEL: Record<CrossFamily, string> = {
+  rightAngle: 'Right Angle',
+  juxtaposition: 'Juxtaposition',
+  leftAngle: 'Left Angle',
 };
 
-function getIncarnationCross(pSunGate: number, pEarthGate: number, dSunGate: number, dEarthGate: number): string {
-  const key = `${pSunGate}/${pEarthGate}|${dSunGate}/${dEarthGate}`;
-  return INCARNATION_CROSS_NAMES[key] ?? `Incarnation Cross (${pSunGate}/${pEarthGate} | ${dSunGate}/${dEarthGate})`;
+const CROSS_NAMES_BY_GATE: Record<number, CrossNamesByGate> = {
+  1: { rightAngle: "the Sphinx", juxtaposition: "Self-Expression", leftAngle: "Defiance" },
+  2: { rightAngle: "the Sphinx", juxtaposition: "the Driver", leftAngle: "Defiance" },
+  3: { rightAngle: "the Laws", juxtaposition: "Mutation", leftAngle: "Wishes" },
+  4: { rightAngle: "Explanation", juxtaposition: "Formulization", leftAngle: "Revolution" },
+  5: { rightAngle: "Consciousness", juxtaposition: "Habits", leftAngle: "Separation" },
+  6: { rightAngle: "Eden", juxtaposition: "Conflict", leftAngle: "the Plane" },
+  7: { rightAngle: "the Sphinx", juxtaposition: "Interaction", leftAngle: "Masks" },
+  8: { rightAngle: "Contagion", juxtaposition: "Contribution", leftAngle: "Uncertainty" },
+  9: { rightAngle: "Planning", juxtaposition: "Focus", leftAngle: "Identification" },
+  10: { rightAngle: "the Vessel of Love", juxtaposition: "Behavior", leftAngle: "Prevention" },
+  11: { rightAngle: "Eden", juxtaposition: "Ideas", leftAngle: "Education" },
+  12: { rightAngle: "Eden", juxtaposition: "Articulation", leftAngle: "Education" },
+  13: { rightAngle: "the Sphinx", juxtaposition: "Listening", leftAngle: "Masks" },
+  14: { rightAngle: "Contagion", juxtaposition: "Empowering", leftAngle: "Uncertainty" },
+  15: { rightAngle: "the Vessel of Love", juxtaposition: "Extremes", leftAngle: "Prevention" },
+  16: { rightAngle: "Planning", juxtaposition: "Experimentation", leftAngle: "Identification" },
+  17: { rightAngle: "Service", juxtaposition: "Opinions", leftAngle: "Upheaval" },
+  18: { rightAngle: "Service", juxtaposition: "Correction", leftAngle: "Upheaval" },
+  19: { rightAngle: "the Four Ways", juxtaposition: "Need", leftAngle: "Refinement" },
+  20: { rightAngle: "the Sleeping Phoenix", juxtaposition: "the Now", leftAngle: "Duality" },
+  21: { rightAngle: "Tension", juxtaposition: "Control", leftAngle: "Endeavor" },
+  22: { rightAngle: "Rulership", juxtaposition: "Grace", leftAngle: "Informing" },
+  23: { rightAngle: "Explanation", juxtaposition: "Assimilation", leftAngle: "Dedication" },
+  24: { rightAngle: "the Four Ways", juxtaposition: "Rationalization", leftAngle: "Incarnation" },
+  25: { rightAngle: "the Vessel of Love", juxtaposition: "Innocence", leftAngle: "Healing" },
+  26: { rightAngle: "Rulership", juxtaposition: "the Trickster", leftAngle: "Confrontation" },
+  27: { rightAngle: "the Unexpected", juxtaposition: "Caring", leftAngle: "Alignment" },
+  28: { rightAngle: "the Unexpected", juxtaposition: "Risks", leftAngle: "Alignment" },
+  29: { rightAngle: "Contagion", juxtaposition: "Commitment", leftAngle: "Industry" },
+  30: { rightAngle: "Contagion", juxtaposition: "Fates", leftAngle: "Industry" },
+  31: { rightAngle: "the Unexpected", juxtaposition: "Influence", leftAngle: "Alpha" },
+  32: { rightAngle: "the Maya", juxtaposition: "Conservation", leftAngle: "Limitation" },
+  33: { rightAngle: "the Four Ways", juxtaposition: "Retreat", leftAngle: "Refinement" },
+  34: { rightAngle: "the Sleeping Phoenix", juxtaposition: "Power", leftAngle: "Duality" },
+  35: { rightAngle: "Consciousness", juxtaposition: "Experience", leftAngle: "Separation" },
+  36: { rightAngle: "Eden", juxtaposition: "Crisis", leftAngle: "the Plane" },
+  37: { rightAngle: "Planning", juxtaposition: "Bargains", leftAngle: "Migration" },
+  38: { rightAngle: "Tension", juxtaposition: "Opposition", leftAngle: "Individualism" },
+  39: { rightAngle: "Tension", juxtaposition: "Provocation", leftAngle: "Individualism" },
+  40: { rightAngle: "Planning", juxtaposition: "Denial", leftAngle: "Migration" },
+  41: { rightAngle: "the Unexpected", juxtaposition: "Fantasy", leftAngle: "Alpha" },
+  42: { rightAngle: "the Maya", juxtaposition: "Completion", leftAngle: "Limitation" },
+  43: { rightAngle: "Explanation", juxtaposition: "Insight", leftAngle: "Dedication" },
+  44: { rightAngle: "the Four Ways", juxtaposition: "Alertness", leftAngle: "Incarnation" },
+  45: { rightAngle: "Rulership", juxtaposition: "Possession", leftAngle: "Confrontation" },
+  46: { rightAngle: "the Vessel of Love", juxtaposition: "Serendipity", leftAngle: "Healing" },
+  47: { rightAngle: "Rulership", juxtaposition: "Oppression", leftAngle: "Informing" },
+  48: { rightAngle: "Tension", juxtaposition: "Depth", leftAngle: "Endeavor" },
+  49: { rightAngle: "Explanation", juxtaposition: "Principles", leftAngle: "Revolution" },
+  50: { rightAngle: "the Laws", juxtaposition: "Values", leftAngle: "Wishes" },
+  51: { rightAngle: "Penetration", juxtaposition: "Shock", leftAngle: "the Clarion" },
+  52: { rightAngle: "Service", juxtaposition: "Stillness", leftAngle: "Demands" },
+  53: { rightAngle: "Penetration", juxtaposition: "Beginnings", leftAngle: "Cycles" },
+  54: { rightAngle: "Penetration", juxtaposition: "Ambition", leftAngle: "Cycles" },
+  55: { rightAngle: "the Sleeping Phoenix", juxtaposition: "Moods", leftAngle: "Spirit" },
+  56: { rightAngle: "the Laws", juxtaposition: "Stimulation", leftAngle: "Distraction" },
+  57: { rightAngle: "Penetration", juxtaposition: "Intuition", leftAngle: "the Clarion" },
+  58: { rightAngle: "Service", juxtaposition: "Vitality", leftAngle: "Demands" },
+  59: { rightAngle: "the Sleeping Phoenix", juxtaposition: "Strategy", leftAngle: "Spirit" },
+  60: { rightAngle: "the Laws", juxtaposition: "Limitation", leftAngle: "Distraction" },
+  61: { rightAngle: "the Maya", juxtaposition: "Thinking", leftAngle: "Obscuration" },
+  62: { rightAngle: "the Maya", juxtaposition: "Detail", leftAngle: "Obscuration" },
+  63: { rightAngle: "Consciousness", juxtaposition: "Doubts", leftAngle: "Dominion" },
+  64: { rightAngle: "Consciousness", juxtaposition: "Confusion", leftAngle: "Dominion" },
+};
+
+function determineCrossFamily(profile: string): CrossFamily | null {
+  if (JUXTAPOSITION_PROFILES.has(profile)) return 'juxtaposition';
+  if (LEFT_ANGLE_PROFILES.has(profile)) return 'leftAngle';
+  if (RIGHT_ANGLE_PROFILES.has(profile)) return 'rightAngle';
+  return null; // unrecognized/malformed profile — fall back to generic label
+}
+
+function getIncarnationCross(
+  pSunGate: number,
+  pEarthGate: number,
+  dSunGate: number,
+  dEarthGate: number,
+  profile: string,
+): string {
+  const family = determineCrossFamily(profile);
+  const names = CROSS_NAMES_BY_GATE[pSunGate];
+
+  if (!family || !names) {
+    return `Incarnation Cross (${pSunGate}/${pEarthGate} | ${dSunGate}/${dEarthGate})`;
+  }
+
+  return `${CROSS_FAMILY_LABEL[family]} Cross of ${names[family]}`;
 }
 
 // ─── GATE CALCULATION ────────────────────────────────────────────────────────
@@ -491,6 +596,7 @@ export function calculateHumanDesign(input: HumanDesignInput): HumanDesignResult
     pEarthActivation?.gate ?? 0,
     dSunActivation?.gate ?? 0,
     dEarthActivation?.gate ?? 0,
+    profile,
   );
 
   return {
