@@ -106,18 +106,42 @@ export interface ChannelCircuit {
   subCircuit: SubCircuit;
 }
 
-export const CIRCUIT_GROUP_MEANING: Record<CircuitGroup, { keynote: string; purpose: string }> = {
+// The dominant reading calculateCircuitBalance() can return: one of the
+// three Circuit Groups, the cross-cutting Integration construct, an even
+// spread across all three groups with no single winner, or none at all
+// (no active channels — the Reflector case).
+export type CircuitMeaningKey = CircuitGroup | 'Integration' | 'Even' | 'None';
+
+export const CIRCUIT_GROUP_MEANING: Record<CircuitMeaningKey, { keynote: string; passage: string }> = {
   Individual: {
     keynote: 'Empowerment',
-    purpose: 'To bring mutation and unique, creative expression to the world. This energy is inherently acoustic, melancholic, and self-referential.',
+    passage:
+      "Your Individual channels don't run on a steady current — they pulse. There's a mutative on/off rhythm to how you know things: a sudden download of certainty, then a genuine quiet with nothing coming through at all. Neither half is a malfunction; both are the mechanism working correctly. The quiet half is where most of the trouble starts — if your mind tries to explain the emptiness instead of just letting it pass, that ordinary chemical dip can curdle into something that feels like real depression. You're not built to fit into a room's consensus or soften a knowing until it sounds palatable; when it lands, it can sound strange, disruptive, even a little unhinged to people running on steadier circuitry, and waiting for the right moment to say it out loud is not the same as silencing yourself. What you're actually here for is simpler than convincing anyone: mutate the world by being unmistakably, uncompromisingly yourself, and let that example do the influencing your words don't have to.",
   },
   Collective: {
     keynote: 'Sharing',
-    purpose: 'To share experiences and logical patterns for the benefit of all. This energy is visual and based on reflection (Abstract) or projection (Logic).',
+    passage:
+      "Your Collective channels point outward by default — toward the room, the organization, the species, never just the one person in front of you. Two very different engines can produce that outward pull. The Logic side runs on testing and pattern, building toward a workable future: what can be made clearer, more efficient, more true, so it holds up later. The Abstract side runs on lived experience, replaying the past until the wisdom in it becomes shareable: what you just lived through, and who needs to hear it. Whichever engine dominates yours, the currency is the same — a pattern, an opinion, a story, offered to the group rather than kept as private property. The shadow shows up as impersonal energy mistaken for a personal attack: Logic can tip into relentless correcting and doubt, Abstract into replaying a disappointment until it hardens into a grievance. The fix isn't to stop sharing — it's remembering the material is about the pattern, not the person holding it, yours or anyone else's.",
   },
   Tribal: {
     keynote: 'Support',
-    purpose: 'To ensure the survival and well-being of the immediate community or family. This energy is tactile and based on touch, bargains, and mutual support.',
+    passage:
+      "Your Tribal channels care about a much smaller radius than Individual or Collective circuitry — not humanity, not a broader philosophy, just who's actually in the room and whether they're provided for. Everything here runs on bargains: I support you, you support me, spoken or not. The Defense side protects and nurtures — the physical safety and continuity of the people closest to you. The Ego side builds and provides — ambition, resources, the material means to actually make good on the bargain. Belonging matters more here than almost anywhere else in the chart, and so does its shadow: a hard line between who's in the clan and who isn't, drawn less by logic than by familiarity. When a bargain goes unspoken and then gets broken, resentment lands harder here than the situation usually warrants — not because you're petty, but because an unspoken agreement is still an agreement to Tribal circuitry. The guidance is almost mechanical in its simplicity: say the terms out loud, every time, before you're depending on someone to hold up their end.",
+  },
+  Integration: {
+    keynote: 'Survival',
+    passage:
+      "The four Integration channels — Power, Charisma, Awakening, and Perfected Form — aren't really a fourth circuit group; they're a separate structure entirely, tying the Throat, G Center, Sacral, and Spleen into what this system calls the survival backbone. Where Individual, Collective, and Tribal are all in some way social — mutating, sharing, or supporting other people — Integration isn't. It's the spine that lets you stand on your own conviction, right now, regardless of what any group thinks. Lived out of balance, that self-referencing intensity can look like reckless overdrive, an intuitive fear with no clear source, or a self-worth that quietly erodes when there's no external mirror confirming it. Lived in balance, it's simply the part of you that doesn't need permission to exist. If Integration is your strongest theme, the work isn't finding your tribe or your audience — it's trusting the immediate, gut-level, in-the-moment read your own design is already giving you.",
+  },
+  Even: {
+    keynote: 'Synthesis',
+    passage:
+      "No single circuit dominates your design — two or more of Individual, Collective, Tribal, and Integration are running in close to equal measure. That's not indecision or a diluted version of any one theme; it makes you a natural translator between genuinely different operating systems. Depending on which circuits are tied, you might generate a personal knowing and shape it into something shareable with a wider audience, or ground a collective idea in what actually supports the people closest to you, or hold your own immediate conviction steady while still building toward something for the group — one circuit doing what another circuit can't. The friction shows up as an internal tug-of-war rather than a single clear pull: competing, equally legitimate demands, all wanting to run at once. Don't expect your mind to referee that argument — it can't, and every attempt just adds noise. Strategy and Authority already knows which circuit is correct for this specific moment; the balance was never a problem to solve, only a range to trust.",
+  },
+  None: {
+    keynote: 'Reflection',
+    passage:
+      "You have no active channels running any of the three Circuit Groups — consistent with a Reflector configuration, where every Center stays open and nothing runs as a fixed circuit of your own. Circuitry, in the usual sense, isn't where your design does its work; your resistant, sampling aura is. Rather than generating a fixed pattern to mutate, share, or support, you take in whatever circuitry is active in the people and places around you and reflect it back with startling clarity — often becoming the clearest mirror in any room for how a group, a family, or even the wider culture is actually doing. That's not an absence; it's a different mechanism entirely, and its correctness depends almost completely on getting your environment and your timing right.",
   },
 };
 
