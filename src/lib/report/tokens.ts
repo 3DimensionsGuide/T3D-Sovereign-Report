@@ -99,6 +99,28 @@ export interface ReportData {
   siderealAsc:  string;
   ayanamsha:    string;   // e.g., "Lahiri" — always named explicitly
 
+  // Astrology — remaining planets (Advanced Stoplight section only; the
+  // base report's Big Three pages don't use these). Sign name per planet,
+  // per zodiac lens. Uranus/Neptune/Pluto are read by Whole-Sign house
+  // (via firdariaWholeSignHouse against tropicalAsc/siderealAsc) rather
+  // than by sign, since their sign is generational, not personal.
+  tropicalMercury: string;
+  tropicalVenus:   string;
+  tropicalMars:    string;
+  tropicalJupiter: string;
+  tropicalSaturn:  string;
+  tropicalUranus:  string;
+  tropicalNeptune: string;
+  tropicalPluto:   string;
+  siderealMercury: string;
+  siderealVenus:   string;
+  siderealMars:    string;
+  siderealJupiter: string;
+  siderealSaturn:  string;
+  siderealUranus:  string;
+  siderealNeptune: string;
+  siderealPluto:   string;
+
   // Extracted signs
   sunSign:    string;
   moonSign:   string;
@@ -456,8 +478,13 @@ const FIRDARIA_ZODIAC_ORDER = [
   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
 ];
 
-/** Whole Sign house number (1–12) of a planet's sign, counted from the Ascendant sign. */
-function firdariaWholeSignHouse(planetSign: string, ascSign: string): number | null {
+/**
+ * Whole Sign house number (1–12) of a planet's sign, counted from the
+ * Ascendant sign. Originally built for Firdaria's day/night-chart check;
+ * exported because the Advanced Stoplight section reuses the exact same
+ * Whole-Sign math to place Uranus/Neptune/Pluto by house.
+ */
+export function firdariaWholeSignHouse(planetSign: string, ascSign: string): number | null {
   const p = FIRDARIA_ZODIAC_ORDER.indexOf(planetSign);
   const a = FIRDARIA_ZODIAC_ORDER.indexOf(ascSign);
   if (p === -1 || a === -1) return null;

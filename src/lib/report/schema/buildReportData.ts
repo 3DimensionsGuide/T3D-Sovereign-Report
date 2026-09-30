@@ -240,6 +240,23 @@ export function buildReportData(lead: LeadRecord): ReportData {
   const moonSign   = getSignFromRaw(tropMoonRaw, tropicalMoon);
   const risingSign = getSignFromRaw(tropAscRaw,  tropicalAsc);
 
+  // Remaining planets (Advanced Stoplight section only) — sign name per
+  // planet, per lens. Same "mapping-only, zero calculations" rule as above;
+  // the raw {sign, formatted, ...} objects are already stored from the same
+  // calculateAstrology() call that produced sun/moon/houses.
+  const REMAINING_PLANETS = [
+    'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto',
+  ] as const;
+
+  const tropicalPlanetSigns: Record<string, string> = {};
+  const siderealPlanetSigns: Record<string, string> = {};
+  for (const p of REMAINING_PLANETS) {
+    const tropRaw = tropObj[p];
+    const sidRaw  = sidObj[p];
+    tropicalPlanetSigns[p] = getSignFromRaw(tropRaw, normalizePlanetPosition(tropRaw));
+    siderealPlanetSigns[p] = getSignFromRaw(sidRaw,  normalizePlanetPosition(sidRaw));
+  }
+
   if (process.env.NODE_ENV === 'development') {
     console.log('[Astrology]', {
       tropicalSun, tropicalMoon, tropicalAsc,
@@ -328,6 +345,24 @@ export function buildReportData(lead: LeadRecord): ReportData {
     siderealMoon,
     siderealAsc,
     ayanamsha,
+
+    // Astrology — remaining planets (Advanced Stoplight section)
+    tropicalMercury: tropicalPlanetSigns['mercury'] ?? '',
+    tropicalVenus:   tropicalPlanetSigns['venus'] ?? '',
+    tropicalMars:    tropicalPlanetSigns['mars'] ?? '',
+    tropicalJupiter: tropicalPlanetSigns['jupiter'] ?? '',
+    tropicalSaturn:  tropicalPlanetSigns['saturn'] ?? '',
+    tropicalUranus:  tropicalPlanetSigns['uranus'] ?? '',
+    tropicalNeptune: tropicalPlanetSigns['neptune'] ?? '',
+    tropicalPluto:   tropicalPlanetSigns['pluto'] ?? '',
+    siderealMercury: siderealPlanetSigns['mercury'] ?? '',
+    siderealVenus:   siderealPlanetSigns['venus'] ?? '',
+    siderealMars:    siderealPlanetSigns['mars'] ?? '',
+    siderealJupiter: siderealPlanetSigns['jupiter'] ?? '',
+    siderealSaturn:  siderealPlanetSigns['saturn'] ?? '',
+    siderealUranus:  siderealPlanetSigns['uranus'] ?? '',
+    siderealNeptune: siderealPlanetSigns['neptune'] ?? '',
+    siderealPluto:   siderealPlanetSigns['pluto'] ?? '',
 
     // Extracted signs
     sunSign,
