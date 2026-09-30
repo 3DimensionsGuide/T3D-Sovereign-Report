@@ -12,7 +12,11 @@
  * all 64 gates, verified against T3D's source library (section3/
  * godhead-content.ts has the full provenance note). calculateGodhead() in
  * tokens.ts resolves the reader's one Godhead from hdActiveGates; this page
- * displays it plus the specific gate that produced it.
+ * opens with a general "What Is A Godhead?" mechanism explainer, then
+ * displays the reader's specific Godhead, its Quarter, its keynote passage,
+ * and the source gate that produced it. The integrated/distorted (light vs
+ * shadow) expression of that same Godhead continues on the companion page,
+ * Page07GodheadLightShadow.tsx, which needs more room than fits here.
  */
 
 import React from 'react';
@@ -20,6 +24,7 @@ import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { TechnicalLines } from '../../shared/PageComponents';
 import { C, F, PAGE, calculateGodhead } from '../../tokens';
 import { GATE_KEYNOTES } from '../../section3/gate-content';
+import { GODHEAD_MECHANISM } from '../../section3/godhead-content';
 import type { ReportData } from '../../tokens';
 
 const S = StyleSheet.create({
@@ -39,6 +44,19 @@ const S = StyleSheet.create({
     lineHeight: 1.5, marginBottom: 20, maxWidth: 420,
   },
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
+
+  mechanismBlock: {
+    padding: 16, backgroundColor: '#F5F3EE',
+    borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
+    marginBottom: 22,
+  },
+  mechanismLabel: {
+    fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
+    color: C.amberDim, textTransform: 'uppercase', marginBottom: 6,
+  },
+  mechanismText: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.88,
+  },
 
   // Godhead name display — the star of the page
   godheadBlock: { marginBottom: 6 },
@@ -126,6 +144,11 @@ export default function Page06Godhead({ data }: Props) {
           life&rsquo;s theme.
         </Text>
         <View style={S.headingRule} />
+
+        <View style={S.mechanismBlock}>
+          <Text style={S.mechanismLabel}>What Is A Godhead?</Text>
+          <Text style={S.mechanismText}>{GODHEAD_MECHANISM}</Text>
+        </View>
 
         {godhead ? (
           <>
