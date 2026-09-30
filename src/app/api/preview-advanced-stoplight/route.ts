@@ -6,7 +6,9 @@ import Page02PersonalPlanets from '@/lib/report/advanced/stoplight/Page02Persona
 import Page03SocialPlanets from '@/lib/report/advanced/stoplight/Page03SocialPlanets';
 import Page04OuterPlanets from '@/lib/report/advanced/stoplight/Page04OuterPlanets';
 import Page05Transits from '@/lib/report/advanced/stoplight/Page05Transits';
+import Page06Synthesis from '@/lib/report/advanced/stoplight/Page06Synthesis';
 import { calculateActiveTransits, getUpcomingTransits } from '@/server/engines/transits';
+import { generateStoplightSynthesis } from '@/lib/report/schema/stoplightSynthesisEngine';
 
 registerFonts();
 
@@ -90,6 +92,22 @@ export async function GET(request: Request) {
   const activeTransits = calculateActiveTransits(natalTransitPoints);
   const upcomingTransits = getUpcomingTransits(natalTransitPoints, new Date(), 2);
 
+  const synthesis = await generateStoplightSynthesis({
+    firstName: data.firstName,
+    sunSign: data.sunSign,
+    tropicalAsc: data.tropicalAsc,
+    tropicalMercury: data.tropicalMercury,
+    tropicalVenus: data.tropicalVenus,
+    tropicalMars: data.tropicalMars,
+    tropicalJupiter: data.tropicalJupiter,
+    tropicalSaturn: data.tropicalSaturn,
+    tropicalUranus: data.tropicalUranus,
+    tropicalNeptune: data.tropicalNeptune,
+    tropicalPluto: data.tropicalPluto,
+    activeTransits,
+    upcomingTransits,
+  });
+
   const pages: React.ReactElement[] = [
     React.createElement(Page01StoplightDivider, { data: data as any, key: 'p1' }),
     React.createElement(Page02PersonalPlanets, { data: data as any, key: 'p2' }),
@@ -98,6 +116,22 @@ export async function GET(request: Request) {
     React.createElement(Page05Transits, {
       data: { tropicalAsc: data.tropicalAsc, activeTransits, upcomingTransits },
       key: 'p5',
+    }),
+    React.createElement(Page06Synthesis, {
+      data: {
+        sunSign: data.sunSign,
+        tropicalAsc: data.tropicalAsc,
+        tropicalMercury: data.tropicalMercury,
+        tropicalVenus: data.tropicalVenus,
+        tropicalMars: data.tropicalMars,
+        tropicalJupiter: data.tropicalJupiter,
+        tropicalSaturn: data.tropicalSaturn,
+        activeTransits,
+        upcomingTransits,
+        stoplightSynthesis: synthesis.text,
+        stoplightSynthesisSource: synthesis.source,
+      },
+      key: 'p6',
     }),
   ];
 

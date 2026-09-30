@@ -15,7 +15,7 @@ import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { TechnicalLines } from '../../shared/PageComponents';
 import { C, F, PAGE } from '../../tokens';
-import { JUPITER_CONTENT, SATURN_CONTENT, getPlanetHouse } from './stoplight-content';
+import { JUPITER_CONTENT, SATURN_CONTENT, SOCIAL_PLANETS_MECHANISM, getPlanetHouse } from './stoplight-content';
 import type { ReportData } from '../../tokens';
 
 const ORDINAL = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
@@ -37,6 +37,15 @@ const S = StyleSheet.create({
     lineHeight: 1.5, marginBottom: 18, maxWidth: 440,
   },
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 18 },
+
+  mechanismBlock: { marginBottom: 16, gap: 5 },
+  mechanismLabel: {
+    fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 2,
+    textTransform: 'uppercase', color: C.crimson,
+  },
+  mechanismText: {
+    fontFamily: F.sans, fontSize: 9, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.85,
+  },
 
   stack: { gap: 14 },
   card: {
@@ -135,6 +144,11 @@ export default function Page03SocialPlanets({ data }: Props) {
           expand, and where you get tested until you&rsquo;ve earned real mastery.
         </Text>
         <View style={S.headingRule} />
+
+        <View style={S.mechanismBlock}>
+          <Text style={S.mechanismLabel}>Why These Planets Are Social to You</Text>
+          <Text style={S.mechanismText}>{SOCIAL_PLANETS_MECHANISM}</Text>
+        </View>
 
         {hasData ? (
           <View style={S.stack}>

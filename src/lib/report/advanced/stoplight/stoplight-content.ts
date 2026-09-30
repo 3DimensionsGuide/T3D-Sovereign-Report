@@ -570,6 +570,22 @@ export const PERSONAL_PLANETS_MECHANISM =
   "of it. All five move fast enough that their zodiac sign is genuinely " +
   "personal to you, the same way your Sun sign is.";
 
+export const SOCIAL_PLANETS_MECHANISM =
+  "Jupiter and Saturn move slowly enough that their zodiac sign is shared " +
+  "with everyone born in roughly the same year or two — Jupiter changes " +
+  "sign about once a year, Saturn only once every two and a half — so in " +
+  "a strict sense they're less personal than Mercury, Venus, and Mars. " +
+  "But they're not generational the way Uranus, Neptune, and Pluto are " +
+  "either, since those can take a decade or more to change sign. " +
+  "Astrologers call Jupiter and Saturn the \"social\" planets for exactly " +
+  "this reason: they sit at the boundary where your inner world meets the " +
+  "wider one, describing how you engage with the structures — " +
+  "opportunity, growth, authority, responsibility — that exist outside of " +
+  "you and are shared with a broader group of your peers. Jupiter shows " +
+  "where you naturally expand and where you find belief and opportunity. " +
+  "Saturn shows where you get tested by structure, and where real, " +
+  "earned standing eventually comes because of that testing.";
+
 export const OUTER_PLANETS_MECHANISM =
   "Uranus, Neptune, and Pluto move so slowly — years or even decades in a " +
   "single sign — that their sign is shared by your entire generation, not " +
