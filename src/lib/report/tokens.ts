@@ -905,3 +905,108 @@ export function calculateSplitBridges(
 
   return bridges;
 }
+
+// ─── INCARNATION CROSS — family (Profile-determined) + the four cross gates ──
+//
+// The cross NAME itself (e.g. "Right Angle Cross of Explanation") is already
+// computed server-side by getIncarnationCross() in human_design.ts and
+// stored as hdIncarnationCross — that function needs the full 64-gate name
+// table, which belongs there. What this section adds is the FAMILY-level
+// reading (Right Angle / Juxtaposition / Left Angle) and the four literal
+// gates that make up the cross, both of which a report page needs directly.
+//
+// determineCrossFamily() and its Profile sets are duplicated here (not
+// imported) for the same reason as MANDALA_START_LON/DEGREES_PER_GATE
+// above: human_design.ts transitively requires the native swisseph addon,
+// which breaks anywhere that binary isn't built — fine for a server-only
+// API route, not safe for a file report *page components* import. This is
+// fixed classification data (which Profiles fall in which family), not
+// derived data — it will not drift. Canonical source: human_design.ts.
+type CrossFamily = 'rightAngle' | 'juxtaposition' | 'leftAngle';
+const RIGHT_ANGLE_PROFILES = new Set(['1/3', '1/4', '2/4', '2/5', '3/5', '3/6', '4/6']);
+const JUXTAPOSITION_PROFILES = new Set(['4/1']);
+const LEFT_ANGLE_PROFILES = new Set(['5/1', '5/2', '6/2', '6/3']);
+
+function determineCrossFamily(profile: string): CrossFamily | null {
+  if (JUXTAPOSITION_PROFILES.has(profile)) return 'juxtaposition';
+  if (LEFT_ANGLE_PROFILES.has(profile)) return 'leftAngle';
+  if (RIGHT_ANGLE_PROFILES.has(profile)) return 'rightAngle';
+  return null; // unrecognized/malformed profile — fall back to a generic reading
+}
+
+export const CROSS_FAMILY_LABEL: Record<CrossFamily, string> = {
+  rightAngle: 'Right Angle',
+  juxtaposition: 'Juxtaposition',
+  leftAngle: 'Left Angle',
+};
+
+export interface CrossFamilyMeaning {
+  keynote: string;
+  passage: string;
+}
+
+export const CROSS_FAMILY_MEANING: Record<CrossFamily, CrossFamilyMeaning> = {
+  rightAngle: {
+    keynote: 'Personal Destiny',
+    passage:
+      "Roughly two out of every three people carry a Right Angle cross, and yours is one of them: a self-contained curriculum, not a shared assignment. You're here to bump into the world on your own terms, live out exactly what your Profile is built to do, and let whatever wisdom comes from it accumulate as yours — not something owed to anyone else first. Other people can benefit enormously from you doing what you love, but that benefit is a byproduct, not the point, and you're not obligated to make your path about them. The shadow here is a specific kind of guilt: mistaking your self-orientation for selfishness, or waiting for a partner, a cause, or a community to hand you your purpose, when the mechanics were never built to depend on anyone showing up. Nobody else is required for your geometry to complete itself — that's not a flaw in the design, it's the design.",
+  },
+  juxtaposition: {
+    keynote: 'Fixed Fate',
+    passage:
+      "You carry the rarest of the three geometries — only the 4/1 Profile lands here — and it makes you a genuinely unbending track. Nothing conditions you out of your own perspective, and nothing needs to: the quiet first-line research underneath your Profile becomes, through your fourth line, a fixed truth you externalize to the specific circle of friends and family already around you, not to the wider world. You're not here to change, evolve past, or soften your core stance to keep the peace — you're the anchor point other people orient around, whether they realize that's what's happening or not. The friction shows up almost entirely from the outside: people who try to bend, convince, or 'grow' you into someone more flexible, mistaking your fixed nature for stubbornness instead of recognizing it as correct mechanics. It was never going to work, and it was never supposed to.",
+  },
+  leftAngle: {
+    keynote: 'Transpersonal Karma',
+    passage:
+      "A little over a third of people carry a Left Angle cross, and yours is one of them — which means your life's work doesn't complete alone. Specific people are mechanically necessary to it: encounters that aren't random, agreements that read almost like karma, where you meet the right person at the right time to deliver something, resolve something, or move something forward together. Depending on which line carries the weight, that shows up as bringing a hard-won solution to whoever's in front of you, or simply being witnessed as an authentic standard other people measure themselves against. The shadow is projection running in both directions: others can load you up with savior-sized expectations you never agreed to carry, and you can mistake the need for isolation as a Right Angle person might, retreating from the very interactions your design actually depends on. The people your path keeps intersecting with aren't distractions from your purpose — they're the mechanism.",
+  },
+};
+
+export const CROSS_FAMILY_MEANING_FALLBACK: CrossFamilyMeaning = {
+  keynote: 'Your Geometry',
+  passage:
+    "Your Profile didn't resolve cleanly to one of the three recognized cross families here, so this reading stays at the gate level below rather than guessing at a family-wide theme. The four gates themselves — and what each one means on its own — still tell the real story of your life's work.",
+};
+
+export interface CrossFamilyResult {
+  family: CrossFamily | null;
+  label: string;        // "Right Angle" / "Juxtaposition" / "Left Angle" / "Your Geometry"
+  meaning: CrossFamilyMeaning;
+}
+
+export function calculateCrossFamily(profile: string): CrossFamilyResult {
+  const family = determineCrossFamily(profile);
+  if (!family) {
+    return { family: null, label: 'Your Geometry', meaning: CROSS_FAMILY_MEANING_FALLBACK };
+  }
+  return { family, label: CROSS_FAMILY_LABEL[family], meaning: CROSS_FAMILY_MEANING[family] };
+}
+
+// The four gates that literally make up an Incarnation Cross, in a fixed
+// reading order, each with a short role blurb (sourced from the T3D
+// PHILOSOPHER notebook's cross-mechanics research — Leann Wolff / Frequency
+// of Self material on how the conscious/unconscious Sun/Earth pair function).
+export interface CrossGateEntry {
+  role: string;   // "Personality Sun", etc.
+  blurb: string;  // one-line role description, not gate-specific content
+  gate: number;
+}
+
+const CROSS_GATE_ROLES: { role: string; blurb: string; match: { epoch: string; planet: string } }[] = [
+  { role: 'Personality Sun', blurb: 'Your core, waking-life expression — about 70% of what you’re consciously aware of being.', match: { epoch: 'personality', planet: 'sun' } },
+  { role: 'Personality Earth', blurb: 'The conscious grounding lesson your mind works through to express that Sun cleanly.', match: { epoch: 'personality', planet: 'earth' } },
+  { role: 'Design Sun', blurb: 'Your body’s unconscious frequency — what people read off you before you’ve said a word.', match: { epoch: 'design', planet: 'sun' } },
+  { role: 'Design Earth', blurb: 'The physical anchor that lets that unconscious frequency actually land in the world.', match: { epoch: 'design', planet: 'earth' } },
+];
+
+export function getCrossGates(
+  activeGates: { gate: number; planet: string; epoch: string }[]
+): CrossGateEntry[] {
+  const entries: CrossGateEntry[] = [];
+  for (const r of CROSS_GATE_ROLES) {
+    const found = activeGates.find(a => a.epoch === r.match.epoch && a.planet === r.match.planet);
+    if (found) entries.push({ role: r.role, blurb: r.blurb, gate: found.gate });
+  }
+  return entries;
+}
