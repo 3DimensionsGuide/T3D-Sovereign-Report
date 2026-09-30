@@ -13,8 +13,9 @@
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { TechnicalLines } from '../../shared/PageComponents';
-import { C, F, PAGE, calculateDefinition, DEFINITION_MEANING } from '../../tokens';
+import { C, F, PAGE, calculateDefinition, calculateSplitBridges, DEFINITION_MEANING } from '../../tokens';
 import { CENTER_DISPLAY_NAME } from '../../section3/hd-content';
+import { GATE_KEYNOTES } from '../../section3/gate-content';
 import type { ReportData } from '../../tokens';
 
 const S = StyleSheet.create({
@@ -73,6 +74,39 @@ const S = StyleSheet.create({
     color: C.parchmentFaint, textTransform: 'uppercase',
   },
 
+  // Bridge detail — per group-pair, narrow (hanging gate) vs wide (no gate)
+  bridgeDetail: {
+    flexDirection: 'column', gap: 12, marginBottom: 20,
+  },
+  bridgeCard: {
+    padding: 14, backgroundColor: '#FFFFFF',
+    borderWidth: 0.75, borderColor: C.base, borderStyle: 'solid', borderRadius: 3,
+    opacity: 0.95,
+  },
+  bridgeCardHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6,
+  },
+  bridgeCardTag: {
+    fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
+    color: '#FFFFFF', backgroundColor: C.amber, textTransform: 'uppercase',
+    paddingVertical: 3, paddingHorizontal: 7, borderRadius: 2,
+  },
+  bridgeCardTitle: {
+    fontFamily: F.display, fontSize: 12, fontWeight: 400, fontStyle: 'italic', color: C.base,
+  },
+  bridgeCardBody: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.85,
+  },
+  hangingGateRow: {
+    marginTop: 8, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: C.base, borderTopStyle: 'solid', opacity: 0.9,
+  },
+  hangingGateLabel: {
+    fontFamily: F.sans, fontSize: 7, fontWeight: 700, letterSpacing: 1, color: C.amberDim, textTransform: 'uppercase',
+  },
+  hangingGateText: {
+    fontFamily: F.sans, fontSize: 9.5, fontWeight: 400, color: C.base, lineHeight: 1.45, marginTop: 3,
+  },
+
   // Meaning block
   meaningBlock: {
     padding: 16, backgroundColor: '#F5F3EE',
@@ -93,13 +127,19 @@ const S = StyleSheet.create({
 });
 
 interface Props {
-  data: Pick<ReportData, 'hdDefinedCenters' | 'hdChannels'>;
+  data: Pick<ReportData, 'hdDefinedCenters' | 'hdChannels' | 'hdActiveGates'>;
 }
 
 export default function Page02Definition({ data }: Props) {
   const result = calculateDefinition(data.hdDefinedCenters, data.hdChannels);
   const meaning = DEFINITION_MEANING[result.type]
     ?? 'Your defined Centers form a configuration unique to you — the specific pattern of what runs consistently versus what depends on connection.';
+  const bridges = calculateSplitBridges(result.groups, data.hdActiveGates);
+
+  const groupLabel = (groupIndex: number) =>
+    result.groups[groupIndex]
+      .map(c => CENTER_DISPLAY_NAME[c] ?? c)
+      .join(' + ');
 
   return (
     <Page size="LETTER" style={S.page}>
@@ -146,6 +186,42 @@ export default function Page02Definition({ data }: Props) {
             </React.Fragment>
           ))}
         </View>
+
+        {bridges.length > 0 && (
+          <View style={S.bridgeDetail}>
+            {bridges.map((bridge, i) => (
+              <View key={i} style={S.bridgeCard}>
+                <View style={S.bridgeCardHeader}>
+                  <Text style={S.bridgeCardTag}>
+                    {bridge.classification === 'narrow' ? 'Narrow Split' : 'Wide Split'}
+                  </Text>
+                  <Text style={S.bridgeCardTitle}>
+                    {groupLabel(bridge.groupAIndex)} {'\u2194'} {groupLabel(bridge.groupBIndex)}
+                  </Text>
+                </View>
+                <Text style={S.bridgeCardBody}>
+                  {bridge.classification === 'narrow'
+                    ? "You already carry half of what would connect these two islands — one specific gate is the difference. That tends to turn inward: a quiet sense that you should be able to supply this yourself, and self-blame when you can't."
+                    : "An entire channel is missing between these two islands, not just one gate — there's no single quality of your own that closes this gap. That tends to turn outward: toward a partner, a group, or the world to supply what's missing, rather than toward yourself."}
+                </Text>
+                {bridge.classification === 'narrow' && bridge.hangingGates.length > 0 && (
+                  <View style={S.hangingGateRow}>
+                    <Text style={S.hangingGateLabel}>Your Bridge Gate</Text>
+                    {bridge.hangingGates.slice(0, 2).map((hg, hi) => {
+                      const partnerKeynote = GATE_KEYNOTES[hg.partnerGate];
+                      return (
+                        <Text key={hi} style={S.hangingGateText}>
+                          Gate {hg.partnerGate}{partnerKeynote ? ` — ${partnerKeynote.ichingName}` : ''}
+                          {partnerKeynote ? `: ${partnerKeynote.coreMeaning}` : ''}
+                        </Text>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={S.meaningBlock}>
           <Text style={S.meaningText}>{meaning}</Text>

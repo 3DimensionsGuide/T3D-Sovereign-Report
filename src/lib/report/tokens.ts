@@ -602,11 +602,20 @@ const DEFINITION_LABELS: Record<number, DefinitionType> = {
 };
 
 export const DEFINITION_MEANING: Record<DefinitionType, string> = {
-  'Single': 'All your defined Centers connect in one continuous circuit. Consistent, self-contained energy — you don’t need another person to feel whole. Can read as fixed or set in your ways.',
-  'Split': 'Two separate circuits that don’t connect on their own. You’re built to seek people who "bridge" the split and complete your circuitry — relationships carry real energetic weight for you.',
-  'Triple Split': 'Three separate circuits. Highly adaptable — you draw on different people to bridge different splits. You tend to thrive in groups, and decisions benefit from time and outside input.',
-  'Quadruple Split': 'Four separate circuits — the rarest Definition. Extremely flexible and environment-dependent. A stable, consistent community does more for your grounding and clarity than it does for most people.',
-  'No Definition': 'No Centers are defined — every Center is open. This is the Reflector configuration: a different mechanic entirely, sampling and reflecting the energy of whoever and wherever you are.',
+  'Single':
+    "All of your defined Centers connect in one continuous circuit — there's no gap anywhere inside you that needs another person to close it. That gives you a natural solidity: you don't wake up feeling like a piece is missing, and you don't need anyone else's presence to feel whole. You process quickly, largely on your own terms, and you enter relationships out of desire rather than mechanical need. The trade-off is real, though — your independence can read to Split-definition people (about 60% of the population) as aloofness or self-containment, when it's actually just a different wiring. Your growth doesn't come from finding a bridge; it comes from paying attention to what your open Centers pick up from the world around you, since that's where your conditioning actually happens.",
+
+  'Split':
+    "Two separate islands of definition are running inside you, and — on your own — they can't talk to each other. That produces a very specific, very real sensation: an underlying sense that something is missing, even when nothing is actually wrong. This isn't a flaw to fix; it's simple mechanics, and it's also exactly what wires half of humanity toward pair-bonding in the first place. When something (or someone) bridges the gap — a partner, a friend, even just the ambient hum of a public space — the two islands connect, and you feel a genuine, almost physical wave of relief and wholeness. Two people can experience this differently depending on the SIZE of what's missing: if it's a single hanging gate, you tend to fixate on that one quality as your own personal Holy Grail, and quietly blame yourself for not having it. If it's a whole missing channel, the story tends to point outward instead — frustration at a partner or the world for not supplying what you need. Either way, knowing the mechanism changes the experience: you can stop treating the gap as a personal failing, and start treating it as a design feature you can meet on purpose — including the simple, underrated fix of spending real time in public places, where the ambient aura does some of the bridging for you without the weight of depending on one person.",
+
+  'Triple Split':
+    "Three separate islands of definition are running inside you at once — closer to managing three ongoing internal conversations than one. Processing takes longer than it does for a Single or Split configuration, because energy has to move through more than one divide before anything settles into clarity. The relational implication is significant: no single person can bridge all three islands the way a partner can bridge a simple Split. One relationship might connect two of your islands; the third stays open regardless. That's not a problem to solve by finding the 'right' person — it's a sign that your wholeness was never meant to come from one relationship at all. It comes from movement: time in groups, in public places, around varied company. Passing through different auras works almost like a reset, briefly connecting and clearing each island before you're back in your own space. Without that movement, staying too long in one aura — even a loved one's — can start to feel claustrophobic or 'stir crazy,' which has nothing to do with how you feel about that person and everything to do with your system needing more circulation than any one relationship can supply.",
+
+  'Quadruple Split':
+    "Four separate islands of definition — the rarest configuration, and the slowest to process of any Definition type. Where other types might feel a quick click of recognition, you're built for a longer arc: information has to move through four distinct internal divides before a decision actually settles, which is exactly why people with this Definition are often described as late bloomers. It's not indecision — it's thoroughness. Because so much of you is already defined, you don't absorb the world the way more open configurations do; if anything, you're here to condition the people and environments around you more than the reverse, which can make relationships feel more one-sided or private than others expect. The people around you do you the biggest favor by simply giving your process room — rushing a Quadruple Split rarely produces a better decision, only an earlier one.",
+
+  'No Definition':
+    "No Centers are defined at all — every single one is open. This is the Reflector configuration, and it runs on an entirely different mechanic than the other four: rather than a fixed circuit (or circuits) of your own, you have a resistant, sampling aura that takes in and reflects whatever is around you without holding onto it permanently. That makes environment the single biggest factor in your life — the right space, the right company, and you genuinely thrive; the wrong one, and it shows up fast. Because nothing in you is fixed, your decision-making runs on its own timeline too: waiting through a full lunar cycle (about 28 days) for something significant lets the full range of your chart actually get illuminated before you commit. Lived well, that patience produces a distinctive kind of ongoing surprise and delight with the world; lived out of step with it, the same openness can just as easily curdle into disappointment. Neither is a flaw in you — it's a direct readout of whether your environment and your timing are actually correct.",
 };
 
 export function calculateDefinition(
@@ -663,9 +672,19 @@ export function calculateDefinition(
 // with valid chart data, but data can be messy) is skipped rather than
 // guessed at.
 
-import { CHANNELS, findChannelCircuit, type CircuitGroup, type ChannelCircuit } from './section3/gate-content';
+import { CHANNELS, findChannelCircuit, GATE_KEYNOTES, type CircuitGroup, type ChannelCircuit } from './section3/gate-content';
 import { findGodheadByGate, type GodheadInfo } from './section3/godhead-content';
-import { MANDALA_START_LON, DEGREES_PER_GATE } from '@/server/engines/human_design';
+// MANDALA_START_LON / DEGREES_PER_GATE are duplicated here (not imported)
+// deliberately: human_design.ts pulls in the astrology engine, which
+// require()s the native swisseph addon — fine for a server-only API route,
+// but tokens.ts is imported by report *page components*, and a value-import
+// chain that drags a native binary into that layer breaks anywhere the
+// binary isn't built for the current platform (hit this on both the sandbox
+// and Tyler's own machine). These are fixed geometry constants of the Rave
+// Mandala wheel, not derived data — they will not drift. Canonical source:
+// src/server/engines/human_design.ts (MANDALA_START_LON, DEGREES_PER_GATE).
+const MANDALA_START_LON = 302.0;      // 2°00' Aquarius — canonical Rave Mandala start point
+const DEGREES_PER_GATE  = 360 / 64;   // 5.625°
 
 export interface CircuitBalanceResult {
   matched: ChannelCircuit[];           // the user's active channels, resolved to circuit info
@@ -811,3 +830,78 @@ export function calculateVariables(
   };
 }
 
+// ─── SPLIT BRIDGES — narrow (single hanging gate) vs wide (whole channel) ────
+//
+// For a Split/Triple Split/Quadruple Split chart, this identifies, for every
+// pair of separate Definition groups, whether the person already has one
+// gate of a connecting channel active (a "hanging gate" — a narrow split,
+// where the psychology tends toward self-blame: "why can't I do this
+// myself?"), or whether no candidate channel has either gate active at all
+// (a wide split — the psychology tends outward: "why doesn't someone/
+// something else supply this?"). Source: T3D PHILOSOPHER notebook — Ra Uru
+// Hu ("Your Definition Type"), Richard Beaumont, Brenda Gregory.
+//
+// Uses the same 36-channel table as calculateCircuitBalance() (CHANNELS,
+// from section3/gate-content.ts) plus GATE_KEYNOTES for each gate's Center,
+// so no new data source is needed — just a different cut through what's
+// already in hdActiveGates.
+
+export interface HangingBridgeGate {
+  gate: number;
+  center: string;
+  partnerGate: number;
+  partnerCenter: string;
+  channelName: string;
+}
+
+export interface GroupBridge {
+  groupAIndex: number;
+  groupBIndex: number;
+  classification: 'narrow' | 'wide';
+  hangingGates: HangingBridgeGate[]; // populated only when classification === 'narrow'
+}
+
+export function calculateSplitBridges(
+  groups: string[][],
+  activeGates: { gate: number }[]
+): GroupBridge[] {
+  const activeSet = new Set(activeGates.map(g => g.gate));
+  const bridges: GroupBridge[] = [];
+
+  for (let i = 0; i < groups.length; i++) {
+    for (let j = i + 1; j < groups.length; j++) {
+      const groupA = new Set(groups[i]);
+      const groupB = new Set(groups[j]);
+      const hangingGates: HangingBridgeGate[] = [];
+
+      for (const ch of CHANNELS) {
+        const [gA, gB] = ch.gates;
+        const centerA = GATE_KEYNOTES[gA]?.center;
+        const centerB = GATE_KEYNOTES[gB]?.center;
+        if (!centerA || !centerB) continue;
+
+        const spansAB =
+          (groupA.has(centerA) && groupB.has(centerB)) ||
+          (groupA.has(centerB) && groupB.has(centerA));
+        if (!spansAB) continue;
+
+        const aActive = activeSet.has(gA);
+        const bActive = activeSet.has(gB);
+        if (aActive && !bActive) {
+          hangingGates.push({ gate: gA, center: centerA, partnerGate: gB, partnerCenter: centerB, channelName: ch.name });
+        } else if (bActive && !aActive) {
+          hangingGates.push({ gate: gB, center: centerB, partnerGate: gA, partnerCenter: centerA, channelName: ch.name });
+        }
+      }
+
+      bridges.push({
+        groupAIndex: i,
+        groupBIndex: j,
+        classification: hangingGates.length > 0 ? 'narrow' : 'wide',
+        hangingGates,
+      });
+    }
+  }
+
+  return bridges;
+}
