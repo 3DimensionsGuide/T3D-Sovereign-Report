@@ -1,11 +1,12 @@
 /**
- * Advanced Sovereign Report — Vehicle Section — Divider
+ * Advanced Sovereign Report — Road Section — Divider
  *
- * You already know what you are (base report). This section is about why
- * you're built that way, and how to actually run the machine day to day.
- * Same divider grammar as the base report's Page10VehicleDivider — dark,
- * amber signal line, one question, no dense copy — but reframed as a
- * continuation/deepening, not a restart.
+ * You already know your Life Path (base report). This section is about the
+ * layers underneath it: the name-encoded numbers (Hidden Passion, Karmic
+ * Lessons) and the timing terrain (Pinnacles, Challenges) that shape how
+ * that Life Path actually gets walked, decade by decade. Same divider
+ * grammar as the Vehicle section's Page01Divider — dark, signal line in
+ * the section's own color, one question, no dense copy.
  */
 
 import React from 'react';
@@ -21,10 +22,10 @@ const S = StyleSheet.create({
     fontFamily: F.sans,
   },
 
-  amberLine: {
+  emeraldLine: {
     width: PAGE.width,
     height: 2,
-    backgroundColor: C.amber,
+    backgroundColor: C.emerald,
   },
 
   content: {
@@ -39,7 +40,7 @@ const S = StyleSheet.create({
     fontSize: 8.5,
     fontWeight: 500,
     letterSpacing: 3,
-    color: C.amber,
+    color: C.emerald,
     textTransform: 'uppercase',
     marginBottom: 20,
     opacity: 0.7,
@@ -59,7 +60,7 @@ const S = StyleSheet.create({
     fontSize: 28,
     fontWeight: 400,
     fontStyle: 'italic',
-    color: C.amber,
+    color: C.emerald,
     lineHeight: 1.1,
     marginBottom: 48,
   },
@@ -120,25 +121,25 @@ const S = StyleSheet.create({
 });
 
 interface Props {
-  data: Pick<ReportData, 'hdType'>;
+  data: Pick<ReportData, 'lifePath'>;
 }
 
-export default function Page01VehicleDivider({ data }: Props) {
+export default function Page01RoadDivider({ data }: Props) {
   return (
     <Page size="LETTER" style={S.page}>
       <TechnicalLines variant="dark" />
 
-      <View style={S.amberLine} />
+      <View style={S.emeraldLine} />
 
       <View style={S.content}>
-        <Text style={S.sectionNum}>Section I · The Vehicle, Deepened</Text>
+        <Text style={S.sectionNum}>Section II · The Road, Deepened</Text>
         <Text style={S.sectionTitle}>Beneath the</Text>
-        <Text style={S.sectionSubtitle}>Surface</Text>
+        <Text style={S.sectionSubtitle}>Terrain</Text>
         <View style={S.rule} />
         <Text style={S.question}>
-          &ldquo;You already know what you are.{'\n'}Now: why are you wired this way — and{'\n'}how do you actually run the machine?&rdquo;
+          &ldquo;You already know your Life Path.{'\n'}Now: what does your name already encode — and{'\n'}when does the ground actually shift beneath you?&rdquo;
         </Text>
-        <Text style={S.pagesNote}>Human Design · {data.hdType} · Advanced Depth</Text>
+        <Text style={S.pagesNote}>Numerology · Life Path {data.lifePath} · Advanced Depth</Text>
       </View>
 
       <View style={S.bottom} fixed>
