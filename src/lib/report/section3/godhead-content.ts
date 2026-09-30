@@ -84,7 +84,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'The Angelical Mind',
     keynote: 'Michael protects innocence with a sword, not a shield — opinion, control, and shock in service of something worth defending. This Godhead initiates through principled action: naming what is right, then moving decisively to protect it.',
     light: "Michael's gift is principled protection — naming what's true and defending the vulnerable without waiting for anyone's permission.",
-    shadow: 'Its shadow is the loud, unearned opinion — controlling, bullying, or casting people out just to feel righteous.',
+    shadow: 'Unearned, that same conviction turns into the loud opinion — controlling, bullying, or casting people out just to feel righteous.',
   },
   {
     name: 'Janus', quarter: 'Initiation', quarterTheme: QUARTER_THEMES.Initiation,
@@ -102,7 +102,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'The Mother of Form',
     keynote: 'Maia receives the formless and gives it direction — the quiet authority of knowing which way is forward without having to explain why. This Godhead civilizes through presence: contribution and clarity offered in the now, not argued for.',
     light: "Maia's gift is quiet, in-the-moment authority — receiving guidance and translating it into clear, useful contribution without over-explaining it.",
-    shadow: 'Its shadow is scarcity and approval-seeking — frantic busyness, or blurting out half-formed insight that alienates the room.',
+    shadow: 'Out of alignment, that same authority curdles into scarcity and approval-seeking — frantic busyness, or blurting out half-formed insight that alienates the room.',
   },
   {
     name: 'Lakshmi', quarter: 'Civilization', quarterTheme: QUARTER_THEMES.Civilization,
@@ -126,7 +126,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'Truth, Justice, and Cosmic Order',
     keynote: "Ma'at weighs the detail against the whole — fact, story, leadership, and privacy held to one honest standard. This Godhead civilizes through truth-telling: the courage to say what is factually so, then lead from it.",
     light: "Ma'at's gift is truth told with real detail — leadership and storytelling rooted in integrity, not spin.",
-    shadow: 'Its shadow is pedantic nitpicking, exaggeration dressed up as fact, or bitter withholding of what’s actually true.',
+    shadow: 'Distorted, that same honesty turns into pedantic nitpicking, exaggeration dressed up as fact, or bitter withholding of what’s actually true.',
   },
 
   // ── Quarter 3: Duality ─────────────────────────────────────────────────
@@ -144,7 +144,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'Resolution Through Conflict',
     keynote: "Harmonia is born of both love and war — the peace that only arrives after friction has done its honest work. This Godhead bonds through resolution: confusion and realization moving toward a hard-won, transcendent accord.",
     light: "Harmonia's gift is hard-won peace — untangling real confusion and negotiating fair terms everyone can actually live with.",
-    shadow: "Its shadow is over-giving until depleted, or forcing “peace” through quiet control instead of real resolution.",
+    shadow: "Unresolved, that same peacemaking becomes over-giving until depleted, or forcing “peace” through quiet control instead of real resolution.",
   },
   {
     name: 'Christ', quarter: 'Duality', quarterTheme: QUARTER_THEMES.Duality,
@@ -160,7 +160,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'Wisdom, Strategy, and Preservation',
     keynote: 'Minerva carries knowledge into action — continuity, values, and instinct held together by strategic, protective intelligence. This Godhead bonds through stewardship: what a relationship, a family, or a tradition needs to survive and be carried forward.',
     light: "Minerva's gift is protecting what actually deserves to last — values, continuity, and instinct sharpened by real experience.",
-    shadow: 'Its shadow is rigid, outdated rule-enforcement, or reckless risk-taking driven by a fear of becoming irrelevant.',
+    shadow: 'Rigid, that same stewardship hardens into outdated rule-enforcement, or reckless risk-taking driven by a fear of becoming irrelevant.',
   },
 
   // ── Quarter 4: Mutation ────────────────────────────────────────────────
@@ -178,7 +178,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'The Fire-Bringer',
     keynote: 'Prometheus steals fire not to hoard it but to give it away — focus, rhythm, ego, and ideas turned toward the benefit of others. This Godhead mutates through ambition in service of humanity: the drive to improve life, not merely to win.',
     light: "Prometheus' gift is focus in service of others — real timing, real value, ideas given away for everyone's benefit, not just his own.",
-    shadow: 'Its shadow is impatience that forces outcomes early, or manipulation and empty promises dressed up as generosity.',
+    shadow: 'Impatient, that same generosity forces outcomes early, or turns into manipulation and empty promises.',
   },
   {
     name: 'Vishnu', quarter: 'Mutation', quarterTheme: QUARTER_THEMES.Mutation,
@@ -194,7 +194,7 @@ export const GODHEADS: GodheadInfo[] = [
     archetype: 'The Hidden Gods',
     keynote: 'The Keepers govern the cycle itself — mystery, acceptance, contraction, and want, moving in a rhythm too large to see all at once. This Godhead mutates through what is hidden: trusting an unfolding you cannot yet fully explain.',
     light: "The Keepers' gift is trusting what can't yet be explained — real acceptance of limitation, and sensitivity to what a community actually needs.",
-    shadow: 'Their shadow is obsessing over unanswerable questions, or clinging to fantasies and people out of a fear of being left behind.',
+    shadow: 'Unintegrated, that same trust collapses into obsessing over unanswerable questions, or clinging to fantasies and people out of a fear of being left behind.',
   },
 ];
 
