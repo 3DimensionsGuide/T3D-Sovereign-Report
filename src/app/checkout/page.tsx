@@ -28,6 +28,7 @@ import Link   from 'next/link';
 import Nav    from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
 import { useT3DStore } from '@/store/useT3DStore';
+import { PRODUCT_DISPLAY, PRODUCT_ORDER } from '@/lib/products/catalog';
 
 // ─── Load Stripe once — outside component ─────────────────────────────────────
 const stripePromise = loadStripe(
@@ -203,7 +204,7 @@ function CheckoutPageInner() {
   const leadId = results?.leadId ?? null;
 
   const searchParams = useSearchParams();
-  const productSlug   = searchParams.get('product') || 'sovereign-report';
+  const initialProductSlug = searchParams.get('product') || 'sovereign-report';
 
   const [clientSecret, setClientSecret] = useState('');
   const [loading,      setLoading]      = useState(true);
@@ -211,10 +212,27 @@ function CheckoutPageInner() {
   const [email,        setEmail]        = useState('');
   const [product,      setProduct]      = useState<ProductInfo | null>(null);
   const [orderId,      setOrderId]      = useState<number | null>(null);
+  const [productSlug,  setProductSlug]  = useState(initialProductSlug);
 
-  const priceDollars = Math.round((product?.priceCents ?? 4400) / 100);
-  const priceLabel   = `$${priceDollars}`;
-  const productName  = product?.name ?? 'Sovereign Report';
+  // Cosmetic fallback (catalog.ts, same static copy the pricing page uses)
+  // for the instant between clicking a different tier and the new
+  // PaymentIntent coming back — keeps the order summary in sync with the
+  // switcher right away instead of showing the previous tier's numbers.
+  const fallbackDisplay = PRODUCT_DISPLAY[productSlug];
+  const priceLabel  = product ? `$${Math.round(product.priceCents / 100)}` : (fallbackDisplay?.priceLabel ?? '$97');
+  const productName = product?.name ?? fallbackDisplay?.name ?? 'Sovereign Report';
+
+  // Switching tiers means a different price, so it needs a brand-new
+  // PaymentIntent (a Stripe PaymentIntent's amount is fixed at creation) —
+  // clearing clientSecret/product/orderId immediately avoids a flash of
+  // the old tier's payment form while the new one is created.
+  function handleSelectTier(slug: string) {
+    if (slug === productSlug || loading) return;
+    setProduct(null);
+    setClientSecret('');
+    setOrderId(null);
+    setProductSlug(slug);
+  }
 
   // Pulled out of the effect and wrapped in useCallback so the "Try Again"
   // button (server/DB failures) can call the exact same logic instead of
@@ -300,6 +318,60 @@ function CheckoutPageInner() {
 
             {/* LEFT — Order summary */}
             <div>
+              {/* Tier switcher — lets a visitor change which report
+                  they're buying without leaving checkout or losing their
+                  calculator results. Native radio inputs: full keyboard
+                  support (arrow keys move between options, same as any
+                  browser radio group) and screen readers announce the
+                  group and selection state without reinventing either. */}
+              <fieldset style={{ border: 'none', padding: 0, margin: '0 0 32px' }}>
+                <legend className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 14, padding: 0 }}>
+                  [CHOOSE YOUR TIER]
+                </legend>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {PRODUCT_ORDER.map((slug) => {
+                    const display = PRODUCT_DISPLAY[slug];
+                    const active  = slug === productSlug;
+                    return (
+                      <label
+                        key={slug}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: 12,
+                          minHeight: 48,
+                          padding: '12px 16px',
+                          border: active ? '1px solid var(--amber)' : '1px solid var(--card-border)',
+                          background: active ? 'rgba(229,169,60,0.06)' : 'transparent',
+                          cursor: loading ? 'not-allowed' : 'pointer',
+                          opacity: loading && !active ? 0.5 : 1,
+                          transition: 'border-color 0.2s ease, background 0.2s ease',
+                        }}
+                      >
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <input
+                            type="radio"
+                            name="t3d-tier"
+                            value={slug}
+                            checked={active}
+                            onChange={() => handleSelectTier(slug)}
+                            disabled={loading}
+                            style={{ accentColor: 'var(--amber)', width: 18, height: 18, flexShrink: 0, cursor: loading ? 'not-allowed' : 'pointer' }}
+                          />
+                          <span className="t3d-body" style={{ fontSize: 13.5, color: active ? 'var(--parchment)' : 'var(--parchment-70)' }}>
+                            {display.name}
+                          </span>
+                        </span>
+                        <span className="t3d-label" style={{ color: active ? 'var(--amber)' : 'var(--parchment-40)', flexShrink: 0 }}>
+                          {display.priceLabel}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+
               <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 20 }}>
                 [ORDER.SUMMARY]
               </p>
