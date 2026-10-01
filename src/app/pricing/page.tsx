@@ -14,6 +14,13 @@
  * survives through the calculator into checkout. Keeping this page a
  * pure Server Component (no 'use client') is also the fastest possible
  * LCP for a page whose entire job is to get a visitor to decide.
+ *
+ * Forced dynamic (see `dynamic` export below): without it, Next.js
+ * tries to statically prerender this page at `next build` time, which
+ * means every production build would require a live, fully-migrated
+ * DB connection just to compile — fragile, and wrong anyway since
+ * pricing should always reflect the live `products` table, not a
+ * snapshot frozen at the last build.
  */
 
 import Link from 'next/link';
@@ -21,6 +28,8 @@ import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
 import { getActiveProducts } from '@/lib/products/queries';
 import { PRODUCT_DISPLAY, PRODUCT_ORDER } from '@/lib/products/catalog';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Pricing — The 3 Dimensions',
