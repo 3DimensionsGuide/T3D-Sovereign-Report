@@ -262,7 +262,7 @@ export async function generateStoplightSynthesis(data: StoplightSynthesisInput):
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929',
+        model: 'claude-sonnet-5-5', // QA fix: 4-5-20250929 deprecated 2026-09-30, retires 2026-11-30 per Anthropic's model-deprecations page
         max_tokens: 600,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: dataPrompt }],
