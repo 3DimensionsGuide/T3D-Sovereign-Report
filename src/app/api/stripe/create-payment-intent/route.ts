@@ -83,8 +83,14 @@ export async function POST(request: Request) {
     });
 
   } catch (error: unknown) {
+    // Full detail (raw DB/Stripe error, query text, etc.) stays server-side —
+    // it was previously forwarded verbatim to the client via error.message,
+    // which meant a DB outage showed a raw SQL query string on the checkout
+    // page. The client only ever gets this one generic, safe message.
     console.error('[Stripe] PaymentIntent creation failed:', error);
-    const message = error instanceof Error ? error.message : 'Payment setup failed.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "We couldn't set up checkout right now. Please try again in a moment." },
+      { status: 500 },
+    );
   }
 }

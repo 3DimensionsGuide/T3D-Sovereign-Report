@@ -15,7 +15,7 @@
  *   4. User pays → Stripe redirects to /report on success
  */
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import {
@@ -216,40 +216,57 @@ function CheckoutPageInner() {
   const priceLabel   = `$${priceDollars}`;
   const productName  = product?.name ?? 'Sovereign Report';
 
-  useEffect(() => {
-    // Read from localStorage inside useEffect — localStorage is unavailable during SSR
+  // Pulled out of the effect and wrapped in useCallback so the "Try Again"
+  // button (server/DB failures) can call the exact same logic instead of
+  // duplicating it — see the error-state render below for why that case is
+  // handled separately from "no calculator results."
+  const createIntent = useCallback(async () => {
+    setLoading(true);
+    setError('');
+
+    // No leadId at all means they never completed the calculator — that's
+    // a real, distinct case from a server/DB failure, and doesn't need a
+    // network round-trip to diagnose.
+    if (!leadId) {
+      setError('No calculator results found.');
+      setLoading(false);
+      return;
+    }
+
+    // Read from localStorage here (not SSR-safe at module scope, and this
+    // only ever runs client-side anyway).
     const savedEmail = localStorage.getItem('t3d_email') ?? '';
     const savedName  = localStorage.getItem('t3d_name')  ?? '';
     setEmail(savedEmail);
 
-    async function createIntent() {
-      try {
-        const res = await fetch('/api/stripe/create-payment-intent', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            leadId,
-            email: savedEmail,
-            name:  savedName,
-            productSlug,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.clientSecret) {
-          throw new Error(data.error ?? 'Failed to initialize checkout.');
-        }
-        setClientSecret(data.clientSecret);
-        if (data.product) setProduct(data.product as ProductInfo);
-        if (typeof data.orderId === 'number') setOrderId(data.orderId);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Something went wrong.');
-      } finally {
-        setLoading(false);
+    try {
+      const res = await fetch('/api/stripe/create-payment-intent', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId,
+          email: savedEmail,
+          name:  savedName,
+          productSlug,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.clientSecret) {
+        throw new Error(data.error ?? 'Failed to initialize checkout.');
       }
+      setClientSecret(data.clientSecret);
+      if (data.product) setProduct(data.product as ProductInfo);
+      if (typeof data.orderId === 'number') setOrderId(data.orderId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
-
-    createIntent();
   }, [leadId, productSlug]);
+
+  useEffect(() => {
+    createIntent();
+  }, [createIntent]);
 
   return (
     <>
@@ -394,21 +411,42 @@ function CheckoutPageInner() {
                   </div>
                 )}
 
-                {/* Error state */}
+                {/* Error state — two genuinely different causes, so two
+                    different messages. leadId present means the calculator
+                    *was* completed and this is a server/DB-side failure
+                    (nothing the visitor can fix by going back); leadId
+                    missing means they never got a lead record at all. */}
                 {error && !loading && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <p className="t3d-label" style={{ color: 'var(--crimson-hi)' }}>⚠ {error}</p>
-                    <p className="t3d-body" style={{ fontSize: 13 }}>
-                      There was a problem setting up checkout. Please complete
-                      the calculator first, then return here.
-                    </p>
-                    <Link
-                      href="/#calculator"
-                      className="t3d-ghost"
-                      style={{ width: 'auto', padding: '12px 24px', marginTop: 8 }}
-                    >
-                      ← BACK TO CALCULATOR
-                    </Link>
+                    {leadId ? (
+                      <>
+                        <p className="t3d-body" style={{ fontSize: 13 }}>
+                          This is on our end, not something you did — please try again in a moment.
+                        </p>
+                        <button
+                          onClick={() => createIntent()}
+                          className="t3d-ghost"
+                          style={{ width: 'auto', padding: '12px 24px', marginTop: 8 }}
+                        >
+                          TRY AGAIN
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <p className="t3d-body" style={{ fontSize: 13 }}>
+                          We couldn&apos;t find your calculator results. Please complete
+                          the calculator first, then return here.
+                        </p>
+                        <Link
+                          href="/#calculator"
+                          className="t3d-ghost"
+                          style={{ width: 'auto', padding: '12px 24px', marginTop: 8 }}
+                        >
+                          ← BACK TO CALCULATOR
+                        </Link>
+                      </>
+                    )}
                   </div>
                 )}
 
