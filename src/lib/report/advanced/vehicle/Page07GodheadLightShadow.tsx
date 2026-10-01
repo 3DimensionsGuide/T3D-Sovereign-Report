@@ -51,14 +51,14 @@ const S = StyleSheet.create({
     borderWidth: 0.75, borderColor: C.base, borderStyle: 'solid', borderRadius: 3,
     borderLeftWidth: 3, borderLeftStyle: 'solid',
   },
-  lightCard: { borderLeftColor: '#1F8A4D' },
-  shadowCard: { borderLeftColor: '#C83E3E' },
+  lightCard: { borderLeftColor: C.emerald }, // QA fix: tokenized (was hardcoded hex)
+  shadowCard: { borderLeftColor: C.crimson }, // QA fix: tokenized (was hardcoded hex)
   cardLabel: {
     fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
     textTransform: 'uppercase', marginBottom: 8,
   },
-  lightLabel: { color: '#1F8A4D' },
-  shadowLabel: { color: '#C83E3E' },
+  lightLabel: { color: C.emerald }, // QA fix: tokenized (was hardcoded hex)
+  shadowLabel: { color: C.crimson }, // QA fix: tokenized (was hardcoded hex)
   cardText: {
     fontFamily: F.sans, fontSize: 9.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.9,
   },

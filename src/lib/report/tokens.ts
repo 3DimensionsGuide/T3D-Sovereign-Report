@@ -19,7 +19,7 @@ export const C = {
   emerald:       '#1F8A4D',
   emeraldDim:    '#0E4425',
   emeraldLight:  '#EAF5EE',
-  crimson:       '#991B1B',
+  crimson:       '#C83E3E', // QA: brand spec color (was #991B1B before this change)
   crimsonDim:    '#4C0D0D',
   crimsonLight:  '#FDEAEA',
   pageLight:     '#FAFAF9',
