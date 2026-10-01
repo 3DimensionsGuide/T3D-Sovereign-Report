@@ -498,7 +498,6 @@ function determineType(
   const sacralDefined       = definedCenters.has('sacral');
   const motorToThroat       = isMotorToThroatDefined(activeChannels);
   const throatDefined       = definedCenters.has('throat');
-  const anyChannelDefined   = activeChannels.length > 0;
 
   // ── Reflector: all 9 centers undefined ────────────────────────────────────
   if (definedCenters.size === 0) return 'Reflector';
@@ -512,22 +511,50 @@ function determineType(
   // ── Manifestor: Sacral undefined + motor-to-throat ────────────────────────
   if (!sacralDefined && motorToThroat) return 'Manifestor';
 
-  // ── Projector: Sacral undefined + no motor-to-throat + at least one channel
-  if (!sacralDefined && !motorToThroat && anyChannelDefined) return 'Projector';
-
-  // ── Edge case: no channels at all but centers defined via lone gate overlap
-  // (theoretically impossible in proper HD but handled defensively)
+  // ── Projector: everything else. QA CLEANUP: this used to be gated on
+  // `activeChannels.length > 0` with a separate "defensive" fallback branch
+  // below it for the zero-channel case — but definedCenters is only ever
+  // populated inside the channel-scanning loop in determineDefinedCenters(),
+  // so reaching this point with zero active channels would mean
+  // definedCenters.size === 0, which the Reflector check above already
+  // catches. That branch was unreachable dead code; removed.
   return 'Projector';
 }
 
 // ─── AUTHORITY HIERARCHY ──────────────────────────────────────────────────────
 
-function determineAuthority(definedCenters: Set<HDCenter>): HDAuthority {
+/**
+ * QA FIX: Ego and Self-Projected authority both require their center to be
+ * defined specifically THROUGH a channel that reaches the Throat — not
+ * merely "defined somewhere." Heart defined via 26-44 (Spleen) or 40-37
+ * (Solar Plexus) alone is not Ego authority; G-Center defined via 25-51
+ * (Heart), 2-14/15-5/46-29 (Sacral), or 10-57 (Spleen) alone is not
+ * Self-Projected authority. The previous version of this function granted
+ * both from raw center-definition membership, which could assign the wrong
+ * Authority — the single most actionable output of a Human Design reading —
+ * for any chart where Heart or G-Center is defined but not Throat-connected.
+ */
+const HEART_TO_THROAT_CHANNEL = '21-45'; // Money Line — the only channel that makes Ego authority valid
+const G_TO_THROAT_CHANNELS: readonly string[] = ['1-8', '7-31', '13-33']; // Inspiration, Alpha, Prodigal
+
+function isChannelActive(activeChannels: ActiveChannel[], sortedGateKey: string): boolean {
+  return activeChannels.some((ch) => [...ch.gates].sort((a, b) => a - b).join('-') === sortedGateKey);
+}
+
+function determineAuthority(definedCenters: Set<HDCenter>, activeChannels: ActiveChannel[]): HDAuthority {
   if (definedCenters.has('solar_plexus')) return 'Emotional';
   if (definedCenters.has('sacral'))       return 'Sacral';
   if (definedCenters.has('spleen'))       return 'Splenic';
-  if (definedCenters.has('heart'))        return 'Ego';
-  if (definedCenters.has('g_center'))     return 'Self-Projected';
+
+  if (isChannelActive(activeChannels, HEART_TO_THROAT_CHANNEL)) return 'Ego';
+  if (G_TO_THROAT_CHANNELS.some((key) => isChannelActive(activeChannels, key))) return 'Self-Projected';
+
+  // NOTE: a chart with Heart or G-Center defined but NOT Throat-connected,
+  // and no Ajna/Throat definition either, falls all the way to 'Lunar' here
+  // even though it isn't a Reflector — real HD would call that "No Inner
+  // Authority" (a distinct category from Reflector's true Lunar authority).
+  // This file's HDAuthority type has no separate value for that case; adding
+  // one is a larger, type-level change outside the scope of this fix.
   if (definedCenters.has('ajna') || definedCenters.has('throat')) return 'Mental';
   return 'Lunar'; // Reflector
 }
@@ -587,7 +614,7 @@ export function calculateHumanDesign(input: HumanDesignInput): HumanDesignResult
 
   // ── Type, Authority, Profile ───────────────────────────────────────────────
   const type      = determineType(definedCenters, activeChannels);
-  const authority = determineAuthority(definedCenters);
+  const authority = determineAuthority(definedCenters, activeChannels);
 
   // Profile: Personality Sun line / Design Sun line
   const pSunActivation = personalityActivations.find((a) => a.planet === 'sun');
