@@ -93,7 +93,7 @@ const ADVANCED_INCLUDES = [
 ] as const;
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
-function CheckoutForm({ email, leadId, priceLabel }: { email: string; leadId: number | null; priceLabel: string }) {
+function CheckoutForm({ email, leadId, orderId, productSlug, priceLabel }: { email: string; leadId: number | null; orderId: number | null; productSlug: string; priceLabel: string }) {
   const stripe   = useStripe();
   const elements = useElements();
   const [busy,  setBusy]  = useState(false);
@@ -105,7 +105,7 @@ function CheckoutForm({ email, leadId, priceLabel }: { email: string; leadId: nu
     setBusy(true);
     setError('');
 
-    const returnUrl = `${window.location.origin}/report?leadId=${leadId ?? ''}`;
+    const returnUrl = `${window.location.origin}/report?leadId=${leadId ?? ''}` + (orderId ? `&orderId=${orderId}` : '') + `&product=${encodeURIComponent(productSlug)}`;
 
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
@@ -176,6 +176,7 @@ function CheckoutPageInner() {
   const [error,        setError]        = useState('');
   const [email,        setEmail]        = useState('');
   const [product,      setProduct]      = useState<ProductInfo | null>(null);
+  const [orderId,      setOrderId]      = useState<number | null>(null);
 
   const priceDollars = Math.round((product?.priceCents ?? 4400) / 100);
   const priceLabel   = `$${priceDollars}`;
@@ -205,6 +206,7 @@ function CheckoutPageInner() {
         }
         setClientSecret(data.clientSecret);
         if (data.product) setProduct(data.product as ProductInfo);
+        if (typeof data.orderId === 'number') setOrderId(data.orderId);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong.');
       } finally {
@@ -383,7 +385,7 @@ function CheckoutPageInner() {
                     stripe={stripePromise}
                     options={{ clientSecret, ...APPEARANCE }}
                   >
-                    <CheckoutForm email={email} leadId={leadId} priceLabel={priceLabel} />
+                    <CheckoutForm email={email} leadId={leadId} orderId={orderId} productSlug={productSlug} priceLabel={priceLabel} />
                   </Elements>
                 )}
               </div>

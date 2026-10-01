@@ -15,11 +15,22 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
+import AdvancedReportUpsell from './AdvancedReportUpsell';
+
+// Display name per product slug — falls back to the generic "Sovereign
+// Report" copy for an unrecognized or missing slug (e.g. an old link from
+// before ?product= existed), which is what this page always said anyway.
+const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
+  'sovereign-report':          'Sovereign Report',
+  'advanced-sovereign-report': 'Advanced Sovereign Report',
+};
 
 export default function ReportClient() {
   const searchParams   = useSearchParams();
   const redirectStatus = searchParams.get('redirect_status');
   const leadIdFromUrl  = searchParams.get('leadId');
+  const orderIdFromUrl = searchParams.get('orderId');
+  const productSlug    = searchParams.get('product') ?? 'sovereign-report';
 
   const { results } = useT3DStore();
 
@@ -29,11 +40,25 @@ export default function ReportClient() {
     ? parseInt(leadIdFromUrl, 10)
     : (results?.leadId ?? null);
 
+  const orderId = orderIdFromUrl ? parseInt(orderIdFromUrl, 10) : null;
+
+  const productName = PRODUCT_DISPLAY_NAMES[productSlug] ?? 'Sovereign Report';
+
   const [downloading, setDownloading] = useState(false);
 
   const paymentLikelyFailed = redirectStatus === 'failed';
 
   function handleDownload() {
+    // Prefer orderId — it resolves to whatever product was actually
+    // purchased. The legacy leadId-only path always resolves to the
+    // Sovereign Report regardless of what was bought, so it's only a
+    // fallback for pre-orders-table links that never had an orderId.
+    if (orderId) {
+      setDownloading(true);
+      window.location.href = `/api/generate-report?orderId=${orderId}`;
+      setTimeout(() => setDownloading(false), 4000);
+      return;
+    }
     if (!leadId) return;
     setDownloading(true);
     window.location.href = `/api/generate-report?leadId=${leadId}`;
@@ -87,12 +112,12 @@ export default function ReportClient() {
             [PAYMENT] — CONFIRMED
           </p>
           <h1 className="t3d-h2" style={{ marginBottom: 20 }}>
-            Your Sovereign Report is ready.
+            Your {productName} is ready.
           </h1>
           <p className="t3d-body" style={{ marginBottom: 40, color: 'var(--parchment-70, rgba(245,245,243,0.75))' }}>
-            Your complete report — Human Design, Numerology, and
-            Astrology, woven into one navigation guide — is ready to
-            download below. We&apos;ve also emailed a copy to you.
+            {productSlug === 'advanced-sovereign-report'
+              ? 'Your deepened report — every gate and channel, all Four Pinnacles and Challenges, your personal and outer planets, plus your live transits — is ready to download below. We’ve also emailed a copy to you.'
+              : 'Your complete report — Human Design, Numerology, and Astrology, woven into one navigation guide — is ready to download below. We’ve also emailed a copy to you.'}
           </p>
 
           <button
@@ -107,7 +132,7 @@ export default function ReportClient() {
               marginBottom: 24,
             }}
           >
-            {downloading ? 'PREPARING YOUR REPORT…' : 'DOWNLOAD MY SOVEREIGN REPORT'}
+            {downloading ? 'PREPARING YOUR REPORT…' : `DOWNLOAD MY ${productName.toUpperCase()}`}
           </button>
 
           <p className="t3d-label" style={{ color: 'var(--parchment-40)', fontSize: 11 }}>
@@ -116,6 +141,10 @@ export default function ReportClient() {
               privacy@3dimensions.guide
             </a>
           </p>
+
+          {productSlug !== 'advanced-sovereign-report' && leadId && (
+            <AdvancedReportUpsell leadId={leadId} />
+          )}
         </>
       )}
 

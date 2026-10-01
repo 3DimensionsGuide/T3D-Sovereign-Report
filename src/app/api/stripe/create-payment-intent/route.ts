@@ -60,16 +60,20 @@ export async function POST(request: Request) {
       automatic_payment_methods: { enabled: true },
     });
 
-    await db.insert(orders).values({
+    const [order] = await db.insert(orders).values({
       leadId,
       productId:             product.id,
       status:                'pending',
       stripePaymentIntentId: paymentIntent.id,
       amountCents:           product.priceCents,
-    });
+    }).returning();
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
+      // Lets the client build a product-aware return_url (/report?orderId=...)
+      // instead of falling back to the legacy leadId-only path, which always
+      // resolves to the Sovereign Report regardless of what was purchased.
+      orderId: order.id,
       product: {
         slug:        product.slug,
         name:        product.name,
