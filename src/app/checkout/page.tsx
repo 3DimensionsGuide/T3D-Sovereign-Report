@@ -76,11 +76,20 @@ interface ProductInfo {
 }
 
 // ─── What's included ──────────────────────────────────────────────────────────
-const INCLUDES = [
+// Product-aware: the Advanced Sovereign Report is a different product with
+// its own four deepened sections, not the base report's four bullets.
+const SOVEREIGN_INCLUDES = [
   { label: '[VEHICLE]',   text: 'Human Design — your Type, Strategy, Authority, and Profile, plus the centers that shape how you make decisions.' },
   { label: '[ROAD]',      text: 'Numerology — your Life Path, current Pinnacle, Challenges, and (with your full name) your complete name-based blueprint.' },
   { label: '[STOPLIGHT]', text: 'Dual-Zodiac Astrology — your Tropical and Sidereal Big Three, read together as two complementary lenses on the same chart.' },
   { label: '[SYNTHESIS]', text: 'A synthesis written specifically for your exact configuration, plus a printable Sovereign Navigation Card for quick reference.' },
+] as const;
+
+const ADVANCED_INCLUDES = [
+  { label: '[VEHICLE]',     text: 'The Vehicle, deepened — every active gate and channel, your bridges, your full circuitry, your Incarnation Cross, and your Godhead, Light & Shadow.' },
+  { label: '[ROAD]',        text: 'The Road, deepened — your Hidden Passion and Karmic Lessons, plus all Four Pinnacles and Four Challenges across your whole life, not just your current season.' },
+  { label: '[STOPLIGHT]',   text: 'The Stoplight, deepened — Mercury, Venus, Mars, Jupiter, and Saturn by sign; Uranus, Neptune, and Pluto by house; plus your live, currently-active transits.' },
+  { label: '[INTEGRATION]', text: 'The Integration — how all three systems stack into one decision hierarchy, where people usually get the order wrong, and a synthesis written for your exact configuration.' },
 ] as const;
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
@@ -281,13 +290,13 @@ function CheckoutPageInner() {
 
               {/* Includes list */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                {INCLUDES.map((item, i) => (
+                {(productSlug === 'advanced-sovereign-report' ? ADVANCED_INCLUDES : SOVEREIGN_INCLUDES).map((item, i) => (
                   <div key={item.label} style={{
                     display: 'flex',
                     gap: 14,
                     alignItems: 'flex-start',
                     padding: '14px 0',
-                    borderBottom: i < INCLUDES.length - 1 ? '1px solid var(--card-border)' : 'none',
+                    borderBottom: i < (productSlug === 'advanced-sovereign-report' ? ADVANCED_INCLUDES : SOVEREIGN_INCLUDES).length - 1 ? '1px solid var(--card-border)' : 'none',
                   }}>
                     <span style={{
                       flexShrink: 0, width: 20, height: 20,

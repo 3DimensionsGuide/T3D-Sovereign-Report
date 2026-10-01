@@ -12,9 +12,11 @@
 
 import type { ProductGenerator } from '@/lib/products/types';
 import { sovereignReportGenerator } from '@/lib/report/sovereignReportGenerator';
+import { advancedSovereignReportGenerator } from '@/lib/report/advancedSovereignReportGenerator';
 
 export const PRODUCT_GENERATORS: Record<string, ProductGenerator> = {
   'sovereign-report': sovereignReportGenerator,
+  'advanced-sovereign-report': advancedSovereignReportGenerator,
 };
 
 export function getGenerator(generatorKey: string): ProductGenerator {
