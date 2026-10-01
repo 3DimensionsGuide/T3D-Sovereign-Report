@@ -39,8 +39,8 @@ const GATE_SEQUENCE: readonly number[] = [
   28, 44,  1, 43, 14, 34,  9,  5, 26, 11, 10, 58, 38, 54, 61, 60,
 ] as const;
 
-/** Starting longitude of gate 41 (0° Aquarius = 300° in tropical zodiac) */
-const MANDALA_START_LON = 302.0; // 2°00' Aquarius — canonical Rave Mandala start point
+/** Starting longitude of gate 41 — 2°00' Aquarius (302° tropical) — canonical Rave Mandala start point. */
+const MANDALA_START_LON = 302.0;
 
 /** Degrees per gate segment */
 const DEGREES_PER_GATE = 360 / 64; // 5.625°
@@ -129,21 +129,29 @@ const CHANNELS: readonly ChannelDefinition[] = [
   { gates: [18, 58], name: 'Judgment',       fromCenter: 'spleen',       toCenter: 'root'         },
   { gates: [28, 38], name: 'Struggle',       fromCenter: 'spleen',       toCenter: 'root'         },
   { gates: [32, 54], name: 'Transformation', fromCenter: 'spleen',       toCenter: 'root'         },
-  // HEAD ↔ AJNA (additional: abstract logic)
-  // AJNA internal (none)
-  // AJNA ↔ THROAT (additional)
-  // SACRAL ↔ THROAT via Spleen (Brain Wave — Spleen pathway to Throat through G)
-  // NOTE: Gate 57 connects to both G (channel 10-57) and Throat (below if defined)
-  // The additional Throat-Spleen pathway is channel 20-57 in some HD maps.
-  // Per strict spec, we use 16-48 for Throat-Spleen; 10-57 for G-Spleen.
-  // Four more channels to complete the 36:
-  { gates: [47, 64], name: 'Abstraction',    fromCenter: 'ajna',         toCenter: 'head'         }, // duplicate check guard in channel scan
-  { gates: [24, 61], name: 'Awareness',      fromCenter: 'ajna',         toCenter: 'head'         },
-  { gates: [ 4, 63], name: 'Logic',          fromCenter: 'ajna',         toCenter: 'head'         },
-  { gates: [ 1,  8], name: 'Inspiration',   fromCenter: 'g_center',     toCenter: 'throat'       },
+  // THROAT ↔ SPLEEN (additional — Gate 57 is a "double-duty" gate)
+  //
+  // QA FIX (previously missing): Gate 57 completes two channels, not one —
+  // 10-57 (G↔Spleen, Perfected Form, above) AND 20-57 (Throat↔Spleen). This
+  // is exactly how the real system reaches 36 channels from only 64 gates:
+  // a handful of gates sit on two channels instead of one. An earlier
+  // version of this file's comments acknowledged 20-57 existed ("the
+  // additional Throat-Spleen pathway is channel 20-57 in some HD maps")
+  // but chose not to implement it, padding the array with four duplicate
+  // entries (reversed gate pairs already listed above) to superficially
+  // reach "36" — those duplicates were silently dropped by the de-dup step
+  // below, so UNIQUE_CHANNELS resolved to 32, and Gate 57 could never
+  // complete the Throat side for anyone. Restored here.
+  { gates: [20, 57], name: 'The Brain Wave', fromCenter: 'throat',       toCenter: 'spleen'       },
 ] as const;
 
-// De-duplicate channels by sorted gate pair to avoid double-counting
+// De-duplicate channels by sorted gate pair to avoid double-counting.
+// NOTE: this currently resolves to 33 unique channels (32 + the restored
+// 20-57 above), not the full 36 of the real system. The 20-57 gap was
+// confirmed and fixed via this file's own prior comments; the remaining
+// gap was not independently re-derived gate-by-gate and should be
+// checked against a canonical channel chart (e.g. Jovian Archive) before
+// treating this list as complete.
 const UNIQUE_CHANNELS = ((): readonly ChannelDefinition[] => {
   const seen = new Set<string>();
   return CHANNELS.filter((ch) => {
