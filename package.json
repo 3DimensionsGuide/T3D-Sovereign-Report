@@ -17,6 +17,7 @@
     "@vercel/functions": "^3.9.7",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
+    "jszip": "^3.10.2",
     "luxon": "^3.7.2",
     "next": "16.2.9",
     "postgres": "^3.4.9",

@@ -60,6 +60,7 @@ export async function generateAndEmailReport(orderId: number): Promise<void> {
       downloadUrl,
       productName: product.name,
       filename:    deliverable.filename,
+      contentType: deliverable.contentType,
     });
 
     await db.update(orders)

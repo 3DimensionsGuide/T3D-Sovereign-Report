@@ -1,16 +1,16 @@
 'use client';
 
 /**
- * Post-purchase upsell — shown on /report after a successful Sovereign
- * Report purchase, offering the Advanced Sovereign Report. This is the
- * one entry point in the app that links to
+ * Post-purchase upsell — shown on /report after a successful Base Report
+ * purchase, offering the Advanced Report as the completion of the full
+ * Sovereign Report. This is the one entry point in the app that links to
  * /checkout?product=advanced-sovereign-report today; there's no pricing
  * page or homepage placement yet, by design — this is the highest-intent
  * moment (someone who just paid and is about to read their results), not
  * a guess at where else to put it.
  *
- * Price is shown as a static "$97" rather than fetched — it mirrors the
- * `advanced-sovereign-report` products row (9700 cents) set via
+ * Price is shown as a static "$53" rather than fetched — it mirrors the
+ * `advanced-sovereign-report` products row (5300 cents) set via
  * scripts/upsert-product.ts. If that price ever changes, update this
  * string to match; checkout itself always shows the authoritative price
  * from the database regardless of what this teaser says.
@@ -36,7 +36,7 @@ export default function AdvancedReportUpsell({ leadId }: { leadId: number }) {
       }}
     >
       <p className="t3d-label" style={{ color: 'var(--amber)', marginBottom: 14 }}>
-        [GO DEEPER] — FOR THOSE WHO WANT MORE
+        [COMPLETE YOUR REPORT] — THE FULL FRAMEWORK
       </p>
 
       <p style={{
@@ -48,7 +48,7 @@ export default function AdvancedReportUpsell({ leadId }: { leadId: number }) {
         lineHeight: 1.2,
         marginBottom: 14,
       }}>
-        Your Sovereign Report is the map. The Advanced Report is the terrain.
+        You have the Base Report. The Advanced Report completes your Sovereign Report.
       </p>
 
       <p className="t3d-body" style={{ fontSize: 15, marginBottom: 24 }}>
@@ -90,7 +90,7 @@ export default function AdvancedReportUpsell({ leadId }: { leadId: number }) {
           color: 'var(--amber)',
           fontWeight: 400,
         }}>
-          $97
+          $53
         </span>
 
         <Link
@@ -98,7 +98,7 @@ export default function AdvancedReportUpsell({ leadId }: { leadId: number }) {
           className="t3d-cta"
           style={{ display: 'inline-flex', padding: '16px 36px' }}
         >
-          UNLOCK THE ADVANCED REPORT
+          COMPLETE MY SOVEREIGN REPORT
         </Link>
       </div>
     </div>

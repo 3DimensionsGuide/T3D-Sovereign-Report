@@ -75,10 +75,14 @@ interface ProductInfo {
   priceCents:  number;
 }
 
-// ─── What's included ──────────────────────────────────────────────────────────
-// Product-aware: the Advanced Sovereign Report is a different product with
-// its own four deepened sections, not the base report's four bullets.
-const SOVEREIGN_INCLUDES = [
+// ─── What's included, per product ──────────────────────────────────────────────
+// Three purchasable products as of the Base/Advanced/Sovereign repricing:
+//   'base-report'               — the original report, now the entry tier
+//   'advanced-sovereign-report' — the deepened report, sold standalone (the
+//                                  completion upsell for Base Report buyers)
+//   'sovereign-report'          — T3D's hero product: both of the above,
+//                                  bundled as the complete framework
+const BASE_INCLUDES = [
   { label: '[VEHICLE]',   text: 'Human Design — your Type, Strategy, Authority, and Profile, plus the centers that shape how you make decisions.' },
   { label: '[ROAD]',      text: 'Numerology — your Life Path, current Pinnacle, Challenges, and (with your full name) your complete name-based blueprint.' },
   { label: '[STOPLIGHT]', text: 'Dual-Zodiac Astrology — your Tropical and Sidereal Big Three, read together as two complementary lenses on the same chart.' },
@@ -91,6 +95,36 @@ const ADVANCED_INCLUDES = [
   { label: '[STOPLIGHT]',   text: 'The Stoplight, deepened — Mercury, Venus, Mars, Jupiter, and Saturn by sign; Uranus, Neptune, and Pluto by house; plus your live, currently-active transits.' },
   { label: '[INTEGRATION]', text: 'The Integration — how all three systems stack into one decision hierarchy, where people usually get the order wrong, and a synthesis written for your exact configuration.' },
 ] as const;
+
+const COMPLETE_INCLUDES = [
+  { label: '[BASE]',     text: 'The full Base Report — all three systems, Human Design, Numerology, and Astrology, woven into one navigation guide.' },
+  { label: '[ADVANCED]', text: 'The full Advanced Report — every gate and channel, all Four Pinnacles and Challenges, every personal and outer planet, plus your live transits.' },
+  { label: '[FORMAT]',   text: 'Both complete reports, delivered together as one download — nothing held back, nothing to unlock later.' },
+  { label: '[VALUE]',    text: 'The same $97 as buying both separately ($44 + $53) — priced as one purchase because this is the version most people actually want.' },
+] as const;
+
+interface IncludeItem { label: string; text: string; }
+
+const INCLUDES_BY_SLUG: Record<string, readonly IncludeItem[]> = {
+  'base-report':               BASE_INCLUDES,
+  'advanced-sovereign-report': ADVANCED_INCLUDES,
+  'sovereign-report':          COMPLETE_INCLUDES,
+};
+
+// Headline + price-row subtitle, same per-slug pattern. Falls back to the
+// complete bundle's copy for an unrecognized slug — matches productSlug's
+// own fallback below ('sovereign-report' when ?product= is missing).
+const HEADLINE_BY_SLUG: Record<string, string> = {
+  'base-report':               'Unlock your Base Report.',
+  'advanced-sovereign-report': 'Complete your Sovereign Report.',
+  'sovereign-report':          'Unlock your complete Sovereign Report.',
+};
+
+const SUBTITLE_BY_SLUG: Record<string, string> = {
+  'base-report':               '40+ PAGES · INSTANT DELIVERY · ONE-TIME',
+  'advanced-sovereign-report': '38 PAGES · INSTANT DELIVERY · ONE-TIME',
+  'sovereign-report':          '80+ PAGES · TWO COMPLETE REPORTS · ONE-TIME',
+};
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
 function CheckoutForm({ email, leadId, orderId, productSlug, priceLabel }: { email: string; leadId: number | null; orderId: number | null; productSlug: string; priceLabel: string }) {
@@ -233,9 +267,7 @@ function CheckoutPageInner() {
               [CHECKOUT] — {productName.toUpperCase()}
             </p>
             <h1 className="t3d-h2">
-              {productSlug === 'sovereign-report'
-                ? 'Unlock your full 40+ page report.'
-                : `Unlock your ${productName}.`}
+              {HEADLINE_BY_SLUG[productSlug] ?? `Unlock your ${productName}.`}
             </h1>
           </div>
 
@@ -275,9 +307,7 @@ function CheckoutPageInner() {
                     T3D {productName}
                   </p>
                   <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginTop: 4 }}>
-                    {productSlug === 'sovereign-report'
-                      ? '40+ PAGES · INSTANT DELIVERY · ONE-TIME'
-                      : 'INSTANT DELIVERY · ONE-TIME'}
+                    {SUBTITLE_BY_SLUG[productSlug] ?? 'INSTANT DELIVERY · ONE-TIME'}
                   </p>
                 </div>
                 <span style={{
@@ -292,13 +322,15 @@ function CheckoutPageInner() {
 
               {/* Includes list */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                {(productSlug === 'advanced-sovereign-report' ? ADVANCED_INCLUDES : SOVEREIGN_INCLUDES).map((item, i) => (
+                {(() => {
+                  const includes = INCLUDES_BY_SLUG[productSlug] ?? COMPLETE_INCLUDES;
+                  return includes.map((item, i) => (
                   <div key={item.label} style={{
                     display: 'flex',
                     gap: 14,
                     alignItems: 'flex-start',
                     padding: '14px 0',
-                    borderBottom: i < (productSlug === 'advanced-sovereign-report' ? ADVANCED_INCLUDES : SOVEREIGN_INCLUDES).length - 1 ? '1px solid var(--card-border)' : 'none',
+                    borderBottom: i < includes.length - 1 ? '1px solid var(--card-border)' : 'none',
                   }}>
                     <span style={{
                       flexShrink: 0, width: 20, height: 20,
@@ -317,7 +349,8 @@ function CheckoutPageInner() {
                       <p className="t3d-body" style={{ fontSize: 13 }}>{item.text}</p>
                     </div>
                   </div>
-                ))}
+                  ));
+                })()}
               </div>
 
               {/* Back link */}

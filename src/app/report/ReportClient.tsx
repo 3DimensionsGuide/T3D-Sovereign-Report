@@ -21,8 +21,20 @@ import AdvancedReportUpsell from './AdvancedReportUpsell';
 // Report" copy for an unrecognized or missing slug (e.g. an old link from
 // before ?product= existed), which is what this page always said anyway.
 const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
+  'base-report':               'Base Report',
+  'advanced-sovereign-report': 'Advanced Report',
   'sovereign-report':          'Sovereign Report',
-  'advanced-sovereign-report': 'Advanced Sovereign Report',
+};
+
+// Post-purchase "ready" copy, one per product slug. Falls back to the
+// complete-bundle copy for an unrecognized slug, same reasoning as above.
+const READY_COPY_BY_SLUG: Record<string, string> = {
+  'base-report':
+    'Your Base Report — Human Design, Numerology, and Astrology, woven into one navigation guide — is ready to download below. We’ve also emailed a copy to you.',
+  'advanced-sovereign-report':
+    'Your Advanced Report — every gate and channel, all Four Pinnacles and Challenges, your personal and outer planets, plus your live transits — is ready to download below. We’ve also emailed a copy to you.',
+  'sovereign-report':
+    'Your complete Sovereign Report — the Base Report and the Advanced Report together, nothing held back — is ready to download below. We’ve also emailed a copy to you.',
 };
 
 export default function ReportClient() {
@@ -43,6 +55,7 @@ export default function ReportClient() {
   const orderId = orderIdFromUrl ? parseInt(orderIdFromUrl, 10) : null;
 
   const productName = PRODUCT_DISPLAY_NAMES[productSlug] ?? 'Sovereign Report';
+  const readyCopy    = READY_COPY_BY_SLUG[productSlug] ?? READY_COPY_BY_SLUG['sovereign-report'];
 
   const [downloading, setDownloading] = useState(false);
 
@@ -115,9 +128,7 @@ export default function ReportClient() {
             Your {productName} is ready.
           </h1>
           <p className="t3d-body" style={{ marginBottom: 40, color: 'var(--parchment-70, rgba(245,245,243,0.75))' }}>
-            {productSlug === 'advanced-sovereign-report'
-              ? 'Your deepened report — every gate and channel, all Four Pinnacles and Challenges, your personal and outer planets, plus your live transits — is ready to download below. We’ve also emailed a copy to you.'
-              : 'Your complete report — Human Design, Numerology, and Astrology, woven into one navigation guide — is ready to download below. We’ve also emailed a copy to you.'}
+            {readyCopy}
           </p>
 
           <button
@@ -142,7 +153,7 @@ export default function ReportClient() {
             </a>
           </p>
 
-          {productSlug !== 'advanced-sovereign-report' && leadId && (
+          {productSlug === 'base-report' && leadId && (
             <AdvancedReportUpsell leadId={leadId} />
           )}
         </>

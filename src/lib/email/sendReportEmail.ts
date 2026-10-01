@@ -1,9 +1,14 @@
 /**
  * T3D Report Email Delivery
  *
- * Sends the completed Sovereign Report PDF as an email attachment via
+ * Sends the completed report deliverable as an email attachment via
  * Resend, with a direct download link included as a backup — some
- * corporate email systems strip PDF attachments, so the link matters.
+ * corporate email systems strip attachments, so the link matters.
+ *
+ * Product-agnostic: the deliverable can be a single PDF (Base Report,
+ * Advanced Report) or a zip bundle (the complete Sovereign Report), so
+ * the body copy and the Resend attachment's contentType are both driven
+ * by the caller-supplied contentType rather than assuming PDF.
  */
 
 import { Resend } from 'resend';
@@ -17,6 +22,8 @@ interface SendReportEmailInput {
   productName?: string;
   /** Attachment filename, e.g. "T3D-Sovereign-Report-Jane.pdf" — defaults to the Sovereign Report's naming pattern. */
   filename?:    string;
+  /** MIME type of the attachment, e.g. "application/pdf" or "application/zip" — defaults to "application/pdf" for backward compatibility. */
+  contentType?: string;
 }
 
 export async function sendReportEmail({
@@ -26,12 +33,17 @@ export async function sendReportEmail({
   downloadUrl,
   productName = 'Sovereign Report',
   filename,
+  contentType = 'application/pdf',
 }: SendReportEmailInput): Promise<void> {
   // Constructed here, not at module scope — this ensures Resend is only
   // instantiated at actual send time, never as a side effect of Next.js
   // importing this module during build-time page-data collection.
   const resend = new Resend(process.env.RESEND_API_KEY);
   const fromAddress = process.env.RESEND_FROM_EMAIL || 'T3D Studio <reports@3dimensions.guide>';
+
+  // "It's attached to this email as a PDF" is wrong for the zip-bundle
+  // Sovereign Report — generalize by what's actually attached.
+  const attachmentNoun = contentType === 'application/zip' ? 'a zip file with both reports inside' : 'a PDF';
 
   const html = `
     <div style="font-family: 'DM Sans', Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #0D0D0E;">
@@ -50,7 +62,7 @@ export async function sendReportEmail({
           for your exact configuration.
         </p>
         <p style="font-size: 15px; line-height: 1.7; color: #333; margin-bottom: 28px;">
-          It's attached to this email as a PDF. If for any reason the
+          It's attached to this email as ${attachmentNoun}. If for any reason the
           attachment doesn't come through, you can also download it directly:
         </p>
         <div style="text-align: center; margin-bottom: 28px;">
@@ -76,8 +88,9 @@ export async function sendReportEmail({
     html,
     attachments: [
       {
-        filename: filename || `T3D-Sovereign-Report-${firstName}.pdf`,
-        content:  pdfBuffer.toString('base64'),
+        filename:     filename || `T3D-Sovereign-Report-${firstName}.pdf`,
+        content:      pdfBuffer.toString('base64'),
+        contentType,
       },
     ],
   });
