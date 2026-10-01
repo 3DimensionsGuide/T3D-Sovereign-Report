@@ -21,7 +21,7 @@ import type { ReportData } from '../../tokens';
 const ORDINAL = ['', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
 
 const S = StyleSheet.create({
-  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   crimsonLine: { width: PAGE.width, height: 1.5, backgroundColor: C.crimson },
   content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
 
