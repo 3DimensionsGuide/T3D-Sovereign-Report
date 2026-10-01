@@ -20,6 +20,12 @@ import { CENTER_DISPLAY_NAME } from '../../section3/hd-content';
 import { GATE_KEYNOTES, HANGING_GATE_AURIC_DETAIL } from '../../section3/gate-content';
 import type { ReportData } from '../../tokens';
 
+// Same value, same reasoning as Page05Transits.tsx's CARD_MIN_PRESENCE_AHEAD:
+// paired with wrap={false} on each hanging-gate detail block below so a
+// gate's full depth (keynote + auric detail) either fits in the remaining
+// space or moves to the next page as a whole -- never splits mid-paragraph.
+const GATE_MIN_PRESENCE_AHEAD = 30;
+
 const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
@@ -164,17 +170,23 @@ export default function Page03Bridges({ data }: Props) {
               </Text>
               {bridge.classification === 'narrow' && bridge.hangingGates.length > 0 && (
                 <View style={S.hangingGateRow}>
-                  <Text style={S.hangingGateLabel}>Your Bridge Gate</Text>
+                  <Text style={S.hangingGateLabel}>
+                    {bridge.hangingGates.length > 1 ? 'Your Bridge Gates' : 'Your Bridge Gate'}
+                  </Text>
                   {/* The same physical partner gate can hang off more than one channel at
                       once (e.g. Gate 57 completing both 57-20 and 57-34) — dedupe by
-                      partnerGate so its detail renders once, not once per channel. */}
+                      partnerGate so its detail renders once, not once per channel. Every
+                      hanging gate in the split renders here, however many there are — a
+                      split with 3 bridge gates used to silently lose the 3rd past a
+                      hard .slice(0, 2) cap; dropping real content isn't a valid way to
+                      keep a card short, so there's no cap at all now. */}
                   {Array.from(
                     new Map(bridge.hangingGates.map(hg => [hg.partnerGate, hg])).values()
-                  ).slice(0, 2).map((hg, hi) => {
+                  ).map((hg, hi) => {
                     const partnerKeynote = GATE_KEYNOTES[hg.partnerGate];
                     const auric = HANGING_GATE_AURIC_DETAIL[hg.partnerGate];
                     return (
-                      <View key={hi}>
+                      <View key={hi} wrap={false} minPresenceAhead={GATE_MIN_PRESENCE_AHEAD}>
                         <Text style={S.hangingGateText}>
                           Gate {hg.partnerGate}{partnerKeynote ? ` — ${partnerKeynote.ichingName}` : ''}
                           {partnerKeynote ? `: ${partnerKeynote.coreMeaning}` : ''}

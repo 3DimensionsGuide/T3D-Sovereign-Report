@@ -42,6 +42,22 @@ export const HANGING_GATE_AURIC_DETAIL: Partial<Record<number, HangingGateAuricD
     experience:
       'Being around someone with Gate 57 active feels like standing in a gentle, steady wind: barely noticeable at first, but it keeps penetrating until you feel quietly, thoroughly read — not analyzed, just registered, the way an animal senses a shift in a room before anyone has said anything. The read is acoustic and instinctive, not visual or mental: it’s picking up the vibrational truth underneath whatever is actually being said. It tends to arrive as a single, quiet signal rather than a repeated nudge, so it’s genuinely easy to miss if your attention is elsewhere — there’s no second alarm.',
   },
+  52: {
+    location:
+      'The Root Center — the adrenalized pressure hub at the base of the bodygraph, supplying the physical fuel and pressure to ground energy, hold still, and concentrate before taking action.',
+    channels:
+      'Gate 52 forms the 52–9 channel (Concentration) with Gate 9 in the Sacral Center — the foundational format channel of the Collective Logic circuitry, setting the master frequency for sustained focus, testing patterns, and logical determination.',
+    experience:
+      'Being around someone with Gate 52 active feels like standing next to a quiet, massive mountain: an immediate, heavy center of gravity that exerts a wordless pressure on the room to slow down and stop rushing. The aura acts as a grounded anchor — mental agitation settles, and the urge toward frantic busyness gives way to stillness and focus. It doesn’t push or demand anything; it simply holds an unyielding, calm space that makes scattered energy feel jarringly out of place.',
+  },
+  27: {
+    location:
+      'The Sacral Center — the body’s primary engine of life-force and generative energy, governing work capacity, sustainability, and physical vitality.',
+    channels:
+      'Gate 27 forms the 27–50 channel (Preservation) with Gate 50 in the Spleen Center — a core pillar of Tribal circuitry, governing the caretaking and physical protection of one’s own.',
+    experience:
+      'Being around someone with Gate 27 active feels like stepping into the warmth of a protective hearth: an immediate, visceral sense of being looked after and nourished. The aura radiates a distinct caretaking frequency that invites others to drop their guard and expect support, as if an unspoken protective blanket has been draped over the room — it instinctively draws in anyone seeking comfort, prioritizing the health and well-being of whoever is nearby.',
+  },
 };
 
 export const GATE_KEYNOTES: Record<number, GateKeynote> = {
