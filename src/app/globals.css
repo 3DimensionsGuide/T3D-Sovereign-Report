@@ -13,7 +13,7 @@
   --color-surface:     #111113;
   --color-overlay:     #18181B;
   --color-parchment:   #F5F5F3;
-  --color-crimson:     #991B1B;
+  --color-crimson:     #C83E3E; /* brand spec: Crimson Red, Stoplight/Astrology accent */
   --color-crimson-hi:  #B91C1C;
   --color-amber:       #E5A93C;
   --color-emerald:     #1F8A4D;
@@ -34,7 +34,7 @@
   --parchment-70:   rgba(245,245,243,0.70);
   --parchment-40:   rgba(245,245,243,0.40);
   --parchment-15:   rgba(245,245,243,0.15);
-  --crimson:        #991B1B;
+  --crimson:        #C83E3E; /* brand spec: Crimson Red, Stoplight/Astrology accent (was #991B1B) */
   --crimson-hi:     #B91C1C;
   --amber:          #E5A93C;
   --emerald:        #1F8A4D;

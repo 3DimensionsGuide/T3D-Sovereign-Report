@@ -16,6 +16,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
+import { PRODUCT_DISPLAY } from '@/lib/products/catalog';
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function fmtLon(lon: unknown): string {
@@ -119,7 +120,8 @@ function ResultCard({
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function ResultsDashboard() {
-  const { results, reset } = useT3DStore();
+  const { results, reset, selectedProduct } = useT3DStore();
+  const product = PRODUCT_DISPLAY[selectedProduct ?? 'sovereign-report'] ?? PRODUCT_DISPLAY['sovereign-report'];
   if (!results) return null;
 
   const { humanDesign: hd, numerology: num, astrology: ast } = results;
@@ -255,8 +257,8 @@ export default function ResultsDashboard() {
         paddingBottom: 'var(--results-pb)',
         display: 'flex', flexDirection: 'column', gap: 16,
       }}>
-        <p className="t3d-label" style={{ color: 'var(--parchment-40)' }}>
-          SOVEREIGN REPORT — COMPLETE NATAL ANALYSIS
+        <p className="t3d-label" style={{ color: 'var(--amber)' }}>
+          {product.eyebrow} — {product.name.toUpperCase()}
         </p>
         <h3 style={{
           fontFamily: "'Playfair Display', Georgia, serif",
@@ -267,14 +269,17 @@ export default function ResultsDashboard() {
           Your profile is just the surface.
         </h3>
         <p className="t3d-body" style={{ maxWidth: '50ch' }}>
-          40+ pages built from your exact birth data — every gate, every number,
-          every transit. One integrated guide for every decision that matters.
+          {product.tagline}
         </p>
 
         {/* UPGRADE 5 — CTA: crimson, zero radius, ALL CAPS 11px DM Sans */}
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
-          <Link href="/checkout" className="t3d-cta" style={{ maxWidth: 320, width: 'auto', padding: '16px 40px' }}>
-            UNLOCK FULL REPORT — $44
+          <Link
+            href={`/checkout?product=${product.slug}`}
+            className="t3d-cta"
+            style={{ maxWidth: 360, width: 'auto', padding: '16px 40px' }}
+          >
+            {product.ctaLabel} — {product.priceLabel}
           </Link>
           <button onClick={reset} className="t3d-ghost">
             RECALCULATE

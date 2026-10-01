@@ -5,7 +5,7 @@
 
 import { db } from '@/server/db';
 import { products, orders, type Product, type Order } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const rows = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
@@ -15,6 +15,13 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 export async function getProductById(id: number): Promise<Product | null> {
   const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
   return rows[0] ?? null;
+}
+
+// Active products, cheapest first — the authoritative (DB) side of the
+// pricing page. Pairs with PRODUCT_DISPLAY (src/lib/products/catalog.ts)
+// for the marketing copy each row doesn't carry.
+export async function getActiveProducts(): Promise<Product[]> {
+  return db.select().from(products).where(eq(products.active, true)).orderBy(asc(products.priceCents));
 }
 
 export async function getOrderByPaymentIntentId(

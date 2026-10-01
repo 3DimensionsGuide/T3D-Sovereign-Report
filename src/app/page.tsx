@@ -16,8 +16,10 @@ import Image from 'next/image';
 import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
 import type { SovereignCompassHandle } from '@/components/SovereignCompassCanvas';
+import { Suspense } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
+import ProductSelectionSync from '@/components/ProductSelectionSync';
 
 // ─── SCROLL HOOK ──────────────────────────────────────────────────────────────
 function useScroll() {
@@ -100,6 +102,9 @@ export default function HomePage() {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <ProductSelectionSync />
+      </Suspense>
       <Nav />
 
       <main style={{ position: 'relative', zIndex: 10, paddingTop: isMobile ? 220 : 0 }}>

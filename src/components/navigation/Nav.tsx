@@ -17,6 +17,7 @@ import { usePathname } from 'next/navigation';
 
 const NAV_LINKS = [
   { href: '/#system',    label: 'The System'  },
+  { href: '/pricing',    label: 'Pricing'     },
   { href: '/#calculator', label: 'Calculator' },
 ];
 
