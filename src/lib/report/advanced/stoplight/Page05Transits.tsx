@@ -22,6 +22,67 @@
  * (getUpcomingTransits()) that aren't active yet but will be soonest,
  * each described with the same depth as an active hit so the reader has
  * something concrete to anticipate, not just a snapshot of right now.
+ *
+ * Because this page's length varies with however many transits happen to
+ * be live on a given day, it's the one page most likely to land a card
+ * right at the bottom edge when react-pdf auto-paginates it across two
+ * physical pages. `wrap={false}` on each card keeps a card from splitting
+ * mid-card, and react-pdf's own page-break rule (`shouldSplit && !canWrap`
+ * in @react-pdf/layout) is enough on its own to move a whole card to the
+ * next page whenever it would end past the page's reserved bottom
+ * padding — so the real fix is just making sure that reserved padding is
+ * genuinely in effect.
+ *
+ * It wasn't. The two earlier attempts at this fix (escalating a
+ * `TRANSITS_PAGE_BOTTOM_PADDING` constant and adding `minPresenceAhead` to
+ * each card) had no visible effect at any value, including a 200pt
+ * reservation — because `S.page` also carried the `padding: 0` shorthand,
+ * declared after `paddingBottom` in the same style object. react-pdf
+ * resolves style keys in declaration order (see `resolve()` in
+ * @react-pdf/stylesheet), so `padding: 0` was silently re-expanding to
+ * paddingTop/Right/Bottom/Left = 0 and clobbering whatever `paddingBottom`
+ * had just been set to — the page's true wrap area was always the full
+ * page height, so nothing ever overflowed by react-pdf's own reckoning no
+ * matter how large the constant got. The fix is to stop using the
+ * `padding` shorthand on this page's style so paddingBottom can't be
+ * overwritten; once that's fixed, a modest reservation is all that's
+ * needed.
+ *
+ * Fixing that surfaced a second, narrower issue: once the overflowing
+ * active-transit card genuinely broke to a new page, a card further down
+ * in the upcoming-transits list could *also* need its own break (when
+ * there were enough active cards to fill most of the continuation page
+ * too) — and react-pdf's pagination does not handle two independent
+ * forced breaks landing in the same pass cleanly: it was reproducibly
+ * inserting one fully blank page between the two breaks instead of
+ * flowing straight through (confirmed by trimming the mock upcoming list
+ * down one card at a time against the debug-transits-overflow route: 0 or
+ * 1 upcoming cards — which only ever need at most one break total — paginate
+ * cleanly; 2 upcoming cards, needing a second break, reproduces the blank
+ * page every time). Flattening the card containers (removing the old
+ * `View style={S.stack}` wrapper in favor of `marginBottom` on each card)
+ * was tried and made no difference — the blank page is about *how many
+ * breaks* happen in one pass, not about nesting depth.
+ *
+ * The first attempt at fixing that forced an explicit `break` on the
+ * upcoming-transits section once the active count crossed a threshold —
+ * but that still produced the blank page, because it's still two forced
+ * breaks happening in the same react-pdf pagination pass (the active
+ * cards' own overflow break, plus the now-unconditional break before
+ * "Looking Ahead"); forcing *where* the second break happens doesn't
+ * reduce the count to one.
+ *
+ * The actual fix (see PAGE05TRANSITS_SPLIT below) sidesteps react-pdf's
+ * multi-break pagination entirely: once the active-card count crosses
+ * `UPCOMING_FORCE_BREAK_AT_ACTIVE_COUNT`, the component renders two
+ * genuinely separate top-level `<Page>` elements — header+active-cards on
+ * one, "Looking Ahead" on the other — instead of one logical page that
+ * react-pdf has to auto-flow across physical pages twice. Each `<Page>`
+ * only ever has to handle its own overflow in isolation, which is the
+ * single-break case already confirmed (via the debug-transits-overflow
+ * route, trimming the mock upcoming list card by card) to paginate
+ * cleanly. On an ordinary day (fewer than 3 active transits) nothing
+ * changes — everything still renders as one page, auto-flowing normally.
  */
 
 import React from 'react';
@@ -39,8 +100,43 @@ import {
 import type { TransitHit, TransitAspectType, UpcomingTransit } from '../../../../server/engines/transits';
 import type { ReportData } from '../../tokens';
 
+// Extra headroom reserved above the fixed footer, over and above the
+// report's usual PAGE.marginV — this page's content length varies day to
+// day (live transit data), so it gets a bit more defensive bottom
+// clearance than a fixed-content page needs, purely so a card's meta row
+// never sits flush against the footer rule. Modest on purpose: once the
+// `padding` shorthand collision below is removed, this value is finally
+// the real, effective wrap-area boundary react-pdf paginates against, so
+// it doesn't need to be oversized to compensate for anything.
+const TRANSITS_PAGE_BOTTOM_PADDING = PAGE.marginV + 30;
+
+// Small additional safety margin (in points) react-pdf must confirm is
+// left on the page before placing a transit card — a minor buffer against
+// any rounding in react-pdf's own text-height estimate, not load-bearing
+// now that the page's bottom padding genuinely reserves space.
+const CARD_MIN_PRESENCE_AHEAD = 30;
+
+// Active-transit-card count at which the "Looking Ahead" (upcoming
+// transits) section is forced onto its own fresh page instead of flowing
+// after the active cards. See the docblock above: once the active stack is
+// long enough to already be spilling onto a continuation page, letting
+// the upcoming cards try to flow onto that same continuation page risks
+// a second forced page break in the same pagination pass, which react-pdf
+// does not handle cleanly (it inserts a blank page). 3 is the point where
+// that risk starts — 2 active cards plus the upcoming section have never
+// been observed to need a second break, only 3+.
+const UPCOMING_FORCE_BREAK_AT_ACTIVE_COUNT = 3;
+
 const S = StyleSheet.create({
-  page: { paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', padding: 0, fontFamily: F.sans },
+  // NOTE: no `padding` shorthand here on purpose — it resolves after any
+  // longhand `paddingX` set earlier in this object (react-pdf resolves
+  // style keys in declaration order) and would silently zero out
+  // `paddingBottom` below. Set every edge explicitly instead.
+  page: {
+    paddingTop: 0, paddingLeft: 0, paddingRight: 0,
+    paddingBottom: TRANSITS_PAGE_BOTTOM_PADDING,
+    backgroundColor: '#F5F5F3', fontFamily: F.sans,
+  },
   crimsonLine: { width: PAGE.width, height: 1.5, backgroundColor: C.crimson },
   content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
 
@@ -66,9 +162,8 @@ const S = StyleSheet.create({
     fontFamily: F.sans, fontSize: 9, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.85,
   },
 
-  stack: { gap: 10 },
   card: {
-    padding: 13, backgroundColor: '#FFFFFF',
+    padding: 13, marginBottom: 10, backgroundColor: '#FFFFFF',
     borderWidth: 0.5, borderColor: 'rgba(13,13,14,0.12)', borderStyle: 'solid',
   },
   cardHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' },
@@ -167,37 +262,68 @@ interface Props {
   };
 }
 
+// One physical page's worth of chrome (background lines, crimson divider,
+// content padding, fixed footer) around whatever section content is passed
+// in. Pulled out so the component below can render either one page (the
+// ordinary case) or two (see PAGE05TRANSITS_SPLIT note) without
+// duplicating the surrounding markup.
+function TransitsPageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Page size="LETTER" style={S.page}>
+      <TechnicalLines />
+      <View style={S.crimsonLine} />
+      <View style={S.content}>{children}</View>
+      <View style={S.footer} fixed>
+        <Text style={S.footerText}>T3D Advanced Sovereign Report</Text>
+        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
+      </View>
+    </Page>
+  );
+}
+
 export default function Page05Transits({ data }: Props) {
   const hasAsc = !!data.tropicalAsc;
   const transits = data.activeTransits ?? [];
   const upcoming = data.upcomingTransits ?? [];
 
-  return (
-    <Page size="LETTER" style={S.page}>
-      <TechnicalLines />
+  // PAGE05TRANSITS_SPLIT: once there are enough active cards that the
+  // "Looking Ahead" section risks needing its own overflow break in
+  // addition to the active cards' own break, render it as a genuinely
+  // separate <Page> instead of letting react-pdf auto-flow both onto one
+  // logical page. See the docblock above for why two breaks in one
+  // react-pdf pagination pass produces a blank page, and why forcing an
+  // explicit `break` on the same logical page wasn't enough to avoid that
+  // (it's still two breaks). Splitting into two top-level <Page> elements
+  // means each one only ever has to handle its own overflow, which is the
+  // single-break case already confirmed to paginate cleanly.
+  const splitToOwnPage = hasAsc && transits.length >= UPCOMING_FORCE_BREAK_AT_ACTIVE_COUNT;
 
-      <View style={S.crimsonLine} />
-      <View style={S.content}>
-        <Text style={S.sectionTag}>Advanced Sovereign Report · The Stoplight</Text>
-        <Text style={S.heading}>Your Current Transits</Text>
-        <Text style={S.subheading}>
-          Not your birth chart — the sky as it stands right now, relative to it. This is the
-          only page in your report that will read differently if you come back to it later.
+  const header = (
+    <>
+      <Text style={S.sectionTag}>Advanced Sovereign Report · The Stoplight</Text>
+      <Text style={S.heading}>Your Current Transits</Text>
+      <Text style={S.subheading}>
+        Not your birth chart — the sky as it stands right now, relative to it. This is the
+        only page in your report that will read differently if you come back to it later.
+      </Text>
+      <View style={S.headingRule} />
+
+      <View style={S.mechanismBlock}>
+        <Text style={S.mechanismLabel}>What&rsquo;s Being Tracked</Text>
+        <Text style={S.mechanismText}>
+          Jupiter, Saturn, Uranus, Neptune, and Pluto move slowly enough that a transit from
+          one of them stays true for weeks or months, not hours — which is what makes them
+          worth reporting in a page you&rsquo;ll come back to more than once. Each is checked
+          against your Sun, Moon, and Ascendant for a live major aspect (conjunction, sextile,
+          square, trine, or opposition, within a tight 3° orb).
         </Text>
-        <View style={S.headingRule} />
+      </View>
+    </>
+  );
 
-        <View style={S.mechanismBlock}>
-          <Text style={S.mechanismLabel}>What&rsquo;s Being Tracked</Text>
-          <Text style={S.mechanismText}>
-            Jupiter, Saturn, Uranus, Neptune, and Pluto move slowly enough that a transit from
-            one of them stays true for weeks or months, not hours — which is what makes them
-            worth reporting in a page you&rsquo;ll come back to more than once. Each is checked
-            against your Sun, Moon, and Ascendant for a live major aspect (conjunction, sextile,
-            square, trine, or opposition, within a tight 3° orb).
-          </Text>
-        </View>
-
-        {!hasAsc ? (
+  const activeSection = (
+    <>
+      {!hasAsc ? (
           <View style={S.missingBlock}>
             <Text style={S.missingTitle}>Transit Data Unavailable</Text>
             <Text style={S.missingText}>
@@ -217,12 +343,15 @@ export default function Page05Transits({ data }: Props) {
             </Text>
           </View>
         ) : (
-          <View style={S.stack}>
-            {transits.map((hit, i) => {
+          // Cards are direct children of `content` here, not wrapped in an
+          // intermediate container — see the note above `CARD_MIN_PRESENCE_AHEAD`
+          // for why. Spacing between them comes from each card's own
+          // marginBottom instead of a parent `gap`.
+          transits.map((hit, i) => {
               const house = getPlanetHouse(hit.transitingSign, data.tropicalAsc);
               const interpretation = getTransitInterpretation(hit, house);
               return (
-                <View style={S.card} key={i} wrap={false}>
+                <View style={S.card} key={i} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
                   <View style={S.cardHeaderRow}>
                     <Text style={S.titleText}>
                       {getPlanetLabel(hit.transitingPlanet)} {getAspectLabel(hit.aspect)}
@@ -244,69 +373,82 @@ export default function Page05Transits({ data }: Props) {
                   </View>
                 </View>
               );
-            })}
-          </View>
+          })
         )}
+    </>
+  );
 
-        {hasAsc && (
-          <View style={S.upcomingSection} wrap={false}>
-            <View style={S.upcomingDivider} />
-            <Text style={S.upcomingSectionTag}>Looking Ahead</Text>
-            <Text style={S.upcomingHeading}>What&rsquo;s Coming Next</Text>
-            <Text style={S.upcomingSubtext}>
-              {upcoming.length > 1
-                ? 'The next major transits on the horizon — not active yet, but the ones to watch for once the current picture above shifts.'
-                : 'The next major transit on the horizon — not active yet, but the one to watch for once the current picture above shifts.'}
-            </Text>
+  const upcomingSection = hasAsc && (
+    <View style={S.upcomingSection}>
+      <View style={S.upcomingDivider} />
+      <Text style={S.upcomingSectionTag}>Looking Ahead</Text>
+      <Text style={S.upcomingHeading}>What&rsquo;s Coming Next</Text>
+      <Text style={S.upcomingSubtext}>
+        {upcoming.length > 1
+          ? 'The next major transits on the horizon — not active yet, but the ones to watch for once the current picture above shifts.'
+          : 'The next major transit on the horizon — not active yet, but the one to watch for once the current picture above shifts.'}
+      </Text>
 
-            {upcoming.length > 0 ? (
-              <View style={S.stack}>
-                {upcoming.map((next, i) => {
-                  const upcomingHouse = getPlanetHouse(next.transitingSign, data.tropicalAsc);
-                  const upcomingInterpretation = getTransitInterpretation(next, upcomingHouse);
-                  return (
-                    <View style={[S.card, S.upcomingCard]} key={i} wrap={false}>
-                      <View style={S.cardHeaderRow}>
-                        <Text style={S.titleText}>
-                          {getPlanetLabel(next.transitingPlanet)} {getAspectLabel(next.aspect)}
-                        </Text>
-                        <Text style={S.targetText}>&rarr; Your {NATAL_TARGET_LABELS[next.natalTarget]}</Text>
-                        <Text style={[S.pill, S.pillNature]}>{ASPECT_NATURE[next.aspect]}</Text>
-                        <Text style={[S.pill, S.pillUpcoming]}>Not Yet Active</Text>
-                      </View>
-                      <View style={S.timeframeRow}>
-                        <Text style={S.timeframeLabel}>Arrives</Text>
-                        <Text style={S.timeframeText}>{formatTransitWindow(next.window)}</Text>
-                      </View>
-                      <Text style={S.interpretationText}>{upcomingInterpretation}</Text>
-                      <View style={S.metaRow}>
-                        <Text style={S.metaText}>
-                          Transiting {getPlanetLabel(next.transitingPlanet)} in {next.transitingSign} at entry
-                          {upcomingHouse !== null ? ` · ${HOUSE_NAMES[upcomingHouse]} (House ${upcomingHouse})` : ''}
-                        </Text>
-                      </View>
-                    </View>
-                  );
-                })}
+      {upcoming.length > 0 ? (
+        // Same flattening as the active-transit cards above — no
+        // intermediate `stack` wrapper.
+        upcoming.map((next, i) => {
+            const upcomingHouse = getPlanetHouse(next.transitingSign, data.tropicalAsc);
+            const upcomingInterpretation = getTransitInterpretation(next, upcomingHouse);
+            return (
+              <View style={[S.card, S.upcomingCard]} key={i} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
+                <View style={S.cardHeaderRow}>
+                  <Text style={S.titleText}>
+                    {getPlanetLabel(next.transitingPlanet)} {getAspectLabel(next.aspect)}
+                  </Text>
+                  <Text style={S.targetText}>&rarr; Your {NATAL_TARGET_LABELS[next.natalTarget]}</Text>
+                  <Text style={[S.pill, S.pillNature]}>{ASPECT_NATURE[next.aspect]}</Text>
+                  <Text style={[S.pill, S.pillUpcoming]}>Not Yet Active</Text>
+                </View>
+                <View style={S.timeframeRow}>
+                  <Text style={S.timeframeLabel}>Arrives</Text>
+                  <Text style={S.timeframeText}>{formatTransitWindow(next.window)}</Text>
+                </View>
+                <Text style={S.interpretationText}>{upcomingInterpretation}</Text>
+                <View style={S.metaRow}>
+                  <Text style={S.metaText}>
+                    Transiting {getPlanetLabel(next.transitingPlanet)} in {next.transitingSign} at entry
+                    {upcomingHouse !== null ? ` · ${HOUSE_NAMES[upcomingHouse]} (House ${upcomingHouse})` : ''}
+                  </Text>
+                </View>
               </View>
-            ) : (
-              <View style={S.noneUpcomingBlock}>
-                <Text style={S.noneUpcomingText}>
-                  None of the five timing planets are projected to reach your Sun, Moon, or
-                  Ascendant within the next decade. The slowest planets — Neptune and Pluto in
-                  particular — only sweep a small arc of the sky over that span, so this reflects
-                  where they are in their long cycle, not a gap in the reading.
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
+            );
+        })
+      ) : (
+        <View style={S.noneUpcomingBlock}>
+          <Text style={S.noneUpcomingText}>
+            None of the five timing planets are projected to reach your Sun, Moon, or
+            Ascendant within the next decade. The slowest planets — Neptune and Pluto in
+            particular — only sweep a small arc of the sky over that span, so this reflects
+            where they are in their long cycle, not a gap in the reading.
+          </Text>
+        </View>
+      )}
+    </View>
+  );
 
-      <View style={S.footer} fixed>
-        <Text style={S.footerText}>T3D Advanced Sovereign Report</Text>
-        <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
-      </View>
-    </Page>
+  if (splitToOwnPage) {
+    return (
+      <>
+        <TransitsPageShell>
+          {header}
+          {activeSection}
+        </TransitsPageShell>
+        <TransitsPageShell>{upcomingSection}</TransitsPageShell>
+      </>
+    );
+  }
+
+  return (
+    <TransitsPageShell>
+      {header}
+      {activeSection}
+      {upcomingSection}
+    </TransitsPageShell>
   );
 }
