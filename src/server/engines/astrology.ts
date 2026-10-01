@@ -29,6 +29,7 @@ import type {
   ZodiacSign,
 } from './types';
 import { DateTime } from 'luxon';
+import fs from 'fs';
 
 // ─── SWISSEPH IMPORT & CONSTANTS ─────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -111,12 +112,45 @@ const WHOLE_SIGN_HSYS = 87;
 // ─── EPHEMERIS SETUP ─────────────────────────────────────────────────────────
 
 let ephemerisInitialized = false;
+let useMoshierFallback = false;
 
+/**
+ * QA FIX: the top-of-file docblock promises "without files, the engine
+ * falls back to Moshier algorithm" — but the previous version of this
+ * function (and the SEFLG_MOSEPH flag logic below it) only checked whether
+ * EPHE_PATH was SET, never whether it actually points at a directory that
+ * contains ephemeris files. A configured-but-empty EPHE_PATH (plausible:
+ * the docblock itself calls the files "optional") made swe_calc_ut throw a
+ * hard error on every single chart calculation instead of degrading
+ * gracefully. This checks for at least one .se1 file as a lightweight
+ * proxy for "files are actually present" — it doesn't replicate Swiss
+ * Ephemeris's exact per-date file-selection logic, but it catches the main
+ * failure mode (missing or empty directory) without adding real I/O cost,
+ * since the result is cached for the life of the process.
+ */
 function initEphemeris(): void {
   if (ephemerisInitialized) return;
   const ephePath = process.env.EPHE_PATH ?? '';
   if (ephePath) {
     swisseph.swe_set_ephe_path(ephePath);
+    try {
+      const hasEpheFiles = fs.readdirSync(ephePath).some((f) => f.endsWith('.se1'));
+      if (!hasEpheFiles) {
+        console.warn(
+          `[astrology] EPHE_PATH="${ephePath}" is set but contains no .se1 ephemeris files — ` +
+          `falling back to the Moshier algorithm (±0.01° accuracy) instead of letting swisseph fail.`
+        );
+        useMoshierFallback = true;
+      }
+    } catch (err) {
+      console.warn(
+        `[astrology] EPHE_PATH="${ephePath}" could not be read ` +
+        `(${err instanceof Error ? err.message : String(err)}) — falling back to the Moshier algorithm.`
+      );
+      useMoshierFallback = true;
+    }
+  } else {
+    useMoshierFallback = true;
   }
   ephemerisInitialized = true;
 }
@@ -193,9 +227,12 @@ export function getPlanetPositionsAtJD(
 ): ChartData {
   initEphemeris();
 
-  // Base flags: always include speed; use Moshier as fallback if no ephe files
+  // Base flags: always include speed; use Moshier as fallback if no ephe
+  // files are actually present (useMoshierFallback is resolved once, in
+  // initEphemeris() above — see its comment for why this isn't simply
+  // `!process.env.EPHE_PATH` anymore).
   const baseFlags = swisseph.SEFLG_SPEED |
-    (process.env.EPHE_PATH ? 0 : swisseph.SEFLG_MOSEPH);
+    (useMoshierFallback ? swisseph.SEFLG_MOSEPH : 0);
 
   let flags = baseFlags;
 

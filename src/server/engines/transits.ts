@@ -71,6 +71,7 @@
  */
 
 import type { PlanetPosition, ZodiacSign } from './types';
+import fs from 'fs';
 
 // ─── LOCAL POSITION FORMATTING (deliberately duplicated — see file header) ──
 
@@ -148,10 +149,39 @@ export type TransitAspectType = 'conjunction' | 'sextile' | 'square' | 'trine' |
 export type NatalTransitTarget = 'sun' | 'moon' | 'ascendant';
 
 let transitEphemerisInitialized = false;
+let transitUseMoshierFallback = false;
+
+// QA FIX (same issue and same fix as astrology.ts's initEphemeris() —
+// deliberately duplicated per this file's own header comment on why its
+// ephemeris setup isn't imported from astrology.ts): EPHE_PATH being set
+// doesn't mean the files are actually there, and the previous version only
+// requested Moshier when the env var itself was unset, so a configured-but-
+// empty directory made sweph.calc_ut fail on every transit lookup instead
+// of degrading gracefully.
 function initTransitEphemeris(): void {
   if (transitEphemerisInitialized) return;
   const ephePath = process.env.EPHE_PATH ?? '';
-  if (ephePath) sweph.set_ephe_path(ephePath);
+  if (ephePath) {
+    sweph.set_ephe_path(ephePath);
+    try {
+      const hasEpheFiles = fs.readdirSync(ephePath).some((f) => f.endsWith('.se1'));
+      if (!hasEpheFiles) {
+        console.warn(
+          `[transits] EPHE_PATH="${ephePath}" is set but contains no .se1 ephemeris files — ` +
+          `falling back to the Moshier algorithm instead of letting sweph fail.`
+        );
+        transitUseMoshierFallback = true;
+      }
+    } catch (err) {
+      console.warn(
+        `[transits] EPHE_PATH="${ephePath}" could not be read ` +
+        `(${err instanceof Error ? err.message : String(err)}) — falling back to the Moshier algorithm.`
+      );
+      transitUseMoshierFallback = true;
+    }
+  } else {
+    transitUseMoshierFallback = true;
+  }
   transitEphemerisInitialized = true;
 }
 
@@ -240,10 +270,11 @@ function getTransitingPlanetPosition(planet: TransitPlanet, date: Date): PlanetP
 
   const jd = dateToJulianDay(date);
   // Same convention as the natal engine: request Moshier explicitly when no
-  // local ephemeris files are configured, rather than letting the library
-  // search for files that aren't there and populate a "not found" message
-  // alongside an otherwise-valid (self-recovered) result.
-  const flags = sweph.constants.SEFLG_SPEED | (process.env.EPHE_PATH ? 0 : sweph.constants.SEFLG_MOSEPH);
+  // *actual* local ephemeris files are available (transitUseMoshierFallback
+  // is resolved once, in initTransitEphemeris() above), rather than letting
+  // the library search for files that aren't there and populate a "not
+  // found" message alongside an otherwise-valid (self-recovered) result.
+  const flags = sweph.constants.SEFLG_SPEED | (transitUseMoshierFallback ? sweph.constants.SEFLG_MOSEPH : 0);
 
   const result = sweph.calc_ut(jd, TRANSIT_PLANET_IDS[planet], flags);
   // `data` still comes back populated even when `error` merely reports a

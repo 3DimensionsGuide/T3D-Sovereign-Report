@@ -205,8 +205,11 @@ function calculateSoulUrge(
  *
  * Count the frequency of each digit (1–9) among all letter values in the full
  * birth name. The digit appearing most frequently is the Hidden Passion.
- * If two or more digits tie, both are valid — we return the lower digit per
- * standard Pythagorean convention.
+ * QA FIX: this used to say "if two or more digits tie, both are valid" —
+ * but the implementation below has only ever returned a single digit (the
+ * lowest one tied for max frequency). That's also what the reader-facing
+ * copy on Page04HiddenPassion.tsx states, so this comment was describing
+ * behavior that never existed rather than the other way around.
  */
 function calculateHiddenPassion(
   firstName: string,
