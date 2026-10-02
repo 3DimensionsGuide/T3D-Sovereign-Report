@@ -13,17 +13,36 @@
  * into react-pdf's automatic reflow, splitting badly across two pages.
  * Same reasoning Page03Bridges' docblock already gives for why it isn't
  * folded into Page02Definition.
+ *
+ * PHANTOM_BLANK_PAGE fix: this page used to render a genuinely blank
+ * trailing page after it. The content fit comfortably within the visible
+ * page bounds, but sat close enough to react-pdf's internal wrap boundary
+ * that its paginator inserted an extra blank page anyway — confirmed
+ * empirically (regenerate + visually inspect the PDF), not from reading
+ * react-pdf's source, which left the exact internal trigger unclear.
+ * wrap={false} + minPresenceAhead alone did NOT fix it — tested by
+ * removing both from every block on this page while the blank page
+ * persisted unchanged. Bisecting paddingBottom didn't converge on a clean
+ * fix either; it only traded "phantom blank page" for "awkward split,"
+ * never landing on a single clean page. The fix that actually worked was
+ * trimming this page's vertical spacing (content paddingTop, subheading/
+ * headingRule margins, stack gap, block padding, closer padding/margin) to
+ * create genuine margin between the content's bottom edge and the page
+ * boundary, with paddingBottom left at the standard PAGE.marginV. wrap=
+ * {false} + minPresenceAhead (CARD_MIN_PRESENCE_AHEAD) is kept on each
+ * block/closer below as a defensive pairing — consistent with every other
+ * page fixed this way — not as the fix itself.
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import { TechnicalLines } from '../../shared/PageComponents';
+import { TechnicalLines, CARD_MIN_PRESENCE_AHEAD } from '../../shared/PageComponents';
 import { C, F, PAGE } from '../../tokens';
 
 const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 32 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -34,13 +53,13 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint,
-    lineHeight: 1.5, marginBottom: 20, maxWidth: 460,
+    lineHeight: 1.5, marginBottom: 14, maxWidth: 460,
   },
-  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
+  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 16 },
 
-  stack: { gap: 16 },
+  stack: { gap: 11 },
   block: {
-    padding: 16, backgroundColor: '#FFFFFF',
+    padding: 12, backgroundColor: '#FFFFFF',
     borderWidth: 0.5, borderColor: 'rgba(13,13,14,0.12)', borderStyle: 'solid',
   },
   blockLabel: {
@@ -52,7 +71,7 @@ const S = StyleSheet.create({
   },
 
   closer: {
-    marginTop: 4, padding: 16, backgroundColor: '#F5F3EE',
+    marginTop: 2, padding: 13, backgroundColor: '#F5F3EE',
     borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
   },
   closerText: {
@@ -85,7 +104,7 @@ export default function Page02Gates() {
         <View style={S.headingRule} />
 
         <View style={S.stack}>
-          <View style={S.block}>
+          <View style={S.block} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
             <Text style={S.blockLabel}>The 64 Gates</Text>
             <Text style={S.blockText}>
               Underneath the 9 Centers sits a finer structure: 64 Gates, one for each hexagram of
@@ -96,7 +115,7 @@ export default function Page02Gates() {
             </Text>
           </View>
 
-          <View style={S.block}>
+          <View style={S.block} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
             <Text style={S.blockLabel}>Two Charts, Not One</Text>
             <Text style={S.blockText}>
               Every planet in your chart activates a Gate by where it fell in the sky at two
@@ -107,7 +126,7 @@ export default function Page02Gates() {
             </Text>
           </View>
 
-          <View style={S.block}>
+          <View style={S.block} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
             <Text style={S.blockLabel}>Gates Come In Pairs</Text>
             <Text style={S.blockText}>
               Every Gate has exactly one partner — on a different Center — that completes it into
@@ -117,7 +136,7 @@ export default function Page02Gates() {
             </Text>
           </View>
 
-          <View style={S.block}>
+          <View style={S.block} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
             <Text style={S.blockLabel}>When Only One Side Is Active</Text>
             <Text style={S.blockText}>
               Sometimes only your side of a pair is active — a hanging Gate. It&rsquo;s live, but
@@ -128,7 +147,7 @@ export default function Page02Gates() {
           </View>
         </View>
 
-        <View style={S.closer}>
+        <View style={S.closer} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
           <Text style={S.closerText}>
             Keep this page in mind as you go: your Bodygraph, your Definition, your Incarnation
             Cross, even your Godhead — all of it reduces to this same mechanism, just read at a

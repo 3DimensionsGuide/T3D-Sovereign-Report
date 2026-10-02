@@ -17,11 +17,17 @@
  * and the source gate that produced it. The integrated/distorted (light vs
  * shadow) expression of that same Godhead continues on the companion page,
  * Page07GodheadLightShadow.tsx, which needs more room than fits here.
+ *
+ * GODHEAD_MECHANISM and each content block below vary in length by reader
+ * (the mechanism text is fixed, but the godhead keynote/theme/gate-card
+ * text is data-dependent), so each gets `wrap={false}` + `minPresenceAhead`
+ * per Page05Transits.tsx's documented fix for the same orphan-blank-page
+ * failure mode — see CARD_MIN_PRESENCE_AHEAD's docblock in PageComponents.tsx.
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import { TechnicalLines } from '../../shared/PageComponents';
+import { TechnicalLines, CARD_MIN_PRESENCE_AHEAD } from '../../shared/PageComponents';
 import { C, F, PAGE, calculateGodhead } from '../../tokens';
 import { GATE_KEYNOTES } from '../../section3/gate-content';
 import { GODHEAD_MECHANISM } from '../../section3/godhead-content';
@@ -30,7 +36,7 @@ import type { ReportData } from '../../tokens';
 const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 30 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -41,14 +47,14 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint,
-    lineHeight: 1.5, marginBottom: 20, maxWidth: 420,
+    lineHeight: 1.5, marginBottom: 14, maxWidth: 420,
   },
-  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
+  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 14 },
 
   mechanismBlock: {
-    padding: 16, backgroundColor: '#F5F3EE',
+    padding: 13, backgroundColor: '#F5F3EE',
     borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
-    marginBottom: 22,
+    marginBottom: 14,
   },
   mechanismLabel: {
     fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
@@ -68,9 +74,9 @@ const S = StyleSheet.create({
     fontFamily: F.display, fontSize: 32, fontWeight: 700, color: C.amber, lineHeight: 1.1,
   },
   archetypeText: {
-    fontFamily: F.display, fontSize: 13, fontStyle: 'italic', color: C.base, marginTop: 4, marginBottom: 10,
+    fontFamily: F.display, fontSize: 13, fontStyle: 'italic', color: C.base, marginTop: 3, marginBottom: 7,
   },
-  quarterBadgeRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 18 },
+  quarterBadgeRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   quarterTag: {
     fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
     color: '#FFFFFF', backgroundColor: C.amber, textTransform: 'uppercase',
@@ -83,9 +89,9 @@ const S = StyleSheet.create({
 
   // Main keynote passage
   meaningBlock: {
-    padding: 18, backgroundColor: '#F5F3EE',
+    padding: 14, backgroundColor: '#F5F3EE',
     borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
-    marginBottom: 22,
+    marginBottom: 14,
   },
   meaningText: {
     fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.base, lineHeight: 1.55, opacity: 0.9,
@@ -145,14 +151,14 @@ export default function Page06Godhead({ data }: Props) {
         </Text>
         <View style={S.headingRule} />
 
-        <View style={S.mechanismBlock}>
+        <View style={S.mechanismBlock} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
           <Text style={S.mechanismLabel}>What Is A Godhead?</Text>
           <Text style={S.mechanismText}>{GODHEAD_MECHANISM}</Text>
         </View>
 
         {godhead ? (
           <>
-            <View style={S.godheadBlock}>
+            <View style={S.godheadBlock} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
               <Text style={S.godheadLabel}>Your Godhead</Text>
               <Text style={S.godheadName}>{godhead.name}</Text>
               <Text style={S.archetypeText}>{godhead.archetype}</Text>
@@ -164,12 +170,12 @@ export default function Page06Godhead({ data }: Props) {
 
             <View style={{ height: 18 }} />
 
-            <View style={S.meaningBlock}>
+            <View style={S.meaningBlock} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
               <Text style={S.meaningText}>{godhead.keynote}</Text>
             </View>
 
             <Text style={S.gateGridLabel}>The Gate Behind This Reading</Text>
-            <View style={S.gateCard}>
+            <View style={S.gateCard} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
               <Text style={S.gateCardRole}>Personality Sun · Gate {personalitySunGate}</Text>
               {sourceKeynote && <Text style={S.gateCardName}>{sourceKeynote.ichingName}</Text>}
               {sourceKeynote && <Text style={S.gateCardMeaning}>{sourceKeynote.coreMeaning}</Text>}

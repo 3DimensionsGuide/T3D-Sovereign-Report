@@ -13,11 +13,16 @@
  * (VARIABLE_ARROW_LABEL / VARIABLE_ARROW_MEANING, sourced from the T3D
  * PHILOSOPHER notebook) rather than going the full six-tone depth, laid out
  * as a 2×2 grid matching the natural quadrant structure of the four points.
+ *
+ * Each card's reading text is data-dependent (VARIABLE_ARROW_MEANING per
+ * reader), so it gets `wrap={false}` + `minPresenceAhead` per
+ * Page05Transits.tsx's documented fix for the same orphan-blank-page
+ * failure mode — see CARD_MIN_PRESENCE_AHEAD's docblock in PageComponents.tsx.
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import { TechnicalLines } from '../../shared/PageComponents';
+import { TechnicalLines, CARD_MIN_PRESENCE_AHEAD } from '../../shared/PageComponents';
 import {
   C, F, PAGE, calculateVariables,
   VARIABLES_MECHANISM, VARIABLE_ARROW_LABEL, VARIABLE_ARROW_MEANING,
@@ -28,7 +33,7 @@ import type { ReportData } from '../../tokens';
 const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 30 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -39,14 +44,14 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint,
-    lineHeight: 1.5, marginBottom: 20, maxWidth: 440,
+    lineHeight: 1.5, marginBottom: 14, maxWidth: 440,
   },
-  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
+  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 14 },
 
   mechanismBlock: {
-    padding: 16, backgroundColor: '#F5F3EE',
+    padding: 13, backgroundColor: '#F5F3EE',
     borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
-    marginBottom: 22,
+    marginBottom: 14,
   },
   mechanismLabel: {
     fontFamily: F.sans, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.2,
@@ -57,10 +62,10 @@ const S = StyleSheet.create({
   },
 
   // 2x2 grid
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   card: {
-    width: (PAGE.contentWidth - 10) / 2,
-    padding: 15, backgroundColor: '#FFFFFF',
+    width: (PAGE.contentWidth - 8) / 2,
+    padding: 12, backgroundColor: '#FFFFFF',
     borderWidth: 0.75, borderColor: C.base, borderStyle: 'solid', borderRadius: 3,
     marginBottom: 10,
   },
@@ -140,7 +145,7 @@ export default function Page08Variables({ data }: Props) {
             const text = arrow ? VARIABLE_ARROW_MEANING[key][arrow] : null;
 
             return (
-              <View key={key} style={S.card}>
+              <View key={key} style={S.card} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
                 <View style={S.cardHeader}>
                   <Text style={S.cardLabel}>{label}</Text>
                   {arrow && <Text style={S.arrowGlyph}>{ARROW_GLYPH[arrow]}</Text>}

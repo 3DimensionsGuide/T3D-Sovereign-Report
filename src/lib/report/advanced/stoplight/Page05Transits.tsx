@@ -87,7 +87,7 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import { TechnicalLines } from '../../shared/PageComponents';
+import { TechnicalLines, CARD_MIN_PRESENCE_AHEAD } from '../../shared/PageComponents';
 import { C, F, PAGE } from '../../tokens';
 import { getPlanetHouse } from './stoplight-content';
 import {
@@ -113,8 +113,9 @@ const TRANSITS_PAGE_BOTTOM_PADDING = PAGE.marginV + 30;
 // Small additional safety margin (in points) react-pdf must confirm is
 // left on the page before placing a transit card — a minor buffer against
 // any rounding in react-pdf's own text-height estimate, not load-bearing
-// now that the page's bottom padding genuinely reserves space.
-const CARD_MIN_PRESENCE_AHEAD = 30;
+// now that the page's bottom padding genuinely reserves space. Shared
+// with every other report page that stacks variable-height content —
+// see CARD_MIN_PRESENCE_AHEAD's own docblock in PageComponents.tsx.
 
 // Active-transit-card count at which the "Looking Ahead" (upcoming
 // transits) section is forced onto its own fresh page instead of flowing

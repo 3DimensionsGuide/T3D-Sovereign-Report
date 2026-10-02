@@ -15,11 +15,16 @@
  * its own. The Third Challenge is conventionally the lifelong "main"
  * challenge, running as a persistent background theme in addition to its
  * own phase.
+ *
+ * Each challenge card's test/key text and the closing interaction block
+ * are data-dependent, so each gets `wrap={false}` + `minPresenceAhead`
+ * per Page05Transits.tsx's documented fix for the same orphan-blank-page
+ * failure mode — see CARD_MIN_PRESENCE_AHEAD's docblock in PageComponents.tsx.
  */
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import { TechnicalLines } from '../../shared/PageComponents';
+import { TechnicalLines, CARD_MIN_PRESENCE_AHEAD } from '../../shared/PageComponents';
 import { C, F, PAGE } from '../../tokens';
 import { CHALLENGE_CONTENT, getPinnacleChallengeInteraction } from './road-content';
 import type { ReportData } from '../../tokens';
@@ -27,7 +32,7 @@ import type { ReportData } from '../../tokens';
 const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   emeraldLine: { width: PAGE.width, height: 1.5, backgroundColor: C.emerald },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 30 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -38,13 +43,13 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint,
-    lineHeight: 1.5, marginBottom: 18, maxWidth: 440,
+    lineHeight: 1.5, marginBottom: 12, maxWidth: 440,
   },
-  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 18 },
+  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 12 },
 
-  stack: { gap: 8 },
+  stack: { gap: 6 },
   card: {
-    padding: 11, backgroundColor: '#FFFFFF',
+    padding: 9, backgroundColor: '#FFFFFF',
     borderWidth: 0.5, borderColor: 'rgba(13,13,14,0.12)', borderStyle: 'solid',
   },
   cardCurrent: { borderColor: C.emerald, borderWidth: 1 },
@@ -143,7 +148,12 @@ export default function Page07Challenges({ data }: Props) {
                 const p = data.pinnacles[i];
                 if (!content || !p) return null;
                 return (
-                  <View style={[S.card, isCurrent ? S.cardCurrent : {}]} key={i}>
+                  <View
+                    style={[S.card, isCurrent ? S.cardCurrent : {}]}
+                    key={i}
+                    wrap={false}
+                    minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}
+                  >
                     <View style={S.cardHeaderRow}>
                       <Text style={S.numberBadge}>{n}</Text>
                       <View style={S.headerText}>
@@ -163,7 +173,7 @@ export default function Page07Challenges({ data }: Props) {
             </View>
 
             {interaction && (
-              <View style={S.interactionBlock}>
+              <View style={S.interactionBlock} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
                 <Text style={S.interactionLabel}>Right Now: How Your Pinnacle and Challenge Interact</Text>
                 <Text style={S.interactionText}>{interaction}</Text>
               </View>

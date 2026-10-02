@@ -1,6 +1,13 @@
 /**
  * Advanced Sovereign Report — Vehicle Section — Your Incarnation Cross
  *
+ * The meaning passage and each of the four gate cards vary in length with
+ * the reader's actual cross and gates, so (per Page05Transits.tsx's
+ * documented fix for the same failure mode) the meaning block and each
+ * gate card get `wrap={false}` + `minPresenceAhead` rather than relying
+ * on react-pdf's default wrap to land cleanly — see CARD_MIN_PRESENCE_AHEAD's
+ * docblock in PageComponents.tsx.
+ *
  * Fourth "architecture" page (after Definition, Bridges, Circuitry). Where
  * the prior pages showed how the Vehicle is built and what runs through it,
  * this page names its background theme — the fixed, unchosen life direction
@@ -22,7 +29,7 @@
 
 import React from 'react';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import { TechnicalLines } from '../../shared/PageComponents';
+import { TechnicalLines, CARD_MIN_PRESENCE_AHEAD } from '../../shared/PageComponents';
 import { C, F, PAGE, calculateCrossFamily, getCrossGates } from '../../tokens';
 import { GATE_KEYNOTES } from '../../section3/gate-content';
 import type { ReportData } from '../../tokens';
@@ -30,7 +37,7 @@ import type { ReportData } from '../../tokens';
 const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
-  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 30 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -41,12 +48,12 @@ const S = StyleSheet.create({
   },
   subheading: {
     fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.parchmentFaint,
-    lineHeight: 1.5, marginBottom: 20, maxWidth: 420,
+    lineHeight: 1.5, marginBottom: 14, maxWidth: 420,
   },
-  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 22 },
+  headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 14 },
 
   // Cross name display — the star of the page
-  crossNameBlock: { marginBottom: 18 },
+  crossNameBlock: { marginBottom: 12 },
   crossName: {
     fontFamily: F.display, fontSize: 24, fontWeight: 700, color: C.amber, lineHeight: 1.15,
   },
@@ -64,9 +71,9 @@ const S = StyleSheet.create({
 
   // Family meaning passage
   meaningBlock: {
-    padding: 18, backgroundColor: '#F5F3EE',
+    padding: 14, backgroundColor: '#F5F3EE',
     borderLeftWidth: 2, borderLeftColor: C.amber, borderLeftStyle: 'solid',
-    marginBottom: 22,
+    marginBottom: 14,
   },
   meaningText: {
     fontFamily: F.sans, fontSize: 10, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.9,
@@ -77,10 +84,10 @@ const S = StyleSheet.create({
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500, letterSpacing: 1.6,
     color: C.parchmentFaint, textTransform: 'uppercase', marginBottom: 10,
   },
-  gateGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  gateGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   gateCard: {
-    width: (PAGE.contentWidth - 10) / 2,
-    padding: 14, backgroundColor: '#FFFFFF',
+    width: (PAGE.contentWidth - 8) / 2,
+    padding: 11, backgroundColor: '#FFFFFF',
     borderWidth: 0.75, borderColor: C.base, borderStyle: 'solid', borderRadius: 3,
   },
   gateCardRole: {
@@ -138,7 +145,7 @@ export default function Page05IncarnationCross({ data }: Props) {
           </View>
         </View>
 
-        <View style={S.meaningBlock}>
+        <View style={S.meaningBlock} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
           <Text style={S.meaningText}>{familyResult.meaning.passage}</Text>
         </View>
 
@@ -147,7 +154,7 @@ export default function Page05IncarnationCross({ data }: Props) {
           {gates.map(g => {
             const keynote = GATE_KEYNOTES[g.gate];
             return (
-              <View key={g.role} style={S.gateCard}>
+              <View key={g.role} style={S.gateCard} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
                 <Text style={S.gateCardRole}>{g.role} · Gate {g.gate}</Text>
                 {keynote && <Text style={S.gateCardName}>{keynote.ichingName}</Text>}
                 <Text style={S.gateCardBlurb}>{g.blurb}</Text>
