@@ -164,7 +164,7 @@ export function Page36CreativeWork({ data }: P36Props) {
           </Text>
         </View>
       </View>
-      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
+      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Base Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
     </Page>
   );
 }
@@ -233,7 +233,7 @@ export function Page37Relate({ data }: P37Props) {
           </Text>
         </View>
       </View>
-      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
+      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Base Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
     </Page>
   );
 }
@@ -287,7 +287,7 @@ export function Page38Recalibration({ data }: P38Props) {
           </View>
         ))}
       </View>
-      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Sovereign Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
+      <View style={BASE.footer} fixed><Text style={BASE.footerT}>The Base Report</Text><Text style={BASE.pageNum} render={({ pageNumber }) => pageNumber} /></View>
     </Page>
   );
 }

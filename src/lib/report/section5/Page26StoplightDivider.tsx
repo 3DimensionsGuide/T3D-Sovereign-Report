@@ -38,7 +38,7 @@ export default function Page26StoplightDivider({ data }: Props) {
         <Text style={S.pagesNote}>Astrology · {data.sunSign} Sun</Text>
       </View>
       <View style={S.bottom} fixed>
-        <Text style={S.typeLabel}>T3D Sovereign Report</Text>
+        <Text style={S.typeLabel}>T3D Base Report</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>

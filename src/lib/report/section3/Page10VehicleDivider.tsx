@@ -145,7 +145,7 @@ export default function Page10VehicleDivider({ data }: Props) {
       </View>
 
       <View style={S.bottom} fixed>
-        <Text style={S.typeLabel}>T3D Sovereign Report</Text>
+        <Text style={S.typeLabel}>T3D Base Report</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>

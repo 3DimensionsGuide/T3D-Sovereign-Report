@@ -133,7 +133,7 @@ export default function Page43DataNotes({ data }: Props) {
             lineHeight: 1.6,
             maxWidth: 460,
           }}>
-            The Sovereign Report combines interpretive traditions—Human Design, Numerology, and
+            The Base Report combines interpretive traditions—Human Design, Numerology, and
             Astrology—as reflective tools for self-inquiry. It is not medical, psychological,
             legal, financial, or scientific advice; it does not diagnose conditions, predict
             guaranteed outcomes, or replace qualified professional support. Keep what is useful,
@@ -252,7 +252,7 @@ export default function Page43DataNotes({ data }: Props) {
         </View>
       </View>
       <View style={S.footer} fixed>
-        <Text style={S.footerT}>The Sovereign Report</Text>
+        <Text style={S.footerT}>The Base Report</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>

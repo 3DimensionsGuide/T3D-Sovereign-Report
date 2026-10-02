@@ -1,5 +1,5 @@
 /**
- * T3D Sovereign Report — Complete 46-Page Document
+ * T3D Base Report — Complete 46-Page Document
  *
  * Section 1 — Arrival              (Pages 1–4)   ✅
  * Section 2 — Your Coordinates     (Pages 5–9)   ✅
@@ -76,10 +76,10 @@ interface Props { data: ReportData; }
 export function SovereignReport({ data }: Props) {
   return (
     <Document
-      title={`T3D Sovereign Report — ${data.firstName} ${data.lastName}`}
+      title={`T3D Base Report — ${data.firstName} ${data.lastName}`}
       author="T3D Studio"
       subject="Sovereign Navigation Report — Human Design, Numerology & Astrology"
-      keywords="Human Design, Numerology, Astrology, T3D, Sovereign Report"
+      keywords="Human Design, Numerology, Astrology, T3D, Base Report"
       creator="3dimensions.guide"
       producer="@react-pdf/renderer"
     >

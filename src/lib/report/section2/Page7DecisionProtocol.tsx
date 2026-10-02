@@ -303,7 +303,7 @@ export default function Page7DecisionProtocol({ data }: Props) {
       </View>
 
       <View style={S.footer} fixed>
-        <Text style={S.footerText}>The Sovereign Report</Text>
+        <Text style={S.footerText}>The Base Report</Text>
         <Text style={S.pageNumber} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>

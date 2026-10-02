@@ -220,7 +220,7 @@ export default function Page20BirthdayAttitude({ data }: Props) {
       </View>
 
       <View style={S.footer} fixed>
-        <Text style={S.footerText}>The Sovereign Report</Text>
+        <Text style={S.footerText}>The Base Report</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>

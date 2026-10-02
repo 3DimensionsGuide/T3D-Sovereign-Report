@@ -1,7 +1,7 @@
 /**
- * Sovereign Report — ProductGenerator implementation.
+ * Base Report — ProductGenerator implementation.
  *
- * The single place that builds a Sovereign Report PDF for a lead:
+ * The single place that builds a Base Report PDF for a lead:
  * normalize → synthesis → stoplight synthesis → QA → render. Both the
  * direct-download route (/api/generate-report) and the post-purchase
  * email pipeline (generateAndEmailReport) call this instead of each
@@ -66,7 +66,7 @@ async function generate(lead: Lead): Promise<GeneratedDeliverable> {
 
   return {
     buffer:      Buffer.from(pdfBuffer),
-    filename:    `T3D-Sovereign-Report-${safeName}.pdf`,
+    filename:    `T3D-Base-Report-${safeName}.pdf`,
     contentType: 'application/pdf',
   };
 }

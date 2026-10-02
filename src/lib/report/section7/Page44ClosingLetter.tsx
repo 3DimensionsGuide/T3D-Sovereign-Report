@@ -183,7 +183,7 @@ export default function Page44ClosingLetter({ data }: Props) {
       </View>
 
       <View style={S.bottomStamp} fixed>
-        <Text style={S.stampText}>T3D Sovereign Report · 3dimensions.guide · privacy@3dimensions.guide</Text>
+        <Text style={S.stampText}>T3D Base Report · 3dimensions.guide · privacy@3dimensions.guide</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>

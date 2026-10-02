@@ -377,7 +377,7 @@ export default function Page3HowTo() {
 
       {/* Footer */}
       <View style={S.footer} fixed>
-        <Text style={S.footerText}>The Sovereign Report</Text>
+        <Text style={S.footerText}>The Base Report</Text>
         <Text style={S.pageNumber} render={({ pageNumber }) => pageNumber} />
       </View>
 

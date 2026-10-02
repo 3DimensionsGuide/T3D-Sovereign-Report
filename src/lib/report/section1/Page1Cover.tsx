@@ -7,7 +7,7 @@
  *   — Full-bleed charcoal #0D0D0E background
  *   — Three hairline rules (amber | emerald | crimson) across full width at top
  *   — Reader's first name in Playfair Display — the compositional hero
- *   — "The Sovereign Report" in DM Sans caps below a thin rule
+ *   — "The Base Report" in DM Sans caps below a thin rule
  *   — Date generated and "Prepared for [Full Name]" in small DM Sans
  *   — Small T3D mark at bottom center
  *   — No images, no icons, no sacred geometry
@@ -221,7 +221,7 @@ export default function Page1Cover({ data }: Props) {
         <View style={S.nameRule} />
 
         {/* Report title */}
-        <Text style={S.reportTitle}>The T3D Sovereign Report</Text>
+        <Text style={S.reportTitle}>The T3D Base Report</Text>
 
         {/* Three dimension labels */}
         <View style={S.triadRow}>

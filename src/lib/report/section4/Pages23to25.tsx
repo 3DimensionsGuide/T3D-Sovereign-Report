@@ -123,7 +123,7 @@ export function Page23Challenges({ data }: Page23Props) {
         </View>
       </View>
       <View style={S23.footer} fixed>
-        <Text style={S23.footerText}>The Sovereign Report</Text>
+        <Text style={S23.footerText}>The Base Report</Text>
         <Text style={S23.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
@@ -211,7 +211,7 @@ export function Page24RoadFriction({ data }: Page24Props) {
         </View>
       </View>
       <View style={S24.footer} fixed>
-        <Text style={S24.footerText}>The Sovereign Report</Text>
+        <Text style={S24.footerText}>The Base Report</Text>
         <Text style={S24.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
