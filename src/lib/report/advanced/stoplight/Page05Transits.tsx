@@ -91,6 +91,11 @@
  * Page03Bridges.tsx fixes its structurally identical gate-cards page: a
  * `fixed` running header repeats the primary eyebrow plus the section's
  * own tag/heading at the top of every physical page this shell produces.
+ * Reuses `sectionTag`/`heading`/`headingRule` verbatim rather than the
+ * smaller `upcomingSectionTag`/`upcomingHeading` pair used when this
+ * section instead flows inline below the active cards on one shared
+ * page -- so on its own page it reads as a full, standard page header,
+ * not a visibly thinner sub-section treatment.
  */
 
 import React from 'react';
@@ -222,7 +227,10 @@ const S = StyleSheet.create({
   missingText: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.82 },
 
   upcomingSection: { marginTop: 22 },
-  runningHeader: { marginBottom: 4 },
+  // Reuses sectionTag/heading/headingRule verbatim (see UPCOMING_RUNNING_HEADER
+  // below) -- no styles of its own -- so the split page's header is pixel-
+  // identical to every other page's, not a smaller "continuation" treatment.
+  runningHeader: {},
   upcomingDivider: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 16 },
   upcomingSectionTag: {
     fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 2,
@@ -467,9 +475,8 @@ export default function Page05Transits({ data }: Props) {
   const upcomingRunningHeader = (
     <View style={S.runningHeader} fixed>
       <Text style={S.sectionTag}>Advanced Sovereign Report · The Stoplight</Text>
-      <Text style={S.upcomingSectionTag}>Looking Ahead</Text>
-      <Text style={S.upcomingHeading}>What&rsquo;s Coming Next</Text>
-      <View style={S.upcomingDivider} />
+      <Text style={S.heading}>What&rsquo;s Coming Next</Text>
+      <View style={S.headingRule} />
     </View>
   );
 

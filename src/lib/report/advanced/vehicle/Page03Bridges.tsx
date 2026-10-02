@@ -54,7 +54,11 @@
  * footer below already uses for repeating on every physical page) fixes
  * this by construction: it repeats on every physical page this shell
  * produces, reflow included, so no page in this section is ever a
- * headerless orphan.
+ * headerless orphan. It reuses `sectionTag`/`heading`/`headingRule`
+ * verbatim rather than a separately-sized "sub-header" variant (an
+ * earlier pass here used a smaller heading and tighter spacing, which
+ * read as visibly thinner than every other page's header once printed)
+ * — so this page's chrome is pixel-identical to the rest of the report.
  */
 
 import React from 'react';
@@ -84,15 +88,12 @@ const S = StyleSheet.create({
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
 
   // Running header for the gate-cards shell — rendered `fixed`, so it
-  // repeats at the top of every physical page that shell produces. Sized
-  // down from the primary `heading` above: it's a continuation of "Where
-  // You Need a Bridge," not a new topic, so it reads as a sub-header
-  // rather than competing with the full page-opener treatment.
-  runningHeader: { marginBottom: 18 },
-  runningHeading: {
-    fontFamily: F.display, fontSize: 17, fontWeight: 400, color: C.base, lineHeight: 1.2, marginBottom: 10,
-  },
-  runningHeaderRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1 },
+  // repeats at the top of every physical page that shell produces. No
+  // styles of its own: it reuses `sectionTag` + `heading` + `headingRule`
+  // verbatim (see gateCardsRunningHeader below) so it reads as identical
+  // page chrome to every other page in the report, not a distinct,
+  // smaller "continuation" treatment.
+  runningHeader: {},
 
   mechanismBlock: {
     padding: 16, backgroundColor: '#F5F3EE',
@@ -237,11 +238,14 @@ export default function Page03Bridges({ data }: Props) {
   // in the docblock above. `fixed` repeats this at the top of every
   // physical page the second BridgesPageShell produces, including any
   // react-pdf reflow overflow page, so that page is never headerless.
+  // Reuses sectionTag/heading/headingRule verbatim (not a smaller,
+  // separately-styled variant) so this page's header is pixel-identical
+  // to every other page's, not a visibly thinner "continuation" treatment.
   const gateCardsRunningHeader = (
     <View style={S.runningHeader} fixed>
       <Text style={S.sectionTag}>Advanced Sovereign Report · The Vehicle</Text>
-      <Text style={S.runningHeading}>Your Bridge Gates</Text>
-      <View style={S.runningHeaderRule} />
+      <Text style={S.heading}>Your Bridge Gates</Text>
+      <View style={S.headingRule} />
     </View>
   );
 
