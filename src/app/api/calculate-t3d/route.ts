@@ -2,11 +2,9 @@
  * POST /api/calculate-t3d
  * Secure server-side calculation endpoint for the T3D Sovereign Calculator.
  *
- * Geocoding and timezone resolution use GeoNames (geonames.org) — a free,
- * no-billing-required service. When GEONAMES_USERNAME is not set, defaults
- * to New York coordinates so the full pipeline can be tested locally.
- * Register a free username at geonames.org and enable "free web services"
- * under Manage Account before using this in production.
+ * Geocoding and timezone resolution (including the GEONAMES_USERNAME
+ * fallback behavior) live in @/server/geocoding, shared with the admin
+ * repair route that re-geocodes an already-written lead.
  */
 
 import { NextResponse } from 'next/server';
@@ -15,6 +13,7 @@ import { leads } from '@/server/db/schema';
 import { calculateNumerology }  from '@/server/engines/numerology';
 import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
+import { resolveGeoAndTimezone } from '@/server/geocoding';
 import type { T3DCalculatorInput } from '@/server/engines/types';
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
@@ -27,81 +26,6 @@ function validateInput(body: Partial<T3DCalculatorInput>): string | null {
   if (!body.birthPlace?.city?.trim())    return 'birthPlace.city is required';
   if (!body.birthPlace?.country?.trim()) return 'birthPlace.country is required';
   return null;
-}
-
-// ─── GEOCODING ────────────────────────────────────────────────────────────────
-interface GeoResult {
-  latitude:  number;
-  longitude: number;
-  timezone:  string;
-}
-
-async function resolveGeoAndTimezone(
-  city: string,
-  country: string,
-  birthDate: string,
-): Promise<GeoResult> {
-  const username = process.env.GEONAMES_USERNAME;
-
-  // ── Fallback: no username — use New York for local testing ────────────────
-  if (!username) {
-    console.warn(
-      '[T3D] No GEONAMES_USERNAME set. Using New York defaults for local testing.\n' +
-      '      Add your GeoNames username to .env.local for accurate geocoding in production.'
-    );
-    return { latitude: 40.7128, longitude: -74.0060, timezone: 'America/New_York' };
-  }
-
-  // ── Geocoding — GeoNames search endpoint ───────────────────────────────────
-  const geoUrl = new URL('https://secure.geonames.org/searchJSON');
-  geoUrl.searchParams.set('q', `${city}, ${country}`);
-  geoUrl.searchParams.set('maxRows', '1');
-  geoUrl.searchParams.set('username', username);
-
-  const geoRes  = await fetch(geoUrl.toString(), { cache: 'no-store' });
-  const geoData = await geoRes.json() as {
-    geonames?: { lat: string; lng: string; name: string }[];
-    status?: { message: string; value: number };
-  };
-
-  if (geoData.status) {
-    throw new Error(`GeoNames geocoding failed: ${geoData.status.message}`);
-  }
-  if (!geoData.geonames || geoData.geonames.length === 0) {
-    throw new Error(`Geocoding failed: no results for "${city}, ${country}"`);
-  }
-
-  const latitude  = parseFloat(geoData.geonames[0].lat);
-  const longitude = parseFloat(geoData.geonames[0].lng);
-
-  // ── Timezone — GeoNames timezoneJSON endpoint ──────────────────────────────
-  // Returns the IANA timezone ID (e.g. "America/New_York") for this
-  // coordinate. The IANA string is what downstream code actually needs —
-  // localToJulianDay() uses it to correctly resolve the historically
-  // accurate UTC offset for the specific birth date, exactly as it did
-  // with Google's timeZoneId field previously. birthDate is accepted here
-  // for interface parity but the IANA identifier itself is date-independent.
-  void birthDate;
-
-  const tzUrl = new URL('https://secure.geonames.org/timezoneJSON');
-  tzUrl.searchParams.set('lat', String(latitude));
-  tzUrl.searchParams.set('lng', String(longitude));
-  tzUrl.searchParams.set('username', username);
-
-  const tzRes  = await fetch(tzUrl.toString(), { cache: 'no-store' });
-  const tzData = await tzRes.json() as {
-    timezoneId?: string;
-    status?: { message: string; value: number };
-  };
-
-  if (tzData.status) {
-    throw new Error(`GeoNames timezone lookup failed: ${tzData.status.message}`);
-  }
-  if (!tzData.timezoneId) {
-    throw new Error('Timezone lookup failed: no timezoneId returned');
-  }
-
-  return { latitude, longitude, timezone: tzData.timezoneId };
 }
 
 // ─── ROUTE HANDLER ────────────────────────────────────────────────────────────

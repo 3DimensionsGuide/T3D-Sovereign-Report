@@ -40,12 +40,37 @@
  *   every matching lead where it actually differs. Never touches
  *   results.astrology or results.numerology.
  *     /api/admin/recompute-human-design?email=someone@example.com&secret=YOUR_SECRET&apply=true
+ *
+ * RELOCATE MODE (?relocate=true) — a different, more serious repair.
+ * Some early leads were written while GEONAMES_USERNAME wasn't set in
+ * this deployment's environment, which makes /api/calculate-t3d's
+ * geocoding step silently fall back to New York City coordinates (see
+ * @/server/geocoding) instead of failing loudly. That doesn't just make
+ * the stored Human Design result wrong — it makes the stored ASTROLOGY
+ * result wrong too, since both read the same birthPlace coordinates.
+ * Fixing it means re-geocoding the lead's stored city/country, writing
+ * the corrected coordinates back into birthData.place, and recomputing
+ * both results.humanDesign and results.astrology against those
+ * corrected coordinates (results.numerology is untouched either way —
+ * it's derived from name and birth date only, never location).
+ *
+ *   Dry run — re-geocodes the stored city/country and shows what would
+ *   change (coordinates, timezone, and the resulting HD profile), writes
+ *   nothing:
+ *     /api/admin/recompute-human-design?id=2&secret=YOUR_SECRET&relocate=true
+ *
+ *   Apply — writes the corrected birthData.place plus freshly computed
+ *   results.humanDesign and results.astrology:
+ *     /api/admin/recompute-human-design?id=2&secret=YOUR_SECRET&relocate=true&apply=true
  */
 import { NextResponse } from 'next/server';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
+import type { Lead } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { calculateHumanDesign } from '@/server/engines/human_design';
+import { calculateAstrology } from '@/server/engines/astrology';
+import { resolveGeoAndTimezone } from '@/server/geocoding';
 
 type BirthData = {
   date: string;
@@ -85,6 +110,152 @@ function diffFields(oldObj: Record<string, unknown>, newObj: Record<string, unkn
   return changed;
 }
 
+// A lead's coordinates are "the same place" for repair purposes if
+// they're within ~11 meters (0.0001 degrees) of each other -- re-querying
+// the same city name against GeoNames twice should return identical
+// results, but this avoids flagging a repair as needed over float noise.
+const SAME_LOCATION_EPSILON = 0.0001;
+
+async function handleRelocate(
+  row: Lead,
+  apply: boolean,
+): Promise<Record<string, unknown>> {
+  const bd = row.birthData as BirthData;
+  if (!bd?.date || !bd?.time || !bd?.place?.city || !bd?.place?.country) {
+    return { leadId: row.id, email: row.email, error: 'birthData missing or malformed', birthData: row.birthData };
+  }
+
+  let regeocoded: { latitude: number; longitude: number; timezone: string };
+  try {
+    regeocoded = await resolveGeoAndTimezone(bd.place.city, bd.place.country, bd.date);
+  } catch (err) {
+    return { leadId: row.id, email: row.email, error: `re-geocoding failed: ${(err as Error).message}` };
+  }
+
+  const samePlace =
+    Math.abs(regeocoded.latitude  - bd.place.latitude)  < SAME_LOCATION_EPSILON &&
+    Math.abs(regeocoded.longitude - bd.place.longitude) < SAME_LOCATION_EPSILON &&
+    regeocoded.timezone === bd.place.timezone;
+
+  const base = {
+    leadId: row.id,
+    name: `${row.firstName} ${row.lastName}`,
+    email: row.email,
+    createdAt: row.createdAt,
+    storedPlace: bd.place,
+    regeocodedPlace: regeocoded,
+  };
+
+  if (samePlace) {
+    return {
+      ...base,
+      samePlace: true,
+      applied: false,
+      note: 'Re-geocoding this lead\'s stored city/country returns the same coordinates already on file — no relocation needed.',
+    };
+  }
+
+  const results = (row.results ?? { astrology: {}, numerology: {}, humanDesign: {} }) as HumanDesignResults;
+
+  let freshHD: Record<string, unknown>;
+  let freshAstrology: Record<string, unknown>;
+  try {
+    const engineInput = {
+      birthDate: bd.date,
+      birthTime: bd.time,
+      latitude:  regeocoded.latitude,
+      longitude: regeocoded.longitude,
+      timezone:  regeocoded.timezone,
+    };
+    freshHD = calculateHumanDesign(engineInput) as unknown as Record<string, unknown>;
+    freshAstrology = calculateAstrology(engineInput) as unknown as Record<string, unknown>;
+  } catch (err) {
+    return { ...base, samePlace: false, error: `recomputation failed: ${(err as Error).message}` };
+  }
+
+  let applied = false;
+  if (apply) {
+    const newBirthData: BirthData = {
+      ...bd,
+      place: { ...bd.place, ...regeocoded },
+    };
+    const newResults: HumanDesignResults = { ...results, humanDesign: freshHD, astrology: freshAstrology };
+    await db.update(leads)
+      .set({ birthData: newBirthData, results: newResults, updatedAt: new Date() })
+      .where(eq(leads.id, row.id));
+    applied = true;
+  }
+
+  return {
+    ...base,
+    samePlace: false,
+    storedProfile: (results.humanDesign ?? {})['profile'],
+    freshProfile: freshHD['profile'],
+    storedIncarnationCross: (results.humanDesign ?? {})['incarnationCross'],
+    freshIncarnationCross: freshHD['incarnationCross'],
+    applied,
+    note: apply
+      ? 'birthData.place, results.humanDesign, and results.astrology were all updated to the re-geocoded coordinates. results.numerology was left untouched (it never depends on location).'
+      : 'Coordinates differ from what\'s stored — add &apply=true to write the correction (updates birthData.place, results.humanDesign, and results.astrology).',
+  };
+}
+
+async function handleRecompute(
+  row: Lead,
+  apply: boolean,
+): Promise<Record<string, unknown>> {
+  const bd = row.birthData as BirthData;
+  if (!bd?.date || !bd?.time || !bd?.place) {
+    return { leadId: row.id, email: row.email, error: 'birthData missing or malformed', birthData: row.birthData };
+  }
+
+  const results = (row.results ?? { astrology: {}, numerology: {}, humanDesign: {} }) as HumanDesignResults;
+  const storedHD = results.humanDesign ?? {};
+
+  let freshHD: Record<string, unknown>;
+  try {
+    freshHD = calculateHumanDesign({
+      birthDate: bd.date,
+      birthTime: bd.time,
+      latitude: bd.place.latitude,
+      longitude: bd.place.longitude,
+      timezone: bd.place.timezone,
+    }) as unknown as Record<string, unknown>;
+  } catch (err) {
+    return { leadId: row.id, email: row.email, error: `recomputation failed: ${(err as Error).message}` };
+  }
+
+  const changedFields = diffFields(storedHD, freshHD);
+  const matches = changedFields.length === 0;
+
+  let applied = false;
+  if (apply && !matches) {
+    const newResults: HumanDesignResults = { ...results, humanDesign: freshHD };
+    await db.update(leads)
+      .set({ results: newResults, updatedAt: new Date() })
+      .where(eq(leads.id, row.id));
+    applied = true;
+  }
+
+  return {
+    leadId: row.id,
+    name: `${row.firstName} ${row.lastName}`,
+    email: row.email,
+    createdAt: row.createdAt,
+    birthData: bd,
+    matches,
+    changedFields,
+    stored: storedHD,
+    fresh: freshHD,
+    applied,
+    note: matches
+      ? 'Stored results.humanDesign already agrees with the current engine — no change needed.'
+      : apply
+        ? 'results.humanDesign updated. astrology and numerology were left untouched.'
+        : 'Mismatch found but not applied — add &apply=true to write it.',
+  };
+}
+
 export async function GET(request: Request): Promise<NextResponse> {
   const url = new URL(request.url);
   const secret = url.searchParams.get('secret');
@@ -103,6 +274,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   const emailParam = url.searchParams.get('email');
   const idParam = url.searchParams.get('id');
   const apply = url.searchParams.get('apply') === 'true';
+  const relocate = url.searchParams.get('relocate') === 'true';
 
   if (!emailParam && !idParam) {
     return NextResponse.json(
@@ -119,62 +291,13 @@ export async function GET(request: Request): Promise<NextResponse> {
     return NextResponse.json({ matched: 0, leads: [] }, { status: 200 });
   }
 
-  const out: unknown[] = [];
-
+  const out: Record<string, unknown>[] = [];
   for (const row of rows) {
-    const bd = row.birthData as BirthData;
-    if (!bd?.date || !bd?.time || !bd?.place) {
-      out.push({ leadId: row.id, email: row.email, error: 'birthData missing or malformed', birthData: row.birthData });
-      continue;
-    }
-
-    const results = (row.results ?? { astrology: {}, numerology: {}, humanDesign: {} }) as HumanDesignResults;
-    const storedHD = results.humanDesign ?? {};
-
-    let freshHD: Record<string, unknown>;
-    try {
-      freshHD = calculateHumanDesign({
-        birthDate: bd.date,
-        birthTime: bd.time,
-        latitude: bd.place.latitude,
-        longitude: bd.place.longitude,
-        timezone: bd.place.timezone,
-      }) as unknown as Record<string, unknown>;
-    } catch (err) {
-      out.push({ leadId: row.id, email: row.email, error: `recomputation failed: ${(err as Error).message}` });
-      continue;
-    }
-
-    const changedFields = diffFields(storedHD, freshHD);
-    const matches = changedFields.length === 0;
-
-    let applied = false;
-    if (apply && !matches) {
-      const newResults: HumanDesignResults = { ...results, humanDesign: freshHD };
-      await db.update(leads)
-        .set({ results: newResults as unknown as HumanDesignResults, updatedAt: new Date() })
-        .where(eq(leads.id, row.id));
-      applied = true;
-    }
-
-    out.push({
-      leadId: row.id,
-      name: `${row.firstName} ${row.lastName}`,
-      email: row.email,
-      createdAt: row.createdAt,
-      birthData: bd,
-      matches,
-      changedFields,
-      stored: storedHD,
-      fresh: freshHD,
-      applied,
-      note: matches
-        ? 'Stored results.humanDesign already agrees with the current engine — no change needed.'
-        : apply
-          ? 'results.humanDesign updated. astrology and numerology were left untouched.'
-          : 'Mismatch found but not applied — add &apply=true to write it.',
-    });
+    out.push(relocate ? await handleRelocate(row, apply) : await handleRecompute(row, apply));
   }
 
-  return NextResponse.json({ matched: rows.length, mode: apply ? 'apply' : 'dry-run', leads: out }, { status: 200 });
+  return NextResponse.json(
+    { matched: rows.length, mode: `${relocate ? 'relocate' : 'recompute'}/${apply ? 'apply' : 'dry-run'}`, leads: out },
+    { status: 200 },
+  );
 }
