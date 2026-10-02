@@ -29,16 +29,32 @@
  * is its OWN bordered card with its own `wrap={false}` +
  * `minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}` and its own "Bridge Gate
  * N of M" label, so a gate card always carries its own identification no
- * matter which page it lands on. The section label ("Your Bridge Gate(s)")
- * is grouped into one atomic unit with the first gate card specifically so
- * the label can never be stranded alone at the bottom of a page while its
- * first card moves to the next one.
+ * matter which page it lands on. When more than one bridge pairing has
+ * hanging gates, the first card of each pairing's group also carries that
+ * pairing's own identity (e.g. "Throat + Sacral ↔ Spleen + Root") so a
+ * reader can tell which pairing a run of gate cards belongs to.
  *
  * Page split (see BRIDGES_PAGE_SPLIT below): the intro card(s) and the
  * gate card(s) render as genuinely separate top-level <Page> elements
  * rather than sharing one <Page>'s auto-flow — fixes a reproducible
  * "blank page between two independent forced breaks" bug (same root
  * cause Page05Transits.tsx's docblock documents).
+ *
+ * GATE_CARDS_RUNNING_HEADER: the gate-cards page used to open with
+ * whatever content happened to flow onto it and nothing else — no page
+ * eyebrow, no title. That's invisible when every gate card fits on one
+ * physical page (the pairing-identity label, when present, reads as a
+ * header). But when the cards overflow react-pdf's own internal reflow
+ * onto a further physical page (confirmed on a real report: three hanging
+ * gates on one narrow split pushed the third card onto its own page), that
+ * further page had literally nothing above the card — no section context,
+ * no title, just a bordered box floating near the top of an otherwise
+ * blank page. A `fixed` header placed at the top of this shell's content
+ * (the standard react-pdf idiom for a running header, same mechanism the
+ * footer below already uses for repeating on every physical page) fixes
+ * this by construction: it repeats on every physical page this shell
+ * produces, reflow included, so no page in this section is ever a
+ * headerless orphan.
  */
 
 import React from 'react';
@@ -66,6 +82,17 @@ const S = StyleSheet.create({
     lineHeight: 1.5, marginBottom: 20, maxWidth: 420,
   },
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
+
+  // Running header for the gate-cards shell — rendered `fixed`, so it
+  // repeats at the top of every physical page that shell produces. Sized
+  // down from the primary `heading` above: it's a continuation of "Where
+  // You Need a Bridge," not a new topic, so it reads as a sub-header
+  // rather than competing with the full page-opener treatment.
+  runningHeader: { marginBottom: 18 },
+  runningHeading: {
+    fontFamily: F.display, fontSize: 17, fontWeight: 400, color: C.base, lineHeight: 1.2, marginBottom: 10,
+  },
+  runningHeaderRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1 },
 
   mechanismBlock: {
     padding: 16, backgroundColor: '#F5F3EE',
@@ -206,6 +233,18 @@ export default function Page03Bridges({ data }: Props) {
     </>
   );
 
+  // Running header for the gate-cards shell — see GATE_CARDS_RUNNING_HEADER
+  // in the docblock above. `fixed` repeats this at the top of every
+  // physical page the second BridgesPageShell produces, including any
+  // react-pdf reflow overflow page, so that page is never headerless.
+  const gateCardsRunningHeader = (
+    <View style={S.runningHeader} fixed>
+      <Text style={S.sectionTag}>Advanced Sovereign Report · The Vehicle</Text>
+      <Text style={S.runningHeading}>Your Bridge Gates</Text>
+      <View style={S.runningHeaderRule} />
+    </View>
+  );
+
   // Dedupe + classify once per bridge pairing, shared by both the intro
   // cards and the gate cards below.
   const prepared = bridges.map((bridge) => ({
@@ -215,6 +254,7 @@ export default function Page03Bridges({ data }: Props) {
       : [],
   }));
   const hasAnyGateCards = prepared.some(p => p.dedupedGates.length > 0);
+  const gatedPairingsCount = prepared.filter(p => p.dedupedGates.length > 0).length;
 
   const introCards = prepared.map(({ bridge }, i) => (
     <View key={i} style={S.introCard} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
@@ -241,61 +281,71 @@ export default function Page03Bridges({ data }: Props) {
   // fresh page is its own independent, wrap={false} unit with its own
   // border. Spacing between cards comes from each card's own marginBottom
   // instead of a parent `gap`.
-  const gateCardSections = prepared.map(({ dedupedGates }, i) => (
-    <React.Fragment key={i}>
-      {dedupedGates.map((hg, hi) => {
-        const partnerKeynote = GATE_KEYNOTES[hg.partnerGate];
-        const auric = HANGING_GATE_AURIC_DETAIL[hg.partnerGate];
-        const card = (
-          <View key={hi} style={S.gateCard} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
-            {dedupedGates.length > 1 && (
-              <Text style={S.gateCardTag}>Bridge Gate {hi + 1} of {dedupedGates.length}</Text>
-            )}
-            <Text style={S.hangingGateText}>
-              Gate {hg.partnerGate}{partnerKeynote ? ` — ${partnerKeynote.ichingName}` : ''}
-              {partnerKeynote ? `: ${partnerKeynote.coreMeaning}` : ''}
-            </Text>
-            {auric && (
-              <>
-                <Text style={S.auricSubLabel}>Where It Sits</Text>
-                <Text style={S.auricText}>{auric.location}</Text>
-                <Text style={S.auricSubLabel}>Its Channels</Text>
-                <Text style={S.auricText}>{auric.channels}</Text>
-                <Text style={S.auricSubLabel}>What You&rsquo;d Feel Around It</Text>
-                <Text style={S.auricText}>{auric.experience}</Text>
-              </>
-            )}
-          </View>
-        );
+  //
+  // The page now opens with a running "Your Bridge Gates" header (see
+  // gateCardsRunningHeader above), so the per-pairing label below only
+  // needs to appear when there's more than one gated pairing to tell
+  // apart — a lone pairing (the common case) would just repeat the
+  // running header's own title.
+  const gateCardSections = prepared.map(({ bridge, dedupedGates }, i) => {
+    const pairingLabel = gatedPairingsCount > 1
+      ? `${groupLabel(bridge.groupAIndex)} ${'↔'} ${groupLabel(bridge.groupBIndex)}`
+      : null;
 
-        // The section label is grouped into one atomic unit with the
-        // FIRST gate card only, so it can never be stranded alone at the
-        // bottom of a page while its card moves to the next one --
-        // later cards paginate independently.
-        if (hi === 0) {
-          return (
-            <View key="gate-group-first" wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
-              <Text style={S.gateCardsLabel}>
-                {dedupedGates.length > 1 ? 'Your Bridge Gates' : 'Your Bridge Gate'}
+    return (
+      <React.Fragment key={i}>
+        {dedupedGates.map((hg, hi) => {
+          const partnerKeynote = GATE_KEYNOTES[hg.partnerGate];
+          const auric = HANGING_GATE_AURIC_DETAIL[hg.partnerGate];
+          const card = (
+            <View key={hi} style={S.gateCard} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
+              {dedupedGates.length > 1 && (
+                <Text style={S.gateCardTag}>Bridge Gate {hi + 1} of {dedupedGates.length}</Text>
+              )}
+              <Text style={S.hangingGateText}>
+                Gate {hg.partnerGate}{partnerKeynote ? ` — ${partnerKeynote.ichingName}` : ''}
+                {partnerKeynote ? `: ${partnerKeynote.coreMeaning}` : ''}
               </Text>
-              {card}
+              {auric && (
+                <>
+                  <Text style={S.auricSubLabel}>Where It Sits</Text>
+                  <Text style={S.auricText}>{auric.location}</Text>
+                  <Text style={S.auricSubLabel}>Its Channels</Text>
+                  <Text style={S.auricText}>{auric.channels}</Text>
+                  <Text style={S.auricSubLabel}>What You&rsquo;d Feel Around It</Text>
+                  <Text style={S.auricText}>{auric.experience}</Text>
+                </>
+              )}
             </View>
           );
-        }
-        return card;
-      })}
-    </React.Fragment>
-  ));
+
+          // The pairing label (when shown) is grouped into one atomic unit
+          // with the FIRST gate card of its pairing only, so it can never
+          // be stranded alone at the bottom of a page while its card moves
+          // to the next one -- later cards paginate independently.
+          if (hi === 0 && pairingLabel) {
+            return (
+              <View key="gate-group-first" wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
+                <Text style={S.gateCardsLabel}>{pairingLabel}</Text>
+                {card}
+              </View>
+            );
+          }
+          return card;
+        })}
+      </React.Fragment>
+    );
+  });
 
   // BRIDGES_PAGE_SPLIT: the intro card(s) and the gate card(s) used to
   // share one <Page>'s auto-flow. Even though the intro card alone always
   // leaves most of the page empty, react-pdf's pagination has to decide,
   // in the same pass, whether the *next* independent wrap={false} unit
-  // (the "Your Bridge Gate(s)" + first card group) fits in what's left —
-  // and if it doesn't, defers the whole thing to a fresh page rather than
-  // splitting it. That is one legitimate forced break. But the remaining
-  // gate cards after it can *also* need their own break if there are
-  // enough of them (observed: 3 hanging gates on a narrow split). Two
+  // (the first gate card, or its pairing-label group) fits in what's left
+  // — and if it doesn't, defers the whole thing to a fresh page rather
+  // than splitting it. That is one legitimate forced break. But the
+  // remaining gate cards after it can *also* need their own break if there
+  // are enough of them (observed: 3 hanging gates on a narrow split). Two
   // independent forced breaks inside one react-pdf pagination pass is
   // exactly the bug Page05Transits.tsx's docblock documents at length:
   // react-pdf reproducibly inserts one fully blank page between the two
@@ -314,7 +364,10 @@ export default function Page03Bridges({ data }: Props) {
         {introCards}
       </BridgesPageShell>
       {hasAnyGateCards && (
-        <BridgesPageShell>{gateCardSections}</BridgesPageShell>
+        <BridgesPageShell>
+          {gateCardsRunningHeader}
+          {gateCardSections}
+        </BridgesPageShell>
       )}
     </>
   );

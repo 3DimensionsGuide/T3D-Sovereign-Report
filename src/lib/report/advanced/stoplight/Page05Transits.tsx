@@ -83,6 +83,14 @@
  * route, trimming the mock upcoming list card by card) to paginate
  * cleanly. On an ordinary day (fewer than 3 active transits) nothing
  * changes — everything still renders as one page, auto-flowing normally.
+ *
+ * UPCOMING_RUNNING_HEADER: the split "Looking Ahead" page used to open
+ * with only its own inline tag/heading (no primary page eyebrow, and no
+ * repeat of that tag/heading if upcoming cards ever overflowed react-pdf's
+ * own reflow past the shell's first physical page). Fixed the same way
+ * Page03Bridges.tsx fixes its structurally identical gate-cards page: a
+ * `fixed` running header repeats the primary eyebrow plus the section's
+ * own tag/heading at the top of every physical page this shell produces.
  */
 
 import React from 'react';
@@ -214,6 +222,7 @@ const S = StyleSheet.create({
   missingText: { fontFamily: F.sans, fontSize: 10.5, fontWeight: 300, color: C.base, lineHeight: 1.5, opacity: 0.82 },
 
   upcomingSection: { marginTop: 22 },
+  runningHeader: { marginBottom: 4 },
   upcomingDivider: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 16 },
   upcomingSectionTag: {
     fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 2,
@@ -379,57 +388,88 @@ export default function Page05Transits({ data }: Props) {
     </>
   );
 
+  // Shared between the merged (same-page) and split (own-page) layouts
+  // below -- pulled out so neither has to duplicate the subtext or the
+  // card list/empty-state.
+  const upcomingSubtextNode = (
+    <Text style={S.upcomingSubtext}>
+      {upcoming.length > 1
+        ? 'The next major transits on the horizon — not active yet, but the ones to watch for once the current picture above shifts.'
+        : 'The next major transit on the horizon — not active yet, but the one to watch for once the current picture above shifts.'}
+    </Text>
+  );
+
+  const upcomingCardsContent = upcoming.length > 0 ? (
+    // Same flattening as the active-transit cards above — no
+    // intermediate `stack` wrapper.
+    upcoming.map((next, i) => {
+        const upcomingHouse = getPlanetHouse(next.transitingSign, data.tropicalAsc);
+        const upcomingInterpretation = getTransitInterpretation(next, upcomingHouse);
+        return (
+          <View style={[S.card, S.upcomingCard]} key={i} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
+            <View style={S.cardHeaderRow}>
+              <Text style={S.titleText}>
+                {getPlanetLabel(next.transitingPlanet)} {getAspectLabel(next.aspect)}
+              </Text>
+              <Text style={S.targetText}>&rarr; Your {NATAL_TARGET_LABELS[next.natalTarget]}</Text>
+              <Text style={[S.pill, S.pillNature]}>{ASPECT_NATURE[next.aspect]}</Text>
+              <Text style={[S.pill, S.pillUpcoming]}>Not Yet Active</Text>
+            </View>
+            <View style={S.timeframeRow}>
+              <Text style={S.timeframeLabel}>Arrives</Text>
+              <Text style={S.timeframeText}>{formatTransitWindow(next.window)}</Text>
+            </View>
+            <Text style={S.interpretationText}>{upcomingInterpretation}</Text>
+            <View style={S.metaRow}>
+              <Text style={S.metaText}>
+                Transiting {getPlanetLabel(next.transitingPlanet)} in {next.transitingSign} at entry
+                {upcomingHouse !== null ? ` · ${HOUSE_NAMES[upcomingHouse]} (House ${upcomingHouse})` : ''}
+              </Text>
+            </View>
+          </View>
+        );
+    })
+  ) : (
+    <View style={S.noneUpcomingBlock}>
+      <Text style={S.noneUpcomingText}>
+        None of the five timing planets are projected to reach your Sun, Moon, or
+        Ascendant within the next decade. The slowest planets — Neptune and Pluto in
+        particular — only sweep a small arc of the sky over that span, so this reflects
+        where they are in their long cycle, not a gap in the reading.
+      </Text>
+    </View>
+  );
+
+  // Merged case (ordinary day, everything fits on one page): "Looking
+  // Ahead" flows right after the active cards on the same physical page,
+  // so its own tag/heading/divider only ever need to appear once, inline.
   const upcomingSection = hasAsc && (
     <View style={S.upcomingSection}>
       <View style={S.upcomingDivider} />
       <Text style={S.upcomingSectionTag}>Looking Ahead</Text>
       <Text style={S.upcomingHeading}>What&rsquo;s Coming Next</Text>
-      <Text style={S.upcomingSubtext}>
-        {upcoming.length > 1
-          ? 'The next major transits on the horizon — not active yet, but the ones to watch for once the current picture above shifts.'
-          : 'The next major transit on the horizon — not active yet, but the one to watch for once the current picture above shifts.'}
-      </Text>
+      {upcomingSubtextNode}
+      {upcomingCardsContent}
+    </View>
+  );
 
-      {upcoming.length > 0 ? (
-        // Same flattening as the active-transit cards above — no
-        // intermediate `stack` wrapper.
-        upcoming.map((next, i) => {
-            const upcomingHouse = getPlanetHouse(next.transitingSign, data.tropicalAsc);
-            const upcomingInterpretation = getTransitInterpretation(next, upcomingHouse);
-            return (
-              <View style={[S.card, S.upcomingCard]} key={i} wrap={false} minPresenceAhead={CARD_MIN_PRESENCE_AHEAD}>
-                <View style={S.cardHeaderRow}>
-                  <Text style={S.titleText}>
-                    {getPlanetLabel(next.transitingPlanet)} {getAspectLabel(next.aspect)}
-                  </Text>
-                  <Text style={S.targetText}>&rarr; Your {NATAL_TARGET_LABELS[next.natalTarget]}</Text>
-                  <Text style={[S.pill, S.pillNature]}>{ASPECT_NATURE[next.aspect]}</Text>
-                  <Text style={[S.pill, S.pillUpcoming]}>Not Yet Active</Text>
-                </View>
-                <View style={S.timeframeRow}>
-                  <Text style={S.timeframeLabel}>Arrives</Text>
-                  <Text style={S.timeframeText}>{formatTransitWindow(next.window)}</Text>
-                </View>
-                <Text style={S.interpretationText}>{upcomingInterpretation}</Text>
-                <View style={S.metaRow}>
-                  <Text style={S.metaText}>
-                    Transiting {getPlanetLabel(next.transitingPlanet)} in {next.transitingSign} at entry
-                    {upcomingHouse !== null ? ` · ${HOUSE_NAMES[upcomingHouse]} (House ${upcomingHouse})` : ''}
-                  </Text>
-                </View>
-              </View>
-            );
-        })
-      ) : (
-        <View style={S.noneUpcomingBlock}>
-          <Text style={S.noneUpcomingText}>
-            None of the five timing planets are projected to reach your Sun, Moon, or
-            Ascendant within the next decade. The slowest planets — Neptune and Pluto in
-            particular — only sweep a small arc of the sky over that span, so this reflects
-            where they are in their long cycle, not a gap in the reading.
-          </Text>
-        </View>
-      )}
+  // UPCOMING_RUNNING_HEADER: split case only. This section becomes its own
+  // top-level <Page> (see PAGE05TRANSITS_SPLIT above), so unlike the
+  // merged case it can no longer rely on anything above it on the same
+  // page for context -- and if enough upcoming transits are live to push
+  // react-pdf's own reflow past this shell's first physical page, that
+  // further page would otherwise open with a bare card and nothing above
+  // it, the same orphaned-page defect fixed in Page03Bridges.tsx (see its
+  // GATE_CARDS_RUNNING_HEADER note). `fixed` repeats this block at the
+  // top of every physical page this shell produces, reflow included, and
+  // it also carries the primary page eyebrow this section otherwise never
+  // gets when split onto its own page.
+  const upcomingRunningHeader = (
+    <View style={S.runningHeader} fixed>
+      <Text style={S.sectionTag}>Advanced Sovereign Report · The Stoplight</Text>
+      <Text style={S.upcomingSectionTag}>Looking Ahead</Text>
+      <Text style={S.upcomingHeading}>What&rsquo;s Coming Next</Text>
+      <View style={S.upcomingDivider} />
     </View>
   );
 
@@ -440,7 +480,11 @@ export default function Page05Transits({ data }: Props) {
           {header}
           {activeSection}
         </TransitsPageShell>
-        <TransitsPageShell>{upcomingSection}</TransitsPageShell>
+        <TransitsPageShell>
+          {upcomingRunningHeader}
+          {upcomingSubtextNode}
+          {upcomingCardsContent}
+        </TransitsPageShell>
       </>
     );
   }
