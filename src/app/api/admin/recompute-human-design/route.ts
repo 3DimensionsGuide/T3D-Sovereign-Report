@@ -59,11 +59,28 @@ type HumanDesignResults = {
   humanDesign: Record<string, unknown>;
 };
 
+// Plain JSON.stringify compares by key INSERTION order, not value --
+// {a:1,b:2} and {b:2,a:1} stringify to different text despite being the
+// same object, and that's exactly the shape stored.results.humanDesign
+// vs. a freshly recomputed one take (different code paths built the same
+// gate/channel objects with their keys in different order). Sort keys
+// recursively before comparing so this only flags an actual value
+// difference, not key order.
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    const keys = Object.keys(obj).sort();
+    return `{${keys.map(k => `${JSON.stringify(k)}:${stableStringify(obj[k])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
 function diffFields(oldObj: Record<string, unknown>, newObj: Record<string, unknown>): string[] {
   const keys = new Set([...Object.keys(oldObj ?? {}), ...Object.keys(newObj ?? {})]);
   const changed: string[] = [];
   for (const key of keys) {
-    if (JSON.stringify(oldObj?.[key]) !== JSON.stringify(newObj?.[key])) changed.push(key);
+    if (stableStringify(oldObj?.[key]) !== stableStringify(newObj?.[key])) changed.push(key);
   }
   return changed;
 }
