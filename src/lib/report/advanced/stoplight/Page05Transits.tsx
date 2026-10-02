@@ -153,6 +153,13 @@ const S = StyleSheet.create({
   },
   crimsonLine: { width: PAGE.width, height: 1.5, backgroundColor: C.crimson },
   content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  // Used only by the split-page shell below, together with `runningHeader`'s
+  // own marginTop — see that style's comment (and Page03Bridges.tsx's
+  // matching contentFlushTop) for why: content's paddingTop is a page-
+  // fragment edge react-pdf only honors on a View's first physical-page
+  // fragment, so the `fixed` header inside it rendered flush against the
+  // top on any reflowed continuation page instead of 40pt down.
+  contentFlushTop: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 0 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -228,9 +235,13 @@ const S = StyleSheet.create({
 
   upcomingSection: { marginTop: 22 },
   // Reuses sectionTag/heading/headingRule verbatim (see UPCOMING_RUNNING_HEADER
-  // below) -- no styles of its own -- so the split page's header is pixel-
-  // identical to every other page's, not a smaller "continuation" treatment.
-  runningHeader: {},
+  // below) so the split page's header is pixel-identical to every other
+  // page's, not a smaller "continuation" treatment. Paired with
+  // contentFlushTop above: the 40pt top gap lives here as marginTop
+  // (re-applied in full every time `fixed` repeats this block) rather
+  // than on the content box, whose own paddingTop silently drops on a
+  // reflowed continuation page.
+  runningHeader: { marginTop: 40 },
   upcomingDivider: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 16 },
   upcomingSectionTag: {
     fontFamily: F.sans, fontSize: 8, fontWeight: 500, letterSpacing: 2,
@@ -285,12 +296,12 @@ interface Props {
 // in. Pulled out so the component below can render either one page (the
 // ordinary case) or two (see PAGE05TRANSITS_SPLIT note) without
 // duplicating the surrounding markup.
-function TransitsPageShell({ children }: { children: React.ReactNode }) {
+function TransitsPageShell({ children, flushTop = false }: { children: React.ReactNode; flushTop?: boolean }) {
   return (
     <Page size="LETTER" style={S.page}>
       <TechnicalLines />
       <View style={S.crimsonLine} />
-      <View style={S.content}>{children}</View>
+      <View style={flushTop ? S.contentFlushTop : S.content}>{children}</View>
       <View style={S.footer} fixed>
         <Text style={S.footerText}>T3D Advanced Sovereign Report</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
@@ -487,7 +498,7 @@ export default function Page05Transits({ data }: Props) {
           {header}
           {activeSection}
         </TransitsPageShell>
-        <TransitsPageShell>
+        <TransitsPageShell flushTop>
           {upcomingRunningHeader}
           {upcomingSubtextNode}
           {upcomingCardsContent}

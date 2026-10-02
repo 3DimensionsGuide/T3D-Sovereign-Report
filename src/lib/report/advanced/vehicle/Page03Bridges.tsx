@@ -73,6 +73,19 @@ const S = StyleSheet.create({
   page: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: PAGE.marginV, backgroundColor: '#F5F5F3', fontFamily: F.sans }, // QA fix: explicit edges, no padding shorthand (see Page05Transits.tsx)
   amberLine: { width: PAGE.width, height: 1.5, backgroundColor: C.amber },
   content: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 40 },
+  // Used only by the gate-cards shell below, together with `runningHeader`'s
+  // own marginTop. content's normal paddingTop:40 is a page-fragment edge —
+  // react-pdf only honors a View's top padding on the FIRST physical-page
+  // fragment of that View, not on a reflowed continuation fragment (the
+  // same "box-decoration-break: slice" behavior print CSS uses). That's
+  // invisible for ordinary body copy, but the running header is a `fixed`
+  // child of this box, so on a continuation page it was computed flush
+  // against content's top edge with no padding at all — hugging the gold
+  // line instead of sitting 40pt down like every other page's header. The
+  // fix moves the 40pt gap onto the header itself (a plain marginTop,
+  // which IS re-applied in full on every page `fixed` repeats it on) and
+  // zeroes it here so the two don't stack.
+  contentFlushTop: { flex: 1, paddingHorizontal: PAGE.marginH, paddingTop: 0 },
 
   sectionTag: {
     fontFamily: F.sans, fontSize: 8.5, fontWeight: 500,
@@ -88,12 +101,14 @@ const S = StyleSheet.create({
   headingRule: { width: PAGE.contentWidth, height: 0.5, backgroundColor: C.base, opacity: 0.1, marginBottom: 24 },
 
   // Running header for the gate-cards shell — rendered `fixed`, so it
-  // repeats at the top of every physical page that shell produces. No
-  // styles of its own: it reuses `sectionTag` + `heading` + `headingRule`
-  // verbatim (see gateCardsRunningHeader below) so it reads as identical
-  // page chrome to every other page in the report, not a distinct,
-  // smaller "continuation" treatment.
-  runningHeader: {},
+  // repeats at the top of every physical page that shell produces, paired
+  // with `contentFlushTop` above (see that style's comment for why the
+  // 40pt top gap lives here, as marginTop, rather than on the content box
+  // it sits in). Otherwise no styles of its own: it reuses `sectionTag` +
+  // `heading` + `headingRule` verbatim (see gateCardsRunningHeader below)
+  // so it reads as identical page chrome to every other page in the
+  // report, not a distinct, smaller "continuation" treatment.
+  runningHeader: { marginTop: 40 },
 
   mechanismBlock: {
     padding: 16, backgroundColor: '#F5F3EE',
@@ -182,12 +197,12 @@ export function hasBridgePage(data: Props['data']): boolean {
 // passed in. Pulled out so the component below can render the intro
 // card(s) and the gate card(s) as genuinely separate <Page> elements —
 // see the docblock note on BRIDGES_PAGE_SPLIT below for why.
-function BridgesPageShell({ children }: { children: React.ReactNode }) {
+function BridgesPageShell({ children, flushTop = false }: { children: React.ReactNode; flushTop?: boolean }) {
   return (
     <Page size="LETTER" style={S.page}>
       <TechnicalLines />
       <View style={S.amberLine} />
-      <View style={S.content}>{children}</View>
+      <View style={flushTop ? S.contentFlushTop : S.content}>{children}</View>
       <View style={S.footer} fixed>
         <Text style={S.footerText}>T3D Advanced Sovereign Report</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
@@ -368,7 +383,7 @@ export default function Page03Bridges({ data }: Props) {
         {introCards}
       </BridgesPageShell>
       {hasAnyGateCards && (
-        <BridgesPageShell>
+        <BridgesPageShell flushTop>
           {gateCardsRunningHeader}
           {gateCardSections}
         </BridgesPageShell>
