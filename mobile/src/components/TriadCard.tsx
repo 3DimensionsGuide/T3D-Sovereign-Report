@@ -1,0 +1,63 @@
+import { StyleSheet, Text, View } from 'react-native';
+import { colors, fonts, radius, space } from '@/theme/tokens';
+
+export interface TriadRow {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  /** The accent color for this system (amber / emerald / crimson). */
+  accent: string;
+  /** Shape glyph — a second signal beyond color. */
+  glyph: string;
+  metaphor: 'THE VEHICLE' | 'THE ROAD' | 'THE STOPLIGHT';
+  system: string;
+  rows: TriadRow[];
+}
+
+export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${metaphor}, ${system}. ${rows.map((r) => `${r.label}: ${r.value}`).join('. ')}`}
+      style={[styles.card, { borderLeftColor: accent }]}
+    >
+      <View style={styles.header}>
+        <Text style={[styles.glyph, { color: accent }]}>{glyph}</Text>
+        <View>
+          <Text style={styles.metaphor}>{metaphor}</Text>
+          <Text style={styles.system}>{system}</Text>
+        </View>
+      </View>
+      <View style={styles.rows}>
+        {rows.map((row) => (
+          <View key={row.label} style={styles.row}>
+            <Text style={styles.rowLabel}>{row.label}</Text>
+            <Text style={styles.rowValue}>{row.value}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.charcoal,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    borderLeftWidth: 4,
+    padding: space.lg,
+    gap: space.md,
+  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  glyph: { fontSize: 26 },
+  metaphor: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
+  system: { fontFamily: fonts.display, fontSize: 22, color: colors.parchment },
+  rows: { gap: 10 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: space.md },
+  rowLabel: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted, flexShrink: 0 },
+  rowValue: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment, textAlign: 'right', flexShrink: 1 },
+});
