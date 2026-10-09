@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import { Redirect, router, type Href } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
@@ -136,6 +136,7 @@ export default function Chart() {
 
       <FadeIn delay={400}>
         <View style={styles.actions}>
+          <GoldButton label="SHARE YOUR T3D CARD" onPress={() => router.push('/share-card' as Href)} />
           <GoldButton label="GLOSSARY · TAP ANY TERM" variant="ghost" onPress={() => router.push('/glossary')} />
           <GoldButton label="EDIT BIRTH DETAILS" variant="ghost" onPress={() => router.push('/onboarding')} />
         </View>
