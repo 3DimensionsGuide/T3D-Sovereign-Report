@@ -40,10 +40,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="numerology"
+        name="readings"
         options={{
-          title: 'Numerology',
-          tabBarIcon: ({ color }) => <TabGlyph glyph="▲" color={color} />,
+          title: 'Readings',
+          tabBarIcon: ({ color }) => <TabGlyph glyph="◈" color={color} />,
         }}
       />
       <Tabs.Screen

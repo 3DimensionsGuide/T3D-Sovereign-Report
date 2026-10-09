@@ -2,6 +2,7 @@ import type { ChartDrawingData } from '@/charts/chartTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
 import type { NumerologyDetail } from '@/lib/numerologyTypes';
 import type { TimelineResult } from '@/lib/timelineTypes';
+import type { VehicleDetail } from '@/lib/vehicleTypes';
 /**
  * Talks to the T3D website's secure calculation endpoint.
  *
@@ -361,6 +362,38 @@ export async function requestDayNumerology(
   }
   if (!payload.success) {
     throw new ChartRequestError(payload.error || 'Could not load today’s numerology. Please try again.');
+  }
+  return payload.data;
+}
+
+/** Full Vehicle (Human Design) interpretations for the Readings tab. */
+export async function requestVehicle(leadId: number, email: string): Promise<VehicleDetail> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/app/vehicle`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId, email }),
+    });
+  } catch {
+    throw new ChartRequestError(
+      'Could not reach the T3D server. Check your internet connection and try again.',
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+
+  let payload: { success: true; data: VehicleDetail } | ApiFailure;
+  try {
+    payload = (await response.json()) as { success: true; data: VehicleDetail } | ApiFailure;
+  } catch {
+    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
+  }
+  if (!payload.success) {
+    throw new ChartRequestError(payload.error || 'Could not load your Human Design. Please try again.');
   }
   return payload.data;
 }
