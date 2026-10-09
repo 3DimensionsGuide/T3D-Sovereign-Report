@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { Field } from '@/components/Field';
@@ -17,7 +18,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const toDateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const toTimeString = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-type FieldErrors = Partial<Record<'firstName' | 'lastName' | 'email' | 'city' | 'country', string>>;
+type FieldErrors = Partial<Record<'firstName' | 'lastName' | 'email' | 'city' | 'country' | 'birthDate', string>>;
 
 export default function Onboarding() {
   const [today] = useState(() => new Date());
@@ -52,6 +53,10 @@ export default function Onboarding() {
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = 'Please enter a valid email address.';
     if (!city.trim()) next.city = 'Please enter your birth city.';
     if (!country.trim()) next.country = 'Please enter your birth country.';
+    const cutoff = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
+    if (birthDate > cutoff) {
+      next.birthDate = 'T3D is for people 13 and older. We can\u2019t create a profile for this birth date.';
+    }
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -177,9 +182,18 @@ export default function Onboarding() {
             Your vehicle,{'\n'}your road,{'\n'}your timing.
           </Text>
           <Text style={styles.lede}>
-            Enter your birth details once. We calculate Human Design, Numerology and Astrology
-            from your exact data and keep it on this phone.
+            Enter your birth details once. We use them to calculate your Human Design, Numerology
+            and Astrology. They are saved on this phone and on our server so your readings load
+            every time. You can ask us to delete them at any time.
           </Text>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Read our privacy policy"
+            onPress={() => { void WebBrowser.openBrowserAsync('https://www.3dimensions.guide/privacy'); }}
+            style={styles.linkRow}
+          >
+            <Text style={styles.link}>Read our privacy policy</Text>
+          </Pressable>
         </View>
       </FadeIn>
 
@@ -201,6 +215,9 @@ export default function Onboarding() {
             <DateTimePicker value={birthDate} mode="date" display="compact" themeVariant="dark"
               maximumDate={today} onValueChange={onDateChange} accessibilityLabel="Birth date" />
           </View>
+          {errors.birthDate ? (
+            <Text accessibilityLiveRegion="polite" style={styles.submitError}>{errors.birthDate}</Text>
+          ) : null}
 
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>Birth time</Text>
@@ -251,6 +268,8 @@ const styles = StyleSheet.create({
   hero: { gap: space.md, paddingTop: space.lg },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
+  linkRow: { minHeight: 48, justifyContent: 'center' },
+  link: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold, textDecorationLine: 'underline' },
   lede: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
   form: { gap: space.md, marginTop: space.md },
   pickerRow: {
