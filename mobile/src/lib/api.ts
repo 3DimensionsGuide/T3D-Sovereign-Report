@@ -1,4 +1,5 @@
 import type { ChartDrawingData } from '@/charts/chartTypes';
+import type { StoplightDetail } from '@/lib/stoplightTypes';
 import type { TransitCardData } from '@/lib/transitCardTypes';
 import type { ExplainEntry, GlossaryItem } from '@/lib/explainTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
@@ -460,5 +461,17 @@ export function requestTransitCard(
     '/api/app/transit-card',
     { leadId, email, ...hit },
     'Could not load that transit. Please try again.',
+  );
+}
+
+export function requestStoplight(
+  leadId: number,
+  email: string,
+  birthTimeKnown: boolean,
+): Promise<StoplightDetail> {
+  return postApp<StoplightDetail>(
+    '/api/app/stoplight',
+    { leadId, email, birthTimeKnown },
+    'Could not load your astrology reading. Please try again.',
   );
 }

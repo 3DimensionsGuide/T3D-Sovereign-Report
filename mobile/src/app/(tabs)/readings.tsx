@@ -4,12 +4,14 @@ import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { Segmented } from '@/components/Segmented';
 import { NumerologyReading } from '@/components/readings/NumerologyReading';
+import { StoplightReading } from '@/components/readings/StoplightReading';
 import { VehicleReading } from '@/components/readings/VehicleReading';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const OPTIONS = [
   { value: 'vehicle', label: 'VEHICLE' },
   { value: 'road', label: 'ROAD' },
+  { value: 'stoplight', label: 'STOPLIGHT' },
 ] as const;
 
 type Lens = (typeof OPTIONS)[number]['value'];
@@ -27,6 +29,12 @@ const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; acce
     sub: 'What your numbers mean, and how they work together.',
     accent: colors.road,
   },
+  stoplight: {
+    eyebrow: 'THE STOPLIGHT',
+    title: 'Astrology',
+    sub: 'Your sky at birth, and where you are in time.',
+    accent: colors.stoplight,
+  },
 };
 
 export default function Readings() {
@@ -43,7 +51,7 @@ export default function Readings() {
         </View>
       </FadeIn>
       <Segmented options={OPTIONS} value={lens} onChange={setLens} />
-      {lens === 'vehicle' ? <VehicleReading /> : <NumerologyReading />}
+      {lens === 'vehicle' ? <VehicleReading /> : lens === 'road' ? <NumerologyReading /> : <StoplightReading />}
     </Screen>
   );
 }
