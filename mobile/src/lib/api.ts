@@ -31,6 +31,8 @@ export interface BirthProfile {
   middleName?: string;
   lastName: string;
   email: string;
+  /** True only if the person ticked the optional "email me insights" switch. */
+  emailOptIn?: boolean;
   /** YYYY-MM-DD */
   birthDate: string;
   /** HH:MM, 24-hour */
@@ -111,6 +113,7 @@ export async function requestChart(profile: BirthProfile): Promise<ChartResult> 
         middleName: profile.middleName?.trim() || undefined,
         lastName: profile.lastName.trim(),
         email: profile.email.trim(),
+        emailOptIn: profile.emailOptIn === true,
         birthDate: profile.birthDate,
         birthTime: profile.birthTime,
         birthPlace: {

@@ -38,6 +38,7 @@ export default function Onboarding() {
     saved ? new Date(`2000-01-01T${saved.birthTime}:00`) : new Date(2000, 0, 1, 12, 0),
   );
   const [timeKnown, setTimeKnown] = useState(saved?.birthTimeKnown ?? true);
+  const [emailOptIn, setEmailOptIn] = useState(saved?.emailOptIn ?? false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -93,6 +94,7 @@ export default function Onboarding() {
       birthDate: toDateString(birthDate),
       birthTime: timeKnown ? toTimeString(birthTime) : '12:00',
       birthTimeKnown: timeKnown,
+      emailOptIn,
       city: city.trim(),
       country: country.trim(),
       placeLabel: place.label,
@@ -246,6 +248,13 @@ export default function Onboarding() {
             autoCapitalize="words" placeholder="e.g. Harbor City, California" />
           <Field label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
             autoCapitalize="words" placeholder="e.g. United States" />
+
+          <View style={styles.pickerRow}>
+            <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
+            <Switch value={emailOptIn} onValueChange={setEmailOptIn}
+              trackColor={{ false: colors.hairline, true: colors.gold }}
+              accessibilityLabel="Email me occasional T3D insights" />
+          </View>
         </View>
       </FadeIn>
 

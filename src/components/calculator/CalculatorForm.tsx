@@ -366,6 +366,7 @@ export default function CalculatorForm() {
           lastName: data.lastName.trim(), email: data.email.toLowerCase().trim(),
           birthDate: buildDate(data.birthMonth, data.birthDay, data.birthYear),
           birthTime,
+          emailOptIn: data.emailOptIn,
           birthPlace: {
             city: [data.city, data.state].filter(Boolean).join(', '),
             country: data.country.trim(),

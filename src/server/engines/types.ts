@@ -13,6 +13,7 @@ export interface T3DCalculatorInput {
   birthTime?: string;         // Optional — HH:MM (24-hour). Defaults to "12:00"
   birthPlace: BirthPlace;
   email: string;              // Required — lead capture + report delivery
+  emailOptIn?: boolean;       // Optional — true only when the person ticked the marketing box
 }
 
 export interface BirthPlace {

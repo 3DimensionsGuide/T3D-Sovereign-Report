@@ -9,7 +9,9 @@
 
 import { NextResponse } from 'next/server';
 import { db }    from '@/server/db';
+import { eq } from 'drizzle-orm';
 import { leads } from '@/server/db/schema';
+import { findExistingLead, mergedOptIn, type StoredLead } from '@/server/leadMatch';
 import { calculateNumerology }  from '@/server/engines/numerology';
 import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
@@ -94,32 +96,63 @@ export async function POST(
       timezone,
     });
 
-    // 5. Save lead to database
-    const inserted = await db.insert(leads).values({
-      email:      body.email.toLowerCase().trim(),
-      firstName:  body.firstName.trim(),
-      lastName:   body.lastName.trim(),
-      middleName: body.middleName?.trim() ?? null,
-      birthData: {
-        date:  body.birthDate,
-        time:  birthTime,
-        place: {
-          city:      body.birthPlace.city,
-          country:   body.birthPlace.country,
-          latitude,
-          longitude,
-          timezone,
-        },
+    // 5. Save the lead. The same person (same email, name, birth date, time and
+    //    place) keeps one record; a calculation for them refreshes it.
+    const email = body.email.toLowerCase().trim();
+    const birthData = {
+      date:  body.birthDate,
+      time:  birthTime,
+      place: {
+        city:      body.birthPlace.city,
+        country:   body.birthPlace.country,
+        latitude,
+        longitude,
+        timezone,
       },
-      results: {
-        astrology:   astrologyResults   as unknown as Record<string, unknown>,
-        numerology:  numerologyResults  as unknown as Record<string, unknown>,
-        humanDesign: humanDesignResults as unknown as Record<string, unknown>,
-      },
-    }).returning({ id: leads.id });
+    };
+    const results = {
+      astrology:   astrologyResults   as unknown as Record<string, unknown>,
+      numerology:  numerologyResults  as unknown as Record<string, unknown>,
+      humanDesign: humanDesignResults as unknown as Record<string, unknown>,
+    };
 
-    const leadId = inserted[0]?.id;
-    if (!leadId) throw new Error('Database insert returned no ID.');
+    const sameEmail = await db.select().from(leads).where(eq(leads.email, email));
+    const existing = findExistingLead(sameEmail as unknown as StoredLead[], {
+      email,
+      firstName:  body.firstName,
+      middleName: body.middleName,
+      lastName:   body.lastName,
+      birthDate:  body.birthDate,
+      birthTime,
+      city:       body.birthPlace.city,
+      country:    body.birthPlace.country,
+    });
+
+    let leadId: number | undefined;
+    if (existing) {
+      await db.update(leads).set({
+        firstName:  body.firstName.trim(),
+        lastName:   body.lastName.trim(),
+        middleName: body.middleName?.trim() ?? null,
+        birthData,
+        results,
+        emailOptIn: mergedOptIn(existing.emailOptIn, body.emailOptIn),
+        updatedAt:  new Date(),
+      }).where(eq(leads.id, existing.id));
+      leadId = existing.id;
+    } else {
+      const inserted = await db.insert(leads).values({
+        email,
+        firstName:  body.firstName.trim(),
+        lastName:   body.lastName.trim(),
+        middleName: body.middleName?.trim() ?? null,
+        birthData,
+        results,
+        emailOptIn: body.emailOptIn === true,
+      }).returning({ id: leads.id });
+      leadId = inserted[0]?.id;
+    }
+    if (!leadId) throw new Error('Database write returned no ID.');
 
     // 6. Return curated response (raw formulas stay server-side)
     return NextResponse.json({
