@@ -52,6 +52,8 @@ export function buildTriadToday(
   vehicle: { type: string | null; authority: string | null },
   day: DayNumerology,
   sky: DailySkyResult,
+  /** "today" for the live day, "this day" when the person is looking at another date. */
+  dayWord: 'today' | 'this day' = 'today',
 ): TriadToday {
   const typeContent = pickTypeContent(vehicle.type);
   const authContent = pickAuthorityContent(vehicle.authority);
@@ -106,10 +108,10 @@ export function buildTriadToday(
     stoplight: {
       moon: moonLine,
       lead: card ? { title: card.title, natureLine: card.natureLine, invitation: card.invitation } : null,
-      quiet: card ? null : 'The sky is quiet today: no close contacts to your chart.',
+      quiet: card ? null : `The sky is quiet ${dayWord}: no close contacts to your chart.`,
     },
     frame:
-      `Let your ${authorityName} lead. Your Personal Day reads as ${p.label}, and the sky is ${skyWord} today. ` +
+      `Let your ${authorityName} lead. Your Personal Day reads as ${p.label}, and the sky is ${skyWord} ${dayWord}. ` +
       'Treat both as information about conditions. The decision itself comes from how your Authority responds.',
     steps: [
       strategyStep,

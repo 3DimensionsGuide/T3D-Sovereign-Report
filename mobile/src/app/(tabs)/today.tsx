@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
@@ -20,6 +21,18 @@ import { TransitSheet } from '@/components/TransitSheet';
 import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
+
+const MIN_DATE = new Date(1950, 0, 1);
+const MAX_DATE = new Date(2100, 11, 31);
+
+/** The calendar day a Date falls on, at local noon (a steady anchor for that day's sky). */
+function noonOf(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+}
+
+function sameDay(a: Date, b: Date): boolean {
+  return localDateString(a) === localDateString(b);
+}
 
 const NATURE_LABEL = { flow: '◯  Flow', friction: '◼  Friction', neutral: '◇  Neutral' } as const;
 
@@ -56,27 +69,52 @@ export default function Today() {
   const [triad, setTriad] = useState<TriadToday | null>(null);
   const [selectedHit, setSelectedHit] = useState<DailyTransitHit | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  /** null means the live day; otherwise the day the person jumped to. */
+  const [viewDate, setViewDate] = useState<Date | null>(null);
+  const isToday = viewDate === null;
+  /** Newest request wins, so quickly stepping through days never shows an older day's data. */
+  const requestId = useRef(0);
 
   const load = useCallback(async () => {
     if (!profile || !chart) return;
     setError(null);
+    const mine = ++requestId.current;
+    const stillCurrent = () => mine === requestId.current;
+    const localDate = localDateString(viewDate ?? new Date());
+    const at = viewDate ? noonOf(viewDate).toISOString() : undefined;
     // Numerology of the day loads alongside the sky; if it fails the sky still shows.
-    requestDayNumerology(chart.leadId, profile.email, localDateString())
-      .then(setDayNum)
-      .catch(() => setDayNum(null));
-    requestTriadToday(chart.leadId, profile.email, localDateString())
-      .then(setTriad)
-      .catch(() => setTriad(null));
+    requestDayNumerology(chart.leadId, profile.email, localDate)
+      .then((d) => stillCurrent() && setDayNum(d))
+      .catch(() => stillCurrent() && setDayNum(null));
+    requestTriadToday(chart.leadId, profile.email, localDate, at)
+      .then((d) => stillCurrent() && setTriad(d))
+      .catch(() => stillCurrent() && setTriad(null));
     try {
-      setToday(await requestToday(chart.leadId, profile.email));
+      const result = await requestToday(chart.leadId, profile.email, at);
+      if (stillCurrent()) setToday(result);
     } catch (err) {
+      if (!stillCurrent()) return;
       setError(err instanceof ChartRequestError ? err.message : 'Something went wrong. Please try again.');
     }
-  }, [profile, chart]);
+  }, [profile, chart, viewDate]);
+
+  const goTo = useCallback((date: Date) => {
+    if (date < MIN_DATE || date > MAX_DATE) return;
+    setViewDate(sameDay(date, new Date()) ? null : noonOf(date));
+  }, []);
+
+  const step = useCallback((days: number) => {
+    const base = viewDate ?? new Date();
+    const next = new Date(base.getFullYear(), base.getMonth(), base.getDate() + days, 12, 0, 0);
+    goTo(next);
+  }, [viewDate, goTo]);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setToday(null);
+    setTriad(null);
+    setDayNum(null);
     load().finally(() => active && setLoading(false));
     return () => {
       active = false;
@@ -89,22 +127,62 @@ export default function Today() {
     setRefreshing(false);
   }, [load]);
 
-  const dateLabel = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  const shown = viewDate ?? new Date();
+  const dateLabel = shown.toLocaleDateString(undefined, {
+    weekday: 'long', month: 'long', day: 'numeric', ...(isToday ? {} : { year: 'numeric' }),
+  });
+  const relation = isToday
+    ? null
+    : localDateString(shown) < localDateString(new Date()) ? 'A DAY GONE BY' : 'A DAY AHEAD';
+  const dayWord = isToday ? 'today' : 'this day';
 
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
       <FadeIn>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>TODAY&apos;S SKY</Text>
+          <Text style={styles.eyebrow}>{isToday ? 'TODAY\u2019S SKY' : `THE SKY · ${relation}`}</Text>
           <Text accessibilityRole="header" style={styles.title}>{dateLabel}</Text>
           <Text style={styles.sub}>Read against your own chart. Pull down to refresh.</Text>
         </View>
+        <View style={styles.dateBar}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Previous day"
+            onPress={() => step(-1)}
+            style={({ pressed }) => [styles.stepBtn, pressed && { opacity: 0.7 }]}
+          >
+            <Text style={styles.stepText}>‹</Text>
+          </Pressable>
+          <View style={styles.pickerWrap}>
+            <DateTimePicker
+              value={shown}
+              mode="date"
+              display="compact"
+              themeVariant="dark"
+              minimumDate={MIN_DATE}
+              maximumDate={MAX_DATE}
+              onValueChange={(_event: unknown, value: Date) => goTo(value)}
+              accessibilityLabel="Jump to a date"
+            />
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Next day"
+            onPress={() => step(1)}
+            style={({ pressed }) => [styles.stepBtn, pressed && { opacity: 0.7 }]}
+          >
+            <Text style={styles.stepText}>›</Text>
+          </Pressable>
+        </View>
+        {!isToday ? (
+          <GoldButton label="BACK TO TODAY" variant="ghost" onPress={() => setViewDate(null)} />
+        ) : null}
       </FadeIn>
 
       {loading && !today ? (
         <View accessibilityLiveRegion="polite" style={styles.center}>
           <ActivityIndicator color={colors.gold} />
-          <Text style={styles.sub}>Reading today&apos;s sky…</Text>
+          <Text style={styles.sub}>Reading the sky…</Text>
         </View>
       ) : null}
 
@@ -120,7 +198,7 @@ export default function Today() {
           <TimeNote scope="sky" />
           {triad ? (
             <FadeIn delay={60}>
-              <TriadTodayCard data={triad} />
+              <TriadTodayCard data={triad} isToday={isToday} />
             </FadeIn>
           ) : null}
 
@@ -199,7 +277,7 @@ export default function Today() {
               </View>
             ) : (
               <Text style={styles.body}>
-                A quiet sky today: no close contacts to your chart. That is a real reading, not missing data.
+                A quiet sky {dayWord}: no close contacts to your chart. That is a real reading, not missing data.
               </Text>
             )}
           </FadeIn>
@@ -233,6 +311,13 @@ export default function Today() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   header: { gap: 6, paddingTop: space.lg },
+  dateBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm, marginVertical: space.sm },
+  stepBtn: {
+    width: 52, height: 52, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,
+    backgroundColor: colors.charcoal, alignItems: 'center', justifyContent: 'center',
+  },
+  stepText: { fontFamily: fonts.bodyBold, fontSize: 28, lineHeight: 32, color: colors.gold },
+  pickerWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 52 },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 32, lineHeight: 40, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },

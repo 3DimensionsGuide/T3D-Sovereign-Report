@@ -16,11 +16,11 @@ function Lens({ glyph, accent, label, title, lines }: {
   );
 }
 
-export function TriadTodayCard({ data }: { data: TriadToday }) {
+export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isToday?: boolean }) {
   return (
     <View style={styles.card}>
-      <Text style={styles.eyebrow}>TODAY'S TRIAD</Text>
-      <Text accessibilityRole="header" style={styles.title}>One frame for today</Text>
+      <Text style={styles.eyebrow}>{isToday ? "TODAY'S TRIAD" : "THIS DAY'S TRIAD"}</Text>
+      <Text accessibilityRole="header" style={styles.title}>{isToday ? 'One frame for today' : 'One frame for this day'}</Text>
       <Text style={styles.frame}>{data.frame}</Text>
 
       <Lens

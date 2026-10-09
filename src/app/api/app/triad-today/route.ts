@@ -3,7 +3,7 @@
  * The daily Triad reading: one decision frame across the Vehicle, the Road
  * and the Stoplight.
  *
- * Body: { leadId: number, email: string, localDate: "YYYY-MM-DD" }
+ * Body: { leadId: number, email: string, localDate: "YYYY-MM-DD", at?: ISO date-time }
  *
  * Same access rule as the other app routes (id must pair with the lead's
  * email; identical 404 otherwise).
@@ -17,6 +17,7 @@ import { buildTriadToday } from '@/lib/app/triadToday';
 import { calculateDailySky, type NatalSkyPoints } from '@/server/engines/dailySky';
 import { calculateDayNumerology } from '@/server/engines/dayNumerology';
 import type { AstrologyResult } from '@/server/engines/types';
+import { parseSkyInstant } from '@/lib/app/skyDate';
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 
@@ -26,7 +27,7 @@ function isNumber(value: unknown): value is number {
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    let body: { leadId?: unknown; email?: unknown; localDate?: unknown };
+    let body: { leadId?: unknown; email?: unknown; localDate?: unknown; at?: unknown; isToday?: unknown };
     try {
       body = (await request.json()) as typeof body;
     } catch {
@@ -41,6 +42,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(localDate) || Number.isNaN(Date.parse(localDate))) {
       return NextResponse.json({ success: false, error: 'localDate must be YYYY-MM-DD' }, { status: 400 });
+    }
+
+    const at = parseSkyInstant(body.at);
+    if (!at) {
+      return NextResponse.json({ success: false, error: 'That date is out of range.' }, { status: 400 });
     }
 
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
@@ -76,7 +82,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     const data = buildTriadToday(
       { type: results?.humanDesign?.type ?? null, authority: results?.humanDesign?.authority ?? null },
       calculateDayNumerology(birthDate, localDate),
-      calculateDailySky(natal),
+      calculateDailySky(natal, at),
+      body.isToday === false ? 'this day' : 'today',
     );
 
     return NextResponse.json({ success: true, data }, { status: 200, headers: { 'Cache-Control': 'no-store' } });

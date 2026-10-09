@@ -2,7 +2,7 @@
  * POST /api/app/today
  * Daily sky for the T3D app's Today screen.
  *
- * Body: { leadId: number, email: string }
+ * Body: { leadId: number, email: string, at?: ISO date-time }
  *
  * Reads the person's saved natal chart from the database, calculates the
  * current sky against it (src/server/engines/dailySky.ts) and returns only
@@ -18,10 +18,13 @@ import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { calculateDailySky, type NatalSkyPoints } from '@/server/engines/dailySky';
 import type { AstrologyResult } from '@/server/engines/types';
+import { parseSkyInstant } from '@/lib/app/skyDate';
 
 interface TodayRequest {
   leadId?: unknown;
   email?: unknown;
+  /** Optional ISO instant to read the sky for (the app's "jump to a date"). */
+  at?: unknown;
 }
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
@@ -49,6 +52,11 @@ export async function POST(request: Request): Promise<NextResponse> {
         { success: false, error: 'leadId and a valid email are required' },
         { status: 400 },
       );
+    }
+
+    const at = parseSkyInstant(body.at);
+    if (!at) {
+      return NextResponse.json({ success: false, error: 'That date is out of range.' }, { status: 400 });
     }
 
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
@@ -92,7 +100,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       midheaven: tropical.houses.mc,
     };
 
-    const sky = calculateDailySky(natal);
+    const sky = calculateDailySky(natal, at);
 
     return NextResponse.json(
       {

@@ -204,7 +204,8 @@ export interface TodayResult {
   reminder: string;
 }
 
-export async function requestToday(leadId: number, email: string): Promise<TodayResult> {
+/** `at` reads the sky for another day (an ISO date-time); leave it out for right now. */
+export async function requestToday(leadId: number, email: string, at?: string): Promise<TodayResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
@@ -213,7 +214,7 @@ export async function requestToday(leadId: number, email: string): Promise<Today
       method: 'POST',
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email }),
+      body: JSON.stringify({ leadId, email, ...(at ? { at } : {}) }),
     });
   } catch {
     throw new ChartRequestError(
@@ -486,10 +487,15 @@ export function requestStoplight(
   );
 }
 
-export function requestTriadToday(leadId: number, email: string, localDate: string): Promise<TriadToday> {
+export function requestTriadToday(
+  leadId: number,
+  email: string,
+  localDate: string,
+  at?: string,
+): Promise<TriadToday> {
   return postApp<TriadToday>(
     '/api/app/triad-today',
-    { leadId, email, localDate },
+    { leadId, email, localDate, ...(at ? { at, isToday: false } : {}) },
     'Could not build today’s reading. Please try again.',
   );
 }
