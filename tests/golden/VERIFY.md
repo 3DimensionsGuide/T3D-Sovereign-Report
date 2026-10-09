@@ -69,7 +69,7 @@ Acceptable difference: about 1 arc-minute (0°01') for planets. Moon and Ascenda
 ### Jovian Archive (Human Design)
 | | T3D says |
 |---|---|
-| Type | Generator |
+| Type | Manifesting Generator |
 | Authority | Sacral |
 | Profile | 4/6 |
 | Cross | Right Angle Cross of Tension |
@@ -107,7 +107,7 @@ Acceptable difference: about 1 arc-minute (0°01') for planets. Moon and Ascenda
 ### Jovian Archive (Human Design)
 | | T3D says |
 |---|---|
-| Type | Projector |
+| Type | Manifestor |
 | Authority | Splenic |
 | Profile | 1/3 |
 | Cross | Right Angle Cross of Tension |
@@ -259,7 +259,7 @@ Acceptable difference: about 1 arc-minute (0°01') for planets. Moon and Ascenda
 ### Jovian Archive (Human Design)
 | | T3D says |
 |---|---|
-| Type | Projector |
+| Type | Manifestor |
 | Authority | Emotional |
 | Profile | 1/3 |
 | Cross | Right Angle Cross of Tension |
@@ -335,7 +335,7 @@ Acceptable difference: about 1 arc-minute (0°01') for planets. Moon and Ascenda
 ### Jovian Archive (Human Design)
 | | T3D says |
 |---|---|
-| Type | Generator |
+| Type | Manifesting Generator |
 | Authority | Emotional |
 | Profile | 2/4 |
 | Cross | Right Angle Cross of the Vessel of Love |
@@ -487,7 +487,7 @@ Acceptable difference: about 1 arc-minute (0°01') for planets. Moon and Ascenda
 ### Jovian Archive (Human Design)
 | | T3D says |
 |---|---|
-| Type | Generator |
+| Type | Manifesting Generator |
 | Authority | Emotional |
 | Profile | 6/2 |
 | Cross | Left Angle Cross of Alignment |
@@ -726,39 +726,39 @@ Mark the result in `verification.json`: "match", "mismatch" or "unchecked". Add 
 
 ---
 
-## Singapore, 15 Jun 1985, 9:30 AM  (`singapore-1985`)
+## Singapore, 15 Jun 1975, 9:30 AM  (`singapore-1975`)
 
-Why this chart: Singapore then ran on UTC+7:30, a rare offset.
+Why this chart: Singapore then ran on UTC+7:30 (until 1982), a rare offset.
 
-**Enter on both sites:** 1985-06-15, 09:30 local time, Singapore (lat 1.3521, lon 103.8198), time zone Asia/Singapore
+**Enter on both sites:** 1975-06-15, 09:30 local time, Singapore (lat 1.3521, lon 103.8198), time zone Asia/Singapore
 
 ### Astro.com (Extended Chart Selection → Whole Sign houses, True Node, Tropical)
 | | T3D says |
 |---|---|
-| Sun | 23°54' Gemini |
-| Moon | 15°25' Taurus |
-| Mercury | 2°55' Cancer |
-| Venus | 8°10' Taurus |
-| Mars | 3°44' Cancer |
-| Jupiter | 16°47' Aquarius R |
-| Saturn | 22°43' Scorpio R |
-| Uranus / Neptune / Pluto | 15°39' Sagittarius R / 2°28' Capricorn R / 2°07' Scorpio R |
-| True Node | 17°52' Taurus |
-| Ascendant | 28°00' Cancer |
-| Midheaven | 1°46' Taurus |
-| Sidereal (Lahiri) Sun / Moon / Asc | 0°15' Gemini / 21°46' Aries / 4°21' Cancer |
+| Sun | 23°22' Gemini |
+| Moon | 2°52' Virgo |
+| Mercury | 16°57' Gemini R |
+| Venus | 8°41' Leo |
+| Mars | 18°22' Aries |
+| Jupiter | 19°14' Aries |
+| Saturn | 18°37' Cancer |
+| Uranus / Neptune / Pluto | 28°33' Libra R / 10°03' Sagittarius R / 6°28' Libra R |
+| True Node | 0°44' Sagittarius R |
+| Ascendant | 4°41' Leo |
+| Midheaven | 8°56' Taurus |
+| Sidereal (Lahiri) Sun / Moon / Asc | 29°51' Taurus / 9°21' Leo / 11°10' Cancer |
 
 Acceptable difference: about 1 arc-minute (0°01') for planets. Moon and Ascendant matter most.
 
 ### Jovian Archive (Human Design)
 | | T3D says |
 |---|---|
-| Type | Generator |
-| Authority | Sacral |
-| Profile | 2/4 |
+| Type | Manifesting Generator |
+| Authority | Emotional |
+| Profile | 1/3 |
 | Cross | Right Angle Cross of Eden |
-| Defined centers | ajna, g_center, root, sacral, throat |
-| Channels | 2-14, 23-43, 3-60, 5-15 |
+| Defined centers | g_center, heart, root, sacral, solar_plexus, spleen, throat |
+| Channels | 20-34, 25-51, 27-50, 35-36, 39-55, 42-53, 6-59 |
 
 Mark the result in `verification.json`: "match", "mismatch" or "unchecked". Add a note if the site differs.
 
