@@ -27,7 +27,8 @@ describe('local time → Julian Day', () => {
     ['1990-07-01', '12:00', 'America/Los_Angeles', '1990-07-01T19:00:00Z'],
     ['1960-03-21', '06:00', 'Asia/Kolkata', '1960-03-21T00:30:00Z'],
     ['1950-05-05', '17:30', 'Europe/Moscow', '1950-05-05T14:30:00Z'],
-    ['1985-06-15', '09:30', 'Asia/Singapore', '1985-06-15T02:00:00Z'],
+    ['1975-06-15', '09:30', 'Asia/Singapore', '1975-06-15T02:00:00Z'], // UTC+7:30 until 1982
+    ['1985-06-15', '09:30', 'Asia/Singapore', '1985-06-15T01:30:00Z'], // UTC+8 from 1982
     ['2012-12-21', '11:11', 'Asia/Kathmandu', '2012-12-21T05:26:00Z'],
   ];
   for (const [date, time, zone, utc] of cases) {
@@ -130,9 +131,9 @@ describe('Rave Mandala', () => {
   });
   test('published gate boundaries', () => {
     assert.equal(longitudeToGate(223.25).gate, 1);
-    assert.equal(longitudeToGate(223.24).gate, 43);
+    assert.equal(longitudeToGate(223.24).gate, 44);
     assert.equal(longitudeToGate(161.375).gate, 64);
-    assert.equal(longitudeToGate(161.37).gate, 47);
+    assert.equal(longitudeToGate(161.37).gate, 40);
   });
   test('opposite points on the wheel are the published opposite gates', () => {
     const pairs: Array<[number, number]> = [[41, 31], [25, 46], [1, 2], [64, 63]];

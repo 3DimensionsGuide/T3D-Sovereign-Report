@@ -1,0 +1,3937 @@
+{
+  "generatedAt": "2026-10-09T05:06:51.445Z",
+  "note": "Regenerate only when you know the new numbers are right.",
+  "charts": {
+    "la-1990": {
+      "julianDay": 2448208.4875,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Scorpio",
+            "longitude": 230.331,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 181.333,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Sagittarius",
+            "longitude": 243.003,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 233.185,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Gemini",
+            "longitude": 70.712,
+            "retrograde": true
+          },
+          "jupiter": {
+            "sign": "Leo",
+            "longitude": 133.116,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Capricorn",
+            "longitude": 290.753,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Capricorn",
+            "longitude": 277.03,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 282.476,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 227.812,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aquarius",
+            "longitude": 301.134,
+            "retrograde": true
+          }
+        },
+        "ascendant": 28.677,
+        "ascendantSign": "Aries",
+        "midheaven": 287.621
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Libra",
+            "longitude": 206.598,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 157.6,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Scorpio",
+            "longitude": 219.27,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Libra",
+            "longitude": 209.452,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Taurus",
+            "longitude": 46.979,
+            "retrograde": true
+          },
+          "jupiter": {
+            "sign": "Cancer",
+            "longitude": 109.383,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Sagittarius",
+            "longitude": 267.02,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Sagittarius",
+            "longitude": 253.297,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 258.743,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 204.079,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Capricorn",
+            "longitude": 277.401,
+            "retrograde": true
+          }
+        },
+        "ascendant": 4.943,
+        "ascendantSign": "Aries",
+        "midheaven": 263.888
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Mental",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of Explanation",
+        "definedCenters": [
+          "ajna",
+          "throat"
+        ],
+        "channels": [
+          "23-43"
+        ],
+        "gates": [
+          "D earth 49.4",
+          "D jupiter 56.4",
+          "D mars 23.3",
+          "D mercury 47.3",
+          "D moon 35.5",
+          "D neptune 38.3",
+          "D northNode 41.6",
+          "D pluto 1.2",
+          "D saturn 54.6",
+          "D southNode 31.6",
+          "D sun 4.4",
+          "D uranus 58.3",
+          "D venus 56.6",
+          "P earth 23.2",
+          "P jupiter 33.6",
+          "P mars 16.6",
+          "P mercury 34.4",
+          "P moon 46.4",
+          "P neptune 38.4",
+          "P northNode 60.6",
+          "P pluto 1.5",
+          "P saturn 61.1",
+          "P southNode 56.6",
+          "P sun 43.2",
+          "P uranus 58.4",
+          "P venus 43.5"
+        ]
+      },
+      "numerology": {
+        "lifePath": 6,
+        "destiny": 2,
+        "personality": 7,
+        "soulUrge": 22,
+        "hiddenPassion": 1,
+        "karmicLessons": [
+          7
+        ],
+        "pinnacles": [
+          5,
+          4,
+          9,
+          3
+        ],
+        "challenges": [
+          1,
+          2,
+          1,
+          1
+        ]
+      }
+    },
+    "nyc-1985": {
+      "julianDay": 2446251.010417,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Cancer",
+            "longitude": 102.456,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Aquarius",
+            "longitude": 308.318,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Leo",
+            "longitude": 126.902,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Taurus",
+            "longitude": 58.053,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 106.562,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aquarius",
+            "longitude": 315.61,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Scorpio",
+            "longitude": 231.83,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Sagittarius",
+            "longitude": 254.908,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 271.953,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 211.942,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Taurus",
+            "longitude": 46.646,
+            "retrograde": true
+          }
+        },
+        "ascendant": 134.485,
+        "ascendantSign": "Leo",
+        "midheaven": 34.46
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Gemini",
+            "longitude": 78.804,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Capricorn",
+            "longitude": 284.667,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Cancer",
+            "longitude": 103.251,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Taurus",
+            "longitude": 34.401,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Gemini",
+            "longitude": 82.911,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Capricorn",
+            "longitude": 291.959,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Libra",
+            "longitude": 208.179,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Scorpio",
+            "longitude": 231.257,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 248.302,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 188.29,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 22.995,
+            "retrograde": true
+          }
+        },
+        "ascendant": 110.834,
+        "ascendantSign": "Cancer",
+        "midheaven": 10.809
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Sacral",
+        "profile": "4/6",
+        "cross": "Right Angle Cross of Tension",
+        "definedCenters": [
+          "g_center",
+          "root",
+          "sacral",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "1-8",
+          "2-14",
+          "28-38"
+        ],
+        "gates": [
+          "D earth 48.6",
+          "D jupiter 19.5",
+          "D mars 2.2",
+          "D mercury 21.4",
+          "D moon 6.6",
+          "D neptune 10.6",
+          "D northNode 2.6",
+          "D pluto 28.3",
+          "D saturn 14.4",
+          "D southNode 1.6",
+          "D sun 21.6",
+          "D uranus 26.1",
+          "D venus 21.5",
+          "P earth 38.4",
+          "P jupiter 13.3",
+          "P mars 53.2",
+          "P mercury 31.6",
+          "P moon 19.1",
+          "P neptune 10.4",
+          "P northNode 2.4",
+          "P pluto 50.6",
+          "P saturn 43.4",
+          "P southNode 1.4",
+          "P sun 39.4",
+          "P uranus 5.4",
+          "P venus 8.4"
+        ]
+      },
+      "numerology": {
+        "lifePath": 7,
+        "destiny": 9,
+        "personality": 5,
+        "soulUrge": 22,
+        "hiddenPassion": 1,
+        "karmicLessons": [
+          2,
+          5,
+          6,
+          8
+        ],
+        "pinnacles": [
+          11,
+          9,
+          2,
+          3
+        ],
+        "challenges": [
+          3,
+          1,
+          2,
+          2
+        ]
+      }
+    },
+    "london-newyear-1975": {
+      "julianDay": 2442413.5,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Capricorn",
+            "longitude": 279.935,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Leo",
+            "longitude": 139.188,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Capricorn",
+            "longitude": 287.043,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Capricorn",
+            "longitude": 293.381,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Sagittarius",
+            "longitude": 254.959,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Pisces",
+            "longitude": 343.315,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Cancer",
+            "longitude": 105.874,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Scorpio",
+            "longitude": 211.878,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 250.433,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 189.223,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Sagittarius",
+            "longitude": 249.959,
+            "retrograde": true
+          }
+        },
+        "ascendant": 186.98,
+        "ascendantSign": "Libra",
+        "midheaven": 99.096
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Sagittarius",
+            "longitude": 256.422,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Cancer",
+            "longitude": 115.676,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Sagittarius",
+            "longitude": 263.531,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Sagittarius",
+            "longitude": 269.868,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Scorpio",
+            "longitude": 231.447,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aquarius",
+            "longitude": 319.802,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Gemini",
+            "longitude": 82.362,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Libra",
+            "longitude": 188.365,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 226.921,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Virgo",
+            "longitude": 165.71,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Scorpio",
+            "longitude": 226.446,
+            "retrograde": true
+          }
+        },
+        "ascendant": 163.467,
+        "ascendantSign": "Virgo",
+        "midheaven": 75.583
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Splenic",
+        "profile": "1/3",
+        "cross": "Right Angle Cross of Tension",
+        "definedCenters": [
+          "ajna",
+          "head",
+          "root",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "16-48",
+          "28-38",
+          "4-63"
+        ],
+        "gates": [
+          "D earth 21.3",
+          "D jupiter 37.4",
+          "D mars 48.6",
+          "D mercury 28.6",
+          "D moon 20.1",
+          "D neptune 9.2",
+          "D northNode 5.1",
+          "D pluto 18.4",
+          "D saturn 53.4",
+          "D southNode 35.1",
+          "D sun 48.3",
+          "D uranus 50.1",
+          "D venus 46.6",
+          "P earth 39.1",
+          "P jupiter 63.3",
+          "P mars 5.4",
+          "P mercury 54.3",
+          "P moon 4.1",
+          "P neptune 9.5",
+          "P northNode 9.5",
+          "P pluto 18.6",
+          "P saturn 53.1",
+          "P southNode 16.5",
+          "P sun 38.1",
+          "P uranus 50.6",
+          "P venus 61.3"
+        ]
+      },
+      "numerology": {
+        "lifePath": 6,
+        "destiny": 9,
+        "personality": 9,
+        "soulUrge": 9,
+        "hiddenPassion": 5,
+        "karmicLessons": [
+          2,
+          3,
+          4
+        ],
+        "pinnacles": [
+          2,
+          5,
+          7,
+          5
+        ],
+        "challenges": [
+          0,
+          3,
+          3,
+          3
+        ]
+      }
+    },
+    "sydney-leapday-2000": {
+      "julianDay": 2451603.541667,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Pisces",
+            "longitude": 339.746,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Capricorn",
+            "longitude": 270.122,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Pisces",
+            "longitude": 342.962,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Aquarius",
+            "longitude": 313.39,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Aries",
+            "longitude": 12.877,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Taurus",
+            "longitude": 32.491,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Taurus",
+            "longitude": 42.329,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Aquarius",
+            "longitude": 318.098,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Aquarius",
+            "longitude": 305.335,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Sagittarius",
+            "longitude": 252.834,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Leo",
+            "longitude": 123.187,
+            "retrograde": false
+          }
+        },
+        "ascendant": 45.401,
+        "ascendantSign": "Taurus",
+        "midheaven": 322.002
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Aquarius",
+            "longitude": 315.89,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Sagittarius",
+            "longitude": 246.267,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Aquarius",
+            "longitude": 319.107,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Capricorn",
+            "longitude": 289.535,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Pisces",
+            "longitude": 349.021,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aries",
+            "longitude": 8.635,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Aries",
+            "longitude": 18.473,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Capricorn",
+            "longitude": 294.242,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 281.48,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 228.978,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Cancer",
+            "longitude": 99.332,
+            "retrograde": false
+          }
+        },
+        "ascendant": 21.545,
+        "ascendantSign": "Aries",
+        "midheaven": 298.146
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Emotional",
+        "profile": "5/1",
+        "cross": "Left Angle Cross of Migration",
+        "definedCenters": [
+          "heart",
+          "sacral",
+          "solar_plexus",
+          "spleen"
+        ],
+        "channels": [
+          "27-50",
+          "37-40"
+        ],
+        "gates": [
+          "D earth 35.1",
+          "D jupiter 42.6",
+          "D mars 41.5",
+          "D mercury 43.3",
+          "D moon 28.1",
+          "D neptune 41.1",
+          "D northNode 31.4",
+          "D pluto 9.5",
+          "D saturn 24.5",
+          "D southNode 41.4",
+          "D sun 5.1",
+          "D uranus 13.1",
+          "D venus 50.2",
+          "P earth 40.5",
+          "P jupiter 27.1",
+          "P mars 21.4",
+          "P mercury 63.2",
+          "P moon 10.2",
+          "P neptune 41.4",
+          "P northNode 31.2",
+          "P pluto 5.2",
+          "P saturn 24.6",
+          "P southNode 41.2",
+          "P sun 37.5",
+          "P uranus 13.6",
+          "P venus 13.1"
+        ]
+      },
+      "numerology": {
+        "lifePath": 6,
+        "destiny": 4,
+        "personality": 8,
+        "soulUrge": 5,
+        "hiddenPassion": 5,
+        "karmicLessons": [
+          2,
+          3
+        ],
+        "pinnacles": [
+          4,
+          4,
+          8,
+          4
+        ],
+        "challenges": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "houston-1969": {
+      "julianDay": 2440423.345139,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Cancer",
+            "longitude": 117.911,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 187.874,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Cancer",
+            "longitude": 115.843,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Gemini",
+            "longitude": 75.037,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Sagittarius",
+            "longitude": 242.773,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Libra",
+            "longitude": 180.746,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Taurus",
+            "longitude": 38.098,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Libra",
+            "longitude": 180.69,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 236.023,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Virgo",
+            "longitude": 173.007,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Pisces",
+            "longitude": 352.476,
+            "retrograde": false
+          }
+        },
+        "ascendant": 229.336,
+        "ascendantSign": "Scorpio",
+        "midheaven": 145.029
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Cancer",
+            "longitude": 94.478,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 164.441,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Cancer",
+            "longitude": 92.41,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Taurus",
+            "longitude": 51.605,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Scorpio",
+            "longitude": 219.341,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Virgo",
+            "longitude": 157.314,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Aries",
+            "longitude": 14.666,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Virgo",
+            "longitude": 157.257,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 212.59,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Leo",
+            "longitude": 149.575,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aquarius",
+            "longitude": 329.043,
+            "retrograde": false
+          }
+        },
+        "ascendant": 205.904,
+        "ascendantSign": "Libra",
+        "midheaven": 121.597
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Sacral",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of the Laws",
+        "definedCenters": [
+          "root",
+          "sacral"
+        ],
+        "channels": [
+          "3-60"
+        ],
+        "gates": [
+          "D earth 50.4",
+          "D jupiter 6.6",
+          "D mars 5.6",
+          "D mercury 24.5",
+          "D moon 16.4",
+          "D neptune 14.4",
+          "D northNode 25.2",
+          "D pluto 6.1",
+          "D saturn 3.3",
+          "D southNode 46.2",
+          "D sun 3.4",
+          "D uranus 46.3",
+          "D venus 21.4",
+          "P earth 60.2",
+          "P jupiter 46.3",
+          "P mars 34.3",
+          "P mercury 62.6",
+          "P moon 18.5",
+          "P neptune 14.2",
+          "P northNode 22.6",
+          "P pluto 6.1",
+          "P saturn 24.1",
+          "P southNode 47.6",
+          "P sun 56.2",
+          "P uranus 46.3",
+          "P venus 35.4"
+        ]
+      },
+      "numerology": {
+        "lifePath": 7,
+        "destiny": 5,
+        "personality": 3,
+        "soulUrge": 11,
+        "hiddenPassion": 6,
+        "karmicLessons": [
+          3,
+          5,
+          7,
+          8
+        ],
+        "pinnacles": [
+          9,
+          9,
+          9,
+          5
+        ],
+        "challenges": [
+          5,
+          5,
+          0,
+          0
+        ]
+      }
+    },
+    "kolkata-1960": {
+      "julianDay": 2437014.520833,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Aries",
+            "longitude": 0.405,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Capricorn",
+            "longitude": 280.209,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Pisces",
+            "longitude": 342.647,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Pisces",
+            "longitude": 336.087,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Aquarius",
+            "longitude": 320.563,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Capricorn",
+            "longitude": 272.226,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Capricorn",
+            "longitude": 287.297,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Leo",
+            "longitude": 137.437,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 218.716,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Virgo",
+            "longitude": 154.274,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Virgo",
+            "longitude": 174.632,
+            "retrograde": false
+          }
+        },
+        "ascendant": 5.84,
+        "ascendantSign": "Aries",
+        "midheaven": 274.034
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Pisces",
+            "longitude": 337.104,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Sagittarius",
+            "longitude": 256.908,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Aquarius",
+            "longitude": 319.346,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Aquarius",
+            "longitude": 312.786,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Capricorn",
+            "longitude": 297.262,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Sagittarius",
+            "longitude": 248.925,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Sagittarius",
+            "longitude": 263.996,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Cancer",
+            "longitude": 114.136,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Libra",
+            "longitude": 195.415,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Leo",
+            "longitude": 130.973,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Virgo",
+            "longitude": 151.331,
+            "retrograde": false
+          }
+        },
+        "ascendant": 342.539,
+        "ascendantSign": "Pisces",
+        "midheaven": 250.733
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Emotional",
+        "profile": "3/5",
+        "cross": "Right Angle Cross of the Vessel of Love",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "head",
+          "heart",
+          "root",
+          "sacral",
+          "solar_plexus",
+          "spleen"
+        ],
+        "channels": [
+          "26-44",
+          "32-54",
+          "37-40",
+          "4-63",
+          "5-15",
+          "6-59"
+        ],
+        "gates": [
+          "D earth 15.5",
+          "D jupiter 26.1",
+          "D mars 5.5",
+          "D mercury 5.4",
+          "D moon 32.5",
+          "D neptune 44.1",
+          "D northNode 46.1",
+          "D pluto 40.1",
+          "D saturn 58.6",
+          "D southNode 25.1",
+          "D sun 10.5",
+          "D uranus 4.2",
+          "D venus 43.2",
+          "P earth 46.3",
+          "P jupiter 10.5",
+          "P mars 49.2",
+          "P mercury 63.2",
+          "P moon 38.1",
+          "P neptune 44.2",
+          "P northNode 6.3",
+          "P pluto 59.5",
+          "P saturn 54.3",
+          "P southNode 36.3",
+          "P sun 25.3",
+          "P uranus 7.5",
+          "P venus 37.1"
+        ]
+      },
+      "numerology": {
+        "lifePath": 4,
+        "destiny": 11,
+        "personality": 11,
+        "soulUrge": 9,
+        "hiddenPassion": 7,
+        "karmicLessons": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "pinnacles": [
+          6,
+          1,
+          7,
+          1
+        ],
+        "challenges": [
+          0,
+          4,
+          4,
+          4
+        ]
+      }
+    },
+    "tokyo-nye-1988": {
+      "julianDay": 2447527.124306,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Capricorn",
+            "longitude": 280.167,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 194.705,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Capricorn",
+            "longitude": 296.794,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Sagittarius",
+            "longitude": 257.325,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Aries",
+            "longitude": 20.012,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Taurus",
+            "longitude": 56.752,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Capricorn",
+            "longitude": 275.549,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Capricorn",
+            "longitude": 271.731,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 279.907,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 224.546,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Pisces",
+            "longitude": 336.62,
+            "retrograde": true
+          }
+        },
+        "ascendant": 192.168,
+        "ascendantSign": "Libra",
+        "midheaven": 103.491
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Sagittarius",
+            "longitude": 256.461,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 171,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Capricorn",
+            "longitude": 273.089,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 233.619,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Pisces",
+            "longitude": 356.307,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Taurus",
+            "longitude": 33.046,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Sagittarius",
+            "longitude": 251.844,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Sagittarius",
+            "longitude": 248.026,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 256.202,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 200.841,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aquarius",
+            "longitude": 312.915,
+            "retrograde": true
+          }
+        },
+        "ascendant": 168.463,
+        "ascendantSign": "Virgo",
+        "midheaven": 79.785
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Emotional",
+        "profile": "1/3",
+        "cross": "Right Angle Cross of Tension",
+        "definedCenters": [
+          "g_center",
+          "heart",
+          "solar_plexus",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "1-8",
+          "16-48",
+          "25-51",
+          "26-44",
+          "37-40"
+        ],
+        "gates": [
+          "D earth 21.3",
+          "D jupiter 16.1",
+          "D mars 25.6",
+          "D mercury 32.5",
+          "D moon 33.3",
+          "D neptune 58.4",
+          "D northNode 63.3",
+          "D pluto 44.4",
+          "D saturn 11.5",
+          "D southNode 64.3",
+          "D sun 48.3",
+          "D uranus 11.6",
+          "D venus 59.1",
+          "P earth 39.1",
+          "P jupiter 8.3",
+          "P mars 51.6",
+          "P mercury 60.1",
+          "P moon 48.6",
+          "P neptune 38.1",
+          "P northNode 37.1",
+          "P pluto 1.2",
+          "P saturn 58.2",
+          "P southNode 40.1",
+          "P sun 38.1",
+          "P uranus 10.4",
+          "P venus 26.1"
+        ]
+      },
+      "numerology": {
+        "lifePath": 6,
+        "destiny": 7,
+        "personality": 11,
+        "soulUrge": 5,
+        "hiddenPassion": 2,
+        "karmicLessons": [
+          1
+        ],
+        "pinnacles": [
+          7,
+          3,
+          1,
+          11
+        ],
+        "challenges": [
+          1,
+          4,
+          3,
+          5
+        ]
+      }
+    },
+    "reykjavik-1999": {
+      "julianDay": 2451350.666667,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Gemini",
+            "longitude": 89.371,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 184.048,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Cancer",
+            "longitude": 113.352,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Leo",
+            "longitude": 134.361,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Libra",
+            "longitude": 206.222,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aries",
+            "longitude": 28.801,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Taurus",
+            "longitude": 43.269,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Aquarius",
+            "longitude": 316.436,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Aquarius",
+            "longitude": 303.858,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Sagittarius",
+            "longitude": 248.571,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Leo",
+            "longitude": 133.993,
+            "retrograde": true
+          }
+        },
+        "ascendant": 98.306,
+        "ascendantSign": "Cancer",
+        "midheaven": 304.631
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Gemini",
+            "longitude": 65.525,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 160.202,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Gemini",
+            "longitude": 89.505,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Cancer",
+            "longitude": 110.514,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Libra",
+            "longitude": 182.376,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aries",
+            "longitude": 4.955,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Aries",
+            "longitude": 19.423,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Capricorn",
+            "longitude": 292.59,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 280.011,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 224.725,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Cancer",
+            "longitude": 110.146,
+            "retrograde": true
+          }
+        },
+        "ascendant": 74.46,
+        "ascendantSign": "Gemini",
+        "midheaven": 280.785
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Self-Projected",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of the Vessel of Love",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "throat"
+        ],
+        "channels": [
+          "10-20",
+          "17-62"
+        ],
+        "gates": [
+          "D earth 46.4",
+          "D jupiter 17.6",
+          "D mars 44.5",
+          "D mercury 36.4",
+          "D moon 20.6",
+          "D neptune 41.2",
+          "D northNode 4.3",
+          "D pluto 9.6",
+          "D saturn 27.1",
+          "D southNode 49.3",
+          "D sun 25.4",
+          "D uranus 13.3",
+          "D venus 27.4",
+          "P earth 10.2",
+          "P jupiter 3.3",
+          "P mars 32.6",
+          "P mercury 62.3",
+          "P moon 18.1",
+          "P neptune 41.2",
+          "P northNode 7.1",
+          "P pluto 9.4",
+          "P saturn 2.1",
+          "P southNode 13.1",
+          "P sun 15.2",
+          "P uranus 13.4",
+          "P venus 7.2"
+        ]
+      },
+      "numerology": {
+        "lifePath": 1,
+        "destiny": 7,
+        "personality": 9,
+        "soulUrge": 7,
+        "hiddenPassion": 1,
+        "karmicLessons": [
+          7
+        ],
+        "pinnacles": [
+          9,
+          4,
+          4,
+          7
+        ],
+        "challenges": [
+          3,
+          2,
+          1,
+          5
+        ]
+      }
+    },
+    "saopaulo-1979": {
+      "julianDay": 2444140.125,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Virgo",
+            "longitude": 179.989,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 204.459,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Libra",
+            "longitude": 188.402,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Libra",
+            "longitude": 187.861,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 119.242,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Leo",
+            "longitude": 148.843,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Virgo",
+            "longitude": 168.884,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Scorpio",
+            "longitude": 228.369,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 257.881,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 198.374,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Virgo",
+            "longitude": 158.392,
+            "retrograde": true
+          }
+        },
+        "ascendant": 280.041,
+        "ascendantSign": "Capricorn",
+        "midheaven": 180.251
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Virgo",
+            "longitude": 156.417,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 180.888,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Virgo",
+            "longitude": 164.83,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Virgo",
+            "longitude": 164.289,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 95.67,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Leo",
+            "longitude": 125.271,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Leo",
+            "longitude": 145.312,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Libra",
+            "longitude": 204.797,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 234.309,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Virgo",
+            "longitude": 174.802,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Leo",
+            "longitude": 134.82,
+            "retrograde": true
+          }
+        },
+        "ascendant": 256.469,
+        "ascendantSign": "Sagittarius",
+        "midheaven": 156.679
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Emotional",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of the Vessel of Love",
+        "definedCenters": [
+          "g_center",
+          "heart",
+          "sacral",
+          "solar_plexus",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "1-8",
+          "10-57",
+          "29-46",
+          "37-40"
+        ],
+        "gates": [
+          "D earth 10.4",
+          "D jupiter 33.2",
+          "D mars 8.5",
+          "D mercury 62.6",
+          "D moon 12.5",
+          "D neptune 26.2",
+          "D northNode 40.6",
+          "D pluto 57.2",
+          "D saturn 40.4",
+          "D southNode 37.6",
+          "D sun 15.4",
+          "D uranus 1.5",
+          "D venus 35.4",
+          "P earth 25.2",
+          "P jupiter 29.5",
+          "P mars 56.4",
+          "P mercury 18.5",
+          "P moon 32.4",
+          "P neptune 26.1",
+          "P northNode 40.3",
+          "P pluto 57.4",
+          "P saturn 47.3",
+          "P southNode 37.3",
+          "P sun 46.2",
+          "P uranus 1.6",
+          "P venus 18.5"
+        ]
+      },
+      "numerology": {
+        "lifePath": 22,
+        "destiny": 4,
+        "personality": 7,
+        "soulUrge": 6,
+        "hiddenPassion": 3,
+        "karmicLessons": [
+          2,
+          4,
+          5,
+          6,
+          8
+        ],
+        "pinnacles": [
+          5,
+          4,
+          9,
+          8
+        ],
+        "challenges": [
+          4,
+          3,
+          1,
+          1
+        ]
+      }
+    },
+    "kathmandu-2012": {
+      "julianDay": 2456282.726389,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Sagittarius",
+            "longitude": 269.756,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Aries",
+            "longitude": 11.29,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Sagittarius",
+            "longitude": 254.344,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Sagittarius",
+            "longitude": 246.287,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Capricorn",
+            "longitude": 296.241,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Gemini",
+            "longitude": 68.929,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Scorpio",
+            "longitude": 218.639,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Aries",
+            "longitude": 4.639,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Pisces",
+            "longitude": 330.808,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Capricorn",
+            "longitude": 278.941,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Scorpio",
+            "longitude": 235.601,
+            "retrograde": false
+          }
+        },
+        "ascendant": 341.842,
+        "ascendantSign": "Pisces",
+        "midheaven": 258.055
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Sagittarius",
+            "longitude": 245.713,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Pisces",
+            "longitude": 347.248,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Scorpio",
+            "longitude": 230.302,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 222.245,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Capricorn",
+            "longitude": 272.198,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Taurus",
+            "longitude": 44.887,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Libra",
+            "longitude": 194.597,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Pisces",
+            "longitude": 340.597,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Aquarius",
+            "longitude": 306.766,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Sagittarius",
+            "longitude": 254.899,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Scorpio",
+            "longitude": 211.558,
+            "retrograde": false
+          }
+        },
+        "ascendant": 317.8,
+        "ascendantSign": "Aquarius",
+        "midheaven": 234.013
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Sacral",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of the Vessel of Love",
+        "definedCenters": [
+          "g_center",
+          "sacral",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "16-48",
+          "5-15"
+        ],
+        "gates": [
+          "D earth 25.4",
+          "D jupiter 35.6",
+          "D mars 43.3",
+          "D mercury 48.4",
+          "D moon 61.2",
+          "D neptune 55.1",
+          "D northNode 14.4",
+          "D pluto 58.4",
+          "D saturn 50.3",
+          "D southNode 8.4",
+          "D sun 46.4",
+          "D uranus 17.4",
+          "D venus 4.1",
+          "P earth 15.2",
+          "P jupiter 16.4",
+          "P mars 61.6",
+          "P mercury 5.4",
+          "P moon 21.2",
+          "P neptune 55.1",
+          "P northNode 14.2",
+          "P pluto 58.6",
+          "P saturn 44.2",
+          "P southNode 8.2",
+          "P sun 10.2",
+          "P uranus 17.1",
+          "P venus 9.1"
+        ]
+      },
+      "numerology": {
+        "lifePath": 11,
+        "destiny": 3,
+        "personality": 8,
+        "soulUrge": 4,
+        "hiddenPassion": 5,
+        "karmicLessons": [
+          1,
+          4,
+          6,
+          8
+        ],
+        "pinnacles": [
+          6,
+          8,
+          5,
+          8
+        ],
+        "challenges": [
+          0,
+          2,
+          2,
+          2
+        ]
+      }
+    },
+    "moscow-1950": {
+      "julianDay": 2433407.104167,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Taurus",
+            "longitude": 44.52,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Capricorn",
+            "longitude": 272.038,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Taurus",
+            "longitude": 57.363,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Pisces",
+            "longitude": 359.781,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Virgo",
+            "longitude": 172.029,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Pisces",
+            "longitude": 333.358,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Virgo",
+            "longitude": 162.663,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Cancer",
+            "longitude": 92.293,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Libra",
+            "longitude": 195.231,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Leo",
+            "longitude": 135.781,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 6.841,
+            "retrograde": true
+          }
+        },
+        "ascendant": 198.611,
+        "ascendantSign": "Libra",
+        "midheaven": 116.011
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Aries",
+            "longitude": 21.357,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Sagittarius",
+            "longitude": 248.876,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Taurus",
+            "longitude": 34.2,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Pisces",
+            "longitude": 336.619,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Leo",
+            "longitude": 148.867,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aquarius",
+            "longitude": 310.195,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Leo",
+            "longitude": 139.5,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Gemini",
+            "longitude": 69.131,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Virgo",
+            "longitude": 172.068,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Cancer",
+            "longitude": 112.618,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Pisces",
+            "longitude": 343.679,
+            "retrograde": true
+          }
+        },
+        "ascendant": 175.448,
+        "ascendantSign": "Virgo",
+        "midheaven": 92.848
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Splenic",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of the Sphinx",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "head",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "1-8",
+          "10-57",
+          "47-64"
+        ],
+        "gates": [
+          "D earth 7.4",
+          "D jupiter 13.2",
+          "D mars 48.2",
+          "D mercury 61.1",
+          "D moon 6.3",
+          "D neptune 57.3",
+          "D northNode 17.6",
+          "D pluto 7.5",
+          "D saturn 47.2",
+          "D southNode 18.6",
+          "D sun 13.4",
+          "D uranus 15.4",
+          "D venus 41.6",
+          "P earth 1.2",
+          "P jupiter 55.4",
+          "P mars 47.6",
+          "P mercury 8.4",
+          "P moon 10.5",
+          "P neptune 57.1",
+          "P northNode 17.4",
+          "P pluto 7.3",
+          "P saturn 64.2",
+          "P southNode 18.4",
+          "P sun 2.2",
+          "P uranus 15.5",
+          "P venus 25.2"
+        ]
+      },
+      "numerology": {
+        "lifePath": 7,
+        "destiny": 1,
+        "personality": 9,
+        "soulUrge": 1,
+        "hiddenPassion": 5,
+        "karmicLessons": [
+          1,
+          2,
+          8,
+          9
+        ],
+        "pinnacles": [
+          1,
+          11,
+          3,
+          11
+        ],
+        "challenges": [
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "berlin-dstgap-1993": {
+      "julianDay": 2449074.5625,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Aries",
+            "longitude": 7.388,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Gemini",
+            "longitude": 60.365,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Pisces",
+            "longitude": 341.657,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Aries",
+            "longitude": 14.594,
+            "retrograde": true
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 106.945,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Libra",
+            "longitude": 190.113,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Aquarius",
+            "longitude": 326.214,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Capricorn",
+            "longitude": 291.829,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 290.968,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 235.279,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Sagittarius",
+            "longitude": 254.349,
+            "retrograde": true
+          }
+        },
+        "ascendant": 276.678,
+        "ascendantSign": "Capricorn",
+        "midheaven": 223.848
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Pisces",
+            "longitude": 343.621,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Taurus",
+            "longitude": 36.598,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Aquarius",
+            "longitude": 317.89,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Pisces",
+            "longitude": 350.827,
+            "retrograde": true
+          },
+          "mars": {
+            "sign": "Gemini",
+            "longitude": 83.178,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Virgo",
+            "longitude": 166.346,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Aquarius",
+            "longitude": 302.446,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Sagittarius",
+            "longitude": 268.062,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 267.201,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 211.512,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Scorpio",
+            "longitude": 230.582,
+            "retrograde": true
+          }
+        },
+        "ascendant": 252.911,
+        "ascendantSign": "Sagittarius",
+        "midheaven": 200.08
+      },
+      "humanDesign": {
+        "type": "Manifestor",
+        "authority": "Emotional",
+        "profile": "4/6",
+        "cross": "Right Angle Cross of Service",
+        "definedCenters": [
+          "ajna",
+          "heart",
+          "root",
+          "solar_plexus",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "17-62",
+          "18-58",
+          "21-45",
+          "35-36"
+        ],
+        "gates": [
+          "D earth 52.6",
+          "D jupiter 48.5",
+          "D mars 62.1",
+          "D mercury 11.4",
+          "D moon 36.3",
+          "D neptune 54.4",
+          "D northNode 26.5",
+          "D pluto 14.1",
+          "D saturn 13.4",
+          "D southNode 45.5",
+          "D sun 58.6",
+          "D uranus 54.3",
+          "D venus 30.1",
+          "P earth 18.4",
+          "P jupiter 48.1",
+          "P mars 53.2",
+          "P mercury 63.1",
+          "P moon 20.1",
+          "P neptune 61.1",
+          "P northNode 5.4",
+          "P pluto 14.1",
+          "P saturn 30.2",
+          "P southNode 35.4",
+          "P sun 17.4",
+          "P uranus 61.2",
+          "P venus 21.6"
+        ]
+      },
+      "numerology": {
+        "lifePath": 8,
+        "destiny": 9,
+        "personality": 3,
+        "soulUrge": 6,
+        "hiddenPassion": 3,
+        "karmicLessons": [],
+        "pinnacles": [
+          4,
+          5,
+          9,
+          7
+        ],
+        "challenges": [
+          2,
+          3,
+          1,
+          1
+        ]
+      }
+    },
+    "nyc-ambiguous-2005": {
+      "julianDay": 2453673.729167,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Scorpio",
+            "longitude": 216.892,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Libra",
+            "longitude": 183.718,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Scorpio",
+            "longitude": 239.827,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Sagittarius",
+            "longitude": 263.827,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Taurus",
+            "longitude": 47.87,
+            "retrograde": true
+          },
+          "jupiter": {
+            "sign": "Scorpio",
+            "longitude": 210.894,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Leo",
+            "longitude": 130.815,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Pisces",
+            "longitude": 336.961,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Aquarius",
+            "longitude": 314.82,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Sagittarius",
+            "longitude": 262.689,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 13.588,
+            "retrograde": false
+          }
+        },
+        "ascendant": 146.159,
+        "ascendantSign": "Leo",
+        "midheaven": 49.58
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Libra",
+            "longitude": 192.955,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 159.781,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Scorpio",
+            "longitude": 215.89,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 239.89,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Aries",
+            "longitude": 23.933,
+            "retrograde": true
+          },
+          "jupiter": {
+            "sign": "Libra",
+            "longitude": 186.957,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Cancer",
+            "longitude": 106.878,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Aquarius",
+            "longitude": 313.023,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 290.883,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 238.752,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Pisces",
+            "longitude": 349.651,
+            "retrograde": false
+          }
+        },
+        "ascendant": 122.222,
+        "ascendantSign": "Leo",
+        "midheaven": 25.642
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Emotional",
+        "profile": "6/2",
+        "cross": "Left Angle Cross of Alignment",
+        "definedCenters": [
+          "g_center",
+          "heart",
+          "sacral",
+          "solar_plexus",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "13-33",
+          "2-14",
+          "27-50",
+          "37-40",
+          "7-31"
+        ],
+        "gates": [
+          "D earth 19.2",
+          "D jupiter 48.5",
+          "D mars 27.1",
+          "D mercury 7.5",
+          "D moon 12.2",
+          "D neptune 13.4",
+          "D northNode 51.2",
+          "D pluto 26.6",
+          "D saturn 31.1",
+          "D southNode 57.2",
+          "D sun 33.2",
+          "D uranus 37.5",
+          "D venus 40.6",
+          "P earth 27.6",
+          "P jupiter 50.5",
+          "P mars 2.5",
+          "P mercury 14.6",
+          "P moon 46.6",
+          "P neptune 13.2",
+          "P northNode 21.5",
+          "P pluto 11.1",
+          "P saturn 33.4",
+          "P southNode 48.5",
+          "P sun 28.6",
+          "P uranus 37.2",
+          "P venus 11.2"
+        ]
+      },
+      "numerology": {
+        "lifePath": 11,
+        "destiny": 9,
+        "personality": 8,
+        "soulUrge": 1,
+        "hiddenPassion": 5,
+        "karmicLessons": [
+          2,
+          3
+        ],
+        "pinnacles": [
+          4,
+          1,
+          5,
+          8
+        ],
+        "challenges": [
+          2,
+          4,
+          2,
+          6
+        ]
+      }
+    },
+    "paris-1920": {
+      "julianDay": 2422324.75,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Capricorn",
+            "longitude": 279.536,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Taurus",
+            "longitude": 35.637,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Sagittarius",
+            "longitude": 260.056,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 236.318,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Libra",
+            "longitude": 196.629,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Leo",
+            "longitude": 136.982,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Virgo",
+            "longitude": 161.607,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Aquarius",
+            "longitude": 328.978,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Leo",
+            "longitude": 130.955,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Cancer",
+            "longitude": 96.673,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Scorpio",
+            "longitude": 233.896,
+            "retrograde": false
+          }
+        },
+        "ascendant": 254.821,
+        "ascendantSign": "Sagittarius",
+        "midheaven": 192.995
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Sagittarius",
+            "longitude": 256.793,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Aries",
+            "longitude": 12.894,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Scorpio",
+            "longitude": 237.313,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 213.574,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Virgo",
+            "longitude": 173.886,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Cancer",
+            "longitude": 114.238,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Leo",
+            "longitude": 138.863,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Aquarius",
+            "longitude": 306.234,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Cancer",
+            "longitude": 108.211,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Gemini",
+            "longitude": 73.93,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Scorpio",
+            "longitude": 211.152,
+            "retrograde": false
+          }
+        },
+        "ascendant": 232.077,
+        "ascendantSign": "Scorpio",
+        "midheaven": 170.252
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Mental",
+        "profile": "1/3",
+        "cross": "Right Angle Cross of Tension",
+        "definedCenters": [
+          "ajna",
+          "throat"
+        ],
+        "channels": [
+          "23-43"
+        ],
+        "gates": [
+          "D earth 21.3",
+          "D jupiter 33.6",
+          "D mars 29.4",
+          "D mercury 57.3",
+          "D moon 49.4",
+          "D neptune 33.4",
+          "D northNode 14.2",
+          "D pluto 52.5",
+          "D saturn 40.1",
+          "D southNode 8.2",
+          "D sun 48.3",
+          "D uranus 30.4",
+          "D venus 40.6",
+          "P earth 39.1",
+          "P jupiter 7.4",
+          "P mars 57.2",
+          "P mercury 26.4",
+          "P moon 27.4",
+          "P neptune 33.4",
+          "P northNode 43.6",
+          "P pluto 52.3",
+          "P saturn 64.1",
+          "P southNode 23.6",
+          "P sun 38.1",
+          "P uranus 30.5",
+          "P venus 14.2"
+        ]
+      },
+      "numerology": {
+        "lifePath": 5,
+        "destiny": 22,
+        "personality": 22,
+        "soulUrge": 9,
+        "hiddenPassion": 1,
+        "karmicLessons": [],
+        "pinnacles": [
+          2,
+          4,
+          6,
+          4
+        ],
+        "challenges": [
+          0,
+          2,
+          2,
+          2
+        ]
+      }
+    },
+    "london-equinox-2024": {
+      "julianDay": 2460389.629167,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Pisces",
+            "longitude": 360,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Leo",
+            "longitude": 123.816,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Aries",
+            "longitude": 17.441,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Pisces",
+            "longitude": 340.171,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Aquarius",
+            "longitude": 327.773,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Taurus",
+            "longitude": 44.886,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Pisces",
+            "longitude": 342.225,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Taurus",
+            "longitude": 50.254,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Pisces",
+            "longitude": 357.46,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Aquarius",
+            "longitude": 301.661,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 15.723,
+            "retrograde": true
+          }
+        },
+        "ascendant": 281.346,
+        "ascendantSign": "Capricorn",
+        "midheaven": 226.983
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Pisces",
+            "longitude": 335.806,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Cancer",
+            "longitude": 99.622,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Pisces",
+            "longitude": 353.247,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Aquarius",
+            "longitude": 315.977,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Aquarius",
+            "longitude": 303.579,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aries",
+            "longitude": 20.692,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Aquarius",
+            "longitude": 318.031,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Aries",
+            "longitude": 26.06,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Pisces",
+            "longitude": 333.266,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Capricorn",
+            "longitude": 277.466,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Pisces",
+            "longitude": 351.529,
+            "retrograde": true
+          }
+        },
+        "ascendant": 257.152,
+        "ascendantSign": "Sagittarius",
+        "midheaven": 202.788
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Splenic",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of the Vessel of Love",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "heart",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "10-57",
+          "23-43",
+          "25-51"
+        ],
+        "gates": [
+          "D earth 15.4",
+          "D jupiter 27.4",
+          "D mars 26.5",
+          "D mercury 10.1",
+          "D moon 8.3",
+          "D neptune 36.3",
+          "D northNode 42.2",
+          "D pluto 60.3",
+          "D saturn 55.3",
+          "D southNode 32.2",
+          "D sun 10.4",
+          "D uranus 23.1",
+          "D venus 43.5",
+          "P earth 46.2",
+          "P jupiter 2.2",
+          "P mars 30.4",
+          "P mercury 51.3",
+          "P moon 31.2",
+          "P neptune 36.6",
+          "P northNode 51.1",
+          "P pluto 60.6",
+          "P saturn 63.1",
+          "P southNode 57.1",
+          "P sun 25.2",
+          "P uranus 23.2",
+          "P venus 37.5"
+        ]
+      },
+      "numerology": {
+        "lifePath": 4,
+        "destiny": 6,
+        "personality": 4,
+        "soulUrge": 11,
+        "hiddenPassion": 6,
+        "karmicLessons": [
+          3,
+          4,
+          7,
+          8
+        ],
+        "pinnacles": [
+          5,
+          1,
+          6,
+          11
+        ],
+        "challenges": [
+          1,
+          6,
+          5,
+          5
+        ]
+      }
+    },
+    "auckland-1996": {
+      "julianDay": 2450310.5,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Leo",
+            "longitude": 142.446,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Leo",
+            "longitude": 149.941,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Virgo",
+            "longitude": 168.922,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Cancer",
+            "longitude": 96.82,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 103.44,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Capricorn",
+            "longitude": 278.421,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Aries",
+            "longitude": 6.793,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Aquarius",
+            "longitude": 301.801,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 295.66,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Sagittarius",
+            "longitude": 240.339,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Libra",
+            "longitude": 188.771,
+            "retrograde": true
+          }
+        },
+        "ascendant": 247.461,
+        "ascendantSign": "Sagittarius",
+        "midheaven": 135.985
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Cancer",
+            "longitude": 118.635,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Leo",
+            "longitude": 126.13,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Leo",
+            "longitude": 145.111,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Gemini",
+            "longitude": 73.008,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Gemini",
+            "longitude": 79.629,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Sagittarius",
+            "longitude": 254.61,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Pisces",
+            "longitude": 342.982,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Capricorn",
+            "longitude": 277.99,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 271.849,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 216.528,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Virgo",
+            "longitude": 164.96,
+            "retrograde": true
+          }
+        },
+        "ascendant": 223.65,
+        "ascendantSign": "Scorpio",
+        "midheaven": 112.174
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Sacral",
+        "profile": "4/6",
+        "cross": "Right Angle Cross of Explanation",
+        "definedCenters": [
+          "ajna",
+          "head",
+          "root",
+          "sacral",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "18-58",
+          "23-43",
+          "24-61",
+          "34-57"
+        ],
+        "gates": [
+          "D earth 43.6",
+          "D jupiter 54.3",
+          "D mars 24.2",
+          "D mercury 8.1",
+          "D moon 42.5",
+          "D neptune 60.2",
+          "D northNode 57.2",
+          "D pluto 34.2",
+          "D saturn 17.1",
+          "D southNode 51.2",
+          "D sun 23.6",
+          "D uranus 41.3",
+          "D venus 12.6",
+          "P earth 49.4",
+          "P jupiter 58.5",
+          "P mars 39.5",
+          "P mercury 47.3",
+          "P moon 29.6",
+          "P neptune 61.6",
+          "P northNode 18.6",
+          "P pluto 34.1",
+          "P saturn 17.4",
+          "P southNode 17.6",
+          "P sun 4.4",
+          "P uranus 60.6",
+          "P venus 52.4"
+        ]
+      },
+      "numerology": {
+        "lifePath": 3,
+        "destiny": 5,
+        "personality": 11,
+        "soulUrge": 3,
+        "hiddenPassion": 2,
+        "karmicLessons": [
+          6
+        ],
+        "pinnacles": [
+          5,
+          4,
+          9,
+          6
+        ],
+        "challenges": [
+          2,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "anchorage-1980": {
+      "julianDay": 2444280.416667,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Aquarius",
+            "longitude": 321.324,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Sagittarius",
+            "longitude": 249.97,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Pisces",
+            "longitude": 336.122,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Aries",
+            "longitude": 1.107,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Virgo",
+            "longitude": 161.093,
+            "retrograde": true
+          },
+          "jupiter": {
+            "sign": "Virgo",
+            "longitude": 157.067,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Virgo",
+            "longitude": 175.958,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Scorpio",
+            "longitude": 235.416,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 262.172,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 201.689,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Leo",
+            "longitude": 149.327,
+            "retrograde": true
+          }
+        },
+        "ascendant": 100.128,
+        "ascendantSign": "Cancer",
+        "midheaven": 317.799
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Capricorn",
+            "longitude": 297.747,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Scorpio",
+            "longitude": 226.393,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Aquarius",
+            "longitude": 312.545,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Pisces",
+            "longitude": 337.53,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Leo",
+            "longitude": 137.515,
+            "retrograde": true
+          },
+          "jupiter": {
+            "sign": "Leo",
+            "longitude": 133.49,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Virgo",
+            "longitude": 152.381,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Scorpio",
+            "longitude": 211.839,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 238.595,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Virgo",
+            "longitude": 178.112,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Leo",
+            "longitude": 125.75,
+            "retrograde": true
+          }
+        },
+        "ascendant": 76.551,
+        "ascendantSign": "Gemini",
+        "midheaven": 294.222
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Emotional",
+        "profile": "3/5",
+        "cross": "Right Angle Cross of Explanation",
+        "definedCenters": [
+          "ajna",
+          "heart",
+          "sacral",
+          "solar_plexus",
+          "spleen",
+          "throat"
+        ],
+        "channels": [
+          "23-43",
+          "34-57",
+          "37-40",
+          "6-59"
+        ],
+        "gates": [
+          "D earth 23.5",
+          "D jupiter 40.3",
+          "D mars 29.5",
+          "D mercury 34.3",
+          "D moon 48.5",
+          "D neptune 26.3",
+          "D northNode 59.6",
+          "D pluto 57.6",
+          "D saturn 6.3",
+          "D southNode 55.6",
+          "D sun 43.5",
+          "D uranus 43.3",
+          "D venus 5.4",
+          "P earth 4.3",
+          "P jupiter 40.2",
+          "P mars 40.6",
+          "P mercury 37.1",
+          "P moon 9.5",
+          "P neptune 26.6",
+          "P northNode 29.6",
+          "P pluto 32.2",
+          "P saturn 6.4",
+          "P southNode 30.6",
+          "P sun 49.3",
+          "P uranus 14.1",
+          "P venus 25.4"
+        ]
+      },
+      "numerology": {
+        "lifePath": 3,
+        "destiny": 4,
+        "personality": 9,
+        "soulUrge": 4,
+        "hiddenPassion": 7,
+        "karmicLessons": [
+          2,
+          3,
+          4,
+          6
+        ],
+        "pinnacles": [
+          3,
+          1,
+          4,
+          11
+        ],
+        "challenges": [
+          1,
+          8,
+          7,
+          7
+        ]
+      }
+    },
+    "dubai-2023": {
+      "julianDay": 2460044.114583,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Aries",
+            "longitude": 19.489,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Sagittarius",
+            "longitude": 241.014,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Taurus",
+            "longitude": 38.568,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Taurus",
+            "longitude": 58.149,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 97.578,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aries",
+            "longitude": 21.197,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Pisces",
+            "longitude": 333.587,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Taurus",
+            "longitude": 47.238,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Pisces",
+            "longitude": 356.03,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Aquarius",
+            "longitude": 300.246,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Taurus",
+            "longitude": 34.025,
+            "retrograde": false
+          }
+        },
+        "ascendant": 201.734,
+        "ascendantSign": "Libra",
+        "midheaven": 112.322
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Pisces",
+            "longitude": 355.31,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Scorpio",
+            "longitude": 216.835,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Aries",
+            "longitude": 14.389,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Taurus",
+            "longitude": 33.97,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Gemini",
+            "longitude": 73.398,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Pisces",
+            "longitude": 357.018,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Aquarius",
+            "longitude": 309.408,
+            "retrograde": false
+          },
+          "uranus": {
+            "sign": "Aries",
+            "longitude": 23.059,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Pisces",
+            "longitude": 331.851,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Capricorn",
+            "longitude": 276.067,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 9.846,
+            "retrograde": false
+          }
+        },
+        "ascendant": 177.555,
+        "ascendantSign": "Virgo",
+        "midheaven": 88.143
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Emotional",
+        "profile": "5/1",
+        "cross": "Left Angle Cross of the Clarion",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "head",
+          "heart",
+          "root",
+          "sacral",
+          "solar_plexus",
+          "spleen"
+        ],
+        "channels": [
+          "19-49",
+          "24-61",
+          "25-51",
+          "28-38",
+          "34-57"
+        ],
+        "gates": [
+          "D earth 62.1",
+          "D jupiter 25.5",
+          "D mars 16.3",
+          "D mercury 38.3",
+          "D moon 64.6",
+          "D neptune 36.1",
+          "D northNode 24.3",
+          "D pluto 60.2",
+          "D saturn 49.6",
+          "D southNode 44.3",
+          "D sun 61.1",
+          "D uranus 2.2",
+          "D venus 19.4",
+          "P earth 57.5",
+          "P jupiter 42.1",
+          "P mars 52.4",
+          "P mercury 24.2",
+          "P moon 34.1",
+          "P neptune 36.4",
+          "P northNode 27.3",
+          "P pluto 60.5",
+          "P saturn 55.4",
+          "P southNode 28.3",
+          "P sun 51.5",
+          "P uranus 2.5",
+          "P venus 8.4"
+        ]
+      },
+      "numerology": {
+        "lifePath": 2,
+        "destiny": 1,
+        "personality": 7,
+        "soulUrge": 3,
+        "hiddenPassion": 1,
+        "karmicLessons": [
+          2,
+          6,
+          7,
+          8
+        ],
+        "pinnacles": [
+          4,
+          7,
+          11,
+          11
+        ],
+        "challenges": [
+          5,
+          2,
+          3,
+          3
+        ]
+      }
+    },
+    "mexicocity-1966": {
+      "julianDay": 2439438.625,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Scorpio",
+            "longitude": 226.259,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 178.841,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Sagittarius",
+            "longitude": 242.817,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Scorpio",
+            "longitude": 226.283,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Virgo",
+            "longitude": 166.133,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Leo",
+            "longitude": 124.234,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Pisces",
+            "longitude": 353.184,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Virgo",
+            "longitude": 173.242,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Scorpio",
+            "longitude": 231.696,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Virgo",
+            "longitude": 170.113,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Taurus",
+            "longitude": 46.193,
+            "retrograde": false
+          }
+        },
+        "ascendant": 92.294,
+        "ascendantSign": "Cancer",
+        "midheaven": 353.146
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Libra",
+            "longitude": 202.868,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Virgo",
+            "longitude": 155.451,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Scorpio",
+            "longitude": 219.426,
+            "retrograde": true
+          },
+          "venus": {
+            "sign": "Libra",
+            "longitude": 202.893,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Leo",
+            "longitude": 142.743,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Cancer",
+            "longitude": 100.844,
+            "retrograde": false
+          },
+          "saturn": {
+            "sign": "Aquarius",
+            "longitude": 329.794,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Leo",
+            "longitude": 149.852,
+            "retrograde": false
+          },
+          "neptune": {
+            "sign": "Libra",
+            "longitude": 208.306,
+            "retrograde": false
+          },
+          "pluto": {
+            "sign": "Leo",
+            "longitude": 146.723,
+            "retrograde": false
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 22.803,
+            "retrograde": false
+          }
+        },
+        "ascendant": 68.903,
+        "ascendantSign": "Gemini",
+        "midheaven": 329.756
+      },
+      "humanDesign": {
+        "type": "Projector",
+        "authority": "Self-Projected",
+        "profile": "4/6",
+        "cross": "Right Angle Cross of the Sphinx",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "head",
+          "throat"
+        ],
+        "channels": [
+          "23-43",
+          "47-64",
+          "7-31"
+        ],
+        "gates": [
+          "D earth 13.6",
+          "D jupiter 62.1",
+          "D mars 62.1",
+          "D mercury 56.5",
+          "D moon 16.5",
+          "D neptune 43.1",
+          "D northNode 23.3",
+          "D pluto 47.1",
+          "D saturn 25.1",
+          "D southNode 43.3",
+          "D sun 7.6",
+          "D uranus 47.2",
+          "D venus 62.5",
+          "P earth 2.4",
+          "P jupiter 31.3",
+          "P mars 64.6",
+          "P mercury 34.3",
+          "P moon 46.1",
+          "P neptune 43.4",
+          "P northNode 2.4",
+          "P pluto 47.4",
+          "P saturn 36.1",
+          "P southNode 1.4",
+          "P sun 1.4",
+          "P uranus 6.1",
+          "P venus 1.4"
+        ]
+      },
+      "numerology": {
+        "lifePath": 5,
+        "destiny": 4,
+        "personality": 9,
+        "soulUrge": 22,
+        "hiddenPassion": 1,
+        "karmicLessons": [
+          2,
+          4
+        ],
+        "pinnacles": [
+          1,
+          3,
+          4,
+          33
+        ],
+        "challenges": [
+          6,
+          4,
+          2,
+          2
+        ]
+      }
+    },
+    "singapore-1985": {
+      "julianDay": 2446231.5625,
+      "tropical": {
+        "bodies": {
+          "sun": {
+            "sign": "Gemini",
+            "longitude": 83.903,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Taurus",
+            "longitude": 45.427,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Cancer",
+            "longitude": 92.925,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Taurus",
+            "longitude": 38.175,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Cancer",
+            "longitude": 93.74,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Aquarius",
+            "longitude": 316.8,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Scorpio",
+            "longitude": 232.733,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Sagittarius",
+            "longitude": 255.651,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Capricorn",
+            "longitude": 272.475,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Scorpio",
+            "longitude": 212.128,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Taurus",
+            "longitude": 47.869,
+            "retrograde": false
+          }
+        },
+        "ascendant": 118.014,
+        "ascendantSign": "Cancer",
+        "midheaven": 31.767
+      },
+      "sidereal": {
+        "bodies": {
+          "sun": {
+            "sign": "Gemini",
+            "longitude": 60.252,
+            "retrograde": false
+          },
+          "moon": {
+            "sign": "Aries",
+            "longitude": 21.777,
+            "retrograde": false
+          },
+          "mercury": {
+            "sign": "Gemini",
+            "longitude": 69.275,
+            "retrograde": false
+          },
+          "venus": {
+            "sign": "Aries",
+            "longitude": 14.525,
+            "retrograde": false
+          },
+          "mars": {
+            "sign": "Gemini",
+            "longitude": 70.089,
+            "retrograde": false
+          },
+          "jupiter": {
+            "sign": "Capricorn",
+            "longitude": 293.15,
+            "retrograde": true
+          },
+          "saturn": {
+            "sign": "Libra",
+            "longitude": 209.083,
+            "retrograde": true
+          },
+          "uranus": {
+            "sign": "Scorpio",
+            "longitude": 232.001,
+            "retrograde": true
+          },
+          "neptune": {
+            "sign": "Sagittarius",
+            "longitude": 248.824,
+            "retrograde": true
+          },
+          "pluto": {
+            "sign": "Libra",
+            "longitude": 188.477,
+            "retrograde": true
+          },
+          "northNode": {
+            "sign": "Aries",
+            "longitude": 24.219,
+            "retrograde": false
+          }
+        },
+        "ascendant": 94.364,
+        "ascendantSign": "Cancer",
+        "midheaven": 8.117
+      },
+      "humanDesign": {
+        "type": "Generator",
+        "authority": "Sacral",
+        "profile": "2/4",
+        "cross": "Right Angle Cross of Eden",
+        "definedCenters": [
+          "ajna",
+          "g_center",
+          "root",
+          "sacral",
+          "throat"
+        ],
+        "channels": [
+          "2-14",
+          "23-43",
+          "3-60",
+          "5-15"
+        ],
+        "gates": [
+          "D earth 6.4",
+          "D jupiter 19.1",
+          "D mars 3.5",
+          "D mercury 21.6",
+          "D moon 60.4",
+          "D neptune 10.6",
+          "D northNode 23.2",
+          "D pluto 28.3",
+          "D saturn 14.4",
+          "D southNode 43.2",
+          "D sun 36.4",
+          "D uranus 26.2",
+          "D venus 42.2",
+          "P earth 11.2",
+          "P jupiter 13.4",
+          "P mars 15.6",
+          "P mercury 15.5",
+          "P moon 2.3",
+          "P neptune 10.5",
+          "P northNode 2.5",
+          "P pluto 28.1",
+          "P saturn 43.5",
+          "P southNode 1.5",
+          "P sun 12.2",
+          "P uranus 5.5",
+          "P venus 24.1"
+        ]
+      },
+      "numerology": {
+        "lifePath": 8,
+        "destiny": 2,
+        "personality": 8,
+        "soulUrge": 3,
+        "hiddenPassion": 5,
+        "karmicLessons": [
+          8
+        ],
+        "pinnacles": [
+          3,
+          11,
+          5,
+          11
+        ],
+        "challenges": [
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  }
+}
