@@ -29,6 +29,8 @@ export async function register(): Promise<void> {
       graphQL: { document: false, variables: false },
     },
     tracesSampleRate: 0,
+    // Set SENTRY_DEBUG=1 to print what Sentry is doing in the Terminal.
+    debug: process.env.SENTRY_DEBUG === '1',
     beforeSend: scrubEvent,
     beforeBreadcrumb: () => null,
   });
