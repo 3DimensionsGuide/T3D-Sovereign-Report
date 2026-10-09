@@ -13,6 +13,7 @@ import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
+import { TimeNote } from '@/components/TimeNote';
 import { TriadTodayCard } from '@/components/TriadTodayCard';
 import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
@@ -116,6 +117,7 @@ export default function Today() {
 
       {today ? (
         <>
+          <TimeNote scope="sky" />
           {triad ? (
             <FadeIn delay={60}>
               <TriadTodayCard data={triad} />

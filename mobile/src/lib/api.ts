@@ -37,6 +37,11 @@ export interface BirthProfile {
   birthTimeKnown: boolean;
   city: string;
   country: string;
+  /** Set when the person confirmed the place; the exact values the chart was built from. */
+  placeLabel?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
 }
 
 export interface PlanetPlacement {
@@ -109,6 +114,9 @@ export async function requestChart(profile: BirthProfile): Promise<ChartResult> 
         birthPlace: {
           city: profile.city.trim(),
           country: profile.country.trim(),
+          latitude: profile.latitude,
+          longitude: profile.longitude,
+          timezone: profile.timezone,
         },
       }),
     });
@@ -483,4 +491,25 @@ export function requestTriadToday(leadId: number, email: string, localDate: stri
     { leadId, email, localDate },
     'Could not build today’s reading. Please try again.',
   );
+}
+
+export interface PlaceCandidate {
+  label: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  utcOffset: string | null;
+}
+
+export async function requestPlaceCheck(
+  city: string,
+  country: string,
+  birthDate: string,
+): Promise<PlaceCandidate[]> {
+  const data = await postApp<{ candidates: PlaceCandidate[] }>(
+    '/api/app/place-check',
+    { city, country, birthDate },
+    'Could not look up that place. Please try again.',
+  );
+  return data.candidates;
 }

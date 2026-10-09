@@ -5,6 +5,7 @@ import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/termIds';
+import { BirthDataCard } from '@/components/BirthDataCard';
 import { TriadCard } from '@/components/TriadCard';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
 import { Segmented } from '@/components/Segmented';
@@ -104,6 +105,10 @@ export default function Chart() {
           ]}
         />
         {risingNote ? <Text style={styles.note}>{risingNote}</Text> : null}
+      </FadeIn>
+
+      <FadeIn delay={360}>
+        <BirthDataCard profile={profile} />
       </FadeIn>
 
         </>

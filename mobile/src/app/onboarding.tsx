@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
-import { ChartRequestError, requestChart, type BirthProfile } from '@/lib/api';
+import {
+  ChartRequestError, requestChart, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
+} from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
 
@@ -38,6 +40,8 @@ export default function Onboarding() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
+  const [chosen, setChosen] = useState(0);
   const onDateChange = (_event: unknown, value: Date) => setBirthDate(value);
   const onTimeChange = (_event: unknown, value: Date) => setBirthTime(value);
 
@@ -52,9 +56,29 @@ export default function Onboarding() {
     return Object.keys(next).length === 0;
   }
 
-  async function onSubmit() {
+  /** Step 1: look the place up and show it back before anything is calculated. */
+  async function onCheckPlace() {
     setSubmitError(null);
     if (!validate()) return;
+    setLoading(true);
+    try {
+      const found = await requestPlaceCheck(city.trim(), country.trim(), toDateString(birthDate));
+      setCandidates(found);
+      setChosen(0);
+    } catch (error) {
+      setSubmitError(
+        error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /** Step 2: calculate using exactly the place the person confirmed. */
+  async function onSubmit() {
+    setSubmitError(null);
+    const place = candidates?.[chosen];
+    if (!place) return;
 
     const profile: BirthProfile = {
       firstName: firstName.trim(),
@@ -66,6 +90,10 @@ export default function Onboarding() {
       birthTimeKnown: timeKnown,
       city: city.trim(),
       country: country.trim(),
+      placeLabel: place.label,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      timezone: place.timezone,
     };
 
     setLoading(true);
@@ -80,6 +108,64 @@ export default function Onboarding() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (candidates) {
+    const dateText = birthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeText = timeKnown
+      ? birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      : '12:00 PM (assumed, no birth time entered)';
+    return (
+      <Screen>
+        <FadeIn>
+          <View style={styles.hero}>
+            <Text style={styles.eyebrow}>CONFIRM YOUR BIRTH DETAILS</Text>
+            <Text accessibilityRole="header" style={styles.title}>Is this right?</Text>
+            <Text style={styles.lede}>
+              Your chart is only as accurate as these details. Check the place especially, since a wrong match
+              changes your Rising sign and Human Design.
+            </Text>
+          </View>
+        </FadeIn>
+        <View style={styles.form}>
+          <View style={styles.confirmCard}>
+            <Text style={styles.confirmLine}>Born {dateText}</Text>
+            <Text style={styles.confirmLine}>at {timeText}</Text>
+          </View>
+          <Text style={styles.pickerLabel}>Which place is yours?</Text>
+          {candidates.map((c, i) => (
+            <Pressable
+              key={`${c.label}-${c.latitude}`}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: i === chosen }}
+              accessibilityLabel={`${c.label}, time zone ${c.timezone}`}
+              onPress={() => setChosen(i)}
+              style={[styles.placeRow, i === chosen && styles.placeRowOn]}
+            >
+              <Text style={styles.placeMark}>{i === chosen ? '◉' : '○'}</Text>
+              <View style={styles.placeText}>
+                <Text style={styles.placeLabel}>{c.label}</Text>
+                <Text style={styles.hint}>
+                  {Math.abs(c.latitude).toFixed(2)}° {c.latitude >= 0 ? 'N' : 'S'},{' '}
+                  {Math.abs(c.longitude).toFixed(2)}° {c.longitude >= 0 ? 'E' : 'W'} · {c.timezone}
+                  {c.utcOffset ? ` (${c.utcOffset} on your birth date)` : ''}
+                </Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+        <View style={styles.actions}>
+          {submitError ? (
+            <Text accessibilityLiveRegion="polite" style={styles.submitError}>
+              {'⚠  '}
+              {submitError}
+            </Text>
+          ) : null}
+          <GoldButton label="CONFIRM AND CALCULATE" onPress={onSubmit} loading={loading} />
+          <GoldButton label="CHANGE MY DETAILS" variant="ghost" onPress={() => setCandidates(null)} />
+        </View>
+      </Screen>
+    );
   }
 
   return (
@@ -154,7 +240,7 @@ export default function Onboarding() {
               {submitError}
             </Text>
           ) : null}
-          <GoldButton label="CALCULATE MY CHART" onPress={onSubmit} loading={loading} />
+          <GoldButton label="CHECK MY BIRTH PLACE" onPress={onCheckPlace} loading={loading} />
         </View>
       </FadeIn>
     </Screen>
@@ -176,4 +262,17 @@ const styles = StyleSheet.create({
   hint: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   actions: { gap: space.md, marginTop: space.md },
   submitError: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
+  confirmCard: {
+    gap: 4, padding: space.md, borderRadius: 12, borderWidth: 1, borderColor: colors.hairline,
+    backgroundColor: colors.charcoal,
+  },
+  confirmLine: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
+  placeRow: {
+    minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md,
+    borderRadius: 12, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
+  },
+  placeRowOn: { borderColor: colors.gold },
+  placeMark: { fontSize: 20, color: colors.gold },
+  placeText: { flex: 1, gap: 2 },
+  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
 });

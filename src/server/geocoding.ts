@@ -93,3 +93,60 @@ export async function resolveGeoAndTimezone(
 
   return { latitude, longitude, timezone: tzData.timezoneId };
 }
+
+// ─── PLACE CANDIDATES (for the app's "confirm your birth place" step) ─────────
+
+export interface PlaceCandidate {
+  label:     string;
+  latitude:  number;
+  longitude: number;
+  timezone:  string;
+}
+
+/**
+ * Up to three populated-place matches for a city and country, with the
+ * coordinates and IANA time zone each one would use. The app shows these back
+ * to the person to confirm before anything is calculated.
+ *
+ * Unlike resolveGeoAndTimezone, this never falls back to New York: if the
+ * lookup service isn't configured it throws PLACE_LOOKUP_UNAVAILABLE so the
+ * app can say so instead of silently using the wrong place.
+ */
+export async function lookupPlaceCandidates(city: string, country: string): Promise<PlaceCandidate[]> {
+  const username = process.env.GEONAMES_USERNAME;
+  if (!username) throw new Error('PLACE_LOOKUP_UNAVAILABLE');
+
+  const url = new URL('https://secure.geonames.org/searchJSON');
+  url.searchParams.set('q', `${city}, ${country}`);
+  url.searchParams.set('maxRows', '6');
+  url.searchParams.set('featureClass', 'P');
+  url.searchParams.set('style', 'FULL');
+  url.searchParams.set('username', username);
+
+  const res = await fetch(url.toString(), { cache: 'no-store' });
+  const data = await res.json() as {
+    geonames?: {
+      lat: string; lng: string; name: string; adminName1?: string; countryName?: string;
+      timezone?: { timeZoneId?: string };
+    }[];
+    status?: { message: string; value: number };
+  };
+  if (data.status) throw new Error('PLACE_LOOKUP_UNAVAILABLE');
+
+  const out: PlaceCandidate[] = [];
+  const seen = new Set<string>();
+  for (const g of data.geonames ?? []) {
+    const latitude = parseFloat(g.lat);
+    const longitude = parseFloat(g.lng);
+    const timezone = g.timezone?.timeZoneId;
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || !timezone) continue;
+    const label = [g.name, g.adminName1 && g.adminName1 !== g.name ? g.adminName1 : null, g.countryName]
+      .filter(Boolean)
+      .join(', ');
+    if (seen.has(label)) continue;
+    seen.add(label);
+    out.push({ label, latitude, longitude, timezone });
+    if (out.length === 3) break;
+  }
+  return out;
+}
