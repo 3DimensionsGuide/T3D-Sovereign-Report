@@ -428,7 +428,7 @@ export function buildSynastry(
 
   const why = unknownTimes(timesKnown);
   const note = why
-    ? `Because ${why}, the Moon is left out. Its position changes too much across a day to compare reliably.`
+    ? `Because ${why}, ${!timesKnown.you && !timesKnown.them ? 'both Moons are' : !timesKnown.you ? 'your Moon is' : 'their Moon is'} left out. The Moon\u2019s position changes too much across a day to compare reliably.`
     : null;
 
   return {
