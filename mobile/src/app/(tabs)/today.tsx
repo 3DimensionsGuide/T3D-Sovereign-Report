@@ -5,7 +5,7 @@ import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { DayNumerologyCard } from '@/components/DayNumerologyCard';
 import {
-  ChartRequestError, requestDayNumerology, requestToday, type DailyTransitHit, type TodayResult,
+  ChartRequestError, requestDayNumerology, requestToday, requestTriadToday, type DailyTransitHit, type TodayResult,
 } from '@/lib/api';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
 import { localDateString } from '@/lib/useTimeline';
@@ -13,6 +13,8 @@ import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
+import { TriadTodayCard } from '@/components/TriadTodayCard';
+import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
 import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -50,6 +52,7 @@ export default function Today() {
   const [dayNum, setDayNum] = useState<DayNumerology | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [triad, setTriad] = useState<TriadToday | null>(null);
   const [selectedHit, setSelectedHit] = useState<DailyTransitHit | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -60,6 +63,9 @@ export default function Today() {
     requestDayNumerology(chart.leadId, profile.email, localDateString())
       .then(setDayNum)
       .catch(() => setDayNum(null));
+    requestTriadToday(chart.leadId, profile.email, localDateString())
+      .then(setTriad)
+      .catch(() => setTriad(null));
     try {
       setToday(await requestToday(chart.leadId, profile.email));
     } catch (err) {
@@ -190,6 +196,11 @@ export default function Today() {
             )}
           </FadeIn>
 
+          {triad ? (
+            <FadeIn delay={320}>
+              <TriadTodayCard data={triad} />
+            </FadeIn>
+          ) : (
           <FadeIn delay={320}>
             <View style={[styles.card, { borderLeftColor: colors.vehicle }]}>
               <Text style={styles.cardEyebrow}>YOUR VEHICLE DECIDES</Text>
@@ -205,6 +216,8 @@ export default function Today() {
               <Text style={styles.body}>{today.reminder}</Text>
             </View>
           </FadeIn>
+          )}
+          {triad ? <Text style={styles.body}>{today.reminder}</Text> : null}
         </>
       ) : null}
       <TransitSheet hit={selectedHit} onClose={() => setSelectedHit(null)} />

@@ -1,5 +1,6 @@
 import type { ChartDrawingData } from '@/charts/chartTypes';
 import type { StoplightDetail } from '@/lib/stoplightTypes';
+import type { TriadToday } from '@/lib/triadTypes';
 import type { TransitCardData } from '@/lib/transitCardTypes';
 import type { ExplainEntry, GlossaryItem } from '@/lib/explainTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
@@ -473,5 +474,13 @@ export function requestStoplight(
     '/api/app/stoplight',
     { leadId, email, birthTimeKnown },
     'Could not load your astrology reading. Please try again.',
+  );
+}
+
+export function requestTriadToday(leadId: number, email: string, localDate: string): Promise<TriadToday> {
+  return postApp<TriadToday>(
+    '/api/app/triad-today',
+    { leadId, email, localDate },
+    'Could not build today’s reading. Please try again.',
   );
 }

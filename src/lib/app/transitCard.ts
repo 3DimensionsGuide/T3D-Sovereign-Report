@@ -159,7 +159,7 @@ const NATURE_FRAME: Record<Nature, string> = {
 const REMINDER =
   'A transit is weather, not a command. It does not predict what will happen. Decide through your Strategy and Inner Authority.';
 
-function pickAuthorityKey(authority: string | null): string | null {
+export function pickAuthorityKey(authority: string | null): string | null {
   if (!authority) return null;
   const lower = authority.toLowerCase();
   const key = Object.keys(AUTHORITY_CONTENT).find((k) => lower.includes(k.toLowerCase()));
@@ -169,7 +169,7 @@ function pickAuthorityKey(authority: string | null): string | null {
   return null;
 }
 
-function pickTypeKey(type: string | null): string | null {
+export function pickTypeKey(type: string | null): string | null {
   if (!type) return null;
   const lower = type.toLowerCase();
   return Object.keys(TYPE_CONTENT).find((k) => lower.includes(k.toLowerCase())) ?? null;
@@ -253,4 +253,14 @@ export function buildTransitCard(input: TransitCardInput, vehicle: TransitCardVe
       input.applying ? 'astro:applying' : 'astro:separating',
     ],
   };
+}
+
+export function pickTypeContent(type: string | null) {
+  const key = pickTypeKey(type);
+  return key ? (TYPE_CONTENT[key] ?? null) : null;
+}
+
+export function pickAuthorityContent(authority: string | null) {
+  const key = pickAuthorityKey(authority);
+  return key ? (AUTHORITY_CONTENT[key] ?? null) : null;
 }
