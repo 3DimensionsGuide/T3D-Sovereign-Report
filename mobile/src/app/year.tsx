@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,8 +16,18 @@ function dayLabel(isoDay: string): string {
 export default function YearAheadScreen() {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
+  const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
   const y = data?.yearAhead;
+
+  // A copy saved before this screen existed has no year ahead in it. Fetch a fresh one once, by itself.
+  const triedRefresh = useRef(false);
+  const missing = Boolean(data) && !y;
+  useEffect(() => {
+    if (missing && !offline && !triedRefresh.current) {
+      triedRefresh.current = true;
+      refresh();
+    }
+  }, [missing, offline, refresh]);
 
   return (
     <View style={styles.root}>
@@ -37,10 +48,14 @@ export default function YearAheadScreen() {
           ) : null}
           {offline && data ? <OfflineNote savedAt={savedAt} /> : null}
 
-          {data && !y ? (
-            <Text style={styles.body}>
-              This screen needs a fresh copy of your timeline. Go back, pull down on the Timeline tab to refresh, then open it again.
-            </Text>
+          {data && !y && (refreshing || !triedRefresh.current) ? <ActivityIndicator color={colors.gold} /> : null}
+          {data && !y && !refreshing && triedRefresh.current ? (
+            <>
+              <Text style={styles.body}>
+                We could not load your year ahead just now. Check your connection and try again.
+              </Text>
+              <GoldButton label="TRY AGAIN" variant="ghost" onPress={() => refresh()} />
+            </>
           ) : null}
 
           {y ? (
