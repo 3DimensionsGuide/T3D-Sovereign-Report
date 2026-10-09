@@ -12,7 +12,7 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = join(process.cwd(), 'src/app/api/app');
-const PUBLIC_ROUTES = new Set(['place-check']); // takes no lead id; rate limited only
+const PUBLIC_ROUTES = new Set(['place-check', 'preview']); // take no lead id; rate limited only
 const routes = readdirSync(ROOT, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(ROOT, d.name, 'route.ts')))
   .map((d) => ({ name: d.name, src: readFileSync(join(ROOT, d.name, 'route.ts'), 'utf8') }));
@@ -21,7 +21,7 @@ const chartRoutes = routes.filter((r) => !PUBLIC_ROUTES.has(r.name));
 test('the app routes exist', () => assert.ok(routes.length >= 14));
 
 test('every app route is rate limited', () => {
-  for (const r of routes) assert.match(r.src, /limitRequest\(request, '(app|place)'\)/, r.name);
+  for (const r of routes) assert.match(r.src, /limitRequest\(request, '(app|place|preview)'\)/, r.name);
 });
 
 test('every chart route pairs the lead id with the email', () => {
@@ -63,4 +63,10 @@ test('no route logs the person\'s details', () => {
 test('decide-together stores no partner details', () => {
   const src = routes.find((r) => r.name === 'decide-together')!.src;
   assert.doesNotMatch(src, /\.insert\(|\.update\(/);
+});
+
+test('the first-launch preview saves nothing, logs nothing and enforces the age rule', () => {
+  const src = routes.find((r) => r.name === 'preview')!.src;
+  assert.doesNotMatch(src, /@\/server\/db|\.insert\(|\.update\(|console\./);
+  assert.match(src, /isUnderMinimumAge\(birthDate\)/);
 });

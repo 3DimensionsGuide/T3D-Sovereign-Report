@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -23,6 +23,7 @@ type FieldErrors = Partial<Record<'firstName' | 'lastName' | 'email' | 'city' | 
 export default function Onboarding() {
   const [today] = useState(() => new Date());
   const saved = useT3DStore((state) => state.profile);
+  const { birthDate: startDate } = useLocalSearchParams<{ birthDate?: string }>();
   const setChart = useT3DStore((state) => state.setChart);
 
   const [firstName, setFirstName] = useState(saved?.firstName ?? '');
@@ -32,7 +33,11 @@ export default function Onboarding() {
   const [city, setCity] = useState(saved?.city ?? '');
   const [country, setCountry] = useState(saved?.country ?? '');
   const [birthDate, setBirthDate] = useState<Date>(
-    saved ? new Date(`${saved.birthDate}T12:00:00`) : new Date(1990, 0, 1, 12, 0),
+    saved
+      ? new Date(`${saved.birthDate}T12:00:00`)
+      : startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate)
+        ? new Date(`${startDate}T12:00:00`)
+        : new Date(1990, 0, 1, 12, 0),
   );
   const [birthTime, setBirthTime] = useState<Date>(
     saved ? new Date(`2000-01-01T${saved.birthTime}:00`) : new Date(2000, 0, 1, 12, 0),
@@ -190,7 +195,7 @@ export default function Onboarding() {
           </Text>
           <Text style={styles.lede}>
             T3D is a reflection tool for self-understanding and entertainment. It does not predict
-            events and is not medical, legal or financial advice. You must be 13 or older to use it.
+            events and is not medical, legal or financial advice. T3D is for people 13 and older.
           </Text>
           <Pressable
             accessibilityRole="link"
@@ -206,21 +211,26 @@ export default function Onboarding() {
       <FadeIn delay={120}>
         <View style={styles.form}>
           <Field label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
-            autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
+            autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next"
+            why="Used to greet you and to personalise your readings." />
           <Field label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
             autoCapitalize="words" autoComplete="additional-name" textContentType="middleName" returnKeyType="next"
-            placeholder="As written on your birth certificate" />
+            placeholder="As written on your birth certificate"
+            why="Numerology uses your full birth name, so add it if you have one." />
           <Field label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}
-            autoCapitalize="words" autoComplete="family-name" textContentType="familyName" returnKeyType="next" />
+            autoCapitalize="words" autoComplete="family-name" textContentType="familyName" returnKeyType="next"
+            why="Part of your full birth name, which numerology reads letter by letter." />
           <Field label="Email" value={email} onChangeText={setEmail} error={errors.email}
             autoCapitalize="none" autoCorrect={false} keyboardType="email-address"
-            autoComplete="email" textContentType="emailAddress" />
+            autoComplete="email" textContentType="emailAddress"
+            why="Only used to find your chart again and to send your report if you buy one. We never sell it." />
 
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>Birth date</Text>
             <DateTimePicker value={birthDate} mode="date" display="compact" themeVariant="dark"
               maximumDate={today} onValueChange={onDateChange} accessibilityLabel="Birth date" />
           </View>
+          <Text style={styles.hint}>Your Life Path, Sun sign and Human Design all start from this date.</Text>
           {errors.birthDate ? (
             <Text accessibilityLiveRegion="polite" style={styles.submitError}>{errors.birthDate}</Text>
           ) : null}
@@ -234,6 +244,9 @@ export default function Onboarding() {
               <Text style={styles.unknownTime}>Using 12:00 noon</Text>
             )}
           </View>
+          <Text style={styles.hint}>
+            Your birth time sets your Rising sign, your houses and your Human Design details. It is on most birth certificates.
+          </Text>
 
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>I know my birth time</Text>
@@ -249,9 +262,11 @@ export default function Onboarding() {
           )}
 
           <Field label="Birth city" value={city} onChangeText={setCity} error={errors.city}
-            autoCapitalize="words" placeholder="e.g. Harbor City, California" />
+            autoCapitalize="words" placeholder="e.g. Harbor City, California"
+            why="Gives us the coordinates and time zone for the exact moment you were born." />
           <Field label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
-            autoCapitalize="words" placeholder="e.g. United States" />
+            autoCapitalize="words" placeholder="e.g. United States"
+            why="Time zones and daylight saving rules differ by country and by year." />
 
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>

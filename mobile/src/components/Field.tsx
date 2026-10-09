@@ -5,10 +5,12 @@ import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
 interface Props extends Omit<TextInputProps, 'style'> {
   label: string;
   error?: string;
+  /** Plain line under the field saying why it is asked. */
+  why?: string;
 }
 
 /** Labeled text input with a gold focus ring and a spoken-aloud error line. */
-export function Field({ label, error, ...inputProps }: Props) {
+export function Field({ label, error, why, ...inputProps }: Props) {
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.wrap}>
@@ -34,6 +36,8 @@ export function Field({ label, error, ...inputProps }: Props) {
           {'⚠  '}
           {error}
         </Text>
+      ) : why ? (
+        <Text style={styles.why}>{why}</Text>
       ) : null}
     </View>
   );
@@ -56,4 +60,5 @@ const styles = StyleSheet.create({
   focused: { borderColor: colors.gold },
   errored: { borderColor: colors.danger },
   error: { fontFamily: fonts.body, fontSize: 14, color: colors.danger },
+  why: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
 });

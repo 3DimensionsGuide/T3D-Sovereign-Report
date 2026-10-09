@@ -26,6 +26,8 @@ export const BUCKETS = {
   authFail: { limit: 15, windowSec: 15 * 60 },
   /** Creating a chart (writes a database row and looks up the place). */
   calculate: { limit: 10, windowSec: 60 * 60 },
+  /** The first-launch preview (date only, nothing saved). */
+  preview: { limit: 30, windowSec: 10 * 60 },
   /** Looking up a birth city. */
   place: { limit: 40, windowSec: 10 * 60 },
   /** Starting a checkout. */

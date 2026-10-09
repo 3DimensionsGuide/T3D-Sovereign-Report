@@ -1,3 +1,4 @@
+import type { BirthPreview } from '@/lib/previewTypes';
 import type { ChartDrawingData } from '@/charts/chartTypes';
 import type { StoplightDetail } from '@/lib/stoplightTypes';
 import type { TriadToday } from '@/lib/triadTypes';
@@ -501,6 +502,15 @@ export function requestTriadToday(
     '/api/app/triad-today',
     { leadId, email, localDate, ...(at ? { at, isToday: false } : {}) },
     'Could not build today’s reading. Please try again.',
+  );
+}
+
+/** First-launch preview from a birth date alone. Nothing is saved. */
+export function requestBirthPreview(birthDate: string): Promise<BirthPreview> {
+  return postApp<BirthPreview>(
+    '/api/app/preview',
+    { birthDate },
+    'Could not build your preview. Please try again.',
   );
 }
 
