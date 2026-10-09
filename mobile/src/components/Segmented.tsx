@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
   compact: { minHeight: 44 },
   selected: { backgroundColor: colors.gold },
   pressed: { backgroundColor: colors.amethyst },
-  label: { fontFamily: fonts.bodyMedium, fontSize: 14, letterSpacing: 0.8, color: colors.parchmentMuted },
+  label: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.4, color: colors.parchmentMuted },
   labelSelected: { fontFamily: fonts.bodyBold, color: colors.obsidian },
 });
