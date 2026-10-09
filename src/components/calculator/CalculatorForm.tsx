@@ -64,7 +64,7 @@ const INIT: FormState = {
 const STEP_FIELDS: Record<number, FKey[]> = {
   1: ['firstName', 'lastName'],
   2: ['birthMonth', 'birthDay', 'birthYear', 'city', 'country'],
-  3: ['email', 'emailOptIn'],
+  3: ['email'],
 };
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
@@ -90,7 +90,6 @@ function validateField(field: FKey, s: FormState): string {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return 'Enter a valid email';
       return '';
     }
-    case 'emailOptIn': return v === true ? '' : 'Agreement required to receive results';
     default: return '';
   }
 }
@@ -353,7 +352,7 @@ export default function CalculatorForm() {
     ) as Errors;
     if (Object.keys(errs).length) {
       setErrors(e => ({ ...e, ...errs }));
-      setTouched(t => ({ ...t, email:true, emailOptIn:true }));
+      setTouched(t => ({ ...t, email:true }));
       return;
     }
     setIsCalculating(true); setError(null);
@@ -584,14 +583,13 @@ export default function CalculatorForm() {
               <input type="checkbox" checked={data.emailOptIn}
                 onChange={e => { set('emailOptIn', e.target.checked); setTouched(t => ({ ...t, emailOptIn:true })); }} />
               <span className="t3d-body" style={{ fontSize:14 }}>
-                I agree to receive my T3D profile and occasional insights. No spam. Unsubscribe anytime.
+                Optional: email me occasional T3D insights. No spam. Unsubscribe anytime.
               </span>
             </label>
-            {touched.emailOptIn && errors.emailOptIn && (
-              <p role="alert" className="t3d-label" style={{ color:'var(--crimson-hi)' }}>
-                ⚠ {errors.emailOptIn}
-              </p>
-            )}
+            <p className="t3d-body" style={{ fontSize:13, color:'var(--parchment-40)', margin:0 }}>
+              We save your email so we can find your chart and send your report if you buy one.
+              Details are in our <a href="/privacy" style={{ color:'inherit', textDecoration:'underline' }}>privacy policy</a>.
+            </p>
 
             {calculationError && (
               <div role="alert" style={{ padding:'12px 16px', border:'1px solid var(--crimson)', background:'rgba(153,27,27,0.08)' }}>
