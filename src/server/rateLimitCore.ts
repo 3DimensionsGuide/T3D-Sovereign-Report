@@ -36,6 +36,10 @@ export const BUCKETS = {
   reportLink: { limit: 20, windowSec: 10 * 60 },
   /** Downloading a report (builds a PDF). */
   download: { limit: 20, windowSec: 10 * 60 },
+  /** The health check (an uptime monitor may call it every few minutes). */
+  health: { limit: 30, windowSec: 10 * 60 },
+  /** Anonymous screen counts from the app. */
+  event: { limit: 120, windowSec: 10 * 60 },
   /** Admin tools. */
   admin: { limit: 10, windowSec: 60 * 60 },
 } as const satisfies Record<string, BucketRule>;

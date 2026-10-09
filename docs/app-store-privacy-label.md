@@ -14,12 +14,15 @@ Yes.
 | Contact Info: Name | first, middle and last name (numerology uses the full name) | Yes | No | App Functionality |
 | Contact Info: Email Address | email used to find their chart | Yes | No | App Functionality |
 | Other Data Types | birth date, birth time, birth place (typed by the person, not device location) | Yes | No | App Functionality |
+| Usage Data: Product Interaction | which screens are opened, as anonymous daily counts (screen name and a number, no person or device attached) | No | No | Analytics |
 | User Content: Other User Content | optional marketing preference (email me insights) | Yes | No | Developer's Advertising or Marketing, only if they switch it on |
 
 Not collected in version 1.0: precise or coarse device location, contacts, photos,
-identifiers (IDFA or device ID), usage data, diagnostics, purchases, health data.
-If crash reporting or analytics are added (Round 2 #15) or the subscription is
-added (#6), come back and update this table before submitting that build.
+identifiers (IDFA or device ID), purchases, health data. Screen counts (Round 2 #15) are
+listed above as Product Interaction, not linked to the person. Crash reporting (Sentry)
+is not added yet: when it is, add Diagnostics: Crash Data and Performance Data, not
+linked to the person, App Functionality. Update this table again when the subscription
+(#6) is added, before submitting that build.
 
 ## "Do you use data for tracking?"
 No. Nothing is shared with advertisers or data brokers, and no tracking SDKs are in the app.

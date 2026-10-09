@@ -1,0 +1,40 @@
+name: Checks
+
+# Runs on every push and pull request: type check, tests, language audit, and the app's type check.
+on:
+  push:
+  pull_request:
+
+jobs:
+  website:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Tests (golden charts, security, app)
+        run: npm test
+      - name: Language audit
+        run: npm run audit:language
+
+  app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+        working-directory: mobile
+      - name: Type check
+        run: npx tsc --noEmit
+        working-directory: mobile

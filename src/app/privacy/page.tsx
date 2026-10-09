@@ -53,6 +53,12 @@ export default function PrivacyPage() {
             choice of date on the Today screen, and the saved details of another person if you
             use Decide Together or the relationship views.
           </p>
+          <p style={S.p}>
+            The app also keeps a simple count of which screens are opened each day, such as how
+            many times Today was opened. The count holds only the screen name and a number. It is
+            not connected to your name, email, chart, phone or IP address, so it cannot be traced
+            to you.
+          </p>
 
           <h2 style={S.h2}>Another Person&apos;s Details</h2>
           <p style={S.p}>

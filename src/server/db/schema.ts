@@ -20,6 +20,7 @@ import {
   boolean,
   index,
   uniqueIndex,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 
 // ─── LEADS TABLE ─────────────────────────────────────────────────────────────
@@ -157,3 +158,23 @@ export const orders = pgTable(
 
 export type Order    = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
+
+
+// ─── APP EVENTS TABLE ────────────────────────────────────────────────────────
+// Anonymous daily counts of which app screens were opened. One row per day and
+// screen, holding only a number. There is no person, device, IP address or
+// chart id in it, so a row can never be traced back to anyone.
+
+export const appEvents = pgTable(
+  'app_events',
+  {
+    /** UTC day, YYYY-MM-DD. */
+    day:   text('day').notNull(),
+    /** One of APP_EVENTS, for example "screen_today". */
+    event: text('event').notNull(),
+    count: integer('count').notNull().default(0),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.day, table.event] }),
+  }),
+);

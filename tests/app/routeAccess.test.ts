@@ -12,7 +12,7 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = join(process.cwd(), 'src/app/api/app');
-const PUBLIC_ROUTES = new Set(['place-check', 'preview']); // take no lead id; rate limited only
+const PUBLIC_ROUTES = new Set(['place-check', 'preview', 'event']); // take no lead id; rate limited only
 const routes = readdirSync(ROOT, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(ROOT, d.name, 'route.ts')))
   .map((d) => ({ name: d.name, src: readFileSync(join(ROOT, d.name, 'route.ts'), 'utf8') }));
@@ -21,7 +21,7 @@ const chartRoutes = routes.filter((r) => !PUBLIC_ROUTES.has(r.name));
 test('the app routes exist', () => assert.ok(routes.length >= 14));
 
 test('every app route is rate limited', () => {
-  for (const r of routes) assert.match(r.src, /limitRequest\(request, '(app|place|preview)'\)/, r.name);
+  for (const r of routes) assert.match(r.src, /limitRequest\(request, '(app|place|preview|event)'\)/, r.name);
 });
 
 test('every chart route pairs the lead id with the email', () => {
