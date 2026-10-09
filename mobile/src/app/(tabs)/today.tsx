@@ -3,7 +3,12 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
-import { ChartRequestError, requestToday, type DailyTransitHit, type TodayResult } from '@/lib/api';
+import { DayNumerologyCard } from '@/components/DayNumerologyCard';
+import {
+  ChartRequestError, requestDayNumerology, requestToday, type DailyTransitHit, type TodayResult,
+} from '@/lib/api';
+import type { DayNumerology } from '@/lib/dayNumerologyTypes';
+import { localDateString } from '@/lib/useTimeline';
 import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
@@ -33,6 +38,7 @@ export default function Today() {
   const chart = useT3DStore((state) => state.chart);
 
   const [today, setToday] = useState<TodayResult | null>(null);
+  const [dayNum, setDayNum] = useState<DayNumerology | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -40,6 +46,10 @@ export default function Today() {
   const load = useCallback(async () => {
     if (!profile || !chart) return;
     setError(null);
+    // Numerology of the day loads alongside the sky; if it fails the sky still shows.
+    requestDayNumerology(chart.leadId, profile.email, localDateString())
+      .then(setDayNum)
+      .catch(() => setDayNum(null));
     try {
       setToday(await requestToday(chart.leadId, profile.email));
     } catch (err) {
@@ -138,6 +148,12 @@ export default function Today() {
               ) : null}
             </View>
           </FadeIn>
+
+          {dayNum ? (
+            <FadeIn delay={200}>
+              <DayNumerologyCard data={dayNum} />
+            </FadeIn>
+          ) : null}
 
           <FadeIn delay={240}>
             <View style={styles.sectionHead}>
