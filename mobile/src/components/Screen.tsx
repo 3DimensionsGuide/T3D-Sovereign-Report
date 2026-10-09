@@ -1,10 +1,17 @@
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, space } from '@/theme/tokens';
 
 /** Obsidian page with a soft amethyst glow at the top and a scrolling body. */
-export function Screen({ children }: { children: ReactNode }) {
+interface ScreenProps {
+  children: ReactNode;
+  /** Pass both to enable pull-to-refresh. */
+  refreshing?: boolean;
+  onRefresh?: () => void;
+}
+
+export function Screen({ children, refreshing = false, onRefresh }: ScreenProps) {
   return (
     <View style={styles.root}>
       <View pointerEvents="none" style={styles.glow} />
@@ -14,6 +21,11 @@ export function Screen({ children }: { children: ReactNode }) {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.gold} />
+            ) : undefined
+          }
         >
           {children}
         </ScrollView>

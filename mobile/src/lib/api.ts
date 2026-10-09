@@ -138,3 +138,81 @@ export function formatLongitude(longitude: number): string {
   const minutes = Math.floor((inSign - degrees) * 60);
   return `${degrees}°${String(minutes).padStart(2, '0')}' ${sign}`;
 }
+
+// ─── TODAY (daily sky) ───────────────────────────────────────────────────────
+
+export type SkyBody =
+  | 'moon' | 'sun' | 'mercury' | 'venus' | 'mars'
+  | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'pluto';
+export type NatalPointName =
+  | 'sun' | 'moon' | 'mercury' | 'venus' | 'mars'
+  | 'jupiter' | 'saturn' | 'ascendant' | 'midheaven';
+export type DailyAspect = 'conjunction' | 'sextile' | 'square' | 'trine' | 'opposition';
+export type AspectNature = 'flow' | 'friction' | 'neutral';
+
+export interface MoonAspectContact {
+  natal: NatalPointName;
+  aspect: DailyAspect;
+  degrees: number;
+  approxHours: number;
+}
+
+export interface DailyTransitHit {
+  transiting: SkyBody;
+  natal: NatalPointName;
+  aspect: DailyAspect;
+  orb: number;
+  peak: boolean;
+  applying: boolean;
+  nature: AspectNature;
+}
+
+export interface TodayResult {
+  asOf: string;
+  moon: {
+    sign: string;
+    formatted: string;
+    house: number;
+    phase: string;
+    waxing: boolean;
+    illuminationPercent: number;
+    nextApplying: MoonAspectContact | null;
+    lastSeparating: MoonAspectContact | null;
+  };
+  sun: { sign: string; formatted: string; house: number };
+  retrograde: SkyBody[];
+  transits: DailyTransitHit[];
+  vehicle: { type: string | null; strategy: string | null; authority: string | null };
+  reminder: string;
+}
+
+export async function requestToday(leadId: number, email: string): Promise<TodayResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/app/today`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId, email }),
+    });
+  } catch {
+    throw new ChartRequestError(
+      'Could not reach the T3D server. Check your internet connection and try again.',
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+
+  let payload: { success: true; data: TodayResult } | ApiFailure;
+  try {
+    payload = (await response.json()) as { success: true; data: TodayResult } | ApiFailure;
+  } catch {
+    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
+  }
+  if (!payload.success) {
+    throw new ChartRequestError(payload.error || 'Could not load today. Please try again.');
+  }
+  return payload.data;
+}

@@ -9,5 +9,5 @@ export default function Index() {
   const hasChart = useT3DStore((state) => state.chart !== null);
 
   if (!hydrated) return <View style={{ flex: 1, backgroundColor: colors.obsidian }} />;
-  return <Redirect href={hasChart ? '/chart' : '/onboarding'} />;
+  return <Redirect href={hasChart ? '/today' : '/onboarding'} />;
 }

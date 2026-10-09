@@ -72,7 +72,7 @@ export default function Onboarding() {
     try {
       const chart = await requestChart(profile);
       setChart(profile, chart);
-      router.replace('/chart');
+      router.replace('/today');
     } catch (error) {
       setSubmitError(
         error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
