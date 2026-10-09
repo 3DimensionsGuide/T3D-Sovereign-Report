@@ -376,6 +376,16 @@ export const AUTHORITY_PROTOCOL: Record<string, {
     instruction: 'Not what you should want. Not what would be admirable. What do you, specifically, want — and are you willing to commit to it with your full will?',
     signal:      'Ego authority: a clear, unforced "I want this" that doesn\'t require justification.',
   },
+  'Mental': {
+    prompt:      'What do you notice as you sound this out in different places?',
+    instruction: 'Your clarity comes from moving through different spaces and conversations, not from a single inner signal. Talk the decision over with people you trust, in more than one setting, and notice what you think, say and feel along the way.',
+    signal:      'Clarity comes from environmental sampling and from hearing yourself speak, not from one internal signal.',
+  },
+  'Lunar': {
+    prompt:      'What does this look like across a full lunar cycle?',
+    instruction: 'Your clarity develops over time, not in a single moment. Let the decision sit for about 28 days, talk it through with people you trust, and notice how it looks on different days and in different places before you commit.',
+    signal:      'Clarity arrives gradually, as the same answer keeps showing up across the cycle.',
+  },
   'None': {
     prompt:      'What does the environment reflect back?',
     instruction: 'Your authority is environmental — you need to move through different spaces and conversations before clarity arrives. Notice what you think, say, and feel in different contexts over time.',

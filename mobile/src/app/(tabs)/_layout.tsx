@@ -47,6 +47,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="practice"
+        options={{
+          title: 'Practice',
+          tabBarIcon: ({ color }) => <TabGlyph glyph="✦" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="chart"
         options={{
           title: 'My Chart',

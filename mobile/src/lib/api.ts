@@ -1,6 +1,7 @@
 import type { ChartDrawingData } from '@/charts/chartTypes';
 import type { StoplightDetail } from '@/lib/stoplightTypes';
 import type { TriadToday } from '@/lib/triadTypes';
+import type { PracticeData } from '@/lib/practiceTypes';
 import type { TransitCardData } from '@/lib/transitCardTypes';
 import type { ExplainEntry, GlossaryItem } from '@/lib/explainTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
@@ -490,6 +491,14 @@ export function requestTriadToday(leadId: number, email: string, localDate: stri
     '/api/app/triad-today',
     { leadId, email, localDate },
     'Could not build today’s reading. Please try again.',
+  );
+}
+
+export function requestPractice(leadId: number, email: string, localDate: string): Promise<PracticeData> {
+  return postApp<PracticeData>(
+    '/api/app/practice',
+    { leadId, email, localDate },
+    'Could not load your practice. Please try again.',
   );
 }
 
