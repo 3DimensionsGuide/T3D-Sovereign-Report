@@ -116,6 +116,12 @@ export default function Today() {
 
       {today ? (
         <>
+          {triad ? (
+            <FadeIn delay={60}>
+              <TriadTodayCard data={triad} />
+            </FadeIn>
+          ) : null}
+
           <FadeIn delay={80}>
             <View style={[styles.card, { borderLeftColor: colors.stoplight }]}>
               <View style={styles.moonHead}>
@@ -196,11 +202,7 @@ export default function Today() {
             )}
           </FadeIn>
 
-          {triad ? (
-            <FadeIn delay={320}>
-              <TriadTodayCard data={triad} />
-            </FadeIn>
-          ) : (
+          {!triad ? (
           <FadeIn delay={320}>
             <View style={[styles.card, { borderLeftColor: colors.vehicle }]}>
               <Text style={styles.cardEyebrow}>YOUR VEHICLE DECIDES</Text>
@@ -216,8 +218,9 @@ export default function Today() {
               <Text style={styles.body}>{today.reminder}</Text>
             </View>
           </FadeIn>
+          ) : (
+            <Text style={styles.body}>{today.reminder}</Text>
           )}
-          {triad ? <Text style={styles.body}>{today.reminder}</Text> : null}
         </>
       ) : null}
       <TransitSheet hit={selectedHit} onClose={() => setSelectedHit(null)} />
