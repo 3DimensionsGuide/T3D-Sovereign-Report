@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
-import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -18,6 +18,7 @@ const toTimeString = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 type FieldErrors = Partial<Record<'firstName' | 'lastName' | 'email' | 'city' | 'country', string>>;
 
 export default function Onboarding() {
+  const [today] = useState(() => new Date());
   const saved = useT3DStore((state) => state.profile);
   const setChart = useT3DStore((state) => state.setChart);
 
@@ -37,9 +38,8 @@ export default function Onboarding() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const onDateChange = (_: DateTimePickerEvent, value?: Date) => value && setBirthDate(value);
-  const onTimeChange = (_: DateTimePickerEvent, value?: Date) => value && setBirthTime(value);
+  const onDateChange = (_event: unknown, value: Date) => setBirthDate(value);
+  const onTimeChange = (_event: unknown, value: Date) => setBirthTime(value);
 
   function validate(): boolean {
     const next: FieldErrors = {};
@@ -113,14 +113,14 @@ export default function Onboarding() {
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>Birth date</Text>
             <DateTimePicker value={birthDate} mode="date" display="compact" themeVariant="dark"
-              maximumDate={new Date()} onChange={onDateChange} accessibilityLabel="Birth date" />
+              maximumDate={today} onValueChange={onDateChange} accessibilityLabel="Birth date" />
           </View>
 
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>Birth time</Text>
             {timeKnown ? (
               <DateTimePicker value={birthTime} mode="time" display="compact" themeVariant="dark"
-                onChange={onTimeChange} accessibilityLabel="Birth time" />
+                onValueChange={onTimeChange} accessibilityLabel="Birth time" />
             ) : (
               <Text style={styles.unknownTime}>Using 12:00 noon</Text>
             )}

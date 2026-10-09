@@ -8,8 +8,11 @@
  * developing), set EXPO_PUBLIC_API_BASE_URL. By default it uses the live site.
  */
 
+// IMPORTANT: use the "www" address. The bare 3dimensions.guide address answers
+// with a redirect, and iOS apps can't follow a redirect on a POST request that
+// carries data (the request hangs and the app can crash).
 export const API_BASE_URL: string =
-  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://3dimensions.guide';
+  process.env.EXPO_PUBLIC_API_BASE_URL ?? 'https://www.3dimensions.guide';
 
 export interface BirthProfile {
   firstName: string;
@@ -76,11 +79,16 @@ interface ApiFailure {
 
 export class ChartRequestError extends Error {}
 
+const REQUEST_TIMEOUT_MS = 45000;
+
 export async function requestChart(profile: BirthProfile): Promise<ChartResult> {
   let response: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     response = await fetch(`${API_BASE_URL}/api/calculate-t3d`, {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         firstName: profile.firstName.trim(),
@@ -99,6 +107,8 @@ export async function requestChart(profile: BirthProfile): Promise<ChartResult> 
     throw new ChartRequestError(
       'Could not reach the T3D server. Check your internet connection and try again.',
     );
+  } finally {
+    clearTimeout(timer);
   }
 
   let payload: ApiSuccess | ApiFailure;
