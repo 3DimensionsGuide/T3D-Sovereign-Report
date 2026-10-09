@@ -10,6 +10,7 @@ import Page06Synthesis from '@/lib/report/advanced/stoplight/Page06Synthesis';
 import { calculateActiveTransits, getUpcomingTransits } from '@/server/engines/transits';
 import { generateStoplightSynthesis } from '@/lib/report/schema/stoplightSynthesisEngine';
 
+import { devOnlyGuard } from '@/server/devOnly';
 registerFonts();
 
 // Representative sample — invented placements, not computed from a real chart.
@@ -80,6 +81,8 @@ const realData = {
 };
 
 export async function GET(request: Request) {
+  const blocked = devOnlyGuard();
+  if (blocked) return blocked;
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('real') === '1' ? realData : sampleData;
 

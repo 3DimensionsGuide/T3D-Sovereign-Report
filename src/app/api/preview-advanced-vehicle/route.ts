@@ -14,6 +14,7 @@ import Page08Variables from '@/lib/report/advanced/vehicle/Page08Variables';
 import Page09Synthesis from '@/lib/report/advanced/vehicle/Page09Synthesis';
 import { generateVehicleSynthesis } from '@/lib/report/schema/vehicleSynthesisEngine';
 
+import { devOnlyGuard } from '@/server/devOnly';
 registerFonts();
 
 // Representative sample data — not a real chart. Throat+Sacral connect via
@@ -103,6 +104,8 @@ const realData = {
 };
 
 export async function GET(request: Request) {
+  const blocked = devOnlyGuard();
+  if (blocked) return blocked;
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('real') === '1' ? realData : sampleData;
 

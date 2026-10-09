@@ -11,6 +11,7 @@ import Page07Challenges from '@/lib/report/advanced/road/Page07Challenges';
 import Page08Synthesis from '@/lib/report/advanced/road/Page08Synthesis';
 import { generateRoadSynthesis } from '@/lib/report/schema/roadSynthesisEngine';
 
+import { devOnlyGuard } from '@/server/devOnly';
 registerFonts();
 
 // Representative sample — computed via the real numerology engine
@@ -63,6 +64,8 @@ const realData = {
 };
 
 export async function GET(request: Request) {
+  const blocked = devOnlyGuard();
+  if (blocked) return blocked;
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('real') === '1' ? realData : sampleData;
 

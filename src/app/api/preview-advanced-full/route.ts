@@ -45,6 +45,7 @@ import Page04Mistakes from '@/lib/report/advanced/synthesis/Page04Mistakes';
 import Page05IntegrationSynthesis from '@/lib/report/advanced/synthesis/Page05Synthesis';
 import { generateIntegrationSynthesis } from '@/lib/report/schema/integrationSynthesisEngine';
 
+import { devOnlyGuard } from '@/server/devOnly';
 registerFonts();
 
 // Merged sample dataset — every field is copied verbatim from its own
@@ -215,6 +216,8 @@ const realData = {
 };
 
 export async function GET(request: Request) {
+  const blocked = devOnlyGuard();
+  if (blocked) return blocked;
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('real') === '1' ? realData : sampleData;
 

@@ -11,6 +11,7 @@ import { registerFonts } from '@/lib/report/fonts';
 import Page05Transits from '@/lib/report/advanced/stoplight/Page05Transits';
 import type { TransitHit, UpcomingTransit } from '@/server/engines/transits';
 
+import { devOnlyGuard } from '@/server/devOnly';
 registerFonts();
 
 const activeTransits: TransitHit[] = [
@@ -48,6 +49,8 @@ const upcomingTransits: UpcomingTransit[] = [
 // split threshold) without editing the file: ?active=2&upcoming=1 etc.
 // Omit either param to use the full 3-active/2-upcoming overflow scenario.
 export async function GET(request: Request) {
+  const blocked = devOnlyGuard();
+  if (blocked) return blocked;
   const url = new URL(request.url);
   const activeParam = url.searchParams.get('active');
   const upcomingParam = url.searchParams.get('upcoming');

@@ -9,6 +9,7 @@ import Page05Synthesis from '@/lib/report/advanced/synthesis/Page05Synthesis';
 import { calculateActiveTransits } from '@/server/engines/transits';
 import { generateIntegrationSynthesis } from '@/lib/report/schema/integrationSynthesisEngine';
 
+import { devOnlyGuard } from '@/server/devOnly';
 registerFonts();
 
 // Merged sample dataset — Vehicle fields copied verbatim from
@@ -79,6 +80,8 @@ const realData = {
 };
 
 export async function GET(request: Request) {
+  const blocked = devOnlyGuard();
+  if (blocked) return blocked;
   const { searchParams } = new URL(request.url);
   const data = searchParams.get('real') === '1' ? realData : sampleData;
 
