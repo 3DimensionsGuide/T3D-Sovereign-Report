@@ -7,6 +7,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
 import { clearReminder } from '@/lib/reminder';
 import { clearAllCached } from '@/lib/persistentCache';
+import { crashReportingOn, sendTestCrashReport } from '@/lib/sentry';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -103,6 +104,10 @@ export default function YourData() {
             variant="ghost"
             onPress={() => { void WebBrowser.openBrowserAsync('https://www.3dimensions.guide/privacy'); }}
           />
+
+          {__DEV__ && crashReportingOn ? (
+            <GoldButton label="SEND A TEST CRASH REPORT" variant="ghost" onPress={sendTestCrashReport} />
+          ) : null}
 
           <View style={[styles.card, { borderLeftColor: colors.danger }]}>
             <Text style={[styles.cardEyebrow, { color: colors.danger }]}>✕</Text>

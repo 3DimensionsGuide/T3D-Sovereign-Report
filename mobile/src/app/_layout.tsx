@@ -11,13 +11,15 @@ import { colors } from '@/theme/tokens';
 import { ExplainProvider } from '@/components/Explain';
 import { pruneCache } from '@/lib/persistentCache';
 import { trackScreen } from '@/lib/track';
+import { initCrashReporting, wrapRoot } from '@/lib/sentry';
 import { configureNotifications, syncReminder } from '@/lib/reminder';
 import { useReminderStore } from '@/store/useReminderStore';
 
+initCrashReporting();
 SplashScreen.preventAutoHideAsync();
 configureNotifications();
 
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     PlayfairDisplay_400Regular,
     PlayfairDisplay_600SemiBold,
@@ -69,3 +71,5 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+export default wrapRoot(RootLayout);

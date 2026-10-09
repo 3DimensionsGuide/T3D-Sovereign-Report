@@ -59,6 +59,12 @@ export default function PrivacyPage() {
             not connected to your name, email, chart, phone or IP address, so it cannot be traced
             to you.
           </p>
+          <p style={S.p}>
+            If the app or our server hits an error, a crash report may be sent to our error
+            tracking provider, Sentry. It holds the type of error and where in the code it
+            happened. We remove your name, email, birth details and chart from these reports
+            before they are sent.
+          </p>
 
           <h2 style={S.h2}>Another Person&apos;s Details</h2>
           <p style={S.p}>
