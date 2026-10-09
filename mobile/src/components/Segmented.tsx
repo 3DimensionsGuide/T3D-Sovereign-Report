@@ -36,7 +36,7 @@ export function Segmented<T extends string>({
               pressed && !selected && styles.pressed,
             ]}
           >
-            <Text style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
+            <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
           </Pressable>
         );
       })}

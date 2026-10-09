@@ -2,6 +2,7 @@ import type { ChartDrawingData } from '@/charts/chartTypes';
 import type { StoplightDetail } from '@/lib/stoplightTypes';
 import type { TriadToday } from '@/lib/triadTypes';
 import type { PracticeData } from '@/lib/practiceTypes';
+import type { DecideTogether, PartnerProfile } from '@/lib/togetherTypes';
 import type { TransitCardData } from '@/lib/transitCardTypes';
 import type { ExplainEntry, GlossaryItem } from '@/lib/explainTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
@@ -505,6 +506,33 @@ export function requestPractice(leadId: number, email: string, localDate: string
     '/api/app/practice',
     { leadId, email, localDate },
     'Could not load your practice. Please try again.',
+  );
+}
+
+export function requestDecideTogether(
+  leadId: number,
+  email: string,
+  localDate: string,
+  youTimeKnown: boolean,
+  partner: PartnerProfile,
+): Promise<DecideTogether> {
+  return postApp<DecideTogether>(
+    '/api/app/decide-together',
+    {
+      leadId,
+      email,
+      localDate,
+      youTimeKnown,
+      partner: {
+        label: partner.label,
+        birthDate: partner.birthDate,
+        birthTime: partner.birthTime,
+        latitude: partner.latitude,
+        longitude: partner.longitude,
+        timezone: partner.timezone,
+      },
+    },
+    'Could not build your reading. Please try again.',
   );
 }
 

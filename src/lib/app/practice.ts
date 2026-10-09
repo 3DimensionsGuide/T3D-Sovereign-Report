@@ -53,7 +53,7 @@ export interface PracticeData {
 
 const AUTHORITY_ORDER = ['Sacral', 'Emotional', 'Splenic', 'Self-Projected', 'Ego', 'Mental', 'Lunar', 'None'] as const;
 
-function pickAuthorityKey(authority: string | null): (typeof AUTHORITY_ORDER)[number] | null {
+export function pickAuthorityKey(authority: string | null): (typeof AUTHORITY_ORDER)[number] | null {
   if (!authority) return null;
   const a = authority.toLowerCase();
   return AUTHORITY_ORDER.find((k) => a.includes(k.toLowerCase())) ?? null;
