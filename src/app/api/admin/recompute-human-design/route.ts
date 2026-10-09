@@ -41,6 +41,12 @@
  *   results.astrology or results.numerology.
  *     /api/admin/recompute-human-design?email=someone@example.com&secret=YOUR_SECRET&apply=true
  *
+ * SCAN MODE (?scan=true) -- read-only. Checks EVERY lead and lists only
+ * those whose meaningful Human Design fields (type, authority, profile,
+ * strategy, cross, centers, channels) differ from the current engine,
+ * ignoring tiny rounding differences in planet longitudes. Never writes.
+ *     /api/admin/recompute-human-design?scan=true&secret=YOUR_SECRET
+ *
  * RELOCATE MODE (?relocate=true) — a different, more serious repair.
  * Some early leads were written while GEONAMES_USERNAME wasn't set in
  * this deployment's environment, which makes /api/calculate-t3d's
@@ -269,6 +275,34 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
   if (!secret || secret !== expected) {
     return NextResponse.json({ error: 'Missing or incorrect secret.' }, { status: 401 });
+  }
+
+  if (url.searchParams.get('scan') === 'true') {
+    const all = await db.select().from(leads);
+    const MEANINGFUL = ['type', 'authority', 'profile', 'strategy', 'notSelf', 'incarnationCross', 'definedCenters', 'undefinedCenters', 'activeChannels'];
+    const affected: Record<string, unknown>[] = [];
+    let errors = 0;
+    for (const row of all) {
+      const bd = row.birthData as BirthData;
+      const stored = ((row.results ?? {}) as HumanDesignResults).humanDesign ?? {};
+      if (!bd?.date || !bd?.time || !bd?.place) { errors++; continue; }
+      try {
+        const fresh = calculateHumanDesign({
+          birthDate: bd.date, birthTime: bd.time,
+          latitude: bd.place.latitude, longitude: bd.place.longitude, timezone: bd.place.timezone,
+        }) as unknown as Record<string, unknown>;
+        const changed = MEANINGFUL.filter(k => stableStringify(stored[k]) !== stableStringify(fresh[k]));
+        if (changed.length > 0) {
+          affected.push({
+            leadId: row.id, name: `${row.firstName} ${row.lastName}`, email: row.email,
+            changed,
+            storedType: stored['type'], freshType: fresh['type'],
+            storedAuthority: stored['authority'], freshAuthority: fresh['authority'],
+          });
+        }
+      } catch { errors++; }
+    }
+    return NextResponse.json({ mode: 'scan', totalLeads: all.length, affectedCount: affected.length, errors, affected });
   }
 
   const emailParam = url.searchParams.get('email');
