@@ -58,24 +58,36 @@ export default function ReportClient() {
   const readyCopy    = READY_COPY_BY_SLUG[productSlug] ?? READY_COPY_BY_SLUG['sovereign-report'];
 
   const [downloading, setDownloading] = useState(false);
+  const [linkError, setLinkError] = useState('');
+  const paymentIntentId = searchParams.get('payment_intent');
 
   const paymentLikelyFailed = redirectStatus === 'failed';
 
-  function handleDownload() {
-    // Prefer orderId — it resolves to whatever product was actually
-    // purchased. The legacy leadId-only path always resolves to the
-    // Sovereign Report regardless of what was bought, so it's only a
-    // fallback for pre-orders-table links that never had an orderId.
-    if (orderId) {
-      setDownloading(true);
-      window.location.href = `/api/generate-report?orderId=${orderId}`;
-      setTimeout(() => setDownloading(false), 4000);
+  async function handleDownload() {
+    setLinkError('');
+    if (!orderId || !paymentIntentId) {
+      setLinkError('To protect your report, downloads from this page only work right after checkout. Please use the link in your report email.');
       return;
     }
-    if (!leadId) return;
     setDownloading(true);
-    window.location.href = `/api/generate-report?leadId=${leadId}`;
-    setTimeout(() => setDownloading(false), 4000);
+    try {
+      const res = await fetch('/api/report-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, paymentIntentId }),
+      });
+      const json = (await res.json()) as { success: boolean; url?: string; error?: string };
+      if (!json.success || !json.url) {
+        setLinkError(json.error ?? 'Could not prepare your download. Please try again.');
+        setDownloading(false);
+        return;
+      }
+      window.location.href = json.url;
+      setTimeout(() => setDownloading(false), 4000);
+    } catch {
+      setLinkError('Could not prepare your download. Please try again.');
+      setDownloading(false);
+    }
   }
 
   return (
@@ -145,6 +157,12 @@ export default function ReportClient() {
           >
             {downloading ? 'PREPARING YOUR REPORT…' : `DOWNLOAD MY ${productName.toUpperCase()}`}
           </button>
+
+          {linkError && (
+            <p role="alert" className="t3d-label" style={{ color: 'var(--crimson-hi, #B91C1C)', marginBottom: 16 }}>
+              ⚠ {linkError}
+            </p>
+          )}
 
           <p className="t3d-label" style={{ color: 'var(--parchment-40)', fontSize: 11 }}>
             Having trouble? Email support at{' '}

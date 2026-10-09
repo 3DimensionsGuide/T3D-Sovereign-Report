@@ -9,6 +9,7 @@
  * touching this file.
  */
 
+import { EMAILED_LINK_SECONDS, reportDownloadUrl } from '@/server/reportLinks';
 import { db }    from '@/server/db';
 import { leads, orders } from '@/server/db/schema';
 import { eq }    from 'drizzle-orm';
@@ -51,7 +52,7 @@ export async function generateAndEmailReport(orderId: number): Promise<void> {
     // endpoint, in case the attachment gets stripped by the recipient's
     // email provider.
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://t3-d-sovereign-report.vercel.app';
-    const downloadUrl = `${siteUrl}/api/generate-report?orderId=${orderId}`;
+    const downloadUrl = reportDownloadUrl(siteUrl, orderId, EMAILED_LINK_SECONDS) ?? siteUrl;
 
     await sendReportEmail({
       to:          lead.email,

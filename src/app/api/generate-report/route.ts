@@ -1,11 +1,13 @@
 /**
- * GET /api/generate-report?orderId=123
- * GET /api/generate-report?leadId=123   (legacy — pre-orders-table links)
+ * GET /api/generate-report?orderId=123&t=<expiry>.<signature>
  *
- * Looks up which product was purchased (via the order, or via the legacy
- * leads.reportPurchased flag for links generated before the orders table
- * existed) and generates that product's deliverable through the registry.
- * Product-agnostic: this route never imports a specific report component.
+ * The signed token (see src/server/reportLinks.ts) is required: the order number alone
+ * is not enough. Links come from the delivery email (30 days) or from /api/report-link
+ * right after payment (15 minutes). The old leadId-only link is no longer accepted.
+ *
+ * Looks up which product was purchased via the order and generates that product's
+ * deliverable through the registry. Product-agnostic: this route never imports a
+ * specific report component.
  */
 
 import { NextResponse }   from 'next/server';
@@ -13,30 +15,42 @@ import { db }             from '@/server/db';
 import { leads }          from '@/server/db/schema';
 import { eq }              from 'drizzle-orm';
 
-import { getOrderById, getProductBySlug, getProductById } from '@/lib/products/queries';
+import { getOrderById, getProductById } from '@/lib/products/queries';
+import { checkReportToken } from '@/server/reportLinks';
 import { getGenerator } from '@/lib/products/registry';
 import type { Lead } from '@/server/db/schema';
 
-const LEGACY_PRODUCT_SLUG = 'sovereign-report';
+const LINK_PROBLEM = 'This download link is not valid or has expired. Use the link in your most recent report email, or email privacy@3dimensions.guide.';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const orderIdParam = searchParams.get('orderId');
-    const leadIdParam  = searchParams.get('leadId');
-    const skipCheck = process.env.SKIP_PURCHASE_CHECK === 'true';
+    // Local testing only. Ignored in production so it can never open the door by accident.
+    const skipCheck = process.env.SKIP_PURCHASE_CHECK === 'true' && process.env.NODE_ENV !== 'production';
 
     let lead: Lead | undefined;
     let generatorKey: string;
     let productLabel: string;
 
     if (orderIdParam) {
-      if (isNaN(parseInt(orderIdParam, 10))) {
-        return NextResponse.json({ error: 'orderId must be a valid integer.' }, { status: 400 });
+      if (!/^\d{1,9}$/.test(orderIdParam)) {
+        return NextResponse.json({ error: LINK_PROBLEM }, { status: 403 });
       }
-      const order = await getOrderById(parseInt(orderIdParam, 10));
+      const orderIdNumber = parseInt(orderIdParam, 10);
+      if (!skipCheck) {
+        const check = checkReportToken(orderIdNumber, searchParams.get('t'));
+        if (check === 'unconfigured') {
+          console.error('[Report] No link-signing secret is configured; refusing downloads.');
+          return NextResponse.json({ error: 'Downloads are not available right now.' }, { status: 503 });
+        }
+        if (check !== 'ok') {
+          return NextResponse.json({ error: LINK_PROBLEM }, { status: 403 });
+        }
+      }
+      const order = await getOrderById(orderIdNumber);
       if (!order) {
-        return NextResponse.json({ error: `Order ${orderIdParam} not found.` }, { status: 404 });
+        return NextResponse.json({ error: LINK_PROBLEM }, { status: 403 });
       }
       if (!skipCheck && order.status !== 'paid') {
         return NextResponse.json({ error: 'Order not paid.' }, { status: 403 });
@@ -55,27 +69,8 @@ export async function GET(request: Request) {
       generatorKey = product.generatorKey;
       productLabel = product.name;
 
-    } else if (leadIdParam) {
-      // Legacy path: links emailed before the orders table existed only
-      // ever pointed at a lead, and only ever meant the Sovereign Report.
-      if (isNaN(parseInt(leadIdParam, 10))) {
-        return NextResponse.json({ error: 'leadId must be a valid integer.' }, { status: 400 });
-      }
-      const rows = await db.select().from(leads).where(eq(leads.id, parseInt(leadIdParam, 10))).limit(1);
-      lead = rows[0];
-      if (!lead) {
-        return NextResponse.json({ error: `Lead ${leadIdParam} not found.` }, { status: 404 });
-      }
-      if (!skipCheck && !lead.reportPurchased) {
-        return NextResponse.json({ error: 'Report not purchased.' }, { status: 403 });
-      }
-
-      const product = await getProductBySlug(LEGACY_PRODUCT_SLUG);
-      generatorKey = product?.generatorKey ?? LEGACY_PRODUCT_SLUG;
-      productLabel = product?.name ?? 'Sovereign Report';
-
     } else {
-      return NextResponse.json({ error: 'orderId or leadId is required.' }, { status: 400 });
+      return NextResponse.json({ error: LINK_PROBLEM }, { status: 403 });
     }
 
     const generator = getGenerator(generatorKey);
