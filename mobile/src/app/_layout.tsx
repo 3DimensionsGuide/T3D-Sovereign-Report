@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, router, type Href } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -9,8 +10,11 @@ import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-googl
 import { colors } from '@/theme/tokens';
 import { ExplainProvider } from '@/components/Explain';
 import { pruneCache } from '@/lib/persistentCache';
+import { configureNotifications, syncReminder } from '@/lib/reminder';
+import { useReminderStore } from '@/store/useReminderStore';
 
 SplashScreen.preventAutoHideAsync();
+configureNotifications();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -24,6 +28,18 @@ export default function RootLayout() {
   useEffect(() => {
     void pruneCache();
   }, []);
+
+  // Keep the saved reminder in step with the phone once its settings have been read.
+  const reminderReady = useReminderStore((s) => s.hydrated);
+  useEffect(() => {
+    if (reminderReady) void syncReminder();
+  }, [reminderReady]);
+
+  // Tapping the reminder opens Today.
+  const lastResponse = Notifications.useLastNotificationResponse();
+  useEffect(() => {
+    if (fontsLoaded && lastResponse) router.navigate('/today' as Href);
+  }, [fontsLoaded, lastResponse]);
 
   useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync();

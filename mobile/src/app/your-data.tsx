@@ -5,6 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoldButton } from '@/components/GoldButton';
 import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
+import { clearReminder } from '@/lib/reminder';
 import { clearAllCached } from '@/lib/persistentCache';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
@@ -57,6 +58,7 @@ export default function YourData() {
       usePartnerStore.getState().clearPartner();
       usePracticeStore.getState().clearAll();
       await clearAllCached();
+      await clearReminder();
       router.replace('/onboarding' as Href);
     } catch (err) {
       setError(err instanceof ChartRequestError ? err.message : 'Something went wrong. Please try again.');

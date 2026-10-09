@@ -13,6 +13,7 @@ import { localDateString } from '@/lib/localDate';
 import { useLocalDate } from '@/lib/useLocalDate';
 import { getCached, setCached } from '@/lib/persistentCache';
 import { OfflineNote } from '@/components/OfflineNote';
+import { ReminderPrompt } from '@/components/ReminderCard';
 import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
@@ -241,6 +242,8 @@ export default function Today() {
           <Text style={styles.sub}>Reading the sky…</Text>
         </View>
       ) : null}
+
+      {today ? <ReminderPrompt /> : null}
 
       {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 

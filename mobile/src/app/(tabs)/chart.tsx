@@ -6,6 +6,7 @@ import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/termIds';
 import { BirthDataCard } from '@/components/BirthDataCard';
+import { ReminderCard } from '@/components/ReminderCard';
 import { TriadCard } from '@/components/TriadCard';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
 import { OfflineNote } from '@/components/OfflineNote';
@@ -110,6 +111,10 @@ export default function Chart() {
 
       <FadeIn delay={360}>
         <BirthDataCard profile={profile} />
+      </FadeIn>
+
+      <FadeIn delay={400}>
+        <ReminderCard />
       </FadeIn>
 
         </>
