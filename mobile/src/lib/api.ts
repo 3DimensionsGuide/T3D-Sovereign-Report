@@ -1,3 +1,4 @@
+import type { ChartDrawingData } from '@/charts/chartTypes';
 /**
  * Talks to the T3D website's secure calculation endpoint.
  *
@@ -213,6 +214,38 @@ export async function requestToday(leadId: number, email: string): Promise<Today
   }
   if (!payload.success) {
     throw new ChartRequestError(payload.error || 'Could not load today. Please try again.');
+  }
+  return payload.data;
+}
+
+/** The picture-ready data for the natal wheel and the bodygraph. */
+export async function requestChartData(leadId: number, email: string): Promise<ChartDrawingData> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/app/chart-data`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId, email }),
+    });
+  } catch {
+    throw new ChartRequestError(
+      'Could not reach the T3D server. Check your internet connection and try again.',
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+
+  let payload: { success: true; data: ChartDrawingData } | ApiFailure;
+  try {
+    payload = (await response.json()) as { success: true; data: ChartDrawingData } | ApiFailure;
+  } catch {
+    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
+  }
+  if (!payload.success) {
+    throw new ChartRequestError(payload.error || 'Could not load your charts. Please try again.');
   }
   return payload.data;
 }

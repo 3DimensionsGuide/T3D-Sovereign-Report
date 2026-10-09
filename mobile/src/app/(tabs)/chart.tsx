@@ -1,16 +1,28 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { TriadCard } from '@/components/TriadCard';
+import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
+import { Segmented } from '@/components/Segmented';
+import { useChartData } from '@/lib/useChartData';
 import { formatLongitude } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
 
+const VIEW_OPTIONS = [
+  { value: 'overview', label: 'OVERVIEW' },
+  { value: 'wheel', label: 'WHEEL' },
+  { value: 'bodygraph', label: 'BODYGRAPH' },
+] as const;
+
 export default function Chart() {
   const chart = useT3DStore((state) => state.chart);
   const profile = useT3DStore((state) => state.profile);
+  const [view, setView] = useState<'overview' | 'wheel' | 'bodygraph'>('overview');
+  const drawing = useChartData(chart?.leadId, profile?.email.trim());
 
   if (!chart || !profile) return <Redirect href="/onboarding" />;
 
@@ -34,6 +46,12 @@ export default function Chart() {
         </View>
       </FadeIn>
 
+      <FadeIn delay={60}>
+        <Segmented options={VIEW_OPTIONS} value={view} onChange={setView} />
+      </FadeIn>
+
+      {view === 'overview' ? (
+        <>
       <FadeIn delay={100}>
         <TriadCard
           accent={colors.vehicle}
@@ -86,6 +104,29 @@ export default function Chart() {
         {risingNote ? <Text style={styles.note}>{risingNote}</Text> : null}
       </FadeIn>
 
+        </>
+      ) : (
+        <View style={styles.chartArea}>
+          {drawing.data ? (
+            view === 'wheel' ? (
+              <WheelPanel tropical={drawing.data.tropical} sidereal={drawing.data.sidereal} />
+            ) : (
+              <BodygraphPanel hd={drawing.data.humanDesign} />
+            )
+          ) : drawing.error ? (
+            <View style={styles.centerBox}>
+              <Text accessibilityRole="alert" style={styles.errorText}>{drawing.error}</Text>
+              <GoldButton label="TRY AGAIN" variant="ghost" onPress={drawing.retry} />
+            </View>
+          ) : (
+            <View style={styles.centerBox} accessibilityLiveRegion="polite">
+              <ActivityIndicator color={colors.gold} />
+              <Text style={styles.note}>Drawing your chart…</Text>
+            </View>
+          )}
+        </View>
+      )}
+
       <FadeIn delay={400}>
         <View style={styles.actions}>
           <GoldButton label="EDIT BIRTH DETAILS" variant="ghost" onPress={() => router.push('/onboarding')} />
@@ -102,4 +143,7 @@ const styles = StyleSheet.create({
   meta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, marginTop: space.sm },
   actions: { marginTop: space.md },
+  chartArea: { marginTop: space.md },
+  centerBox: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
+  errorText: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
 });
