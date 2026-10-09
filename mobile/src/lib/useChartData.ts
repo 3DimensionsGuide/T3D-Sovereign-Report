@@ -1,44 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
 import type { ChartDrawingData } from '@/charts/chartTypes';
 import { requestChartData } from '@/lib/api';
+import { ONE_DAY_MS, useCachedLoad } from '@/lib/useCachedLoad';
 
-/** Drawing data never changes for a given chart, so keep it for the life of the app session. */
-const cache = new Map<number, ChartDrawingData>();
-
+/** Drawing data for a chart. A saved copy opens instantly and works with no signal. */
 export function useChartData(leadId: number | undefined, email: string | undefined) {
-  const [data, setData] = useState<ChartDrawingData | null>(leadId ? (cache.get(leadId) ?? null) : null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-
-  useEffect(() => {
-    if (!leadId || !email) return;
-    const cached = cache.get(leadId);
-    if (cached) {
-      setData(cached);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    requestChartData(leadId, email)
-      .then((result) => {
-        if (cancelled) return;
-        cache.set(leadId, result);
-        setData(result);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Could not load your charts. Please try again.');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [leadId, email, attempt]);
-
-  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  const { data, error, loading, retry } = useCachedLoad<ChartDrawingData>({
+    key: leadId && email ? `chartdata|${leadId}` : null,
+    fetcher: () => requestChartData(leadId as number, email as string),
+    maxAgeMs: ONE_DAY_MS,
+  });
   return { data, error, loading, retry };
 }

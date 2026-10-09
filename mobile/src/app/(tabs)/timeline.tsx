@@ -7,6 +7,7 @@ import { Segmented } from '@/components/Segmented';
 import { aspectWord, bodyName, houseTheme, natalName, ordinal } from '@/lib/skyText';
 import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineResult } from '@/lib/timelineTypes';
 import { useTimeline } from '@/lib/useTimeline';
+import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -202,7 +203,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
 export default function Timeline() {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, refreshing, refresh, retry } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
+  const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -248,6 +249,7 @@ export default function Timeline() {
         </View>
       ) : data ? (
         <>
+          {offline ? <OfflineNote savedAt={savedAt} /> : null}
           <YearCard data={data} />
 
           {data.seasons.length > 0 ? (

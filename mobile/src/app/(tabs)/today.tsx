@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -9,7 +9,10 @@ import {
   ChartRequestError, requestDayNumerology, requestToday, requestTriadToday, type DailyTransitHit, type TodayResult,
 } from '@/lib/api';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
-import { localDateString } from '@/lib/useTimeline';
+import { localDateString } from '@/lib/localDate';
+import { useLocalDate } from '@/lib/useLocalDate';
+import { getCached, setCached } from '@/lib/persistentCache';
+import { OfflineNote } from '@/components/OfflineNote';
 import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
@@ -33,6 +36,15 @@ function noonOf(date: Date): Date {
 function sameDay(a: Date, b: Date): boolean {
   return localDateString(a) === localDateString(b);
 }
+
+interface TodayBundle {
+  today: TodayResult;
+  dayNum: DayNumerology | null;
+  triad: TriadToday | null;
+}
+
+/** If the app has been in the background this long, the live day reloads when it returns. */
+const STALE_AFTER_MS = 30 * 60 * 1000;
 
 const NATURE_LABEL = { flow: '◯  Flow', friction: '◼  Friction', neutral: '◇  Neutral' } as const;
 
@@ -69,34 +81,70 @@ export default function Today() {
   const [triad, setTriad] = useState<TriadToday | null>(null);
   const [selectedHit, setSelectedHit] = useState<DailyTransitHit | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [offline, setOffline] = useState(false);
+  const [savedCopyAt, setSavedCopyAt] = useState<number | null>(null);
+  /** Today's date on this phone; it changes at midnight so the screen loads the new day. */
+  const liveDate = useLocalDate();
+  const lastLoadedAt = useRef(0);
   /** null means the live day; otherwise the day the person jumped to. */
   const [viewDate, setViewDate] = useState<Date | null>(null);
   const isToday = viewDate === null;
   /** Newest request wins, so quickly stepping through days never shows an older day's data. */
   const requestId = useRef(0);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts?: { quiet?: boolean }) => {
     if (!profile || !chart) return;
-    setError(null);
     const mine = ++requestId.current;
     const stillCurrent = () => mine === requestId.current;
-    const localDate = localDateString(viewDate ?? new Date());
+    const localDate = viewDate ? localDateString(viewDate) : liveDate;
     const at = viewDate ? noonOf(viewDate).toISOString() : undefined;
-    // Numerology of the day loads alongside the sky; if it fails the sky still shows.
-    requestDayNumerology(chart.leadId, profile.email, localDate)
-      .then((d) => stillCurrent() && setDayNum(d))
-      .catch(() => stillCurrent() && setDayNum(null));
-    requestTriadToday(chart.leadId, profile.email, localDate, at)
-      .then((d) => stillCurrent() && setTriad(d))
-      .catch(() => stillCurrent() && setTriad(null));
+    const key = `today|${chart.leadId}|${localDate}|${at ?? 'live'}`;
+    setError(null);
+
+    // Show the saved copy of this exact day straight away, then refresh it from the server.
+    const saved = await getCached<TodayBundle>(key);
+    if (!stillCurrent()) return;
+    if (saved) {
+      setToday(saved.value.today);
+      setDayNum(saved.value.dayNum);
+      setTriad(saved.value.triad);
+      setSavedCopyAt(saved.savedAt);
+      setLoading(false);
+    } else if (!opts?.quiet) {
+      setToday(null);
+      setDayNum(null);
+      setTriad(null);
+      setSavedCopyAt(null);
+    }
+
+    // Numerology of the day and the triad load alongside the sky; if they fail the sky still shows.
+    const dayNumP = requestDayNumerology(chart.leadId, profile.email, localDate)
+      .then((d) => { if (stillCurrent()) setDayNum(d); return d; })
+      .catch(() => null);
+    const triadP = requestTriadToday(chart.leadId, profile.email, localDate, at)
+      .then((d) => { if (stillCurrent()) setTriad(d); return d; })
+      .catch(() => null);
     try {
       const result = await requestToday(chart.leadId, profile.email, at);
-      if (stillCurrent()) setToday(result);
+      if (!stillCurrent()) return;
+      setToday(result);
+      setOffline(false);
+      const [d, t] = await Promise.all([dayNumP, triadP]);
+      if (!stillCurrent()) return;
+      const savedAtNow = Date.now();
+      lastLoadedAt.current = savedAtNow;
+      setSavedCopyAt(savedAtNow);
+      await setCached<TodayBundle>(key, { value: { today: result, dayNum: d, triad: t }, savedAt: savedAtNow });
     } catch (err) {
       if (!stillCurrent()) return;
-      setError(err instanceof ChartRequestError ? err.message : 'Something went wrong. Please try again.');
+      if (saved) {
+        // Keep the saved copy on screen and say so, instead of an error with nothing to read.
+        setOffline(true);
+      } else {
+        setError(err instanceof ChartRequestError ? err.message : 'Something went wrong. Please try again.');
+      }
     }
-  }, [profile, chart, viewDate]);
+  }, [profile, chart, viewDate, liveDate]);
 
   const goTo = useCallback((date: Date) => {
     if (date < MIN_DATE || date > MAX_DATE) return;
@@ -112,14 +160,22 @@ export default function Today() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    setToday(null);
-    setTriad(null);
-    setDayNum(null);
+    setOffline(false);
     load().finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
   }, [load]);
+
+  // Coming back to the app after a while on the live day: quietly refresh it.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && viewDate === null && Date.now() - lastLoadedAt.current > STALE_AFTER_MS) {
+        void load({ quiet: true });
+      }
+    });
+    return () => sub.remove();
+  }, [viewDate, load]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -127,13 +183,13 @@ export default function Today() {
     setRefreshing(false);
   }, [load]);
 
-  const shown = viewDate ?? new Date();
+  const shown = viewDate ?? new Date(`${liveDate}T12:00:00`);
   const dateLabel = shown.toLocaleDateString(undefined, {
     weekday: 'long', month: 'long', day: 'numeric', ...(isToday ? {} : { year: 'numeric' }),
   });
   const relation = isToday
     ? null
-    : localDateString(shown) < localDateString(new Date()) ? 'A DAY GONE BY' : 'A DAY AHEAD';
+    : localDateString(shown) < liveDate ? 'A DAY GONE BY' : 'A DAY AHEAD';
   const dayWord = isToday ? 'today' : 'this day';
 
   return (
@@ -185,6 +241,8 @@ export default function Today() {
           <Text style={styles.sub}>Reading the sky…</Text>
         </View>
       ) : null}
+
+      {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 
       {error ? (
         <View style={styles.errorBox}>

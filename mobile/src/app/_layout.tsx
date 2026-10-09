@@ -8,6 +8,7 @@ import { PlayfairDisplay_400Regular, PlayfairDisplay_600SemiBold } from '@expo-g
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { colors } from '@/theme/tokens';
 import { ExplainProvider } from '@/components/Explain';
+import { pruneCache } from '@/lib/persistentCache';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,6 +20,10 @@ export default function RootLayout() {
     DMSans_500Medium,
     DMSans_700Bold,
   });
+
+  useEffect(() => {
+    void pruneCache();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync();
