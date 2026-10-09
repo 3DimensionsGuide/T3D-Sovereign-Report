@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Term, TermPressable } from '@/components/Explain';
+import { aspectId, centerId, channelId, gateId, natalId } from '@/lib/termIds';
 import { buildBodygraphScene } from '@/charts/bodygraph';
 import { chartColors } from '@/charts/palette';
 import type { BodygraphData, WheelChart } from '@/charts/chartTypes';
@@ -73,14 +75,14 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
 
       <Section title="PLANETS & POINTS">
         {chart.planets.map((p) => (
-          <View key={p.body} style={styles.row} accessible accessibilityLabel={
+          <TermPressable key={p.body} id={natalId(p.body)} style={styles.row} label={
             `${BODY_NAMES[p.body]} in ${p.formatted}, house ${p.house}${p.retrograde ? ', retrograde' : ''}`}>
             <Text style={styles.glyph}>{BODY_GLYPHS[p.body]}</Text>
             <Text style={styles.rowName}>{BODY_NAMES[p.body]}</Text>
             <Text style={styles.rowValue}>
               {p.formatted}{p.retrograde ? ' ℞' : ''} · House {p.house}
             </Text>
-          </View>
+          </TermPressable>
         ))}
       </Section>
 
@@ -89,12 +91,12 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
           <Text style={styles.note}>No major aspects within 3°.</Text>
         ) : (
           chart.aspects.map((a, i) => (
-            <View key={`${a.a}-${a.b}-${i}`} style={styles.row} accessible>
+            <TermPressable key={`${a.a}-${a.b}-${i}`} id={aspectId(a.aspect)} style={styles.row}>
               <Text style={styles.aspectText}>
                 {pointName(a.a)} · {ASPECT_NAMES[a.aspect]} · {pointName(a.b)}
               </Text>
               <Text style={styles.rowValue}>{a.orb.toFixed(1)}°{a.peak ? ' · exact' : ''}</Text>
-            </View>
+            </TermPressable>
           ))
         )}
       </Section>
@@ -149,11 +151,15 @@ export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
       <Section title="CENTERS">
         <Text style={styles.paragraph}>
           <Text style={styles.strong}>Defined: </Text>
-          {hd.definedCenters.length ? hd.definedCenters.map((c) => CENTER_NAMES[c] ?? c).join(', ') : 'None'}
+          {hd.definedCenters.length ? hd.definedCenters.map((c, i) => (
+            <Text key={c}>{i > 0 ? ', ' : ''}<Term id={centerId(c)}>{CENTER_NAMES[c] ?? c}</Term></Text>
+          )) : 'None'}
         </Text>
         <Text style={styles.paragraph}>
           <Text style={styles.strong}>Open: </Text>
-          {hd.undefinedCenters.length ? hd.undefinedCenters.map((c) => CENTER_NAMES[c] ?? c).join(', ') : 'None'}
+          {hd.undefinedCenters.length ? hd.undefinedCenters.map((c, i) => (
+            <Text key={c}>{i > 0 ? ', ' : ''}<Term id={centerId(c)}>{CENTER_NAMES[c] ?? c}</Term></Text>
+          )) : 'None'}
         </Text>
       </Section>
 
@@ -162,10 +168,10 @@ export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
           <Text style={styles.note}>No complete channels. All gates are hanging.</Text>
         ) : (
           hd.channels.map((ch) => (
-            <View key={ch.gates.join('-')} style={styles.row} accessible>
+            <TermPressable key={ch.gates.join('-')} id={channelId(Math.min(...ch.gates), Math.max(...ch.gates))} style={styles.row}>
               <Text style={styles.rowName}>{ch.gates[0]}–{ch.gates[1]}  {ch.name}</Text>
               <Text style={styles.rowValue}>{EPOCH_LABEL[ch.activatedBy]}</Text>
-            </View>
+            </TermPressable>
           ))
         )}
       </Section>
@@ -190,12 +196,12 @@ function GateList({ gates }: { gates: BodygraphData['gates'] }) {
   return (
     <View style={styles.gateWrap}>
       {gates.map((g, i) => (
-        <View key={`${g.planet}-${i}`} style={styles.gateChip} accessible
-          accessibilityLabel={`${PLANET_LABEL[g.planet] ?? g.planet}, gate ${g.gate} line ${g.line}`}>
+        <TermPressable key={`${g.planet}-${i}`} id={gateId(g.gate)} style={styles.gateChip}
+          label={`${PLANET_LABEL[g.planet] ?? g.planet}, gate ${g.gate} line ${g.line}`}>
           <Text style={styles.gateChipText}>
             {PLANET_LABEL[g.planet] ?? g.planet} <Text style={styles.gateNum}>{g.gate}.{g.line}</Text>
           </Text>
-        </View>
+        </TermPressable>
       ))}
     </View>
   );

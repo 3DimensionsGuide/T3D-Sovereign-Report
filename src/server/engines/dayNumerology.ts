@@ -131,6 +131,9 @@ const CONTENT: Record<number, Content> = {
   },
 };
 
+/** Reading text for each day number; also used by the app glossary. */
+export const DAY_NUMBER_CONTENT = CONTENT;
+
 const ROOT: Record<number, number> = { 11: 2, 22: 4, 33: 6 };
 
 function meaning(n: number): DayNumberMeaning {

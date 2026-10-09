@@ -12,6 +12,8 @@ import { localDateString } from '@/lib/useTimeline';
 import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
+import { Term } from '@/components/Explain';
+import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -22,11 +24,14 @@ function TransitRow({ hit }: { hit: DailyTransitHit }) {
   const detail = `${hit.orb.toFixed(1)}° from exact · ${hit.applying ? 'applying' : 'separating'}${hit.peak ? ' · peak' : ''}`;
   return (
     <View
-      accessible
       accessibilityLabel={`${phrase}. ${NATURE_LABEL[hit.nature].replace(/[^A-Za-z]/g, '')}. ${detail}`}
       style={[styles.transitRow, hit.nature === 'friction' && styles.transitFriction]}
     >
-      <Text style={styles.transitPhrase}>{phrase}</Text>
+      <Text style={styles.transitPhrase}>
+        <Term id={planetId(hit.transiting)}>{bodyName(hit.transiting)}</Term>{' '}
+        <Term id={aspectId(hit.aspect)}>{aspectWord(hit.aspect)}</Term> your{' '}
+        <Term id={natalId(hit.natal)}>{natalName(hit.natal)}</Term>
+      </Text>
       <Text style={styles.transitDetail}>{detail}</Text>
       <Text style={styles.transitNature}>{NATURE_LABEL[hit.nature]}</Text>
     </View>
@@ -108,13 +113,13 @@ export default function Today() {
                   <Text style={styles.cardEyebrow}>THE MOON</Text>
                   <Text style={styles.cardTitle}>{today.moon.formatted}</Text>
                   <Text style={styles.body}>
-                    {today.moon.phase} · {today.moon.illuminationPercent}% lit
+                    <Term id="astro:phase">{today.moon.phase}</Term> · {today.moon.illuminationPercent}% lit
                   </Text>
                 </View>
               </View>
               <Text style={styles.body}>{phaseMeaning(today.moon.waxing)}</Text>
               <Text style={styles.body}>
-                Moving through your <Text style={styles.strong}>{ordinal(today.moon.house)} house</Text>:{' '}
+                Moving through your <Term id={houseId(today.moon.house)} style={styles.strong}>{ordinal(today.moon.house)} house</Term>:{' '}
                 {houseTheme(today.moon.house)}.
               </Text>
               {today.moon.nextApplying ? (
@@ -137,13 +142,18 @@ export default function Today() {
               <Text style={styles.cardEyebrow}>THE SUN</Text>
               <Text style={styles.cardTitle}>{today.sun.formatted}</Text>
               <Text style={styles.body}>
-                Lighting up your <Text style={styles.strong}>{ordinal(today.sun.house)} house</Text>:{' '}
+                Lighting up your <Term id={houseId(today.sun.house)} style={styles.strong}>{ordinal(today.sun.house)} house</Term>:{' '}
                 {houseTheme(today.sun.house)}.
               </Text>
               {today.retrograde.length ? (
                 <Text style={styles.body}>
-                  <Text style={styles.strong}>Retrograde now: </Text>
-                  {today.retrograde.map((b) => `${bodyName(b)} ℞`).join(', ')}
+                  <Term id="astro:retrograde" style={styles.strong}>Retrograde now: </Term>
+                  {today.retrograde.map((b, i) => (
+                    <Text key={b}>
+                      {i > 0 ? ', ' : ''}
+                      <Term id={planetId(b)}>{`${bodyName(b)} ℞`}</Term>
+                    </Text>
+                  ))}
                 </Text>
               ) : null}
             </View>

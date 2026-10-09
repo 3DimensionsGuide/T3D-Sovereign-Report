@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { DayNumberMeaning, DayNumerology } from '@/lib/dayNumerologyTypes';
+import { Term } from '@/components/Explain';
+import { numberId } from '@/lib/termIds';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 function numberText(m: DayNumberMeaning): string {
@@ -11,7 +13,6 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
   const caption = kind === 'GLOBAL' ? 'The energy of this date, felt by everyone' : 'The energy of this date, for you';
   return (
     <View
-      accessible
       accessibilityLabel={`${title} ${numberText(meaning)}, ${meaning.label}. ${meaning.theme} Key themes: ${meaning.keyThemes.join(', ')}. Lean in: ${meaning.leanIn} Watch for: ${meaning.watchFor}`}
       style={styles.block}
     >
@@ -20,8 +21,12 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
           <Text style={styles.badgeText}>{numberText(meaning)}</Text>
         </View>
         <View style={styles.flex}>
-          <Text style={styles.eyebrow}>{title}</Text>
-          <Text style={styles.label}>{meaning.label}</Text>
+          <Text style={styles.eyebrow}>
+            <Term id={kind === 'GLOBAL' ? 'num:universalday' : 'num:personalday'}>{title}</Term>
+          </Text>
+          <Text style={styles.label}>
+            <Term id={numberId(meaning.number)}>{meaning.label}</Term>
+          </Text>
           <Text style={styles.caption}>{caption}</Text>
         </View>
       </View>
@@ -54,7 +59,8 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
       <DayBlock kind="YOURS" meaning={data.personal} />
       <Text style={styles.body}>{data.blend}</Text>
       <Text style={styles.caption}>
-        Personal Year {data.personalYear} · Personal Month {data.personalMonth}
+        <Term id="num:personalyear">Personal Year</Term> {data.personalYear} ·{' '}
+        <Term id="num:personalmonth">Personal Month</Term> {data.personalMonth}
       </Text>
     </View>
   );

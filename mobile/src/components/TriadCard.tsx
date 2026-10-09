@@ -1,9 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { Term } from '@/components/Explain';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 export interface TriadRow {
   label: string;
   value: string;
+  /** Glossary id for the label (tap to learn what it means). */
+  labelId?: string;
+  /** Glossary id for the value. */
+  valueId?: string;
 }
 
 interface Props {
@@ -19,8 +24,6 @@ interface Props {
 export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
   return (
     <View
-      accessible
-      accessibilityLabel={`${metaphor}, ${system}. ${rows.map((r) => `${r.label}: ${r.value}`).join('. ')}`}
       style={[styles.card, { borderLeftColor: accent }]}
     >
       <View style={styles.header}>
@@ -33,8 +36,12 @@ export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
       <View style={styles.rows}>
         {rows.map((row) => (
           <View key={row.label} style={styles.row}>
-            <Text style={styles.rowLabel}>{row.label}</Text>
-            <Text style={styles.rowValue}>{row.value}</Text>
+            <Text style={styles.rowLabel}>
+              {row.labelId ? <Term id={row.labelId}>{row.label}</Term> : row.label}
+            </Text>
+            <Text style={styles.rowValue}>
+              {row.valueId ? <Term id={row.valueId}>{row.value}</Term> : row.value}
+            </Text>
           </View>
         ))}
       </View>

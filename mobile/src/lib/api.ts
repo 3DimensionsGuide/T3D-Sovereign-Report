@@ -1,4 +1,5 @@
 import type { ChartDrawingData } from '@/charts/chartTypes';
+import type { ExplainEntry, GlossaryItem } from '@/lib/explainTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
 import type { NumerologyDetail } from '@/lib/numerologyTypes';
 import type { TimelineResult } from '@/lib/timelineTypes';
@@ -396,4 +397,45 @@ export async function requestVehicle(leadId: number, email: string): Promise<Veh
     throw new ChartRequestError(payload.error || 'Could not load your Human Design. Please try again.');
   }
   return payload.data;
+}
+
+
+async function postApp<T>(path: string, body: Record<string, unknown>, failure: string): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new ChartRequestError(
+      'Could not reach the T3D server. Check your internet connection and try again.',
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+
+  let payload: { success: true; data: T } | ApiFailure;
+  try {
+    payload = (await response.json()) as { success: true; data: T } | ApiFailure;
+  } catch {
+    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
+  }
+  if (!payload.success) throw new ChartRequestError(payload.error || failure);
+  return payload.data;
+}
+
+/** One glossary entry ("tap any term"), with an "In your chart" line. */
+export function requestExplain(leadId: number, email: string, id: string): Promise<ExplainEntry> {
+  return postApp<ExplainEntry>('/api/app/explain', { leadId, email, id }, 'Could not load that explanation.');
+}
+
+/** Every glossary term, for the searchable Glossary screen. */
+export async function requestGlossary(leadId: number, email: string): Promise<GlossaryItem[]> {
+  const data = await postApp<{ entries: GlossaryItem[] }>('/api/app/glossary', { leadId, email }, 'Could not load the glossary.');
+  return data.entries;
 }

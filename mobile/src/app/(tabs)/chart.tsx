@@ -4,6 +4,7 @@ import { Redirect, router } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/termIds';
 import { TriadCard } from '@/components/TriadCard';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
 import { Segmented } from '@/components/Segmented';
@@ -59,10 +60,10 @@ export default function Chart() {
           metaphor="THE VEHICLE"
           system="Human Design"
           rows={[
-            { label: 'Type', value: hd.type },
-            { label: 'Strategy', value: hd.strategy },
-            { label: 'Authority', value: hd.authority },
-            { label: 'Profile', value: hd.profile },
+            { label: 'Type', value: hd.type, valueId: typeId(hd.type) },
+            { label: 'Strategy', value: hd.strategy, labelId: STRATEGY_ID },
+            { label: 'Authority', value: hd.authority, valueId: authorityId(hd.authority), labelId: 'hd:authority' },
+            { label: 'Profile', value: hd.profile, valueId: profileId(hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile), labelId: 'hd:profile' },
           ]}
         />
       </FadeIn>
@@ -74,13 +75,14 @@ export default function Chart() {
           metaphor="THE ROAD"
           system="Numerology"
           rows={[
-            { label: 'Life Path', value: String(num.lifePath) },
-            { label: 'Destiny', value: String(num.destiny) },
-            { label: 'Soul Urge', value: String(num.soulUrge) },
-            { label: 'Personality', value: String(num.personality) },
-            { label: 'Hidden Passion', value: String(num.hiddenPassion) },
+            { label: 'Life Path', value: String(num.lifePath), labelId: 'num:lifepath', valueId: `num:${num.lifePath}` },
+            { label: 'Destiny', value: String(num.destiny), labelId: 'num:destiny', valueId: `num:${num.destiny}` },
+            { label: 'Soul Urge', value: String(num.soulUrge), labelId: 'num:soulurge', valueId: `num:${num.soulUrge}` },
+            { label: 'Personality', value: String(num.personality), labelId: 'num:personality', valueId: `num:${num.personality}` },
+            { label: 'Hidden Passion', value: String(num.hiddenPassion), labelId: 'num:hiddenpassion', valueId: `num:${num.hiddenPassion}` },
             {
               label: 'Karmic Lessons',
+              labelId: 'num:karmic',
               value: num.karmicLessons.length ? num.karmicLessons.join(', ') : 'None',
             },
           ]}
@@ -94,11 +96,11 @@ export default function Chart() {
           metaphor="THE STOPLIGHT"
           system="Astrology"
           rows={[
-            { label: 'Tropical Sun', value: astro.tropicalSun.formatted },
-            { label: 'Tropical Moon', value: astro.tropicalMoon.formatted },
-            { label: 'Tropical Rising', value: formatLongitude(astro.tropicalAscendant) },
-            { label: 'Sidereal Sun', value: astro.siderealSun.formatted },
-            { label: 'Sidereal Rising', value: formatLongitude(astro.siderealAscendant) },
+            { label: 'Tropical Sun', value: astro.tropicalSun.formatted, labelId: planetId('sun') },
+            { label: 'Tropical Moon', value: astro.tropicalMoon.formatted, labelId: planetId('moon') },
+            { label: 'Tropical Rising', value: formatLongitude(astro.tropicalAscendant), labelId: 'astro:ascendant' },
+            { label: 'Sidereal Sun', value: astro.siderealSun.formatted, labelId: 'astro:sidereal' },
+            { label: 'Sidereal Rising', value: formatLongitude(astro.siderealAscendant), labelId: 'astro:ascendant' },
           ]}
         />
         {risingNote ? <Text style={styles.note}>{risingNote}</Text> : null}
@@ -129,6 +131,7 @@ export default function Chart() {
 
       <FadeIn delay={400}>
         <View style={styles.actions}>
+          <GoldButton label="GLOSSARY · TAP ANY TERM" variant="ghost" onPress={() => router.push('/glossary')} />
           <GoldButton label="EDIT BIRTH DETAILS" variant="ghost" onPress={() => router.push('/onboarding')} />
         </View>
       </FadeIn>

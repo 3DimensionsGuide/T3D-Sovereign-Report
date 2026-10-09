@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_600SemiBold } from '@expo-google-fonts/playfair-display';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { colors } from '@/theme/tokens';
+import { ExplainProvider } from '@/components/Explain';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,6 +29,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
+      <ExplainProvider>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -35,6 +37,7 @@ export default function RootLayout() {
           animation: 'fade',
         }}
       />
+      </ExplainProvider>
     </SafeAreaProvider>
   );
 }
