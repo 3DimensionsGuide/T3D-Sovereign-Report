@@ -7,7 +7,7 @@ import { GoldButton } from '@/components/GoldButton';
 import {
   ChartRequestError, requestDecideTogether, requestPlaceCheck, type PlaceCandidate,
 } from '@/lib/api';
-import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastry, TogetherPerson } from '@/lib/togetherTypes';
+import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastry, TogetherPerson, CenterEffects, HouseOverlays } from '@/lib/togetherTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -177,7 +177,73 @@ function Unavailable({ what }: { what: string }) {
   );
 }
 
-function ChannelsView({ c, partnerLabel }: { c: HdConnections | null; partnerLabel: string }) {
+function CentersSection({ e }: { e: CenterEffects }) {
+  return (
+    <View style={{ gap: space.md }}>
+      <View style={styles.card}>
+        <Text style={[styles.eyebrow, { color: colors.vehicle }]}>◆  HUMAN DESIGN · CENTERS</Text>
+        <Text accessibilityRole="header" style={styles.title}>Defined and open centers</Text>
+        <Text style={styles.small}>{e.intro}</Text>
+      </View>
+      {e.note ? <View style={styles.noteBox}><Text style={styles.body}>{e.note}</Text></View> : null}
+      {e.items.length === 0 ? (
+        <View style={styles.card}>
+          <Text style={styles.body}>No center is defined for one of you and open for the other, so nothing is amplified between you in this way.</Text>
+        </View>
+      ) : null}
+      {e.items.map((i) => (
+        <View key={i.center} style={[styles.person, { borderLeftColor: colors.vehicle }]}>
+          <Text style={styles.personTitle}>{i.center}  <Text style={styles.small}>{i.theme}</Text></Text>
+          <Text style={styles.small}>{i.holders}</Text>
+          <Text style={styles.body}>{i.brings} {i.feels}</Text>
+          <Text style={styles.small}>Worth noticing: {i.watch}</Text>
+          <Text style={styles.small}>{i.grows}</Text>
+        </View>
+      ))}
+      {e.bothDefined.length > 0 ? (
+        <View style={styles.rowBox}>
+          <Text style={styles.personTitle}>Defined for both of you: {e.bothDefined.join(', ')}</Text>
+          <Text style={styles.small}>{e.bothDefinedText}</Text>
+        </View>
+      ) : null}
+      {e.bothOpen.length > 0 ? (
+        <View style={styles.rowBox}>
+          <Text style={styles.personTitle}>Open for both of you: {e.bothOpen.join(', ')}</Text>
+          <Text style={styles.small}>{e.bothOpenText}</Text>
+        </View>
+      ) : null}
+      <Text style={styles.small}>{e.closing}</Text>
+    </View>
+  );
+}
+
+function HousesSection({ h }: { h: HouseOverlays }) {
+  return (
+    <View style={{ gap: space.md }}>
+      <View style={styles.card}>
+        <Text style={[styles.eyebrow, { color: colors.stoplight }]}>●  ASTROLOGY · HOUSE OVERLAYS</Text>
+        <Text accessibilityRole="header" style={styles.title}>Where you land in each other{'’'}s lives</Text>
+        <Text style={styles.small}>{h.intro}</Text>
+      </View>
+      {h.note ? <View style={styles.noteBox}><Text style={styles.body}>{h.note}</Text></View> : null}
+      {h.groups.map((g) => (
+        <View key={g.title} style={{ gap: space.md }}>
+          <Text accessibilityRole="header" style={styles.personTitle}>{g.title}</Text>
+          {g.items.map((i) => (
+            <View key={i.line} style={[styles.person, { borderLeftColor: colors.stoplight }]}>
+              <Text style={styles.personTitle}>{i.line}</Text>
+              <Text style={styles.small}>{i.theme}</Text>
+              <Text style={styles.body}>{i.text}</Text>
+            </View>
+          ))}
+        </View>
+      ))}
+      <Text style={styles.small}>{h.closing}</Text>
+    </View>
+  );
+}
+
+function ChannelsView({ c, e, partnerLabel }: { c: HdConnections | null; e: CenterEffects | null; partnerLabel: string }) {
   if (!c) return <Unavailable what="the channel connections" />;
   return (
     <View style={{ gap: space.md }}>
@@ -219,6 +285,7 @@ function ChannelsView({ c, partnerLabel }: { c: HdConnections | null; partnerLab
         );
       })}
       <Text style={styles.small}>{c.closing}</Text>
+      {e ? <CentersSection e={e} /> : null}
     </View>
   );
 }
@@ -246,7 +313,7 @@ function NumbersView({ n }: { n: NumberPair | null }) {
   );
 }
 
-function SkyView({ s }: { s: Synastry | null }) {
+function SkyView({ s, h }: { s: Synastry | null; h: HouseOverlays | null }) {
   if (!s) return <Unavailable what="the sky connections" />;
   return (
     <View style={{ gap: space.md }}>
@@ -271,6 +338,7 @@ function SkyView({ s }: { s: Synastry | null }) {
         </View>
       ))}
       <Text style={styles.small}>{s.closing}</Text>
+      {h ? <HousesSection h={h} /> : null}
     </View>
   );
 }
@@ -330,9 +398,9 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
 
       <Segmented options={VIEW_OPTIONS} value={view} onChange={setView} compact />
 
-      {view === 'channels' ? <ChannelsView c={data.connections} partnerLabel={partner.label} /> : null}
+      {view === 'channels' ? <ChannelsView c={data.connections} e={data.centers} partnerLabel={partner.label} /> : null}
       {view === 'numbers' ? <NumbersView n={data.numbers} /> : null}
-      {view === 'sky' ? <SkyView s={data.sky} /> : null}
+      {view === 'sky' ? <SkyView s={data.sky} h={data.houses} /> : null}
 
       {view === 'decide' ? (
       <View style={{ gap: space.md }}>

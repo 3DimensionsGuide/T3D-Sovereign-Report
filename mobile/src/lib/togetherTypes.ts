@@ -18,8 +18,10 @@ export interface DecideTogether {
   note: string | null;
   closing: string;
   connections: HdConnections | null;
+  centers: CenterEffects | null;
   numbers: NumberPair | null;
   sky: Synastry | null;
+  houses: HouseOverlays | null;
 }
 
 export type ConnectionKind = 'electromagnetic' | 'companionship' | 'dominance' | 'compromise';
@@ -29,6 +31,27 @@ export interface HdConnections {
   items: Array<{ kind: ConnectionKind; channel: string; gates: [number, number]; centers: string; holders: string }>;
   leftOut: number;
   note: string | null;
+  closing: string;
+}
+
+export interface CenterEffects {
+  items: Array<{
+    center: string; theme: string; holders: string; brings: string; feels: string; watch: string; grows: string;
+  }>;
+  bothDefined: string[];
+  bothOpen: string[];
+  bothDefinedText: string;
+  bothOpenText: string;
+  leftOut: number;
+  note: string | null;
+  intro: string;
+  closing: string;
+}
+
+export interface HouseOverlays {
+  groups: Array<{ title: string; items: Array<{ line: string; house: number; theme: string; text: string }> }>;
+  note: string | null;
+  intro: string;
   closing: string;
 }
 

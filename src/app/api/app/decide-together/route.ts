@@ -25,6 +25,7 @@ import { calculateDayNumerology } from '@/server/engines/dayNumerology';
 import { calculateAstrology } from '@/server/engines/astrology';
 import { calculateLifePath } from '@/server/engines/numerology';
 import { buildConnections, buildNumberPair, buildSynastry, type GateKnowledge } from '@/lib/app/relationshipPieces';
+import { buildCenterEffects, buildHouseOverlays, type CenterKnowledge } from '@/lib/app/relationshipExtras';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
@@ -150,15 +151,24 @@ export async function POST(request: Request): Promise<NextResponse> {
       possible: new Set(g.gatesAnyTime),
     });
 
+    const toCenters = (g: { centersAllDay: string[]; centersAnyTime: string[] }): CenterKnowledge => ({
+      sure: new Set(g.centersAllDay),
+      possible: new Set(g.centersAnyTime),
+    });
+
     let connections = null;
+    let centers = null;
     let sky = null;
+    let houses = null;
     if (yourPlaceOk && pl) {
       const yourInput = { birthDate: birth.date, latitude: pl.latitude as number, longitude: pl.longitude as number, timezone: pl.timezone as string };
       try {
         const yours = hdCertainty(yourInput, yourTime);
         connections = buildConnections(toKnowledge(yours), toKnowledge(c), labels, known);
+        centers = buildCenterEffects(toCenters(yours), toCenters(c), labels, known);
       } catch {
         connections = null;
+        centers = null;
       }
       try {
         const yourSky = calculateAstrology({ ...yourInput, birthTime: yourTime ?? '12:00' }).tropical;
@@ -167,8 +177,10 @@ export async function POST(request: Request): Promise<NextResponse> {
           latitude: p.latitude, longitude: p.longitude, timezone: p.timezone,
         }).tropical;
         sky = buildSynastry(yourSky, theirSky, labels, known);
+        houses = buildHouseOverlays(yourSky, theirSky, labels, known);
       } catch {
         sky = null;
+        houses = null;
       }
     }
 
@@ -184,7 +196,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     return NextResponse.json(
-      { success: true, data: { ...data, connections, numbers, sky } },
+      { success: true, data: { ...data, connections, centers, numbers, sky, houses } },
       { status: 200, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error: unknown) {

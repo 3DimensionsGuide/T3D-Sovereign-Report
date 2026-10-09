@@ -20,6 +20,9 @@ export interface HdCertainty {
   possibilities: string[];
   gatesAllDay: number[];
   gatesAnyTime: number[];
+  /** Centers defined at every hour sampled (certain), and at any hour sampled (possible). */
+  centersAllDay: string[];
+  centersAnyTime: string[];
 }
 
 const gatesOf = (hd: ReturnType<typeof calculateHumanDesign>): Set<number> => new Set(hd.activeGates.map((a) => a.gate));
@@ -28,13 +31,16 @@ export function hdCertainty(input: Omit<HumanDesignInput, 'birthTime'>, birthTim
   if (birthTime) {
     const hd = calculateHumanDesign({ ...input, birthTime });
     const gates = [...gatesOf(hd)].sort((a, b) => a - b);
-    return { type: hd.type, authority: hd.authority, certainty: 'sure', possibilities: [], gatesAllDay: gates, gatesAnyTime: gates };
+    const centers = [...hd.definedCenters].sort();
+    return { type: hd.type, authority: hd.authority, certainty: 'sure', possibilities: [], gatesAllDay: gates, gatesAnyTime: gates, centersAllDay: centers, centersAnyTime: centers };
   }
   const seen = new Map<string, { type: string; authority: string }>();
   let noon = { type: '', authority: '' };
   let all = new Set<number>();
   let first = true;
   const any = new Set<number>();
+  let centersAll = new Set<string>();
+  const centersAny = new Set<string>();
   for (let hour = 0; hour < 24; hour += 1) {
     const hd = calculateHumanDesign({ ...input, birthTime: `${String(hour).padStart(2, '0')}:30` });
     seen.set(`${hd.type} · ${hd.authority}`, { type: hd.type, authority: hd.authority });
@@ -43,6 +49,9 @@ export function hdCertainty(input: Omit<HumanDesignInput, 'birthTime'>, birthTim
     all = first ? new Set(g) : new Set([...all].filter((x) => g.has(x)));
     first = false;
     g.forEach((x) => any.add(x));
+    const cs = new Set<string>(hd.definedCenters);
+    centersAll = hour === 0 ? new Set(cs) : new Set([...centersAll].filter((x) => cs.has(x)));
+    cs.forEach((x) => centersAny.add(x));
   }
   const possibilities = [...seen.keys()];
   return {
@@ -52,5 +61,7 @@ export function hdCertainty(input: Omit<HumanDesignInput, 'birthTime'>, birthTim
     possibilities: possibilities.length === 1 ? [] : possibilities,
     gatesAllDay: [...all].sort((a, b) => a - b),
     gatesAnyTime: [...any].sort((a, b) => a - b),
+    centersAllDay: [...centersAll].sort(),
+    centersAnyTime: [...centersAny].sort(),
   };
 }
