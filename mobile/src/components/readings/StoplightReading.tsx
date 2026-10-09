@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 import { View } from 'react-native';
 import {
   Accordion as BaseAccordion, Block, Bullets, Footnote, NoteCard, ReadingStatus, SectionTitle,
@@ -163,14 +163,19 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
   );
 }
 
-export function StoplightReading() {
+export function StoplightReading({ onRefreshReady }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void }) {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry } = useStoplight(
+  const { data, error, loading, retry, offline, savedAt, refresh } = useStoplight(
     chart?.leadId,
     profile?.email.trim(),
     profile?.birthTimeKnown !== false,
   );
+
+  useEffect(() => {
+    onRefreshReady?.({ run: refresh });
+    return () => onRefreshReady?.(null);
+  }, [refresh, onRefreshReady]);
 
   return (
     <ReadingStatus
@@ -179,6 +184,8 @@ export function StoplightReading() {
       hasData={data !== null}
       loadingText="Reading your sky…"
       onRetry={retry}
+      offline={offline}
+      savedAt={savedAt}
     >
       {data ? <StoplightBody data={data} /> : null}
     </ReadingStatus>

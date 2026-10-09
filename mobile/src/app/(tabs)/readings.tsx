@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -40,9 +40,15 @@ const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; acce
 export default function Readings() {
   const [lens, setLens] = useState<Lens>('vehicle');
   const head = HEADINGS[lens];
+  const [refresher, setRefresher] = useState<{ run: () => Promise<void> } | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await refresher?.run(); } finally { setRefreshing(false); }
+  }, [refresher]);
 
   return (
-    <Screen>
+    <Screen refreshing={refreshing} onRefresh={onRefresh}>
       <FadeIn>
         <View style={styles.header}>
           <Text style={[styles.eyebrow, { color: head.accent }]}>{head.eyebrow}</Text>
@@ -51,7 +57,13 @@ export default function Readings() {
         </View>
       </FadeIn>
       <Segmented options={OPTIONS} value={lens} onChange={setLens} />
-      {lens === 'vehicle' ? <VehicleReading /> : lens === 'road' ? <NumerologyReading /> : <StoplightReading />}
+      {lens === 'vehicle' ? (
+        <VehicleReading onRefreshReady={setRefresher} />
+      ) : lens === 'road' ? (
+        <NumerologyReading onRefreshReady={setRefresher} />
+      ) : (
+        <StoplightReading onRefreshReady={setRefresher} />
+      )}
     </Screen>
   );
 }

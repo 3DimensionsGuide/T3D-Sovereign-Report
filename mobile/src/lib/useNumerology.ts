@@ -4,10 +4,10 @@ import { ONE_DAY_MS, useCachedLoad } from '@/lib/useCachedLoad';
 
 /** A saved copy opens instantly and works with no signal; it refreshes in the background after a day. */
 export function useNumerology(leadId: number | undefined, email: string | undefined) {
-  const { data, error, loading, retry } = useCachedLoad<NumerologyDetail>({
+  const result = useCachedLoad<NumerologyDetail>({
     key: leadId && email ? `numerology|${leadId}` : null,
     fetcher: () => requestNumerology(leadId as number, email as string),
     maxAgeMs: ONE_DAY_MS,
   });
-  return { data, error, loading, retry };
+  return result;
 }

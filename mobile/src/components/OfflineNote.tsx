@@ -11,7 +11,7 @@ export function OfflineNote({ savedAt }: { savedAt: number | null }) {
       <Text style={styles.text}>
         {'◇  '}
         {when ? `Showing your saved copy from ${when}. ` : 'Showing your saved copy. '}
-        We couldn{'’'}t reach the server. Pull down to try again.
+        We couldn{'’'}t reach the server. Pull down to check again.
       </Text>
     </View>
   );

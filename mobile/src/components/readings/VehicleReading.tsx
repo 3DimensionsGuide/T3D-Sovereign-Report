@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 import { View } from 'react-native';
 import {
   Accordion as BaseAccordion, Block, Bullets, Footnote, NoteCard, ReadingStatus, SectionTitle,
@@ -216,10 +216,15 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
   );
 }
 
-export function VehicleReading() {
+export function VehicleReading({ onRefreshReady }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void }) {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry } = useVehicle(chart?.leadId, profile?.email.trim());
+  const { data, error, loading, retry, offline, savedAt, refresh } = useVehicle(chart?.leadId, profile?.email.trim());
+
+  useEffect(() => {
+    onRefreshReady?.({ run: refresh });
+    return () => onRefreshReady?.(null);
+  }, [refresh, onRefreshReady]);
 
   return (
     <ReadingStatus
@@ -228,6 +233,8 @@ export function VehicleReading() {
       hasData={data !== null}
       loadingText="Reading your design…"
       onRetry={retry}
+      offline={offline}
+      savedAt={savedAt}
     >
       {data ? <VehicleBody data={data} /> : null}
     </ReadingStatus>

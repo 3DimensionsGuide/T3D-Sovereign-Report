@@ -8,6 +8,7 @@ import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/ter
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { TriadCard } from '@/components/TriadCard';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
+import { OfflineNote } from '@/components/OfflineNote';
 import { Segmented } from '@/components/Segmented';
 import { useChartData } from '@/lib/useChartData';
 import { formatLongitude } from '@/lib/api';
@@ -34,7 +35,7 @@ export default function Chart() {
     : 'Rising sign uses 12:00 noon because no birth time was entered.';
 
   return (
-    <Screen>
+    <Screen refreshing={drawing.refreshing} onRefresh={drawing.refresh}>
       <FadeIn>
         <View style={styles.header}>
           <Text style={styles.eyebrow}>YOUR T3D CHART</Text>
@@ -114,6 +115,7 @@ export default function Chart() {
         </>
       ) : (
         <View style={styles.chartArea}>
+          {drawing.offline && drawing.data ? <OfflineNote savedAt={drawing.savedAt} /> : null}
           {drawing.data ? (
             view === 'wheel' ? (
               <WheelPanel tropical={drawing.data.tropical} sidereal={drawing.data.sidereal} />

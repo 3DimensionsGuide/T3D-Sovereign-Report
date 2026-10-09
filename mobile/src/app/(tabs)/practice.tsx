@@ -23,11 +23,11 @@ const OPTIONS = [
 export default function Practice() {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry } = usePractice(chart?.leadId, profile?.email.trim());
+  const { data, error, loading, retry, offline, savedAt, refresh, refreshing } = usePractice(chart?.leadId, profile?.email.trim());
   const [mode, setMode] = useState<Mode>('decide');
 
   return (
-    <Screen>
+    <Screen refreshing={refreshing} onRefresh={refresh}>
       <View style={styles.head}>
         <Text style={styles.eyebrow}>PRACTICE</Text>
         <Text accessibilityRole="header" style={styles.title}>Decide through your design</Text>
@@ -39,7 +39,7 @@ export default function Practice() {
       <Segmented options={OPTIONS} value={mode} onChange={setMode} />
       {mode === 'together' ? <Together /> : null}
       {mode !== 'together' ? (
-      <ReadingStatus loading={loading} error={error} hasData={!!data} loadingText="Loading your practice…" onRetry={retry}>
+      <ReadingStatus loading={loading} error={error} hasData={!!data} loadingText="Loading your practice…" onRetry={retry} offline={offline} savedAt={savedAt}>
         {data ? (
           mode === 'decide' ? (
             <DecideFlow data={data} onSaved={() => setMode('log')} />

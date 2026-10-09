@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GoldButton } from '@/components/GoldButton';
+import { OfflineNote } from '@/components/OfflineNote';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 /**
@@ -116,13 +117,16 @@ export function Accordion({
 
 /** Loading / error wrapper shared by the readings. */
 export function ReadingStatus({
-  loading, error, hasData, loadingText, onRetry, children,
+  loading, error, hasData, loadingText, onRetry, offline = false, savedAt = null, children,
 }: {
   loading: boolean;
   error: string | null;
   hasData: boolean;
   loadingText: string;
   onRetry: () => void;
+  /** True when the server could not be reached and a saved copy is showing. */
+  offline?: boolean;
+  savedAt?: number | null;
   children: ReactNode;
 }) {
   if (loading && !hasData) {
@@ -141,7 +145,12 @@ export function ReadingStatus({
       </View>
     );
   }
-  return hasData ? <>{children}</> : null;
+  return hasData ? (
+    <>
+      {offline ? <OfflineNote savedAt={savedAt} /> : null}
+      {children}
+    </>
+  ) : null;
 }
 
 const styles = StyleSheet.create({

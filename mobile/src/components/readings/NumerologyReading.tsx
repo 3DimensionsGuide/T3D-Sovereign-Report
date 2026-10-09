@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 import { View } from 'react-native';
 import {
   Accordion as BaseAccordion, Block, Bullets, Chips, Footnote, NoteCard, ReadingStatus, SectionTitle,
@@ -101,10 +101,15 @@ function ChallengeBlock({ c }: { c: ChallengeCard }) {
 
 // ─── reading ────────────────────────────────────────────────────────────────
 
-export function NumerologyReading() {
+export function NumerologyReading({ onRefreshReady }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void }) {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry } = useNumerology(chart?.leadId, profile?.email.trim());
+  const { data, error, loading, retry, offline, savedAt, refresh } = useNumerology(chart?.leadId, profile?.email.trim());
+
+  useEffect(() => {
+    onRefreshReady?.({ run: refresh });
+    return () => onRefreshReady?.(null);
+  }, [refresh, onRefreshReady]);
 
   return (
     <ReadingStatus
@@ -113,6 +118,8 @@ export function NumerologyReading() {
       hasData={data !== null}
       loadingText="Reading your numbers…"
       onRetry={retry}
+      offline={offline}
+      savedAt={savedAt}
     >
       {data ? <NumerologyBody data={data} /> : null}
     </ReadingStatus>
