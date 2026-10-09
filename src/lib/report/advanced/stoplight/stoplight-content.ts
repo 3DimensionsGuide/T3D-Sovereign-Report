@@ -457,7 +457,7 @@ export const NEPTUNE_HOUSE_CONTENT: Record<number, PlanetSignContent> = {
   6: {
     theme: 'Dissolution touches daily routine and health — a body and work life sensitive to what can’t always be measured.',
     gift: 'Genuine compassion in service-oriented work; intuitive sensitivity to what a body actually needs.',
-    friction: 'Vague health issues that resist a clean diagnosis, or work routines that dissolve under stress.',
+    friction: 'Vague health issues that resist a clear explanation, or work routines that dissolve under stress.',
   },
   7: {
     theme: 'Dissolution touches partnership — relationships approached with idealism that can blur what a partner is actually like.',

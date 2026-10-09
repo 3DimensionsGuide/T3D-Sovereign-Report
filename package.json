@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --import tsx --test tests/golden/*.test.ts",
-    "golden:update": "tsx tests/golden/update-snapshot.ts"
+    "golden:update": "tsx tests/golden/update-snapshot.ts",
+    "audit:language": "python3 dev-tools/audit_language_guide.py . && python3 dev-tools/audit_app_strings.py ."
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.6.0",
