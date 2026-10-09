@@ -33,6 +33,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="timeline"
+        options={{
+          title: 'Timeline',
+          tabBarIcon: ({ color }) => <TabGlyph glyph="◷" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="chart"
         options={{
           title: 'My Chart',

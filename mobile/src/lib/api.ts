@@ -1,4 +1,5 @@
 import type { ChartDrawingData } from '@/charts/chartTypes';
+import type { TimelineResult } from '@/lib/timelineTypes';
 /**
  * Talks to the T3D website's secure calculation endpoint.
  *
@@ -246,6 +247,50 @@ export async function requestChartData(leadId: number, email: string): Promise<C
   }
   if (!payload.success) {
     throw new ChartRequestError(payload.error || 'Could not load your charts. Please try again.');
+  }
+  return payload.data;
+}
+
+export interface TimelineOptions {
+  /** The person's calendar date on this phone, YYYY-MM-DD. */
+  localDate: string;
+  /** Minutes behind UTC (JS getTimezoneOffset). */
+  tzOffsetMinutes: number;
+  days: number;
+}
+
+/** Sky events, profection and numerology cycles for the Timeline tab. */
+export async function requestTimeline(
+  leadId: number,
+  email: string,
+  options: TimelineOptions,
+): Promise<TimelineResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/app/timeline`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId, email, ...options }),
+    });
+  } catch {
+    throw new ChartRequestError(
+      'Could not reach the T3D server. Check your internet connection and try again.',
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+
+  let payload: { success: true; data: TimelineResult } | ApiFailure;
+  try {
+    payload = (await response.json()) as { success: true; data: TimelineResult } | ApiFailure;
+  } catch {
+    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
+  }
+  if (!payload.success) {
+    throw new ChartRequestError(payload.error || 'Could not load your timeline. Please try again.');
   }
   return payload.data;
 }
