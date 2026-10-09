@@ -11,6 +11,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { listEntries } from '@/lib/app/glossary';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 interface GlossaryRequest {
   leadId?: unknown;
@@ -20,6 +21,8 @@ interface GlossaryRequest {
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: GlossaryRequest;
     try {
@@ -37,6 +40,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

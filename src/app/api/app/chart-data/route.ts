@@ -15,6 +15,7 @@ import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { buildChartDrawingData } from '@/server/engines/chartData';
 import type { AstrologyResult, HumanDesignResult } from '@/server/engines/types';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 interface ChartDataRequest {
   leadId?: unknown;
@@ -24,6 +25,8 @@ interface ChartDataRequest {
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: ChartDataRequest;
     try {
@@ -44,6 +47,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

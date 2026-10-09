@@ -13,6 +13,7 @@ import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 import {
   buildTransitCard,
   TRANSIT_ASPECTS,
@@ -32,6 +33,8 @@ function oneOf<T extends string>(list: readonly T[], value: unknown): T | null {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: Record<string, unknown>;
     try {
@@ -58,6 +61,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

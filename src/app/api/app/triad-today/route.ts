@@ -18,6 +18,7 @@ import { calculateDailySky, type NatalSkyPoints } from '@/server/engines/dailySk
 import { calculateDayNumerology } from '@/server/engines/dayNumerology';
 import type { AstrologyResult } from '@/server/engines/types';
 import { parseSkyInstant } from '@/lib/app/skyDate';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 
@@ -26,6 +27,8 @@ function isNumber(value: unknown): value is number {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: { leadId?: unknown; email?: unknown; localDate?: unknown; at?: unknown; isToday?: unknown };
     try {
@@ -52,6 +55,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

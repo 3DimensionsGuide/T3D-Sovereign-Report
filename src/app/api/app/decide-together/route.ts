@@ -25,6 +25,7 @@ import { calculateDayNumerology } from '@/server/engines/dayNumerology';
 import { calculateAstrology } from '@/server/engines/astrology';
 import { calculateLifePath } from '@/server/engines/numerology';
 import { buildConnections, buildNumberPair, buildSynastry, type GateKnowledge } from '@/lib/app/relationshipPieces';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 const BAD_PARTNER = { success: false, error: 'Please check the other person’s birth details and try again.' };
@@ -39,6 +40,8 @@ function cleanLabel(value: unknown): string {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: {
       leadId?: unknown; email?: unknown; localDate?: unknown; youTimeKnown?: unknown;
@@ -73,6 +76,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

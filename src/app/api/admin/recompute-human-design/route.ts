@@ -77,6 +77,7 @@ import { eq } from 'drizzle-orm';
 import { calculateHumanDesign } from '@/server/engines/human_design';
 import { calculateAstrology } from '@/server/engines/astrology';
 import { resolveGeoAndTimezone } from '@/server/geocoding';
+import { limitRequest } from '@/server/rateLimit';
 
 type BirthData = {
   date: string;
@@ -263,6 +264,8 @@ async function handleRecompute(
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'admin');
+  if (limited) return limited;
   const url = new URL(request.url);
   const secret = url.searchParams.get('secret');
   const expected = process.env.ADMIN_RECOMPUTE_SECRET;

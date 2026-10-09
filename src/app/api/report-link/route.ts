@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getOrderById } from '@/lib/products/queries';
 import { PAGE_LINK_SECONDS, reportDownloadUrl } from '@/server/reportLinks';
+import { limitRequest } from '@/server/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-07
 const DENIED = { success: false, error: 'We could not confirm this purchase. Please use the link in your email.' };
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'reportLink');
+  if (limited) return limited;
   try {
     let body: { orderId?: unknown; paymentIntentId?: unknown };
     try {

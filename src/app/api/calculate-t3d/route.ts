@@ -15,6 +15,7 @@ import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
 import { resolveGeoAndTimezone } from '@/server/geocoding';
 import type { T3DCalculatorInput } from '@/server/engines/types';
+import { limitRequest } from '@/server/rateLimit';
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
 function validateInput(body: Partial<T3DCalculatorInput>): string | null {
@@ -32,6 +33,8 @@ function validateInput(body: Partial<T3DCalculatorInput>): string | null {
 export async function POST(
   request: Request,
 ): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'calculate');
+  if (limited) return limited;
   try {
     // 1. Parse body
     let body: T3DCalculatorInput;

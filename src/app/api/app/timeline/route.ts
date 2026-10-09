@@ -18,6 +18,7 @@ import { leads } from '@/server/db/schema';
 import { calculateTimeline } from '@/server/engines/timeline';
 import type { NatalSkyPoints } from '@/server/engines/dailySky';
 import type { AstrologyResult, NumerologyCycle } from '@/server/engines/types';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 interface TimelineRequest {
   leadId?: unknown;
@@ -45,6 +46,8 @@ function isCycles(value: unknown): value is NumerologyCycle[] {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: TimelineRequest;
     try {
@@ -78,6 +81,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

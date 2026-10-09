@@ -18,6 +18,7 @@ import Stripe from 'stripe';
 import { db } from '@/server/db';
 import { orders } from '@/server/db/schema';
 import { getProductBySlug } from '@/lib/products/queries';
+import { limitRequest } from '@/server/rateLimit';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-07-29.dahlia',
@@ -26,6 +27,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const DEFAULT_PRODUCT_SLUG = 'sovereign-report';
 
 export async function POST(request: Request) {
+  const limited = await limitRequest(request, 'checkout');
+  if (limited) return limited;
   try {
     const { leadId, email, name, productSlug } = await request.json() as {
       leadId:      number;

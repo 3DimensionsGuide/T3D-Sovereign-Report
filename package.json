@@ -17,6 +17,7 @@
     "@splinetool/runtime": "^1.12.97",
     "@stripe/react-stripe-js": "^6.6.0",
     "@stripe/stripe-js": "^9.8.0",
+    "@upstash/redis": "^1.39.0",
     "@vercel/functions": "^3.9.7",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",

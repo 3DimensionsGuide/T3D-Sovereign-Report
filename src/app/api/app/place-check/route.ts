@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { DateTime } from 'luxon';
 import { lookupPlaceCandidates } from '@/server/geocoding';
+import { limitRequest } from '@/server/rateLimit';
 
 function utcOffsetLabel(timezone: string, birthDate: string): string | null {
   const dt = DateTime.fromISO(`${birthDate}T12:00:00`, { zone: timezone });
@@ -23,6 +24,8 @@ function utcOffsetLabel(timezone: string, birthDate: string): string | null {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'place');
+  if (limited) return limited;
   try {
     let body: { city?: unknown; country?: unknown; birthDate?: unknown };
     try {

@@ -35,6 +35,7 @@ import {
   findChannelCircuit,
 } from '@/lib/report/section3/gate-content';
 import { GODHEAD_MECHANISM, findGodheadByGate } from '@/lib/report/section3/godhead-content';
+import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 import {
   DEFINITION_MEANING,
   VARIABLES_MECHANISM,
@@ -99,6 +100,8 @@ function pickAuthority(display: string) {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const limited = await limitRequest(request, 'app');
+  if (limited) return limited;
   try {
     let body: VehicleRequest;
     try {
@@ -119,6 +122,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
     const lead = rows[0];
     if (!lead || lead.email.toLowerCase().trim() !== email) {
+      await noteAccessFailure(request);
       return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 

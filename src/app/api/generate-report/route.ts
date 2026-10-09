@@ -19,10 +19,13 @@ import { getOrderById, getProductById } from '@/lib/products/queries';
 import { checkReportToken } from '@/server/reportLinks';
 import { getGenerator } from '@/lib/products/registry';
 import type { Lead } from '@/server/db/schema';
+import { limitRequest } from '@/server/rateLimit';
 
 const LINK_PROBLEM = 'This download link is not valid or has expired. Use the link in your most recent report email, or email privacy@3dimensions.guide.';
 
 export async function GET(request: Request) {
+  const limited = await limitRequest(request, 'download');
+  if (limited) return limited;
   try {
     const { searchParams } = new URL(request.url);
     const orderIdParam = searchParams.get('orderId');
