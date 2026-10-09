@@ -471,26 +471,33 @@ function determineDefinedCenters(
 /**
  * Motor centers in Human Design: Solar Plexus, Sacral, Heart, Root.
  * The Throat is the expression center; when a motor connects to it (directly
- * via a completed channel), the type changes.
+ * or through other defined centers), the type changes.
  */
 const MOTOR_CENTERS = new Set<HDCenter>(['solar_plexus', 'sacral', 'heart', 'root']);
 
 /**
- * Channels that directly connect a motor center to the Throat.
- * These are the channels that create Manifestor / MG energy.
+ * A motor reaches the Throat when an unbroken chain of defined channels links
+ * them — directly (e.g. 20-34) or through other defined centers (e.g. Root →
+ * Spleen → Throat). Per the T3D sources, indirect connections count.
  */
-const MOTOR_TO_THROAT_CHANNELS: ReadonlySet<string> = new Set([
-  '20-34', // Sacral → Throat (Charisma) — MG when Sacral is defined
-  '12-22', // Solar Plexus → Throat (Openness)
-  '35-36', // Solar Plexus → Throat (Transience)
-  '45-21', // Heart → Throat (Money Line)
-]);
-
 function isMotorToThroatDefined(activeChannels: ActiveChannel[]): boolean {
-  return activeChannels.some((ch) => {
-    const key = [...ch.gates].sort((a, b) => a - b).join('-');
-    return MOTOR_TO_THROAT_CHANNELS.has(key);
-  });
+  const adjacency = new Map<HDCenter, HDCenter[]>();
+  for (const ch of activeChannels) {
+    adjacency.set(ch.fromCenter, [...(adjacency.get(ch.fromCenter) ?? []), ch.toCenter]);
+    adjacency.set(ch.toCenter, [...(adjacency.get(ch.toCenter) ?? []), ch.fromCenter]);
+  }
+  const reached = new Set<HDCenter>(['throat']);
+  const queue: HDCenter[] = ['throat'];
+  while (queue.length > 0) {
+    const current = queue.pop() as HDCenter;
+    for (const next of adjacency.get(current) ?? []) {
+      if (!reached.has(next)) {
+        reached.add(next);
+        queue.push(next);
+      }
+    }
+  }
+  return [...MOTOR_CENTERS].some((motor) => reached.has(motor));
 }
 
 function determineType(

@@ -286,9 +286,11 @@ describe('numerology anchors', () => {
     });
   }
 
-  test('master-number life paths use the reduced path for pinnacle ages', { todo: 'Pinnacle/Challenge transition ages use 36 − 22 = 14 for a 22 life path; the traditional rule uses the reduced 4 (age 32). Needs Tyler to decide.' }, () => {
+  // Decision (Tyler): master numbers are NOT reduced for pinnacle ages. A 22 life path
+  // uses 36 − 22 = 14. This test locks that choice in.
+  test('master-number life paths keep the unreduced number for pinnacle ages', () => {
     const n = calculateNumerology({ firstName: 'Yvonne', lastName: 'Kim-Lopez', birthDate: '1968-09-16' });
-    assert.equal(n.pinnacles[0].endAge, 32);
+    assert.equal(n.pinnacles[0].endAge, 14);
   });
 });
 
