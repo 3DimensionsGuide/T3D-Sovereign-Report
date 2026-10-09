@@ -16,6 +16,7 @@ import { calculateHumanDesign } from '@/server/engines/human_design';
 import { resolveGeoAndTimezone } from '@/server/geocoding';
 import type { T3DCalculatorInput } from '@/server/engines/types';
 import { limitRequest } from '@/server/rateLimit';
+import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
 function validateInput(body: Partial<T3DCalculatorInput>): string | null {
@@ -24,6 +25,7 @@ function validateInput(body: Partial<T3DCalculatorInput>): string | null {
   if (!body.email?.includes('@')) return 'A valid email is required';
   if (!body.birthDate?.match(/^\d{4}-\d{2}-\d{2}$/))
     return 'birthDate must be in YYYY-MM-DD format';
+  if (isUnderMinimumAge(body.birthDate)) return UNDER_AGE_MESSAGE;
   if (!body.birthPlace?.city?.trim())    return 'birthPlace.city is required';
   if (!body.birthPlace?.country?.trim()) return 'birthPlace.country is required';
   return null;

@@ -12,6 +12,7 @@
  * No changes to calculation logic, API calls, or store.
  */
 
+import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import ResultsDashboard from './ResultsDashboard';
@@ -74,7 +75,13 @@ function validateField(field: FKey, s: FormState): string {
     case 'lastName':   return typeof v === 'string' && v.trim() ? '' : 'Last name is required';
     case 'birthMonth': return typeof v === 'string' && v ? '' : 'Select birth month';
     case 'birthDay':   return typeof v === 'string' && v ? '' : 'Select birth day';
-    case 'birthYear':  return typeof v === 'string' && v ? '' : 'Select birth year';
+    case 'birthYear': {
+      if (typeof v !== 'string' || !v) return 'Select birth year';
+      if (s.birthMonth && s.birthDay && isUnderMinimumAge(buildDate(s.birthMonth, s.birthDay, v))) {
+        return UNDER_AGE_MESSAGE;
+      }
+      return '';
+    }
     case 'city':    return typeof v === 'string' && v.trim() ? '' : 'Birth city is required';
     case 'country': return typeof v === 'string' && v.trim() ? '' : 'Country is required';
     case 'email': {
@@ -278,6 +285,7 @@ export default function CalculatorForm() {
     setData(prev => {
       const next = { ...prev, [field]: value };
       if (touched[field]) validate(field, next);
+      if ((field === 'birthMonth' || field === 'birthDay') && touched.birthYear) validate('birthYear', next);
       return next;
     });
   }
