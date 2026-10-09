@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
@@ -13,19 +13,22 @@ import {
   aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
 } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
+import { TransitSheet } from '@/components/TransitSheet';
 import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 const NATURE_LABEL = { flow: '◯  Flow', friction: '◼  Friction', neutral: '◇  Neutral' } as const;
 
-function TransitRow({ hit }: { hit: DailyTransitHit }) {
+function TransitRow({ hit, onSelect }: { hit: DailyTransitHit; onSelect: (hit: DailyTransitHit) => void }) {
   const phrase = `${bodyName(hit.transiting)} ${aspectWord(hit.aspect)} your ${natalName(hit.natal)}`;
   const detail = `${hit.orb.toFixed(1)}° from exact · ${hit.applying ? 'applying' : 'separating'}${hit.peak ? ' · peak' : ''}`;
   return (
-    <View
-      accessibilityLabel={`${phrase}. ${NATURE_LABEL[hit.nature].replace(/[^A-Za-z]/g, '')}. ${detail}`}
-      style={[styles.transitRow, hit.nature === 'friction' && styles.transitFriction]}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${phrase}. ${NATURE_LABEL[hit.nature].replace(/[^A-Za-z]/g, '')}. ${detail}. Opens the full meaning.`}
+      onPress={() => onSelect(hit)}
+      style={({ pressed }) => [styles.transitRow, hit.nature === 'friction' && styles.transitFriction, pressed && { opacity: 0.8 }]}
     >
       <Text style={styles.transitPhrase}>
         <Term id={planetId(hit.transiting)}>{bodyName(hit.transiting)}</Term>{' '}
@@ -34,7 +37,8 @@ function TransitRow({ hit }: { hit: DailyTransitHit }) {
       </Text>
       <Text style={styles.transitDetail}>{detail}</Text>
       <Text style={styles.transitNature}>{NATURE_LABEL[hit.nature]}</Text>
-    </View>
+      <Text style={styles.transitMore}>TAP FOR FULL MEANING ›</Text>
+    </Pressable>
   );
 }
 
@@ -46,6 +50,7 @@ export default function Today() {
   const [dayNum, setDayNum] = useState<DayNumerology | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedHit, setSelectedHit] = useState<DailyTransitHit | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
@@ -175,7 +180,7 @@ export default function Today() {
             {today.transits.length ? (
               <View style={styles.transitList}>
                 {today.transits.map((hit) => (
-                  <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} />
+                  <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} onSelect={setSelectedHit} />
                 ))}
               </View>
             ) : (
@@ -202,6 +207,7 @@ export default function Today() {
           </FadeIn>
         </>
       ) : null}
+      <TransitSheet hit={selectedHit} onClose={() => setSelectedHit(null)} />
     </Screen>
   );
 }
@@ -235,5 +241,6 @@ const styles = StyleSheet.create({
   transitFriction: { borderColor: colors.stoplight },
   transitPhrase: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   transitDetail: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
+  transitMore: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, color: colors.gold, marginTop: 2 },
   transitNature: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1, color: colors.parchment },
 });

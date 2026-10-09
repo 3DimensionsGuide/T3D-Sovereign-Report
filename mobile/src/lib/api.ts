@@ -1,4 +1,5 @@
 import type { ChartDrawingData } from '@/charts/chartTypes';
+import type { TransitCardData } from '@/lib/transitCardTypes';
 import type { ExplainEntry, GlossaryItem } from '@/lib/explainTypes';
 import type { DayNumerology } from '@/lib/dayNumerologyTypes';
 import type { NumerologyDetail } from '@/lib/numerologyTypes';
@@ -438,4 +439,26 @@ export function requestExplain(leadId: number, email: string, id: string): Promi
 export async function requestGlossary(leadId: number, email: string): Promise<GlossaryItem[]> {
   const data = await postApp<{ entries: GlossaryItem[] }>('/api/app/glossary', { leadId, email }, 'Could not load the glossary.');
   return data.entries;
+}
+
+export interface TransitCardRequest {
+  transiting: string;
+  natal: string;
+  aspect: string;
+  nature: string;
+  orb: number;
+  peak: boolean;
+  applying: boolean;
+}
+
+export function requestTransitCard(
+  leadId: number,
+  email: string,
+  hit: TransitCardRequest,
+): Promise<TransitCardData> {
+  return postApp<TransitCardData>(
+    '/api/app/transit-card',
+    { leadId, email, ...hit },
+    'Could not load that transit. Please try again.',
+  );
 }
