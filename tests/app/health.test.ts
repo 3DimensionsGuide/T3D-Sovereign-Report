@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { REFERENCES, checkEngine } from '../../src/server/healthCheck';
-import { APP_EVENTS, isAppEvent } from '../../src/lib/app/events';
+import { APP_EVENTS, CARD_REFS, SCREEN_EVENTS, isAppEvent } from '../../src/lib/app/events';
 
 type Snap = {
   tropical: { bodies: Record<string, { longitude: number }>; ascendant: number };
   humanDesign: { type: string; authority: string; profile: string };
   numerology: { lifePath: number };
 };
+const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8');
 const snapshot = JSON.parse(readFileSync(join(process.cwd(), 'tests/golden/snapshot.json'), 'utf8')) as { charts: Record<string, Snap> };
 
 test('health check reference values match the golden snapshot', () => {
@@ -47,10 +48,22 @@ test('the app and the server list the same screens', () => {
   const src = readFileSync(join(process.cwd(), 'mobile/src/lib/track.ts'), 'utf8');
   const block = /new Set\(\[([\s\S]*?)\]\)/.exec(src)![1]!;
   const mobile = [...block.matchAll(/'([^']+)'/g)].map((m) => `screen_${m[1]}`).sort();
-  assert.deepEqual(mobile, [...APP_EVENTS].sort());
+  assert.deepEqual(mobile, [...SCREEN_EVENTS].sort());
 });
 
 test('the event route stores nothing but a day, a screen name and a count', () => {
   const src = readFileSync(join(process.cwd(), 'src/app/api/app/event/route.ts'), 'utf8');
   assert.doesNotMatch(src, /leadId|email|headers\.get|x-forwarded|console\.(log|info)/);
+});
+
+test('card visit tags: the website beacon, the app links and the server list agree', () => {
+  assert.ok(isAppEvent('visit_card-profile'));
+  assert.ok(isAppEvent('visit_card-today'));
+  assert.ok(!isAppEvent('visit_card-other'));
+  const beacon = read('src/components/RefBeacon.tsx');
+  const share = read('mobile/src/app/share-card.tsx');
+  for (const ref of CARD_REFS) {
+    assert.ok(beacon.includes(`'${ref}'`), `beacon knows ${ref}`);
+    assert.ok(share.includes(`?ref=${ref}`), `share link carries ${ref}`);
+  }
 });

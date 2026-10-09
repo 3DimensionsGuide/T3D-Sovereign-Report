@@ -5,6 +5,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import VideoBackground from '@/components/VideoBackground';
+import RefBeacon from '@/components/RefBeacon';
 
 export const metadata: Metadata = {
   title: {
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased">
   <VideoBackground />
+        <RefBeacon />
         {children}
       </body>
     </html>

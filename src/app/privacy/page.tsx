@@ -60,6 +60,11 @@ export default function PrivacyPage() {
             to you.
           </p>
           <p style={S.p}>
+            If you open our website from a link on a card someone shared from the app, we add one
+            to a daily count for that kind of card. This uses no cookies and keeps nothing about
+            you.
+          </p>
+          <p style={S.p}>
             If the app or our server hits an error, a crash report may be sent to our error
             tracking provider, Sentry. It holds the type of error and where in the code it
             happened. We remove your name, email, birth details and chart from these reports
