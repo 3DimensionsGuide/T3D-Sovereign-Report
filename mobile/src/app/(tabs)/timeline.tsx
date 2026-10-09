@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { router, type Href } from 'expo-router';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -115,6 +116,7 @@ function YearCard({ data }: { data: TimelineResult }) {
         ) : null}
         <CycleBlock title="Pinnacle" cycle={data.pinnacle.current} next={data.pinnacle.next} />
         <CycleBlock title="Challenge" cycle={data.challenge.current} next={data.challenge.next} />
+        <GoldButton label="YOUR YEAR AHEAD ›" variant="ghost" onPress={() => router.push('/year' as Href)} />
       </Panel>
     </FadeIn>
   );

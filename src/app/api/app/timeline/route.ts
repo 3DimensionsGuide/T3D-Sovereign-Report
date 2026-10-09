@@ -16,6 +16,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { calculateTimeline } from '@/server/engines/timeline';
+import { buildYearAhead } from '@/lib/app/yearAhead';
 import type { NatalSkyPoints } from '@/server/engines/dailySky';
 import type { AstrologyResult, NumerologyCycle } from '@/server/engines/types';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
@@ -136,7 +137,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     return NextResponse.json(
-      { success: true, data: { ...timeline, reminder: REMINDER } },
+      { success: true, data: { ...timeline, yearAhead: buildYearAhead(timeline), reminder: REMINDER } },
       { status: 200, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error: unknown) {

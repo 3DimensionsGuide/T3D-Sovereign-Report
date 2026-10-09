@@ -42,6 +42,7 @@ import {
 import { HOUSE_NAMES, HOUSE_THEMES } from '@/lib/report/advanced/stoplight/transits-content';
 import { calculateFirdaria, calculateProfection, type FirdariaPlanet } from '@/lib/report/tokens';
 import type { ChartData, PlanetPosition } from '@/server/engines/types';
+import { buildNatalAspects, buildNodes, type NatalAspects, type NodesReading } from '@/lib/app/natalExtras';
 
 const SIGNS = [
   'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
@@ -107,6 +108,8 @@ export interface StoplightDetail {
     lordQuote: string | null;
   };
   mixups: FrictionPattern[];
+  nodes: NodesReading | null;
+  aspects: NatalAspects | null;
 }
 
 function signOf(longitude: number): string {
@@ -293,5 +296,7 @@ export function buildStoplight(
       lordQuote: lordAnalysis?.quote ?? null,
     },
     mixups: STOPLIGHT_FRICTION,
+    nodes: buildNodes(tropical, birthTimeKnown),
+    aspects: buildNatalAspects(tropical, birthTimeKnown),
   };
 }

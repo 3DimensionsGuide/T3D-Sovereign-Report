@@ -21,6 +21,36 @@ export interface StoplightPlanet {
   friction: string;
 }
 
+export interface NodesReading {
+  intro: string;
+  north: { sign: string; formatted: string; house: number | null };
+  south: { sign: string; formatted: string; house: number | null };
+  growth: string;
+  familiar: string;
+  balance: string;
+  houseGrowth: string | null;
+  houseFamiliar: string | null;
+  note: string | null;
+  closing: string;
+}
+
+export interface NatalAspectItem {
+  line: string;
+  aspect: 'conjunction' | 'sextile' | 'square' | 'trine' | 'opposition';
+  feel: 'easy' | 'challenging' | 'blend';
+  orb: number;
+  tight: boolean;
+  theme: string;
+  text: string;
+}
+
+export interface NatalAspects {
+  intro: string;
+  items: NatalAspectItem[];
+  note: string | null;
+  closing: string;
+}
+
 export interface StoplightDetail {
   locked: boolean;
   birthTimeKnown: boolean;
@@ -45,4 +75,7 @@ export interface StoplightDetail {
     sign: string; lord: string; lordQuote: string | null;
   };
   mixups: { confusion: string; signal: string; recalibrate: string }[];
+  /** Optional: older saved copies do not have these. */
+  nodes?: NodesReading | null;
+  aspects?: NatalAspects | null;
 }

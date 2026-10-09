@@ -66,6 +66,27 @@ export interface CycleWindow {
   reframe?: string;
 }
 
+export interface YearAhead {
+  age: number;
+  startsOn: string;
+  endsOn: string;
+  summary: string;
+  chapter: {
+    items: { name: string; when: 'now' | 'next'; ages: string; text: string }[];
+    none: string;
+  };
+  topic: {
+    house: number;
+    houseName: string;
+    sign: string;
+    lord: string;
+    theme: string;
+    lordQuote: string | null;
+  };
+  pace: { personalYear: number | null; word: string | null; line: string | null; universalYear: number };
+  closing: string;
+}
+
 export interface TimelineResult {
   from: string;
   to: string;
@@ -78,4 +99,6 @@ export interface TimelineResult {
   challenge: { current: CycleWindow; next: CycleWindow | null };
   numberMeanings: Record<number, { word: string; line: string }>;
   reminder: string;
+  /** Optional: copies saved before this was added do not have it. */
+  yearAhead?: YearAhead;
 }

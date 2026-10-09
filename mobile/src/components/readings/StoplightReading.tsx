@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import {
   Accordion as BaseAccordion, Block, Bullets, Footnote, NoteCard, ReadingStatus, SectionTitle,
 } from '@/components/ReadingBlocks';
-import type { BigThreeLens, StoplightDetail, StoplightPlanet } from '@/lib/stoplightTypes';
+import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, StoplightPlanet } from '@/lib/stoplightTypes';
 import { useStoplight } from '@/lib/useStoplight';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, space } from '@/theme/tokens';
@@ -50,6 +50,60 @@ function BigThree({ lens, prefix }: { lens: BigThreeLens; prefix: string }) {
       >
         <Block label="HOW OTHERS MEET YOU" text={lens.rising.text} />
       </Accordion>
+    </>
+  );
+}
+
+const FEEL_WORD: Record<string, string> = {
+  easy: 'Flows easily',
+  challenging: 'Creates friction',
+  blend: 'Blends together',
+};
+
+function NodesSection({ nodes }: { nodes: NodesReading }) {
+  return (
+    <>
+      <SectionTitle eyebrow="YOUR LUNAR NODES" title="Where you grow, where you rest" note={nodes.intro} />
+      {nodes.note ? <NoteCard text={nodes.note} /> : null}
+      <Accordion
+        badge="☊"
+        title={`North Node in ${nodes.north.sign}`}
+        subtitle={`${nodes.north.formatted}${nodes.north.house ? ` · house ${nodes.north.house}` : ''}`}
+      >
+        <Block label="THE DIRECTION OF GROWTH" text={nodes.growth} />
+        {nodes.houseGrowth ? <Block label={`WHERE IT SHOWS UP (HOUSE ${nodes.north.house})`} text={nodes.houseGrowth} /> : null}
+      </Accordion>
+      <Accordion
+        badge="☋"
+        title={`South Node in ${nodes.south.sign}`}
+        subtitle={`${nodes.south.formatted}${nodes.south.house ? ` · house ${nodes.south.house}` : ''}`}
+      >
+        <Block label="WHAT FEELS FAMILIAR" text={nodes.familiar} />
+        {nodes.houseFamiliar ? <Block label={`WHERE IT SHOWS UP (HOUSE ${nodes.south.house})`} text={nodes.houseFamiliar} /> : null}
+        <Block label="HOLDING THE BALANCE" text={nodes.balance} />
+      </Accordion>
+      <Footnote text={nodes.closing} />
+    </>
+  );
+}
+
+function AspectsSection({ aspects }: { aspects: NatalAspects }) {
+  return (
+    <>
+      <SectionTitle eyebrow="PLANETS IN CONVERSATION" title="Aspects in your chart" note={aspects.intro} />
+      {aspects.note ? <NoteCard text={aspects.note} /> : null}
+      {aspects.items.map((a) => (
+        <Accordion
+          key={a.line}
+          badge={a.tight ? '◎' : '○'}
+          title={a.line}
+          subtitle={`${FEEL_WORD[a.feel] ?? a.feel} · ${a.orb.toFixed(1)}° from exact${a.tight ? ' · very tight' : ''}`}
+        >
+          <Block label="THE THEME" text={a.theme} />
+          <Block label="HOW IT TENDS TO FEEL" text={a.text} />
+        </Accordion>
+      ))}
+      <Footnote text={aspects.closing} />
     </>
   );
 }
@@ -113,6 +167,9 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
 
       <SectionTitle eyebrow="YOUR PLANETS" title="Uranus, Neptune, Pluto" note={data.mechanisms.outer} />
       {outer.map((p) => <PlanetCard key={p.key} p={p} />)}
+
+      {data.nodes ? <NodesSection nodes={data.nodes} /> : null}
+      {data.aspects && data.aspects.items.length > 0 ? <AspectsSection aspects={data.aspects} /> : null}
 
       <SectionTitle
         eyebrow="YOUR TIMING"
