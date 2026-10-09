@@ -22,6 +22,7 @@ export default function Onboarding() {
   const setChart = useT3DStore((state) => state.setChart);
 
   const [firstName, setFirstName] = useState(saved?.firstName ?? '');
+  const [middleName, setMiddleName] = useState(saved?.middleName ?? '');
   const [lastName, setLastName] = useState(saved?.lastName ?? '');
   const [email, setEmail] = useState(saved?.email ?? '');
   const [city, setCity] = useState(saved?.city ?? '');
@@ -57,6 +58,7 @@ export default function Onboarding() {
 
     const profile: BirthProfile = {
       firstName: firstName.trim(),
+      middleName: middleName.trim() || undefined,
       lastName: lastName.trim(),
       email: email.trim().toLowerCase(),
       birthDate: toDateString(birthDate),
@@ -99,6 +101,9 @@ export default function Onboarding() {
         <View style={styles.form}>
           <Field label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
             autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
+          <Field label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
+            autoCapitalize="words" autoComplete="additional-name" textContentType="middleName" returnKeyType="next"
+            placeholder="As written on your birth certificate" />
           <Field label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}
             autoCapitalize="words" autoComplete="family-name" textContentType="familyName" returnKeyType="next" />
           <Field label="Email" value={email} onChangeText={setEmail} error={errors.email}

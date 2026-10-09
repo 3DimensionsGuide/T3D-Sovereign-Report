@@ -13,6 +13,8 @@ export const API_BASE_URL: string =
 
 export interface BirthProfile {
   firstName: string;
+  /** Optional, but numerology uses the full birth name — enter it if you have one. */
+  middleName?: string;
   lastName: string;
   email: string;
   /** YYYY-MM-DD */
@@ -82,6 +84,7 @@ export async function requestChart(profile: BirthProfile): Promise<ChartResult> 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         firstName: profile.firstName.trim(),
+        middleName: profile.middleName?.trim() || undefined,
         lastName: profile.lastName.trim(),
         email: profile.email.trim(),
         birthDate: profile.birthDate,

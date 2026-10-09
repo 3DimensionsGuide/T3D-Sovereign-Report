@@ -25,7 +25,7 @@ export default function Chart() {
         <View style={styles.header}>
           <Text style={styles.eyebrow}>YOUR T3D CHART</Text>
           <Text accessibilityRole="header" style={styles.name}>
-            {profile.firstName} {profile.lastName}
+            {[profile.firstName, profile.middleName, profile.lastName].filter(Boolean).join(' ')}
           </Text>
           <Text style={styles.meta}>
             {profile.birthDate} · {profile.birthTimeKnown ? profile.birthTime : 'time unknown'} ·{' '}
