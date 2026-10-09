@@ -19,7 +19,7 @@
  *    Events that touch the Lord of the Year or fall in the profected house are
  *    flagged.
  *  - Numerology timing: Personal Year = reduce(birth month + birth day +
- *    Universal Year), Personal Month = reduce(PY + month), Personal Day =
+ *    Universal Year of the year your last birthday fell in; it runs birthday to birthday), Personal Month = reduce(PY + month), Personal Day =
  *    reduce(PM + day). Master numbers 11 / 22 / 33 are preserved.
  *  - Transits are neutral weather: classified flow / friction / neutral, never
  *    scored. Decisions go through Strategy and Authority.
@@ -38,6 +38,7 @@ import type {
   SkyBody,
 } from './dailySky';
 import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/road-content';
+import { personalYearBase } from './dayNumerology';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
 
@@ -761,12 +762,13 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
   const personal: PersonalDay[] = [];
   for (let i = 0; i < days; i++) {
     const day = new Date(localMidnightUtc.getTime() + i * MS_PER_DAY);
-    const year = day.getUTCFullYear();
-    const universal = reduceKeepMasters(digitSum(year));
+    const iso = day.toISOString().slice(0, 10);
+    // Personal Year runs birthday to birthday, so it follows the cycle year.
+    const universal = reduceKeepMasters(digitSum(personalYearBase(input.birthDate, iso)));
     const py = reduceKeepMasters(bm + bd + universal);
     const pm = reduceKeepMasters(py + (day.getUTCMonth() + 1));
     const pd = reduceKeepMasters(pm + day.getUTCDate());
-    personal.push({ date: day.toISOString().slice(0, 10), year: py, month: pm, day: pd });
+    personal.push({ date: iso, year: py, month: pm, day: pd });
   }
 
   return {

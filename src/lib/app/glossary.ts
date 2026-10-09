@@ -231,7 +231,7 @@ add('num:attitude', 'Numerology', 'Attitude number', 'Your first reaction to the
 add('num:universalday', 'Numerology', 'Universal Day', 'The energy of today’s date for everyone.', ['The Universal Day is worked out from the calendar date alone, so the whole world shares it.'], ['num:personalday']);
 add('num:personalday', 'Numerology', 'Personal Day', 'The energy of today for you.', ['Your Personal Day comes from your Personal Month plus today’s date. It shades how today tends to feel for you.'], ['num:universalday', 'num:personalmonth']);
 add('num:personalmonth', 'Numerology', 'Personal Month', 'The theme of this month for you.', ['Your Personal Month is your Personal Year plus the calendar month.'], ['num:personalyear']);
-add('num:personalyear', 'Numerology', 'Personal Year', 'The theme of this year for you.', ['Your Personal Year is your birth month and day plus the current Universal Year. It runs on the calendar year.'], ['num:personalmonth']);
+add('num:personalyear', 'Numerology', 'Personal Year', 'The theme of this year for you.', ['Your Personal Year is your birth month and day plus the Universal Year of your most recent birthday. It runs from birthday to birthday, so it changes on your birthday and not on January 1.'], ['num:personalmonth']);
 add('num:universalyear', 'Numerology', 'Universal Year', 'The energy of the calendar year.', ['The Universal Year is the digit sum of the calendar year. It is shared by everyone and is the base for every Personal Year.'], ['num:personalyear']);
 for (const [n, c] of Object.entries(DAY_NUMBER_CONTENT)) {
   const num = Number(n);

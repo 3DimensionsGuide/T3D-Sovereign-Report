@@ -150,6 +150,17 @@ function blendSentence(universal: number, personal: number): string {
   return `The world is running a ${u} theme while your own day is about ${p}. Let the global tone set the backdrop, and let your personal day guide what you do within it.`;
 }
 
+/**
+ * The calendar year that a Personal Year is built from. A Personal Year runs
+ * from birthday to birthday, so before this year's birthday it still belongs to
+ * the previous calendar year. Dates are YYYY-MM-DD.
+ */
+export function personalYearBase(birthDate: string, localDate: string): number {
+  const [y, m, d] = localDate.split('-').map(Number) as [number, number, number];
+  const [, bm, bd] = birthDate.split('-').map(Number) as [number, number, number];
+  return m < bm || (m === bm && d < bd) ? y - 1 : y;
+}
+
 /** localDate is the person's calendar date, YYYY-MM-DD. birthDate likewise. */
 export function calculateDayNumerology(birthDate: string, localDate: string): DayNumerology {
   const [y, m, d] = localDate.split('-').map(Number) as [number, number, number];
@@ -159,7 +170,7 @@ export function calculateDayNumerology(birthDate: string, localDate: string): Da
   const universalDay = reduceKeepMasters(
     reduceKeepMasters(m) + reduceKeepMasters(d) + universalYear,
   );
-  const personalYear = reduceKeepMasters(bm + bd + universalYear);
+  const personalYear = reduceKeepMasters(bm + bd + reduceKeepMasters(digitSum(personalYearBase(birthDate, localDate))));
   const personalMonth = reduceKeepMasters(personalYear + m);
   const personalDay = reduceKeepMasters(personalMonth + d);
 
