@@ -9,6 +9,7 @@
  *   partner: { label, birthDate, birthTime: "HH:MM" | null, latitude, longitude, timezone }
  * }
  *
+ * Also returns channel connections, a numerology pair and sky connections.
  * The other person's details are used to calculate and are then discarded:
  * nothing about them is written to the database or to the logs.
  */
@@ -21,6 +22,9 @@ import { leads } from '@/server/db/schema';
 import { buildDecideTogether, type TogetherPersonInput } from '@/lib/app/decideTogether';
 import { hdCertainty } from '@/server/engines/hdCertainty';
 import { calculateDayNumerology } from '@/server/engines/dayNumerology';
+import { calculateAstrology } from '@/server/engines/astrology';
+import { calculateLifePath } from '@/server/engines/numerology';
+import { buildConnections, buildNumberPair, buildSynastry, type GateKnowledge } from '@/lib/app/relationshipPieces';
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 const BAD_PARTNER = { success: false, error: 'Please check the other person’s birth details and try again.' };
@@ -117,7 +121,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     };
 
     const yourDay = calculateDayNumerology(birth.date, localDate).personal;
-    const theirDay = calculateDayNumerology(p.birthDate, localDate).personal;
+    const theirDayFull = calculateDayNumerology(p.birthDate, localDate);
+    const theirDay = theirDayFull.personal;
+    const theirDayYear = theirDayFull.personalYear;
     const text = (d: typeof yourDay) => (d.root ? `${d.number}/${d.root}` : String(d.number));
 
     const data = buildDecideTogether(you, partner, {
@@ -127,7 +133,56 @@ export async function POST(request: Request): Promise<NextResponse> {
       partnerNumber: text(theirDay),
     });
 
-    return NextResponse.json({ success: true, data }, { status: 200, headers: { 'Cache-Control': 'no-store' } });
+    // The other relationship pieces. Each is optional: if one cannot be built, the rest still return.
+    const youTimeKnown = body.youTimeKnown !== false;
+    const partnerTimeKnown = typeof p.birthTime === 'string';
+    const labels = { you: 'You', them: label };
+    const known = { you: youTimeKnown, them: partnerTimeKnown };
+    const pl = birth.place;
+    const yourPlaceOk = !!pl && isNum(pl.latitude, -90, 90) && isNum(pl.longitude, -180, 180) && typeof pl.timezone === 'string';
+    const yourTime = youTimeKnown && typeof birth.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(birth.time) ? birth.time : null;
+    const toKnowledge = (g: { gatesAllDay: number[]; gatesAnyTime: number[] }): GateKnowledge => ({
+      sure: new Set(g.gatesAllDay),
+      possible: new Set(g.gatesAnyTime),
+    });
+
+    let connections = null;
+    let sky = null;
+    if (yourPlaceOk && pl) {
+      const yourInput = { birthDate: birth.date, latitude: pl.latitude as number, longitude: pl.longitude as number, timezone: pl.timezone as string };
+      try {
+        const yours = hdCertainty(yourInput, yourTime);
+        connections = buildConnections(toKnowledge(yours), toKnowledge(c), labels, known);
+      } catch {
+        connections = null;
+      }
+      try {
+        const yourSky = calculateAstrology({ ...yourInput, birthTime: yourTime ?? '12:00' }).tropical;
+        const theirSky = calculateAstrology({
+          birthDate: p.birthDate, birthTime: typeof p.birthTime === 'string' ? p.birthTime : '12:00',
+          latitude: p.latitude, longitude: p.longitude, timezone: p.timezone,
+        }).tropical;
+        sky = buildSynastry(yourSky, theirSky, labels, known);
+      } catch {
+        sky = null;
+      }
+    }
+
+    let numbers = null;
+    try {
+      numbers = buildNumberPair(
+        { lifePath: calculateLifePath(birth.date), personalYear: calculateDayNumerology(birth.date, localDate).personalYear },
+        { lifePath: calculateLifePath(p.birthDate), personalYear: theirDayYear },
+        labels,
+      );
+    } catch {
+      numbers = null;
+    }
+
+    return NextResponse.json(
+      { success: true, data: { ...data, connections, numbers, sky } },
+      { status: 200, headers: { 'Cache-Control': 'no-store' } },
+    );
   } catch (error: unknown) {
     // Deliberately logs only the error, never the request body (it holds another person's birth details).
     console.error('[T3D Decide Together Error]', error instanceof Error ? error.message : 'unknown');

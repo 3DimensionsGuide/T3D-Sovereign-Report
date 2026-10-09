@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Field } from '@/components/Field';
+import { Segmented } from '@/components/Segmented';
 import { GoldButton } from '@/components/GoldButton';
 import {
   ChartRequestError, requestDecideTogether, requestPlaceCheck, type PlaceCandidate,
 } from '@/lib/api';
-import type { DecideTogether, PartnerProfile, TogetherPerson } from '@/lib/togetherTypes';
+import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastry, TogetherPerson } from '@/lib/togetherTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -157,6 +158,123 @@ function PersonCard({ p }: { p: TogetherPerson }) {
   );
 }
 
+
+type View_ = 'decide' | 'channels' | 'numbers' | 'sky';
+const VIEW_OPTIONS: ReadonlyArray<{ value: View_; label: string }> = [
+  { value: 'decide', label: 'Deciding' },
+  { value: 'channels', label: 'Channels' },
+  { value: 'numbers', label: 'Numbers' },
+  { value: 'sky', label: 'Sky' },
+];
+
+const KIND_MARK: Record<string, string> = { electromagnetic: '⚡', companionship: '＝', dominance: '▲', compromise: '↔' };
+
+function Unavailable({ what }: { what: string }) {
+  return (
+    <View style={styles.card}>
+      <Text style={styles.body}>We could not build {what} this time. Please try again in a moment.</Text>
+    </View>
+  );
+}
+
+function ChannelsView({ c, partnerLabel }: { c: HdConnections | null; partnerLabel: string }) {
+  if (!c) return <Unavailable what="the channel connections" />;
+  return (
+    <View style={{ gap: space.md }}>
+      <View style={styles.card}>
+        <Text style={[styles.eyebrow, { color: colors.vehicle }]}>◆  HUMAN DESIGN · CHANNELS</Text>
+        <Text accessibilityRole="header" style={styles.title}>How your charts connect</Text>
+        <Text style={styles.small}>
+          When two charts sit side by side, a channel can be completed, shared, or carried by one of you. There are four ways this happens.
+        </Text>
+      </View>
+      {c.note ? <View style={styles.noteBox}><Text style={styles.body}>{c.note}</Text></View> : null}
+      {c.items.length === 0 ? (
+        <View style={styles.card}>
+          <Text style={styles.body}>
+            You and {partnerLabel} do not share a channel connection. That is common. Your connection then tends to come more from the
+            centers you each carry and from how you choose to spend time together.
+          </Text>
+        </View>
+      ) : null}
+      {c.kinds.map((k) => {
+        const rows = c.items.filter((i) => i.kind === k.kind);
+        if (rows.length === 0) return null;
+        return (
+          <View key={k.kind} style={[styles.person, { borderLeftColor: colors.vehicle }]}>
+            <Text style={[styles.eyebrow, { color: colors.vehicle }]}>{KIND_MARK[k.kind]}  {k.title.toUpperCase()} · {k.mark.toUpperCase()}</Text>
+            <Text style={styles.small}>{k.what}</Text>
+            <Text style={styles.body}>{k.feels}</Text>
+            {rows.map((r) => (
+              <View key={r.channel} style={styles.rowBox}>
+                <Text style={styles.personTitle}>
+                  {r.channel}  <Text style={styles.small}>{[...r.gates].sort((a, b) => a - b).join('–')}</Text>
+                </Text>
+                <Text style={styles.small}>{r.centers}</Text>
+                <Text style={styles.body}>{r.holders}</Text>
+              </View>
+            ))}
+            <Text style={styles.small}>Worth noticing: {k.watch}</Text>
+          </View>
+        );
+      })}
+      <Text style={styles.small}>{c.closing}</Text>
+    </View>
+  );
+}
+
+function NumbersView({ n }: { n: NumberPair | null }) {
+  if (!n) return <Unavailable what="the number reading" />;
+  const Block = ({ b }: { b: NumberPair['lifePath'] }) => (
+    <View style={[styles.person, { borderLeftColor: colors.road }]}>
+      <Text style={styles.personTitle}>{b.title}</Text>
+      <Text style={styles.body}>{b.text}</Text>
+      {b.bring.map((x) => <Text key={x.who} style={styles.small}>•  {x.text}</Text>)}
+    </View>
+  );
+  return (
+    <View style={{ gap: space.md }}>
+      <View style={styles.card}>
+        <Text style={[styles.eyebrow, { color: colors.road }]}>▲  NUMEROLOGY · THE TWO OF YOU</Text>
+        <Text accessibilityRole="header" style={styles.title}>Your numbers side by side</Text>
+        <Text style={styles.small}>Life Path shows each person's long road. Personal Year shows the pace of this year.</Text>
+      </View>
+      <Block b={n.lifePath} />
+      <Block b={n.year} />
+      <Text style={styles.small}>{n.closing}</Text>
+    </View>
+  );
+}
+
+function SkyView({ s }: { s: Synastry | null }) {
+  if (!s) return <Unavailable what="the sky connections" />;
+  return (
+    <View style={{ gap: space.md }}>
+      <View style={styles.card}>
+        <Text style={[styles.eyebrow, { color: colors.stoplight }]}>●  ASTROLOGY · CONNECTIONS</Text>
+        <Text accessibilityRole="header" style={styles.title}>Where your skies touch</Text>
+        <Text style={styles.small}>The closest links between your two birth charts, strongest first.</Text>
+      </View>
+      {s.note ? <View style={styles.noteBox}><Text style={styles.body}>{s.note}</Text></View> : null}
+      {s.items.length === 0 ? (
+        <View style={styles.card}>
+          <Text style={styles.body}>No close links turned up between the main points we compare. That does not say anything about the two of you. It only means no single pairing stands out.</Text>
+        </View>
+      ) : null}
+      {s.items.map((i) => (
+        <View key={i.line} style={[styles.person, { borderLeftColor: colors.stoplight }]}>
+          <Text style={styles.personTitle}>{i.line}</Text>
+          <Text style={styles.small}>
+            {i.aspect[0].toUpperCase() + i.aspect.slice(1)}, {i.orb.toFixed(1)}° from exact · {i.theme}
+          </Text>
+          <Text style={styles.body}>{i.text}</Text>
+        </View>
+      ))}
+      <Text style={styles.small}>{s.closing}</Text>
+    </View>
+  );
+}
+
 function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () => void }) {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
@@ -164,6 +282,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
   const [data, setData] = useState<DecideTogether | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<View_>('decide');
 
   const load = useCallback(async () => {
     if (!profile || !chart) return;
@@ -202,13 +321,21 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>DECIDE TOGETHER</Text>
+        <Text style={styles.eyebrow}>TOGETHER</Text>
         <Text accessibilityRole="header" style={styles.title}>You and {partner.label}</Text>
         <Text style={styles.small}>
-          Each of you decides through your own Strategy and Authority. This is a frame for doing that side by side.
+          Four views of the two of you. Each of you still decides through your own Strategy and Authority.
         </Text>
       </View>
 
+      <Segmented options={VIEW_OPTIONS} value={view} onChange={setView} compact />
+
+      {view === 'channels' ? <ChannelsView c={data.connections} partnerLabel={partner.label} /> : null}
+      {view === 'numbers' ? <NumbersView n={data.numbers} /> : null}
+      {view === 'sky' ? <SkyView s={data.sky} /> : null}
+
+      {view === 'decide' ? (
+      <View style={{ gap: space.md }}>
       {data.people.map((p) => <PersonCard key={p.label} p={p} />)}
       {data.note ? <View style={styles.noteBox}><Text style={styles.body}>{data.note}</Text></View> : null}
 
@@ -244,6 +371,8 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
       </View>
 
       <Text style={styles.small}>{data.closing}</Text>
+      </View>
+      ) : null}
 
       <GoldButton label="Change person" variant="ghost" onPress={onChange} />
       <GoldButton
@@ -285,6 +414,7 @@ const styles = StyleSheet.create({
   placeRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
   mark: { fontSize: 20, color: colors.gold },
   placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  rowBox: { gap: 4, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline },
   stepRow: { flexDirection: 'row', gap: 10 },
   stepNum: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 23, color: colors.gold, width: 16 },
 });
