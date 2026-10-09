@@ -40,6 +40,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="numerology"
+        options={{
+          title: 'Numerology',
+          tabBarIcon: ({ color }) => <TabGlyph glyph="▲" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="chart"
         options={{
           title: 'My Chart',
