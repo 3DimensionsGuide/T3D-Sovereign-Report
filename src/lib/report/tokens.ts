@@ -3,6 +3,8 @@
  * Updated for Section 4: Road numerology fields
  */
 
+import { ageOn, personalYearNumber, todayIso } from '../numerology/personalYear';
+
 // DataQualityReport is imported from schema/dataIntegrity
 // and added to ReportData below
 export type { DataQualityReport, BirthTimeCertainty } from './schema/dataIntegrity';
@@ -146,20 +148,7 @@ export interface ReportData {
 
 // ─── PERSONAL YEAR ────────────────────────────────────────────────────────────
 export function calculatePersonalYear(birthDate: string): number {
-  const parts = birthDate.split('-');
-  const month = parseInt(parts[1] ?? '1', 10);
-  const day   = parseInt(parts[2] ?? '1', 10);
-  const currentYear = new Date().getFullYear();
-  function digitSum(n: number): number {
-    return n.toString().split('').reduce((a, b) => a + parseInt(b, 10), 0);
-  }
-  function reduce(n: number): number {
-    if (n === 11 || n === 22 || n === 33) return n;
-    if (n <= 9) return n;
-    return reduce(digitSum(n));
-  }
-  const total = digitSum(month) + digitSum(day) + digitSum(currentYear);
-  return reduce(total);
+  return personalYearNumber(birthDate, todayIso());
 }
 
 // ─── COMPOUND LIFE PATH ───────────────────────────────────────────────────────
@@ -237,9 +226,7 @@ export function getCurrentPinnacleIndex(
   pinnacles: { startAge: number; endAge: number | null }[],
   birthDate: string
 ): number {
-  const parts = birthDate.split('-');
-  const birthYear = parseInt(parts[0] ?? '1990', 10);
-  const currentAge = new Date().getFullYear() - birthYear;
+  const currentAge = ageOn(birthDate, todayIso());
 
   for (let i = 0; i < pinnacles.length; i++) {
     const p = pinnacles[i]!;

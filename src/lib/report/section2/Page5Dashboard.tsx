@@ -247,7 +247,7 @@ export default function Page5Dashboard({ data }: Props) {
             <Text style={S.translation}>
               LP {data.lifePathDisplay} — a pattern of growth, not a fixed destination.
             </Text>
-            <Text style={S.technical}>Personal Year {data.personalYear} · {new Date().getFullYear()}</Text>
+            <Text style={S.technical}>Personal Year {data.personalYear} · birthday to birthday</Text>
           </View>
 
           <View style={S.moduleDivider} />

@@ -101,7 +101,7 @@ VEHICLE (Human Design):
 
 ROAD (Numerology):
   Life Path: ${data.lifePathDisplay}
-  Personal Year: ${data.personalYear} (${new Date().getFullYear()})
+  Personal Year: ${data.personalYear} (runs from birthday to birthday)
   Current phase: ${pinnacleDesc}
   Core direction (one line): ${getLifePathDirection(data.lifePath)}
 

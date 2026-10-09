@@ -10,6 +10,8 @@
  * not a raw `String(value)` cast.
  */
 
+import { ageOn, personalYearNumber, todayIso } from '../../numerology/personalYear';
+
 // ─── HUMAN DESIGN NORMALIZATION ───────────────────────────────────────────────
 
 export const HD_TYPE_MAP: Record<string, string> = {
@@ -267,14 +269,9 @@ export function computeAttitude(birthDate: string): { number: number; display: s
   return { number: reduced, display };
 }
 
-/** Calculate Personal Year */
-export function computePersonalYear(birthDate: string): number {
-  const parts = birthDate.split('-');
-  const month = parseInt(parts[1] ?? '1', 10);
-  const day   = parseInt(parts[2] ?? '1', 10);
-  const year  = new Date().getFullYear();
-  const total = digitSum(month) + digitSum(day) + digitSum(year);
-  return reduceNumber(total);
+/** Calculate Personal Year (birthday to birthday; shared with the app). */
+export function computePersonalYear(birthDate: string, now: Date = new Date()): number {
+  return personalYearNumber(birthDate, todayIso(now));
 }
 
 /** Calculate four Challenges from birth date */
@@ -304,8 +301,7 @@ export function computePinnacleIndex(
   pinnacles: { startAge: number; endAge: number | null }[],
   birthDate: string
 ): number {
-  const birthYear  = parseInt(birthDate.split('-')[0] ?? '1990', 10);
-  const currentAge = new Date().getFullYear() - birthYear;
+  const currentAge = ageOn(birthDate, todayIso());
   for (let i = 0; i < pinnacles.length; i++) {
     const p = pinnacles[i]!;
     if (p.endAge === null || currentAge <= p.endAge) return i;

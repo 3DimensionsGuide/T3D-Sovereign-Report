@@ -38,7 +38,7 @@ import type {
   SkyBody,
 } from './dailySky';
 import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/road-content';
-import { personalYearBase } from './dayNumerology';
+import { personalYearNumber } from '../../lib/numerology/personalYear';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
 
@@ -758,14 +758,12 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
   events.sort((a, b) => a.at.localeCompare(b.at));
 
   // ── Numerology: personal year / month / day for each day in range ────────
-  const [, bm, bd] = input.birthDate.split('-').map(Number) as [number, number, number];
   const personal: PersonalDay[] = [];
   for (let i = 0; i < days; i++) {
     const day = new Date(localMidnightUtc.getTime() + i * MS_PER_DAY);
     const iso = day.toISOString().slice(0, 10);
-    // Personal Year runs birthday to birthday, so it follows the cycle year.
-    const universal = reduceKeepMasters(digitSum(personalYearBase(input.birthDate, iso)));
-    const py = reduceKeepMasters(bm + bd + universal);
+    // Personal Year runs birthday to birthday (shared rule, same as the PDF).
+    const py = personalYearNumber(input.birthDate, iso);
     const pm = reduceKeepMasters(py + (day.getUTCMonth() + 1));
     const pd = reduceKeepMasters(pm + day.getUTCDate());
     personal.push({ date: iso, year: py, month: pm, day: pd });
