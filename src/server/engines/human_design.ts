@@ -143,15 +143,17 @@ const CHANNELS: readonly ChannelDefinition[] = [
   // below, so UNIQUE_CHANNELS resolved to 32, and Gate 57 could never
   // complete the Throat side for anyone. Restored here.
   { gates: [20, 57], name: 'The Brain Wave', fromCenter: 'throat',       toCenter: 'spleen'       },
+  // INTEGRATION CIRCUIT CROSS-LINKS (previously missing). Gates 10, 20, 34
+  // and 57 interlock, giving three more canonical channels. Verified against
+  // the T3D NotebookLM knowledge base: all sources agree on 36 channels.
+  { gates: [20, 10], name: 'Awakening',      fromCenter: 'throat',       toCenter: 'g_center'     },
+  { gates: [10, 34], name: 'Exploration',    fromCenter: 'g_center',     toCenter: 'sacral'       },
+  { gates: [34, 57], name: 'Power',          fromCenter: 'sacral',       toCenter: 'spleen'       },
 ] as const;
 
 // De-duplicate channels by sorted gate pair to avoid double-counting.
-// NOTE: this currently resolves to 33 unique channels (32 + the restored
-// 20-57 above), not the full 36 of the real system. The 20-57 gap was
-// confirmed and fixed via this file's own prior comments; the remaining
-// gap was not independently re-derived gate-by-gate and should be
-// checked against a canonical channel chart (e.g. Jovian Archive) before
-// treating this list as complete.
+// This resolves to the full 36 canonical channels (verified against the
+// T3D NotebookLM knowledge base).
 const UNIQUE_CHANNELS = ((): readonly ChannelDefinition[] => {
   const seen = new Set<string>();
   return CHANNELS.filter((ch) => {
@@ -535,7 +537,7 @@ function determineType(
  * for any chart where Heart or G-Center is defined but not Throat-connected.
  */
 const HEART_TO_THROAT_CHANNEL = '21-45'; // Money Line — the only channel that makes Ego authority valid
-const G_TO_THROAT_CHANNELS: readonly string[] = ['1-8', '7-31', '13-33']; // Inspiration, Alpha, Prodigal
+const G_TO_THROAT_CHANNELS: readonly string[] = ['1-8', '7-31', '13-33', '10-20']; // Inspiration, Alpha, Prodigal, Awakening
 
 function isChannelActive(activeChannels: ActiveChannel[], sortedGateKey: string): boolean {
   return activeChannels.some((ch) => [...ch.gates].sort((a, b) => a - b).join('-') === sortedGateKey);
