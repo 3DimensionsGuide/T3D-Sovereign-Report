@@ -50,6 +50,15 @@ export default function ShareCard() {
     }
   }
 
+  async function onShareLink() {
+    setError(null);
+    try {
+      await Share.share({ message: LINKS[kind] });
+    } catch {
+      setError('We could not open the share sheet. Please try again.');
+    }
+  }
+
   const first = profile.firstName.trim();
 
   return (
@@ -102,6 +111,10 @@ export default function ShareCard() {
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
       <GoldButton label="SHARE OR SAVE IMAGE" onPress={onShare} loading={busy} disabled={kind === 'today' && !triad.data} />
       <Text style={styles.small}>In the share sheet, choose “Save Image” to keep it in Photos.</Text>
+      <GoldButton label="SHARE THE LINK ONLY" variant="ghost" onPress={onShareLink} />
+      <Text style={styles.small}>
+        Some apps, such as Notes, keep only the picture. Share the link on its own to add it there.
+      </Text>
       <GoldButton label="BACK" variant="ghost" onPress={() => router.back()} />
     </Screen>
   );
