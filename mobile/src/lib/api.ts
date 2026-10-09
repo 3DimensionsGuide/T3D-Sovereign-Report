@@ -504,6 +504,15 @@ export function requestTriadToday(
   );
 }
 
+/** Deletes everything saved on the server for this person's email. */
+export function requestDeleteMyData(leadId: number, email: string): Promise<{ removed: number; blanked: number }> {
+  return postApp<{ removed: number; blanked: number }>(
+    '/api/app/delete-data',
+    { leadId, email, confirm: true },
+    'Could not delete your data. Please try again.',
+  );
+}
+
 export function requestPractice(leadId: number, email: string, localDate: string): Promise<PracticeData> {
   return postApp<PracticeData>(
     '/api/app/practice',

@@ -119,7 +119,11 @@ export default function PrivacyPage() {
           <p style={S.p}>
             You can request a copy of the data we hold about you, or request that it be
             permanently deleted from our systems, at any time. This includes every chart record
-            saved under your email address. To do either, email:
+            saved under your email address. In the T3D app, you can delete your data yourself
+            at any time: open the My Chart tab, choose &ldquo;About &amp; your data&rdquo; and then
+            &ldquo;Delete my data&rdquo;. If you bought a report, we keep the payment record
+            without your personal details. For a copy of your data, or to delete it from the
+            website, email:
           </p>
           <p style={S.p}>
             <a href="mailto:privacy@3dimensions.guide" style={S.link}>privacy@3dimensions.guide</a>

@@ -45,6 +45,7 @@ interface PracticeState {
   toggleCheckin: (date: string, index: 0 | 1 | 2) => void;
   setAnswer: (date: string, index: 0 | 1 | 2, text: string) => void;
   setReview: (index: 0 | 1 | 2, text: string) => void;
+  clearAll: () => void;
 }
 
 const emptyEntry = (): DayEntry => ({ done: [false, false, false], answers: ['', '', ''] });
@@ -84,6 +85,7 @@ export const usePracticeStore = create<PracticeState>()(
           answers[index] = text;
           return { entries: { ...s.entries, [date]: { ...entry, answers } } };
         }),
+      clearAll: () => set({ decisions: [], startedOn: null, entries: {}, review: ['', '', ''] }),
       setReview: (index, text) =>
         set((s) => {
           const review: [string, string, string] = [...s.review];

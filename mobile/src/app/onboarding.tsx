@@ -186,7 +186,11 @@ export default function Onboarding() {
           <Text style={styles.lede}>
             Enter your birth details once. We use them to calculate your Human Design, Numerology
             and Astrology. They are saved on this phone and on our server so your readings load
-            every time. You can ask us to delete them at any time.
+            every time. You can delete them at any time from the My Chart tab.
+          </Text>
+          <Text style={styles.lede}>
+            T3D is a reflection tool for self-understanding and entertainment. It does not predict
+            events and is not medical, legal or financial advice. You must be 13 or older to use it.
           </Text>
           <Pressable
             accessibilityRole="link"

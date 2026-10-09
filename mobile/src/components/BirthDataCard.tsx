@@ -62,6 +62,7 @@ export function BirthDataCard({ profile }: { profile: BirthProfile }) {
         </Text>
       </View>
       <GoldButton label="HOW THIS IS CALCULATED" variant="ghost" onPress={() => router.push('/method' as Href)} />
+      <GoldButton label="ABOUT & YOUR DATA" variant="ghost" onPress={() => router.push('/your-data' as Href)} />
     </View>
   );
 }
