@@ -147,7 +147,7 @@ export default function HomePage() {
                 animation: 'rise 0.6s var(--ease) 0.1s both',
               }}
             >
-              <span style={{ width: 6, height: 6, background: 'var(--crimson)', display: 'block', flexShrink: 0 }} aria-hidden />
+              <span style={{ width: 6, height: 6, background: 'var(--gold)', display: 'block', flexShrink: 0 }} aria-hidden />
               SOVEREIGN NAVIGATION SYSTEM — ONLINE
             </p>
 
@@ -202,7 +202,7 @@ export default function HomePage() {
               Your sovereign navigation profile — free, in 60 seconds.
             </p>
 
-            {/* UPGRADE 5 — Primary CTA: crimson, zero radius, ALL CAPS, 11px DM Sans */}
+            {/* UPGRADE 5 — Primary CTA: gold, zero radius, ALL CAPS, 11px DM Sans */}
             <div style={{ animation: 'rise 0.8s var(--ease) 0.55s both', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: isMobile ? '100%' : 320, margin: isMobile ? '0 auto' : '0' }}>
               <Link href="/calculator" className="t3d-cta">
                 CALCULATE MY PROFILE

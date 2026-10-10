@@ -6,7 +6,7 @@
  * UPGRADE 5 changes applied:
  *   — Step Indicator: thin 3-segment horizontal line, active = Amber Gold #E5A93C
  *   — Input Fields: underline-only (border-bottom), border-radius: 0
- *   — Primary CTA: crimson #991B1B → parchment hover, 11px DM Sans ALL CAPS
+ *   — Primary CTA: gold → sun hover, 11px DM Sans ALL CAPS
  *   — All fonts: DM Sans
  *
  * No changes to calculation logic, API calls, or store.
@@ -510,8 +510,8 @@ export default function CalculatorForm() {
                       style={{
                         width:52, height:48, border:'none', cursor:'pointer',
                         fontFamily:"'DM Sans',sans-serif", fontSize:11, fontWeight:500, letterSpacing:'0.12em',
-                        background: data.birthPeriod === p ? 'var(--crimson)' : 'transparent',
-                        color: data.birthPeriod === p ? 'var(--parchment)' : 'var(--parchment-40)',
+                        background: data.birthPeriod === p ? 'var(--gold)' : 'transparent',
+                        color: data.birthPeriod === p ? 'var(--obsidian)' : 'var(--parchment-40)',
                         transition: 'background 0.18s var(--ease), color 0.18s var(--ease)',
                       }}>
                       {p}
@@ -599,7 +599,7 @@ export default function CalculatorForm() {
 
             <div className="calc-2col" style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12, marginTop:8 }}>
               <button type="button" onClick={goBack} className="t3d-ghost">← BACK</button>
-              <button type="button" onClick={submit} className="t3d-cta" style={{ animation:'crimsonPulse 3s var(--ease) infinite' }}>
+              <button type="button" onClick={submit} className="t3d-cta" style={{ animation:'goldPulse 3s var(--ease) infinite' }}>
                 CALCULATE MY PROFILE
               </button>
             </div>

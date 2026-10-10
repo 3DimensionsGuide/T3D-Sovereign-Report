@@ -17,6 +17,12 @@
   --color-crimson-hi:  #B91C1C;
   --color-amber:       #E5A93C;
   --color-emerald:     #1F8A4D;
+  --color-obsidian:    #0B0B0C;
+  --color-charcoal:    #121214;
+  --color-royal:       #2E1A47;
+  --color-amethyst:    #1F1235;
+  --color-gold:        #D4AF37;
+  --color-sun:         #F2C94C;
 
   --color-grid:        rgba(245,245,243,0.12);
   --color-card-border: rgba(245,245,243,0.15);
@@ -32,12 +38,20 @@
   --overlay:        #18181B;
   --parchment:      #F5F5F3;
   --parchment-70:   rgba(245,245,243,0.70);
-  --parchment-40:   rgba(245,245,243,0.40);
+  --parchment-40:   rgba(245,245,243,0.66); /* small text: >=7:1 on base (WCAG AAA) */
   --parchment-15:   rgba(245,245,243,0.15);
   --crimson:        #C83E3E; /* brand spec: Crimson Red, Stoplight/Astrology accent (was #991B1B) */
   --crimson-hi:     #B91C1C;
   --amber:          #E5A93C;
   --emerald:        #1F8A4D;
+  /* 30% structure layer */
+  --obsidian:       #0B0B0C;
+  --charcoal:       #121214;
+  --royal:          #2E1A47;
+  --amethyst:       #1F1235;
+  /* 10% catalyst: primary buttons, active states, success only */
+  --gold:           #D4AF37;
+  --sun:            #F2C94C;
   --card-border:    rgba(245,245,243,0.15);
   --card-hover:     rgba(245,245,243,0.35);
   --card-bg:        rgba(245,245,243,0.03);
@@ -61,7 +75,7 @@
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
-  background: var(--base);
+  background: radial-gradient(120% 70% at 50% 0%, var(--amethyst) 0%, var(--base) 60%) fixed no-repeat, var(--base);
   color: var(--parchment-70);
   font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   font-weight: 300;
@@ -71,11 +85,11 @@ body {
   overflow-x: hidden;
 }
 
-:focus-visible { outline: 1px solid var(--crimson); outline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 .skip-link {
   position: absolute; left: 16px; top: -60px; z-index: 200;
-  background: var(--crimson); color: var(--parchment);
+  background: var(--gold); color: var(--obsidian);
   font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
   letter-spacing: 0.15em; text-transform: uppercase;
   padding: 10px 18px; text-decoration: none;
@@ -178,17 +192,16 @@ body {
 .t3d-cta {
   display: inline-flex; align-items: center; justify-content: center;
   width: 100%; min-height: 52px; padding: 16px 24px;
-  background: var(--crimson); color: var(--parchment);
-  border: 1px solid var(--crimson); border-radius: 0;
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+  background: var(--gold); color: var(--obsidian);
+  border: 1px solid var(--gold); border-radius: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 12px;
+  font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
   cursor: pointer; text-decoration: none;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
-  /* Large touch target on mobile */
+  transition: transform 0.3s var(--ease), background 0.3s var(--ease), box-shadow 0.3s var(--ease);
   -webkit-tap-highlight-color: transparent;
 }
-.t3d-cta:hover  { background: var(--parchment); color: var(--base); }
-.t3d-cta:active { background: var(--crimson-hi); color: var(--parchment); }
+.t3d-cta:hover  { background: var(--sun); border-color: var(--sun); transform: scale(1.02); box-shadow: 0 0 28px rgba(212,175,55,0.35); }
+.t3d-cta:active { background: var(--gold); transform: scale(0.98); box-shadow: none; }
 
 .t3d-ghost {
   display: inline-flex; align-items: center; justify-content: center;
@@ -212,8 +225,8 @@ body {
   flex: 1; height: 2px; background: var(--step-off);
   transition: background 0.4s var(--ease);
 }
-.t3d-step-seg.active { background: var(--amber); }
-.t3d-step-seg.done   { background: rgba(229,169,60,0.45); }
+.t3d-step-seg.active { background: var(--gold); }
+.t3d-step-seg.done   { background: rgba(212,175,55,0.45); }
 
 /* ── Results animations ──────────────────────────────────────────────────── */
 @keyframes cardEntry {
@@ -238,6 +251,10 @@ body {
 @keyframes spin     { to { transform: rotate(360deg);  } }
 @keyframes spinRev  { to { transform: rotate(-360deg); } }
 @keyframes pulse    { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+@keyframes goldPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.45); }
+  50%     { box-shadow: 0 0 0 8px rgba(212,175,55,0); }
+}
 @keyframes crimsonPulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(153,27,27,0.5); }
   50%     { box-shadow: 0 0 0 8px rgba(153,27,27,0); }
@@ -318,6 +335,6 @@ body {
 @media (hover: none) {
   /* On touch devices, remove hover states that don't apply */
   .t3d-card:hover       { border-color: var(--card-border); }
-  .t3d-cta:hover        { background: var(--crimson); color: var(--parchment); }
+  .t3d-cta:hover        { background: var(--gold); transform: none; box-shadow: none; }
   .t3d-ghost:hover      { border-color: var(--card-border); color: var(--parchment-70); }
 }
