@@ -20,6 +20,7 @@ import { Suspense } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
 import ProductSelectionSync from '@/components/ProductSelectionSync';
+import TriadStory from '@/components/home/TriadStory';
 
 // ─── SCROLL HOOK ──────────────────────────────────────────────────────────────
 function useScroll() {
@@ -51,31 +52,6 @@ function useScroll() {
 
   return progress;
 }
-
-// ─── DIMENSION DATA ───────────────────────────────────────────────────────────
-const DIMENSIONS = [
-  {
-    label:  'THE VEHICLE',
-    system: 'Human Design',
-    body:   'Your energy type, strategy, authority, and defined centers — the precision machinery beneath every decision.',
-    color:  'var(--amber)',
-    flash:  'flash-vehicle',
-  },
-  {
-    label:  'THE ROAD',
-    system: 'Numerology',
-    body:   'Your life path, destiny, and active pinnacle — the geometric trajectory your numbers have been tracing.',
-    color:  'var(--emerald)',
-    flash:  'flash-road',
-  },
-  {
-    label:  'THE STOPLIGHT',
-    system: 'Astrology',
-    body:   'Your natal chart, current transits, and timing gates — the sky\'s precise signal for when to move.',
-    color:  'var(--crimson)',
-    flash:  'flash-stoplight',
-  },
-] as const;
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function HomePage() {
@@ -228,75 +204,7 @@ export default function HomePage() {
             UPGRADE 2: Inherits base section spacing
             UPGRADE 4: Sharp card borders, zero radius
             ═══════════════════════════════════════════════════════════════════ */}
-        <section
-          id="system"
-          style={{
-            height: isMobile ? 'auto' : '250vh',
-            position: 'relative',
-          }}
-        >
-          {/* Outer sticky wrapper — flex to push content RIGHT so compass shows left */}
-          <div style={{
-            position: isMobile ? 'relative' : 'sticky',
-            top: isMobile ? 'auto' : '15vh',
-            padding: 'clamp(48px,6vh,80px) clamp(20px,4vw,64px)',
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}>
-            {/* Content column — right 45% of viewport, compass fills the left */}
-            <div style={{ width: isMobile ? '100%' : '45%' }}>
-
-            {/* UPGRADE 1 — H2: Playfair Display italic, clamp(36px,5vw,64px) */}
-            <h2 className="t3d-h2" style={{ marginBottom: 12 }}>
-              One journey, three lenses.
-            </h2>
-            <p className="t3d-label" style={{ marginBottom: 48 }}>
-              MODULE 01 — THE SOVEREIGN TRIAD
-            </p>
-
-            {/* UPGRADE 4 — Cards: sharp borders, no rounded corners, no shadows */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-            }}>
-              {DIMENSIONS.map((dim, i) => (
-                <div
-                  key={dim.label}
-                  className={`t3d-card ${dim.flash}`}
-                  style={{
-                    padding: 'clamp(20px,2.5vw,32px)',
-                    borderBottom: i < 2 ? '1px solid var(--card-border)' : undefined,
-                  }}
-                >
-                  <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 14 }}>
-                    {dim.label}
-                  </p>
-                  <h3 style={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontSize: 'clamp(20px,2vw,28px)',
-                    fontWeight: 400,
-                    color: dim.color,
-                    marginBottom: 6,
-                    lineHeight: 1.15,
-                  }}>
-                    {dim.system}
-                  </h3>
-                  <div style={{ height: 1, background: `linear-gradient(90deg, ${dim.color}, transparent)`, marginBottom: 18, opacity: 0.4 }} />
-                  <p className="t3d-body">{dim.body}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Inline CTA */}
-            <div style={{ marginTop: 40 }}>
-              <Link href="/calculator" className="t3d-cta" style={{ width: '100%', display: 'inline-flex', padding: '16px 40px' }}>
-                BEGIN CALCULATION
-              </Link>
-            </div>
-            </div>{/* end right content column */}
-          </div>
-        </section>
+        <TriadStory />
 
         {/* UPGRADE 2 — Section divider */}
         <div className="t3d-divider" />

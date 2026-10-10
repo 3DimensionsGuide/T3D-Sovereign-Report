@@ -42,6 +42,7 @@
   --parchment-15:   rgba(245,245,243,0.15);
   --crimson:        #C83E3E; /* brand spec: Crimson Red, Stoplight/Astrology accent (was #991B1B) */
   --crimson-hi:     #B91C1C;
+  --signal-red:     #E0524F; /* Stoplight scene red: lighter than button crimson, 5:1+ on base */
   --amber:          #E5A93C;
   --emerald:        #1F8A4D;
   /* 30% structure layer */
@@ -260,6 +261,7 @@ body {
   0%,100% { box-shadow: 0 0 0 0 rgba(153,27,27,0.5); }
   50%     { box-shadow: 0 0 0 8px rgba(153,27,27,0); }
 }
+@keyframes sceneIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
