@@ -26,7 +26,7 @@ test('onboarding lets people enter the emailed code or skip it', () => {
   const onboarding = read('mobile/src/app/onboarding.tsx');
   assert.match(onboarding, /confirmOptInCode/);
   assert.match(onboarding, /Skip for now/);
-  assert.match(onboarding, /SEND A NEW CODE/);
+  assert.match(onboarding, /Send a new code/);
   const api = read('mobile/src/lib/api.ts');
   assert.match(api, /\/api\/email-optin\/confirm/);
   assert.match(api, /\/api\/email-optin\/send/);
