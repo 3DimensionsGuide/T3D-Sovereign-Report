@@ -88,8 +88,7 @@ function buildDataPrompt(data: ReportData): string {
     : 'Current Pinnacle unknown';
 
   return `READER DATA:
-Name: ${data.firstName}
-Birth date: ${data.birthDate}
+Name: {{NAME}}  (write the token {{NAME}} exactly wherever the reader's first name belongs; it is swapped in after writing)
 
 VEHICLE (Human Design):
   Type: ${data.hdType}
@@ -302,7 +301,8 @@ export async function generateSynthesis(data: ReportData): Promise<SynthesisResu
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n')
-      .trim();
+      .trim()
+      .split('{{NAME}}').join(data.firstName);
 
     // Validate
     const validation = validateSynthesis(rawText);

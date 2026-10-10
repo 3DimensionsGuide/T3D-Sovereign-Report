@@ -101,7 +101,7 @@ export default function PrivacyPage() {
           </p>
           <ul style={{ paddingLeft: 20, marginBottom: 16 }}>
             <li style={S.li}><strong>Stripe</strong> — processes payment. We never receive or store your full card number.</li>
-            <li style={S.li}><strong>Anthropic (Claude)</strong> — writes the personalized synthesis paragraphs in your report. It receives your first name, your birth date and your calculated placements. It does not receive your email address, last name, birth time or birth place.</li>
+            <li style={S.li}><strong>Anthropic (Claude)</strong> — writes the personalized synthesis paragraphs in your report. It receives your calculated chart placements and numbers (for example your Human Design type and Life Path). It does not receive your name, email address, birth date, birth time or birth place.</li>
             <li style={S.li}><strong>GeoNames</strong> — receives the birth city and country you enter, and returns coordinates and time zone data needed for accurate calculations.</li>
             <li style={S.li}><strong>Google Maps (Places)</strong> — on the website calculator, suggests places as you type your birth city. This runs in your browser.</li>
             <li style={S.li}><strong>Resend</strong> — delivers the emails we send you, including your report.</li>

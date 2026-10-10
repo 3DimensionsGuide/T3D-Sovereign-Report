@@ -136,7 +136,7 @@ function buildDataPrompt(data: IntegrationSynthesisInput): string {
     : 'No major named transit currently active — the Stoplight reading is quiet right now, which is itself worth naming as a signal';
 
   return `READER DATA — FULL CROSS-SYSTEM CONFIGURATION:
-Name: ${data.firstName}
+Name: {{NAME}}  (write the token {{NAME}} exactly wherever the reader's first name belongs; it is swapped in after writing)
 
 VEHICLE (Human Design):
   Type: ${data.hdType}
@@ -259,7 +259,8 @@ export async function generateIntegrationSynthesis(
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n')
-      .trim();
+      .trim()
+      .split('{{NAME}}').join(data.firstName);
 
     const validation = validateSynthesis(rawText);
 

@@ -152,7 +152,7 @@ function buildDataPrompt(data: StoplightSynthesisInput): string {
     : 'Nothing else projected to arrive within the visible horizon.';
 
   return `READER DATA — STOPLIGHT SECTION ONLY:
-Name: ${data.firstName}
+Name: {{NAME}}  (write the token {{NAME}} exactly wherever the reader's first name belongs; it is swapped in after writing)
 Sun: ${data.sunSign} · Ascendant: ${data.tropicalAsc}
 
 PERSONAL PLANETS (by sign):
@@ -281,7 +281,8 @@ export async function generateStoplightSynthesis(data: StoplightSynthesisInput):
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n')
-      .trim();
+      .trim()
+      .split('{{NAME}}').join(data.firstName);
 
     const validation = validateSynthesis(rawText);
 

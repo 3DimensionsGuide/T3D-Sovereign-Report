@@ -75,7 +75,7 @@ function buildDataPrompt(data: ReportData): string {
     : 'none — every digit 1–9 appears in the full birth name';
 
   return `READER DATA — ROAD SECTION ONLY:
-Name: ${data.firstName}
+Name: {{NAME}}  (write the token {{NAME}} exactly wherever the reader's first name belongs; it is swapped in after writing)
 
 LIFE PATH:
   Life Path: ${data.lifePathDisplay} (root ${data.lifePath})
@@ -201,7 +201,8 @@ export async function generateRoadSynthesis(data: ReportData): Promise<RoadSynth
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n')
-      .trim();
+      .trim()
+      .split('{{NAME}}').join(data.firstName);
 
     const validation = validateSynthesis(rawText);
 

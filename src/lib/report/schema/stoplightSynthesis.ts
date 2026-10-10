@@ -70,7 +70,7 @@ Respond ONLY with valid JSON. No other text.`;
 // ─── User data prompt ─────────────────────────────────────────────────────────
 function buildPrompt(data: ReportData & { siderealMoon?: string }): string {
   const sidMoon = data.siderealMoon ?? '—';
-  return `READER: ${data.firstName}
+  return `READER: {{NAME}}  (write the token {{NAME}} exactly wherever the reader's first name belongs; it is swapped in after writing)
 HD AUTHORITY: ${data.hdAuthority}
 
 TROPICAL (seasonal reference):
@@ -216,7 +216,8 @@ export async function generateStoplightSynthesis(
       .trim()
       .replace(/^```json\s*/i, '')
       .replace(/```\s*$/, '')
-      .trim();
+      .trim()
+      .split('{{NAME}}').join(JSON.stringify(data.firstName).slice(1, -1));
 
     const parsed = JSON.parse(raw) as {
       thesis: string; body: string;

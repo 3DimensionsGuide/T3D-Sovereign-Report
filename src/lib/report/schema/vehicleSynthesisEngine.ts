@@ -86,7 +86,7 @@ function buildDataPrompt(data: ReportData): string {
   };
 
   return `READER DATA — VEHICLE SECTION ONLY:
-Name: ${data.firstName}
+Name: {{NAME}}  (write the token {{NAME}} exactly wherever the reader's first name belongs; it is swapped in after writing)
 
 TYPE MECHANICS:
   Type: ${data.hdType}
@@ -226,7 +226,8 @@ export async function generateVehicleSynthesis(data: ReportData): Promise<Vehicl
       .filter(block => block.type === 'text')
       .map(block => block.text)
       .join('\n')
-      .trim();
+      .trim()
+      .split('{{NAME}}').join(data.firstName);
 
     const validation = validateSynthesis(rawText);
 
