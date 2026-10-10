@@ -32,8 +32,8 @@ const JumpContext = createContext<JumpContextValue>({ entries: [], register: () 
 
 /** Keeps the list of sections on screen and scrolls to one when asked. */
 export function ReadingJumpProvider({
-  scrollRef, children,
-}: { scrollRef: RefObject<ScrollView | null>; scrollOffset?: MutableRefObject<number>; children: ReactNode }) {
+  scrollRef, scrollOffset, children,
+}: { scrollRef: RefObject<ScrollView | null>; scrollOffset: MutableRefObject<number>; children: ReactNode }) {
   const [entries, setEntries] = useState<JumpEntry[]>([]);
   const register = useCallback((entry: JumpEntry) => {
     setEntries((list) => (list.some((e) => e.id === entry.id) ? list : [...list, entry]));
@@ -45,15 +45,15 @@ export function ReadingJumpProvider({
     const entry = entries.find((e) => e.id === id);
     const scroller = scrollRef.current;
     if (!entry?.ref.current || !scroller) return;
-    if (typeof scroller.getInnerViewNode !== 'function') return;
-    const inner = scroller.getInnerViewNode();
-    if (inner == null) return;
-    entry.ref.current.measureLayout(
-      inner,
-      (_x, y) => scroller.scrollTo({ y: Math.max(0, y - 12), animated: true }),
-      () => undefined,
-    );
-  }, [entries, scrollRef]);
+    const host = scroller as unknown as { measureInWindow?: (cb: (x: number, y: number, w: number, h: number) => void) => void };
+    if (typeof host.measureInWindow !== 'function') return;
+    host.measureInWindow((_sx, scrollerTop) => {
+      entry.ref.current?.measureInWindow((_x, top) => {
+        const target = scrollOffset.current + (top - scrollerTop) - 12;
+        scroller.scrollTo({ y: Math.max(0, target), animated: true });
+      });
+    });
+  }, [entries, scrollRef, scrollOffset]);
   const value = useMemo(() => ({ entries, register, unregister, jumpTo }), [entries, register, unregister, jumpTo]);
   return <JumpContext.Provider value={value}>{children}</JumpContext.Provider>;
 }
