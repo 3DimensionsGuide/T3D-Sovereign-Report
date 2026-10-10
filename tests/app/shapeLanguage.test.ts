@@ -98,3 +98,17 @@ test('step 7: practice checks follow Triad order and partner form has no fake de
   assert.match(t, /Please choose their birth date/);
   assert.match(t, /Choose date/);
 });
+
+test('step 8: glossary is grouped by lens, folds gates and channels, and titles are not doubled', async () => {
+  const g = read('mobile/src/app/glossary.tsx');
+  assert.match(g, /SectionList/);
+  assert.match(g, /Jump to letter/);
+  assert.match(g, /fold/);
+  const { listEntries } = await import('../../src/lib/app/glossary');
+  const titles = listEntries().map((e) => e.title);
+  assert.ok(!titles.some((t) => /Center\) Center$/.test(t)), 'no doubled Center');
+  assert.ok(!titles.some((t) => /\(Mental\) [Aa]uthority$/.test(t)), 'no doubled Authority');
+  assert.ok(!titles.some((t) => t.includes('℞')), 'no ℞ glyph in titles');
+  const defs = listEntries().filter((e) => e.id.startsWith('hd:definition:')).map((e) => e.summary);
+  assert.equal(new Set(defs).size, defs.length, 'definition one-liners are distinct');
+});

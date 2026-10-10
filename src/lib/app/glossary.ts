@@ -160,16 +160,16 @@ for (const [key, name, angle, summary, body] of ASPECTS) {
 // Astrology terms
 add('astro:ascendant', 'Astrology', 'Ascendant (Rising sign)', 'The sign rising on the eastern horizon at your birth.', ['Your Ascendant shows how you meet the world and how the world first meets you. It is also the starting point for the houses, so it needs an accurate birth time.', 'If no birth time was entered, the app uses 12:00 noon, and the Rising sign and houses are only approximate.'], ['astro:house:1', 'astro:wholesign']);
 add('astro:midheaven', 'Astrology', 'Midheaven', 'The highest point of your chart.', ['The Midheaven (MC) points to your public role and what you are known for. Like the Ascendant, it depends on your birth time.'], ['astro:house:10']);
-add('astro:retrograde', 'Astrology', 'Retrograde (℞)', 'A planet that appears to move backward.', ['From Earth, planets sometimes seem to slow, stop and move backward across the sky. This is an effect of perspective, and astrologers read it as a time to review and revisit rather than push forward.', 'A retrograde is not a malfunction. It changes the tempo of that planet’s themes.'], ['astro:planet:mercury']);
+add('astro:retrograde', 'Astrology', 'Retrograde', 'A planet that appears to move backward.', ['From Earth, planets sometimes seem to slow, stop and move backward across the sky. This is an effect of perspective, and astrologers read it as a time to review and revisit rather than push forward.', 'A retrograde is not a malfunction. It changes the tempo of that planet’s themes.'], ['astro:planet:mercury']);
 add('astro:orb', 'Astrology', 'Orb', 'How far from exact an aspect is.', ['The orb is the gap, in degrees, between the actual angle and the perfect one. A smaller orb means a stronger contact.', 'T3D uses 1° or less for peak and 3° or less for active.'], ['astro:aspect:conjunction', 'astro:applying']);
 add('astro:applying', 'Astrology', 'Applying', 'An aspect that is getting closer to exact.', ['An applying aspect is still building toward its exact moment. It is often felt as anticipation or mounting pressure.'], ['astro:separating', 'astro:orb']);
 add('astro:separating', 'Astrology', 'Separating', 'An aspect that is moving away from exact.', ['A separating aspect has passed its exact moment and is fading. It is often felt as the aftermath: what the contact brought up is now settling.'], ['astro:applying', 'astro:orb']);
 add('astro:transit', 'Astrology', 'Transit', 'Where a planet is in the sky right now.', ['A transit is a planet’s current position compared against your birth chart. A transiting planet making an aspect to one of your natal planets is a transit contact.', 'T3D treats transits as weather: information about the conditions, never an instruction. You decide through your Strategy and Authority.'], ['astro:natal', 'astro:aspect:square']);
-add('astro:natal', 'Astrology', 'Natal chart', 'The sky at the moment you were born.', ['Your natal chart is a snapshot of the planets at your birth time and place. It stays fixed. Everything that changes (transits, timelines) is read against it.'], ['astro:transit']);
+add('astro:natal', 'Astrology', 'Natal Chart', 'The sky at the moment you were born.', ['Your natal chart is a snapshot of the planets at your birth time and place. It stays fixed. Everything that changes (transits, timelines) is read against it.'], ['astro:transit']);
 add('astro:tropical', 'Astrology', 'Tropical zodiac', 'The zodiac anchored to the seasons.', ['The tropical zodiac starts Aries at the spring equinox. It is the system most Western astrology uses, including most "sun sign" content.'], ['astro:sidereal']);
 add('astro:sidereal', 'Astrology', 'Sidereal zodiac', 'The zodiac anchored to the stars.', ['The sidereal zodiac is measured against the fixed stars. The two zodiacs have drifted about 24° apart, so many planets fall in a different sign. T3D shows both so you can see the two lenses.'], ['astro:tropical']);
-add('astro:wholesign', 'Astrology', 'Whole-sign houses', 'Each house is one full sign.', ['In the whole-sign system your rising sign is the 1st house, the next sign the 2nd, and so on. It is the oldest house system and the one T3D uses.'], ['astro:ascendant']);
-add('astro:phase', 'Astrology', 'Moon phase', 'Where the Moon is in its monthly cycle.', ['A waxing Moon is growing toward full and is read as a time of building and beginning. A waning Moon is shrinking toward new and is read as a time of release and review.'], ['astro:planet:moon']);
+add('astro:wholesign', 'Astrology', 'Whole-Sign Houses', 'Each house is one full sign.', ['In the whole-sign system your rising sign is the 1st house, the next sign the 2nd, and so on. It is the oldest house system and the one T3D uses.'], ['astro:ascendant']);
+add('astro:phase', 'Astrology', 'Moon Phase', 'Where the Moon is in its monthly cycle.', ['A waxing Moon is growing toward full and is read as a time of building and beginning. A waning Moon is shrinking toward new and is read as a time of release and review.'], ['astro:planet:moon']);
 add('astro:eclipse', 'Astrology', 'Eclipse', 'A New or Full Moon on the Moon’s nodes.', ['Eclipses happen about twice a year in pairs and mark turning points. Their effect is read over the following weeks to months, especially when they touch your chart.'], ['astro:planet:northNode']);
 add('astro:ingress', 'Astrology', 'Ingress', 'A planet moving into a new sign.', ['An ingress is the moment a planet crosses into the next sign. The planet’s themes take on the style of the new sign until it moves on.'], ['astro:planet:sun']);
 add('astro:profection', 'Astrology', 'Lord of the Year', 'The planet in charge of your current year of life.', ['In annual profections you move one house forward each birthday, starting from the 1st house at birth. The planet that rules that house’s sign becomes the Lord of the Year, and its themes get emphasis from birthday to birthday.'], ['astro:wholesign', 'astro:house:1']);
@@ -181,8 +181,8 @@ add('hd:authority', 'Human Design', 'Authority', 'Where your best decisions come
 add('hd:notself', 'Human Design', 'Not-self', 'The signal that you are off track.', ['The not-self theme is a feeling, such as frustration, bitterness, anger or disappointment, that tends to show up when you are not following your Strategy and Authority. It is a signal to adjust, not a flaw.'], ['hd:strategy', 'hd:signature']);
 add('hd:signature', 'Human Design', 'Signature', 'The feeling of being aligned.', ['Your signature is the feeling that tends to show up when you are living by your Strategy and Authority, such as satisfaction, success, peace or surprise.'], ['hd:notself']);
 add('hd:bodygraph', 'Human Design', 'Bodygraph', 'The map of your design.', ['The bodygraph is the chart of nine Centers connected by channels and gates. Coloured Centers are defined; white Centers are open.'], ['hd:defined', 'hd:open']);
-add('hd:defined', 'Human Design', 'Defined center', 'A Center that works the same way all the time.', ['A defined Center is a consistent, reliable source of its theme. People often lean on you for it.'], ['hd:open']);
-add('hd:open', 'Human Design', 'Open center', 'A Center that takes in and amplifies.', ['An open Center is receptive and sensitive to the people around you. It is not a weakness, and over time it becomes a source of wisdom.'], ['hd:defined']);
+add('hd:defined', 'Human Design', 'Defined Center', 'A Center that works the same way all the time.', ['A defined Center is a consistent, reliable source of its theme. People often lean on you for it.'], ['hd:open']);
+add('hd:open', 'Human Design', 'Open Center', 'A Center that takes in and amplifies.', ['An open Center is receptive and sensitive to the people around you. It is not a weakness, and over time it becomes a source of wisdom.'], ['hd:defined']);
 add('hd:hanging', 'Human Design', 'Hanging gate', 'A gate without its channel partner.', ['A hanging gate is one half of a channel. It is active in you but not connected, and it often shows up as a quality you seek in other people.'], ['hd:channel']);
 add('hd:channel', 'Human Design', 'Channel', 'Two gates that join two Centers.', ['A channel is formed when both gates at either end of a connecting line are active. It defines both Centers and creates a steady current in you.'], ['hd:hanging']);
 add('hd:personality', 'Human Design', 'Personality (conscious)', 'What you know about yourself.', ['Personality activations are calculated from your birth moment. They describe the part of you that you are aware of.'], ['hd:design']);
@@ -196,7 +196,7 @@ for (const [type, c] of Object.entries(TYPE_CONTENT)) {
   add(`hd:type:${type}`, 'Human Design', type, `Strategy: ${c.strategy}`, [c.plain, `When aligned you tend to feel ${c.signature.toLowerCase()}. When off track you tend to feel ${c.notSelf.toLowerCase()}.`], ['hd:strategy', 'hd:authority']);
 }
 for (const [key, c] of Object.entries(AUTHORITY_CONTENT)) {
-  add(`hd:authority:${key}`, 'Human Design', `${c.authority} authority`, c.mechanism.split('. ')[0] + '.', [c.mechanism, c.falseUrgency], ['hd:authority', 'hd:strategy']);
+  add(`hd:authority:${key}`, 'Human Design', /authority/i.test(c.authority) ? c.authority : `${c.authority} Authority`, c.mechanism.split('. ')[0] + '.', [c.mechanism, c.falseUrgency], ['hd:authority', 'hd:strategy']);
 }
 for (const [key, c] of Object.entries(PROFILE_CONTENT)) {
   add(`hd:profile:${key}`, 'Human Design', `Profile ${key}`, c.role, [c.plain, c.socialPattern, c.visibility], ['hd:profile', 'hd:line']);
@@ -204,16 +204,16 @@ for (const [key, c] of Object.entries(PROFILE_CONTENT)) {
 for (const [id, name] of Object.entries(CENTER_DISPLAY_NAME)) {
   const cap = CENTER_CAPACITIES[id];
   const open = OPEN_CENTER_THEMES[id];
-  add(`hd:center:${id}`, 'Human Design', `${name} Center`, cap?.title ?? name, [
+  add(`hd:center:${id}`, 'Human Design', /center/i.test(name) ? name : `${name} Center`, cap?.title ?? name, [
     cap ? `When defined: ${cap.title}. ${cap.description}` : '',
     open ? `When open: ${open.title}. ${open.sensitivity} ${open.wisdom}` : '',
   ].filter(Boolean), ['hd:defined', 'hd:open']);
 }
 for (const [key, m] of Object.entries(DEFINITION_MEANING)) {
-  add(`hd:definition:${key}`, 'Human Design', key === 'No Definition' ? key : `${key} Definition`, 'How your defined Centers connect.', [m], ['hd:defined']);
+  add(`hd:definition:${key}`, 'Human Design', key === 'No Definition' ? key : `${key} Definition`, m.split('. ')[0]!.replace(/\.?$/, '.'), [m], ['hd:defined']);
 }
 for (const [key, m] of Object.entries(CIRCUIT_GROUP_MEANING)) {
-  add(`hd:circuit:${key}`, 'Human Design', `${key} circuitry`, m.keynote, [m.passage], ['hd:channel']);
+  add(`hd:circuit:${key}`, 'Human Design', `${key} Circuitry`, m.keynote, [m.passage], ['hd:channel']);
 }
 
 // Numerology
@@ -221,13 +221,13 @@ add('num:master', 'Numerology', 'Master numbers', '11, 22 and 33 keep their doub
 add('num:lifepath', 'Numerology', 'Life Path', 'The direction your whole life leans toward.', ['Your Life Path comes from your full birth date and is the central number in your chart. It describes your lifelong curriculum.'], ['num:destiny']);
 add('num:destiny', 'Numerology', 'Destiny (Expression)', 'What you are here to do and develop.', [INNER_DRIVERS_MECHANISM], ['num:soulurge', 'num:personality']);
 add('num:soulurge', 'Numerology', 'Soul Urge', 'What you want at your core.', ['The Soul Urge comes from the vowels in your full birth name and describes your inner motivations.'], ['num:destiny']);
-add('num:personality', 'Numerology', 'Personality number', 'How others first experience you.', ['The Personality number comes from the consonants in your full birth name and describes the face you present.'], ['num:destiny']);
+add('num:personality', 'Numerology', 'Personality Number', 'How others first experience you.', ['The Personality number comes from the consonants in your full birth name and describes the face you present.'], ['num:destiny']);
 add('num:hiddenpassion', 'Numerology', 'Hidden Passion', 'The energy you use most.', [HIDDEN_PASSION_MECHANISM], ['num:karmic']);
 add('num:karmic', 'Numerology', 'Karmic Lessons', 'Numbers missing from your name.', [KARMIC_LESSONS_MECHANISM], ['num:hiddenpassion']);
 add('num:pinnacle', 'Numerology', 'Pinnacle', 'A long chapter of your life.', ['Your life has four Pinnacles, each a chapter of many years with its own theme. The one you are in now sets the main terrain.'], ['num:challenge']);
 add('num:challenge', 'Numerology', 'Challenge', 'The recurring lesson in each chapter.', ['Each Pinnacle has a matching Challenge, a skill that life keeps asking you to build during that chapter.'], ['num:pinnacle']);
-add('num:birthday', 'Numerology', 'Birthday number', 'The day you were born.', ['The day of the month you were born adds a specific talent to your Life Path.'], ['num:lifepath']);
-add('num:attitude', 'Numerology', 'Attitude number', 'Your first reaction to the world.', ['The Attitude number comes from your birth month and day and describes your instinctive stance.'], ['num:lifepath']);
+add('num:birthday', 'Numerology', 'Birthday Number', 'The day you were born.', ['The day of the month you were born adds a specific talent to your Life Path.'], ['num:lifepath']);
+add('num:attitude', 'Numerology', 'Attitude Number', 'Your first reaction to the world.', ['The Attitude number comes from your birth month and day and describes your instinctive stance.'], ['num:lifepath']);
 add('num:universalday', 'Numerology', 'Universal Day', 'The energy of today’s date for everyone.', ['The Universal Day is worked out from the calendar date alone, so the whole world shares it.'], ['num:personalday']);
 add('num:personalday', 'Numerology', 'Personal Day', 'The energy of today for you.', ['Your Personal Day comes from your Personal Month plus today’s date. It shades how today tends to feel for you.'], ['num:universalday', 'num:personalmonth']);
 add('num:personalmonth', 'Numerology', 'Personal Month', 'The theme of this month for you.', ['Your Personal Month is your Personal Year plus the calendar month.'], ['num:personalyear']);
