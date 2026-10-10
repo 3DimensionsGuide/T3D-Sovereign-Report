@@ -30,7 +30,7 @@ No. Nothing is shared with advertisers or data brokers, and no tracking SDKs are
 ## Server-side processors (explain to the lawyer, may not appear on the label)
 Vercel (hosting), Sentry (crash reports, personal details removed before sending), Neon (database), Upstash (short-lived request counters, keyed by IP),
 GeoNames (birth city and country lookup), Anthropic (report writing for the website
-reports: first name and birth date, see Round 2 #20), Stripe (website payments only),
+reports: calculated placements only, no name or birth date), Stripe (website payments only),
 Resend (email).
 
 ## Privacy policy URL
