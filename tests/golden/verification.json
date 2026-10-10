@@ -56,8 +56,8 @@
   },
   "berlin-dstgap-1993": {
     "astroCom": "match",
-    "jovian": "unchecked",
-    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com also treats 02:30 as non-existent and assumes unchanged clock (UT 01:30), same as ours. Sidereal (Lahiri) spot-checked: matches."
+    "jovian": "match",
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com also treats 02:30 as non-existent and assumes unchanged clock (UT 01:30), same as ours. Sidereal (Lahiri) spot-checked: matches. Jovian Archive (checked 2026-10-09): Manifestor, Solar Plexus, 4/6, Right Angle Cross of Service, centers and channels all match. Jovian converts the non-existent 02:30 to 03:30 local = 01:30 UTC, the same moment we use."
   },
   "nyc-ambiguous-2005": {
     "astroCom": "match",
