@@ -66,8 +66,8 @@
   },
   "paris-1920": {
     "astroCom": "match",
-    "jovian": "unchecked",
-    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+0, same as ours. Ascendant differs by about 1.2 arc-minutes because of city coordinates."
+    "jovian": "match",
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+0, same as ours. Ascendant differs by about 1.2 arc-minutes because of city coordinates. Jovian Archive (checked 2026-10-09): Projector, Sounding Board (our Mental), 1/3, Right Angle Cross of Tension, only Ajna and Throat defined, channel 23-43 match. Jovian uses 06:00 UTC for 06:00 local, same as ours."
   },
   "london-equinox-2024": {
     "astroCom": "unchecked",
