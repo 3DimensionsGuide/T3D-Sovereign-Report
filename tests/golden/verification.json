@@ -61,8 +61,8 @@
   },
   "nyc-ambiguous-2005": {
     "astroCom": "match",
-    "jovian": "unchecked",
-    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com picks the first 1:30 (daylight time, UT 05:30), same as ours."
+    "jovian": "match",
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com picks the first 1:30 (daylight time, UT 05:30), same as ours. Jovian Archive (checked 2026-10-09): Manifesting Generator, Solar Plexus, 6/2, Left Angle Cross of Alignment, centers and channels all match. Jovian picks the first 1:30 (daylight time, 05:30 UTC), same as ours."
   },
   "paris-1920": {
     "astroCom": "match",
