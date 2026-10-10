@@ -24,6 +24,8 @@ export interface StoredLead {
   lastName: string;
   birthData: { date: string; time: string; place: { city: string; country: string } };
   emailOptIn: boolean;
+  emailOptInAt: Date | null;
+  emailOptInSource: string | null;
   createdAt: Date;
 }
 
@@ -52,4 +54,28 @@ export function findExistingLead(rows: StoredLead[], who: LeadIdentity): StoredL
 /** Consent only ever turns on from a calculation. Turning it off happens through unsubscribe. */
 export function mergedOptIn(existing: boolean, requested: unknown): boolean {
   return existing || requested === true;
+}
+
+/** Where a marketing opt-in came from. Bump the version when the checkbox wording changes. */
+export const OPT_IN_SOURCE_WEB_CALCULATOR = 'website-calculator-v1';
+
+/**
+ * The consent columns to write after a calculation. The time and source are stamped only
+ * the first time consent turns on; a later calculation never rewrites them.
+ */
+export function optInFields(
+  existing: { emailOptIn: boolean; emailOptInAt: Date | null; emailOptInSource: string | null } | null,
+  requested: unknown,
+  now: Date,
+): { emailOptIn: boolean; emailOptInAt: Date | null; emailOptInSource: string | null } {
+  const on = (existing?.emailOptIn ?? false) || requested === true;
+  if (!on) return { emailOptIn: false, emailOptInAt: null, emailOptInSource: null };
+  if (existing?.emailOptIn) {
+    return {
+      emailOptIn: true,
+      emailOptInAt: existing.emailOptInAt,
+      emailOptInSource: existing.emailOptInSource,
+    };
+  }
+  return { emailOptIn: true, emailOptInAt: now, emailOptInSource: OPT_IN_SOURCE_WEB_CALCULATOR };
 }

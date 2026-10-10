@@ -61,6 +61,9 @@ export const leads = pgTable(
 
     // Marketing / consent
     emailOptIn:    boolean('email_opt_in').default(false).notNull(),
+    // When and where the person ticked the marketing box (null = never, or given before we recorded it)
+    emailOptInAt:     timestamp('email_opt_in_at', { withTimezone: true }),
+    emailOptInSource: text('email_opt_in_source'),
     reportPurchased: boolean('report_purchased').default(false).notNull(),
 
     // Timestamps

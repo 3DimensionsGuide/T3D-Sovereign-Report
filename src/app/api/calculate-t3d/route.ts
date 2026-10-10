@@ -11,7 +11,7 @@ import { NextResponse } from 'next/server';
 import { db }    from '@/server/db';
 import { eq } from 'drizzle-orm';
 import { leads } from '@/server/db/schema';
-import { findExistingLead, mergedOptIn, type StoredLead } from '@/server/leadMatch';
+import { findExistingLead, optInFields, type StoredLead } from '@/server/leadMatch';
 import { calculateNumerology }  from '@/server/engines/numerology';
 import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
@@ -136,7 +136,7 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
-        emailOptIn: mergedOptIn(existing.emailOptIn, body.emailOptIn),
+        ...optInFields(existing, body.emailOptIn, new Date()),
         updatedAt:  new Date(),
       }).where(eq(leads.id, existing.id));
       leadId = existing.id;
@@ -148,7 +148,7 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
-        emailOptIn: body.emailOptIn === true,
+        ...optInFields(null, body.emailOptIn, new Date()),
       }).returning({ id: leads.id });
       leadId = inserted[0]?.id;
     }

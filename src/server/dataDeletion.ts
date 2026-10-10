@@ -33,5 +33,7 @@ export function blankedLead(id: number) {
     },
     results: { astrology: {}, numerology: {}, humanDesign: {} },
     emailOptIn: false,
+    emailOptInAt: null,
+    emailOptInSource: null,
   };
 }
