@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
+import { LENS_COLOR, LensLabel } from '@/components/Lens';
 import type { PracticeData, VerdictKey } from '@/lib/practiceTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { addDays, usePracticeStore } from '@/store/usePracticeStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
-const ACCENT = { vehicle: colors.vehicle, road: colors.road, stoplight: colors.stoplight } as const;
-const GLYPH = { vehicle: '◆', road: '▲', stoplight: '●' } as const;
+const ORDER = ['vehicle', 'road', 'stoplight'] as const;
 
 /** Simple, visible rule: the Authority leads; the Road and the Stoplight add context. */
 function verdictFor(vehicle: string, road: string, light: string): VerdictKey {
@@ -24,7 +24,7 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
   const [text, setText] = useState('');
   const [stepIndex, setStepIndex] = useState(-1); // -1 = describe the decision
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const steps = data.decide.steps;
+  const steps = [...data.decide.steps].sort((a, b) => ORDER.indexOf(a.key) - ORDER.indexOf(b.key));
   const done = stepIndex >= steps.length;
 
   const reset = () => {
@@ -36,7 +36,6 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
   if (stepIndex === -1) {
     return (
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>DECIDE</Text>
         <Text accessibilityRole="header" style={styles.title}>What are you deciding?</Text>
         <Text style={styles.body}>{data.decide.intro}</Text>
         <Text style={styles.pace}>{data.decide.pace}</Text>
@@ -60,11 +59,11 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
     const revisit = hold && data.decide.revisitDays > 0 ? addDays(localDateString(), data.decide.revisitDays) : null;
     return (
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>YOUR CHECKS</Text>
+        <Text style={styles.eyebrow}>Your three checks</Text>
         <Text style={styles.decisionText}>{text.trim()}</Text>
         {steps.map((s) => (
-          <View key={s.key} style={[styles.recap, { borderLeftColor: ACCENT[s.key] }]}>
-            <Text style={[styles.recapLabel, { color: ACCENT[s.key] }]}>{GLYPH[s.key]}  {s.system}</Text>
+          <View key={s.key} style={[styles.recap, { borderLeftColor: LENS_COLOR[s.key] }]}>
+            <LensLabel lens={s.key}>{s.system}</LensLabel>
             <Text style={styles.body}>{s.choices.find((c) => c.id === answers[s.key])?.label ?? ''}</Text>
           </View>
         ))}
@@ -94,11 +93,16 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
   }
 
   const step = steps[stepIndex];
-  const accent = ACCENT[step.key];
+  const accent = LENS_COLOR[step.key];
   return (
     <View style={[styles.card, { borderColor: accent }]}>
-      <Text style={styles.progress}>CHECK {stepIndex + 1} OF {steps.length}</Text>
-      <Text style={[styles.eyebrow, { color: accent }]}>{GLYPH[step.key]}  {step.system}</Text>
+      <View style={styles.bars} accessibilityLabel={`Check ${stepIndex + 1} of ${steps.length}`}>
+        {steps.map((st, i) => (
+          <View key={st.key} style={[styles.bar, i <= stepIndex && { backgroundColor: LENS_COLOR[st.key] }]} />
+        ))}
+      </View>
+      <Text style={styles.progress}>{`Check ${stepIndex + 1} of ${steps.length}`}</Text>
+      <LensLabel lens={step.key}>{step.system}</LensLabel>
       <Text accessibilityRole="header" style={styles.title}>{step.title}</Text>
       <Text style={styles.decisionText}>{text.trim()}</Text>
       <Text style={styles.prompt}>{step.prompt}</Text>
@@ -134,8 +138,10 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
 
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 14 },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.2, color: colors.gold },
-  progress: { fontFamily: fonts.bodyMedium, fontSize: 12, letterSpacing: 1.6, color: colors.parchmentMuted },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
+  progress: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
+  bars: { flexDirection: 'row', gap: 6 },
+  bar: { flex: 1, height: 5, borderRadius: 3, backgroundColor: colors.hairline },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   pace: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 22, color: colors.parchmentMuted },

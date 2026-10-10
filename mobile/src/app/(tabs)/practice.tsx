@@ -29,12 +29,8 @@ export default function Practice() {
   return (
     <Screen refreshing={refreshing} onRefresh={refresh}>
       <View style={styles.head}>
-        <Text style={styles.eyebrow}>PRACTICE</Text>
-        <Text accessibilityRole="header" style={styles.title}>Decide through your design</Text>
-        <Text style={styles.sub}>
-          Check a choice against your Authority, decide with someone else, keep a log of how it went, and run a seven-day
-          experiment. Everything you write stays on this phone.
-        </Text>
+        <Text accessibilityRole="header" style={styles.title}>Practice</Text>
+        <Text style={styles.sub}>Decide through your design. Everything you write stays on this phone.</Text>
       </View>
       <Segmented options={OPTIONS} value={mode} onChange={setMode} />
       {mode === 'together' ? <Together /> : null}
@@ -57,7 +53,6 @@ export default function Practice() {
 
 const styles = StyleSheet.create({
   head: { gap: 6, paddingTop: space.sm },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.gold },
-  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 35, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 36, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
 });

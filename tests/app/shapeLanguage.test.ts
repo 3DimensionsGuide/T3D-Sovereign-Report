@@ -88,3 +88,13 @@ test('step 6: readings pieces exist and are wired', async () => {
   assert.match(r('components/readings/StoplightCompare.tsx'), /Different sign/);
   assert.match(r('components/readings/StoplightCompare.tsx'), /of 3/);
 });
+
+test('step 7: practice checks follow Triad order and partner form has no fake default date', () => {
+  const d = read('mobile/src/components/practice/DecideFlow.tsx');
+  assert.match(d, /ORDER = \['vehicle', 'road', 'stoplight'\]/);
+  assert.match(d, /LensLabel/);
+  const t = read('mobile/src/components/practice/Together.tsx');
+  assert.match(t, /useState<Date \| null>\(saved \? new Date\(`\$\{saved\.birthDate\}/);
+  assert.match(t, /Please choose their birth date/);
+  assert.match(t, /Choose date/);
+});

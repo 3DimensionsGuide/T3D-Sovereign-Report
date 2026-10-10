@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Field } from '@/components/Field';
 import { Segmented } from '@/components/Segmented';
 import { GoldButton } from '@/components/GoldButton';
+import { LensLabel } from '@/components/Lens';
 import {
   ChartRequestError, requestDecideTogether, requestPlaceCheck, type PlaceCandidate,
 } from '@/lib/api';
@@ -13,6 +14,7 @@ import { usePartnerStore } from '@/store/usePartnerStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+const sc = (t: string): string => t.charAt(0) + t.slice(1).toLowerCase().replace(/ · /g, ' · ');
 const pad = (n: number) => String(n).padStart(2, '0');
 const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const timeString = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -24,8 +26,10 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
   const [label, setLabel] = useState(saved?.label ?? '');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
-  const [birthDate, setBirthDate] = useState<Date>(saved ? new Date(`${saved.birthDate}T12:00:00`) : new Date(1990, 0, 1, 12, 0));
-  const [birthTime, setBirthTime] = useState<Date>(saved?.birthTime ? new Date(`2000-01-01T${saved.birthTime}:00`) : new Date(2000, 0, 1, 12, 0));
+  const [birthDate, setBirthDate] = useState<Date | null>(saved ? new Date(`${saved.birthDate}T12:00:00`) : null);
+  const [pickingDate, setPickingDate] = useState(false);
+  const [pickingTime, setPickingTime] = useState(false);
+  const [birthTime, setBirthTime] = useState<Date | null>(saved?.birthTime ? new Date(`2000-01-01T${saved.birthTime}:00`) : null);
   const [timeKnown, setTimeKnown] = useState(saved ? saved.birthTime !== null : true);
   const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
   const [chosen, setChosen] = useState(0);
@@ -35,10 +39,12 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
   async function onCheck() {
     setError(null);
     if (label.trim().length < 1) return setError('Please enter a name or nickname.');
+    if (!birthDate) return setError('Please choose their birth date.');
+    if (timeKnown && !birthTime) return setError('Please choose their birth time, or switch off "I know their birth time".');
     if (!city.trim() || !country.trim()) return setError('Please enter their birth city and country.');
     setLoading(true);
     try {
-      setCandidates(await requestPlaceCheck(city.trim(), country.trim(), dateString(birthDate)));
+      setCandidates(await requestPlaceCheck(city.trim(), country.trim(), dateString(birthDate as Date)));
       setChosen(0);
     } catch (e) {
       setError(e instanceof ChartRequestError ? e.message : 'Something went wrong. Please try again.');
@@ -52,8 +58,8 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
     if (!place) return;
     setPartner({
       label: label.trim().slice(0, 24),
-      birthDate: dateString(birthDate),
-      birthTime: timeKnown ? timeString(birthTime) : null,
+      birthDate: dateString(birthDate as Date),
+      birthTime: timeKnown && birthTime ? timeString(birthTime) : null,
       placeLabel: place.label,
       latitude: place.latitude,
       longitude: place.longitude,
@@ -65,11 +71,11 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
   if (candidates) {
     return (
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>CONFIRM THEIR DETAILS</Text>
+        <Text style={styles.eyebrow}>Confirm their details</Text>
         <Text accessibilityRole="header" style={styles.title}>Is this right?</Text>
         <Text style={styles.body}>
-          {label.trim()}, born {birthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          {timeKnown ? ` at ${birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : ', birth time not known'}.
+          {label.trim()}, born {birthDate?.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          {timeKnown && birthTime ? ` at ${birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : ', birth time not known'}.
         </Text>
         <Text style={styles.small}>Check the place especially. A wrong match changes their Human Design.</Text>
         {candidates.map((c, i) => (
@@ -96,7 +102,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
 
   return (
     <View style={styles.card}>
-      <Text style={styles.eyebrow}>DECIDE TOGETHER</Text>
+      <Text style={styles.eyebrow}>Decide together</Text>
       <Text accessibilityRole="header" style={styles.title}>Who are you deciding with?</Text>
       <Text style={styles.body}>
         Add one other person. Their details are used to work out their Type and Authority and are kept on this phone only. They
@@ -105,18 +111,48 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
       <Field label="Name or nickname" value={label} onChangeText={setLabel} maxLength={24} autoCapitalize="words" returnKeyType="next" />
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>Their birth date</Text>
-        <DateTimePicker value={birthDate} mode="date" display="compact" themeVariant="dark" maximumDate={today}
-          minimumDate={new Date(1900, 0, 1)} onValueChange={(_e: unknown, v: Date) => setBirthDate(v)} accessibilityLabel="Their birth date" />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={birthDate ? `Their birth date, ${dateString(birthDate)}. Change` : 'Choose their birth date'}
+          onPress={() => { if (!birthDate) setBirthDate(new Date(1990, 0, 1, 12, 0)); setPickingDate((v) => !v); }}
+          style={styles.chooseBtn}
+        >
+          <Text style={styles.chooseText}>
+            {birthDate ? birthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Choose date'}
+          </Text>
+        </Pressable>
       </View>
+      {pickingDate && birthDate ? (
+        <View style={{ gap: space.sm }}>
+          <DateTimePicker value={birthDate} mode="date" display="spinner" themeVariant="dark" maximumDate={today}
+            minimumDate={new Date(1900, 0, 1)} onValueChange={(_e: unknown, v: Date) => setBirthDate(v)} accessibilityLabel="Their birth date" />
+          <GoldButton label="Use this date" onPress={() => setPickingDate(false)} />
+        </View>
+      ) : null}
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>Their birth time</Text>
         {timeKnown ? (
-          <DateTimePicker value={birthTime} mode="time" display="compact" themeVariant="dark"
-            onValueChange={(_e: unknown, v: Date) => setBirthTime(v)} accessibilityLabel="Their birth time" />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={birthTime ? `Their birth time, ${timeString(birthTime)}. Change` : 'Choose their birth time'}
+            onPress={() => { if (!birthTime) setBirthTime(new Date(2000, 0, 1, 12, 0)); setPickingTime((v) => !v); }}
+            style={styles.chooseBtn}
+          >
+            <Text style={styles.chooseText}>
+              {birthTime ? birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : 'Choose time'}
+            </Text>
+          </Pressable>
         ) : (
           <Text style={styles.small}>Not known</Text>
         )}
       </View>
+      {timeKnown && pickingTime && birthTime ? (
+        <View style={{ gap: space.sm }}>
+          <DateTimePicker value={birthTime} mode="time" display="spinner" themeVariant="dark"
+            onValueChange={(_e: unknown, v: Date) => setBirthTime(v)} accessibilityLabel="Their birth time" />
+          <GoldButton label="Use this time" onPress={() => setPickingTime(false)} />
+        </View>
+      ) : null}
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>I know their birth time</Text>
         <Switch value={timeKnown} onValueChange={setTimeKnown} trackColor={{ false: colors.hairline, true: colors.gold }}
@@ -139,7 +175,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
 function PersonCard({ p }: { p: TogetherPerson }) {
   return (
     <View style={[styles.person, { borderLeftColor: colors.vehicle }]}>
-      <Text style={[styles.eyebrow, { color: colors.vehicle }]}>◆  {p.label.toUpperCase()}</Text>
+      <LensLabel lens="vehicle">{p.label}</LensLabel>
       {p.certainty === 'sure' ? (
         <>
           <Text style={styles.personTitle}>{p.type ?? 'Type unknown'} · {p.authority ?? 'Authority unknown'}</Text>
@@ -167,8 +203,6 @@ const VIEW_OPTIONS: ReadonlyArray<{ value: View_; label: string }> = [
   { value: 'sky', label: 'Sky' },
 ];
 
-const KIND_MARK: Record<string, string> = { electromagnetic: '⚡', companionship: '＝', dominance: '▲', compromise: '↔' };
-
 function Unavailable({ what }: { what: string }) {
   return (
     <View style={styles.card}>
@@ -181,7 +215,7 @@ function CentersSection({ e }: { e: CenterEffects }) {
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={[styles.eyebrow, { color: colors.vehicle }]}>◆  HUMAN DESIGN · CENTERS</Text>
+        <LensLabel lens="vehicle">{sc("HUMAN DESIGN · CENTERS")}</LensLabel>
         <Text accessibilityRole="header" style={styles.title}>Defined and open centers</Text>
         <Text style={styles.small}>{e.intro}</Text>
       </View>
@@ -221,7 +255,7 @@ function HousesSection({ h }: { h: HouseOverlays }) {
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={[styles.eyebrow, { color: colors.stoplight }]}>●  ASTROLOGY · HOUSE OVERLAYS</Text>
+        <LensLabel lens="stoplight">{sc("ASTROLOGY · HOUSE OVERLAYS")}</LensLabel>
         <Text accessibilityRole="header" style={styles.title}>Where you land in each other{'’'}s lives</Text>
         <Text style={styles.small}>{h.intro}</Text>
       </View>
@@ -248,7 +282,7 @@ function ChannelsView({ c, e, partnerLabel }: { c: HdConnections | null; e: Cent
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={[styles.eyebrow, { color: colors.vehicle }]}>◆  HUMAN DESIGN · CHANNELS</Text>
+        <LensLabel lens="vehicle">{sc("HUMAN DESIGN · CHANNELS")}</LensLabel>
         <Text accessibilityRole="header" style={styles.title}>How your charts connect</Text>
         <Text style={styles.small}>
           When two charts sit side by side, a channel can be completed, shared, or carried by one of you. There are four ways this happens.
@@ -268,7 +302,7 @@ function ChannelsView({ c, e, partnerLabel }: { c: HdConnections | null; e: Cent
         if (rows.length === 0) return null;
         return (
           <View key={k.kind} style={[styles.person, { borderLeftColor: colors.vehicle }]}>
-            <Text style={[styles.eyebrow, { color: colors.vehicle }]}>{KIND_MARK[k.kind]}  {k.title.toUpperCase()} · {k.mark.toUpperCase()}</Text>
+            <LensLabel lens="vehicle">{`${k.title} · ${k.mark}`}</LensLabel>
             <Text style={styles.small}>{k.what}</Text>
             <Text style={styles.body}>{k.feels}</Text>
             {rows.map((r) => (
@@ -302,7 +336,7 @@ function NumbersView({ n }: { n: NumberPair | null }) {
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={[styles.eyebrow, { color: colors.road }]}>▲  NUMEROLOGY · THE TWO OF YOU</Text>
+        <LensLabel lens="road">{sc("NUMEROLOGY · THE TWO OF YOU")}</LensLabel>
         <Text accessibilityRole="header" style={styles.title}>Your numbers side by side</Text>
         <Text style={styles.small}>Life Path shows each person's long road. Personal Year shows the pace of this year.</Text>
       </View>
@@ -318,7 +352,7 @@ function SkyView({ s, h }: { s: Synastry | null; h: HouseOverlays | null }) {
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={[styles.eyebrow, { color: colors.stoplight }]}>●  ASTROLOGY · CONNECTIONS</Text>
+        <LensLabel lens="stoplight">{sc("ASTROLOGY · CONNECTIONS")}</LensLabel>
         <Text accessibilityRole="header" style={styles.title}>Where your skies touch</Text>
         <Text style={styles.small}>The closest links between your two birth charts, strongest first.</Text>
       </View>
@@ -389,7 +423,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>TOGETHER</Text>
+        <Text style={styles.eyebrow}>Together</Text>
         <Text accessibilityRole="header" style={styles.title}>You and {partner.label}</Text>
         <Text style={styles.small}>
           Four views of the two of you. Each of you still decides through your own Strategy and Authority.
@@ -409,7 +443,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
 
       {data.tempo ? (
         <View style={[styles.person, { borderLeftColor: colors.road }]}>
-          <Text style={[styles.eyebrow, { color: colors.road }]}>▲  YOUR TEMPO</Text>
+          <LensLabel lens="road">{sc("YOUR TEMPO")}</LensLabel>
           <Text style={styles.personTitle}>{data.tempo.title}</Text>
           <Text style={styles.body}>{data.tempo.text}</Text>
         </View>
@@ -417,7 +451,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
 
       {data.approach ? (
         <View style={styles.card}>
-          <Text style={styles.eyebrow}>BRINGING A DECISION TO EACH OTHER</Text>
+          <Text style={styles.eyebrow}>Bringing a decision to each other</Text>
           {data.approach.map((a) => (
             <View key={a.forLabel} style={{ gap: 6 }}>
               <Text style={styles.personTitle}>For {a.forLabel === 'You' ? 'you' : a.forLabel}</Text>
@@ -429,7 +463,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
       ) : null}
 
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>YOUR STEPS</Text>
+        <Text style={styles.eyebrow}>Your steps</Text>
         {data.steps.map((s, i) => (
           <View key={s} style={styles.stepRow}>
             <Text style={styles.stepNum}>{i + 1}</Text>
@@ -470,7 +504,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
   person: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, borderLeftWidth: 4, padding: space.lg, gap: 8 },
   noteBox: { padding: space.md, borderRadius: radius.md, backgroundColor: colors.amethyst, borderWidth: 1, borderColor: colors.gold },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   personTitle: { fontFamily: fonts.display, fontSize: 19, lineHeight: 26, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
@@ -478,6 +512,8 @@ const styles = StyleSheet.create({
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   center: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },
   pickerRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
+  chooseBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold, backgroundColor: colors.amethyst },
+  chooseText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment, flexShrink: 1 },
   placeRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
   mark: { fontSize: 20, color: colors.gold },

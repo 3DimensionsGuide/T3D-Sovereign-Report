@@ -12,6 +12,7 @@ function DayStrip({ startedOn, todayIndex }: { startedOn: string; todayIndex: nu
   const entries = usePracticeStore((s) => s.entries);
   return (
     <View style={styles.strip} accessibilityLabel={`Day ${Math.min(todayIndex + 1, DAYS)} of ${DAYS}`}>
+      <View style={styles.pathLine} />
       {Array.from({ length: DAYS }, (_, i) => {
         const entry = entries[addDays(startedOn, i)];
         const count = entry ? entry.done.filter(Boolean).length : 0;
@@ -43,7 +44,7 @@ function Today({ data, date }: { data: PracticeData; date: string }) {
         const done = entry?.done[index] ?? false;
         return (
           <View key={c.when} style={[styles.checkin, done && { borderColor: colors.gold }]}>
-            <Text style={styles.when}>{c.when.toUpperCase()}</Text>
+            <Text style={styles.when}>{`${c.when} check-in`}</Text>
             <Text style={styles.body}>{c.question}</Text>
             <Field
               label="What I noticed"
@@ -77,7 +78,7 @@ function Finale({ data, startedOn }: { data: PracticeData; startedOn: string }) 
   );
   return (
     <View style={styles.card}>
-      <Text style={styles.eyebrow}>WEEK COMPLETE</Text>
+      <Text style={styles.eyebrow}>Week complete</Text>
       <Text accessibilityRole="header" style={styles.title}>{data.experiment.finale.title}</Text>
       <Text style={styles.body}>{data.experiment.finale.intro}</Text>
       <Text style={styles.small}>You completed {total} of 21 check-ins, with {full} full days.</Text>
@@ -107,7 +108,7 @@ export function SevenDay({ data }: { data: PracticeData }) {
   if (!startedOn) {
     return (
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>SEVEN-DAY EXPERIMENT{data.type ? ` · ${data.type.toUpperCase()}` : ''}</Text>
+        <Text style={styles.eyebrow}>{`Seven-day experiment${data.type ? ` for your ${data.type}` : ''}`}</Text>
         <Text accessibilityRole="header" style={styles.title}>{data.experiment.title}</Text>
         <Text style={styles.body}>{data.experiment.premise}</Text>
         <Text style={styles.small}>Three short check-ins a day: morning, midday and evening. Your notes stay on this phone.</Text>
@@ -122,7 +123,7 @@ export function SevenDay({ data }: { data: PracticeData }) {
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>{data.experiment.title.toUpperCase()}</Text>
+        <Text style={styles.eyebrow}>{data.experiment.title}</Text>
         <Text accessibilityRole="header" style={styles.title}>Day {dayIndex + 1} of {DAYS}</Text>
         <DayStrip startedOn={startedOn} todayIndex={dayIndex} />
         <Text style={styles.small}>{data.experiment.premise}</Text>
@@ -135,15 +136,16 @@ export function SevenDay({ data }: { data: PracticeData }) {
 
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 14 },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
-  strip: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  dot: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.hairline },
+  strip: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  pathLine: { position: 'absolute', left: 20, right: 20, top: 19, height: 2, backgroundColor: colors.hairline },
+  dot: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.charcoal, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.hairline },
   dotDone: { backgroundColor: colors.gold, borderColor: colors.gold },
   dotToday: { borderColor: colors.gold, borderWidth: 2 },
   dotText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
   checkin: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
-  when: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
+  when: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
 });
