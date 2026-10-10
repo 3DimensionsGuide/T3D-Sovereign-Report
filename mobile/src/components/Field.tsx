@@ -45,7 +45,7 @@ export function Field({ label, error, why, ...inputProps }: Props) {
 
 const styles = StyleSheet.create({
   wrap: { gap: 6 },
-  label: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 1, color: colors.parchmentMuted, textTransform: 'uppercase' },
+  label: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.2, color: colors.parchmentMuted },
   input: {
     minHeight: TOUCH,
     borderRadius: radius.md,

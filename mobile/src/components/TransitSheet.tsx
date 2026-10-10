@@ -7,6 +7,7 @@ import type { TransitCardData, TransitNature } from '@/lib/transitCardTypes';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 const NATURE_GLYPH: Record<TransitNature, string> = { flow: '◯', friction: '◼', neutral: '◇' };
 
 function Section({ label, children }: { label: string; children: string }) {
@@ -82,13 +83,13 @@ export function TransitSheet({ hit, onClose }: { hit: DailyTransitHit | null; on
                 <Section label="HOW LONG IT LASTS">{card.howLong}</Section>
                 <Section label="WORTH NOTICING">{card.invitation}</Section>
 
-                <View style={styles.meet}>
+                <AccentView style={styles.meet}>
                   <Text style={styles.meetLabel}>MEET IT THROUGH STRATEGY & AUTHORITY</Text>
                   <Text style={styles.body}>{card.meetIt.frame}</Text>
                   {card.meetIt.strategy ? <Text style={styles.body}>{card.meetIt.strategy}</Text> : null}
                   {card.meetIt.authority ? <Text style={styles.body}>{card.meetIt.authority}</Text> : null}
                   {card.meetIt.cue ? <Text style={styles.muted}>{card.meetIt.cue}</Text> : null}
-                </View>
+                </AccentView>
 
                 <Text style={styles.muted}>{card.reminder}</Text>
 

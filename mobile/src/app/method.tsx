@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 interface Section {
   glyph: string;
   accent: string;
@@ -98,13 +99,13 @@ export default function Method() {
             Accuracy is the point of this app. Here is what goes into your chart, in plain language.
           </Text>
           {SECTIONS.map((s) => (
-            <View key={s.title} style={[styles.card, { borderLeftColor: s.accent }]}>
+            <AccentView key={s.title} style={[styles.card, { borderLeftColor: s.accent }]}>
               <Text style={[styles.cardEyebrow, { color: s.accent }]}>{s.glyph}</Text>
               <Text accessibilityRole="header" style={styles.cardTitle}>{s.title}</Text>
               {s.paragraphs.map((p) => (
                 <Text key={p} style={styles.body}>{p}</Text>
               ))}
-            </View>
+            </AccentView>
           ))}
         </ScrollView>
       </SafeAreaView>

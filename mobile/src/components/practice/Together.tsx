@@ -14,6 +14,7 @@ import { usePartnerStore } from '@/store/usePartnerStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 const sc = (t: string): string => t.charAt(0) + t.slice(1).toLowerCase().replace(/ · /g, ' · ');
 const pad = (n: number) => String(n).padStart(2, '0');
 const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -155,7 +156,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
       ) : null}
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>I know their birth time</Text>
-        <Switch value={timeKnown} onValueChange={setTimeKnown} trackColor={{ false: colors.hairline, true: colors.gold }}
+        <Switch value={timeKnown} onValueChange={setTimeKnown} trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
           accessibilityLabel="I know their birth time" />
       </View>
       {!timeKnown ? (
@@ -174,7 +175,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
 
 function PersonCard({ p }: { p: TogetherPerson }) {
   return (
-    <View style={[styles.person, { borderLeftColor: colors.vehicle }]}>
+    <AccentView style={[styles.person, { borderLeftColor: colors.vehicle }]}>
       <LensLabel lens="vehicle">{p.label}</LensLabel>
       {p.certainty === 'sure' ? (
         <>
@@ -190,7 +191,7 @@ function PersonCard({ p }: { p: TogetherPerson }) {
           {p.possibilities.map((x) => <Text key={x} style={styles.body}>•  {x}</Text>)}
         </>
       )}
-    </View>
+    </AccentView>
   );
 }
 
@@ -226,13 +227,13 @@ function CentersSection({ e }: { e: CenterEffects }) {
         </View>
       ) : null}
       {e.items.map((i) => (
-        <View key={i.center} style={[styles.person, { borderLeftColor: colors.vehicle }]}>
+        <AccentView key={i.center} style={[styles.person, { borderLeftColor: colors.vehicle }]}>
           <Text style={styles.personTitle}>{i.center}  <Text style={styles.small}>{i.theme}</Text></Text>
           <Text style={styles.small}>{i.holders}</Text>
           <Text style={styles.body}>{i.brings} {i.feels}</Text>
           <Text style={styles.small}>Worth noticing: {i.watch}</Text>
           <Text style={styles.small}>{i.grows}</Text>
-        </View>
+        </AccentView>
       ))}
       {e.bothDefined.length > 0 ? (
         <View style={styles.rowBox}>
@@ -415,7 +416,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
     return (
       <View style={styles.card}>
         <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error ?? 'Something went wrong.'}</Text>
-        <GoldButton label="TRY AGAIN" variant="ghost" onPress={load} />
+        <GoldButton label="Try again" variant="ghost" onPress={load} />
       </View>
     );
   }

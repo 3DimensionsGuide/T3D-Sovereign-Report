@@ -25,7 +25,7 @@ test('the page glow fades out instead of ending in a hard edge', () => {
 test('onboarding lets people enter the emailed code or skip it', () => {
   const onboarding = read('mobile/src/app/onboarding.tsx');
   assert.match(onboarding, /confirmOptInCode/);
-  assert.match(onboarding, /SKIP FOR NOW/);
+  assert.match(onboarding, /Skip for now/);
   assert.match(onboarding, /SEND A NEW CODE/);
   const api = read('mobile/src/lib/api.ts');
   assert.match(api, /\/api\/email-optin\/confirm/);
@@ -61,7 +61,7 @@ test('onboarding asks one question at a time, shows the calculation, and the wel
   assert.match(onboarding, /Step \$\{step \+ 1\} of 4/);
   assert.match(onboarding, /validateStep/);
   assert.match(onboarding, /<CalculatingView /);
-  assert.match(onboarding, /CALCULATE MY CHART/);
+  assert.match(onboarding, /Calculate my chart/);
   assert.match(read('mobile/src/app/welcome.tsx'), /<TriadSeal /);
   assert.match(read('mobile/src/components/CalculatingView.tsx'), /isReduceMotionEnabled/);
 });

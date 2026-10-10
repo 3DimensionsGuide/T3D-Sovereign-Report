@@ -17,6 +17,14 @@ const ORDER: LensName[] = ['vehicle', 'road', 'stoplight'];
 const SUBJECT: Record<LensName, string> = { vehicle: 'Human Design', road: 'Numerology', stoplight: 'Astrology' };
 
 /** Same wording the server now sends, so older servers read cleanly too. */
+/** One clean sentence for the list, never cut mid-word. */
+function previewOf(text: string): string {
+  const first = text.split(/(?<=[.!?])\s/)[0] ?? text;
+  if (first.length <= 120) return first;
+  const cut = first.slice(0, 117);
+  return `${cut.slice(0, cut.lastIndexOf(' '))}…`;
+}
+
 function cleanTitle(t: string): string {
   return t
     .replace(/\s*\(℞\)/, '')
@@ -178,7 +186,7 @@ export default function Glossary() {
             ) : error ? (
               <View style={styles.center}>
                 <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
-                <GoldButton label="TRY AGAIN" variant="ghost" onPress={load} />
+                <GoldButton label="Try again" variant="ghost" onPress={load} />
               </View>
             ) : (
               <Text style={styles.empty}>No terms match that search.</Text>
@@ -210,7 +218,7 @@ export default function Glossary() {
                 <View style={[styles.bar, { backgroundColor: LENS_COLOR[LENS_OF[row.item.group]] }]} />
                 <View style={styles.rowText}>
                   <Text style={styles.rowTitle}>{row.title}</Text>
-                  <Text style={styles.rowSummary} numberOfLines={3}>{row.item.summary}</Text>
+                  <Text style={styles.rowSummary}>{previewOf(row.item.summary)}</Text>
                 </View>
               </TermPressable>
             )

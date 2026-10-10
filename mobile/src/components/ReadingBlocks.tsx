@@ -195,7 +195,7 @@ export function Accordion({
           <Text style={styles.cardTitle}>{title}</Text>
           {subtitle ? <Text style={styles.cardSub} numberOfLines={open ? undefined : 2}>{subtitle}</Text> : null}
         </View>
-        <Text style={styles.chevron}>{open ? '–' : '+'}</Text>
+        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
       </Pressable>
       {open ? <View style={styles.cardBody}>{children}</View> : null}
     </View>
@@ -228,7 +228,7 @@ export function ReadingStatus({
     return (
       <View style={styles.center}>
         <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
-        <GoldButton label="TRY AGAIN" variant="ghost" onPress={onRetry} />
+        <GoldButton label="Try again" variant="ghost" onPress={onRetry} />
       </View>
     );
   }

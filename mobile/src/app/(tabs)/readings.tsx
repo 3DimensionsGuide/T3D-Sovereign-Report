@@ -11,9 +11,9 @@ import { VehicleReading } from '@/components/readings/VehicleReading';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const OPTIONS = [
-  { value: 'vehicle', label: 'VEHICLE', icon: <LensIcon lens="vehicle" size={13} /> },
-  { value: 'road', label: 'ROAD', icon: <LensIcon lens="road" size={13} /> },
-  { value: 'stoplight', label: 'STOPLIGHT', icon: <LensIcon lens="stoplight" size={13} /> },
+  { value: 'vehicle', label: 'Vehicle', icon: <LensIcon lens="vehicle" size={13} /> },
+  { value: 'road', label: 'Road', icon: <LensIcon lens="road" size={13} /> },
+  { value: 'stoplight', label: 'Stoplight', icon: <LensIcon lens="stoplight" size={13} /> },
 ] as const;
 
 type Lens = (typeof OPTIONS)[number]['value'];

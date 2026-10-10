@@ -9,6 +9,7 @@ import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 function dayLabel(isoDay: string): string {
   const [y, m, d] = isoDay.split('-').map(Number);
   return new Date(y!, (m ?? 1) - 1, d ?? 1).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
@@ -44,7 +45,7 @@ export default function YearAheadScreen() {
           {error && !data ? (
             <>
               <Text style={styles.body}>{error}</Text>
-              <GoldButton label="TRY AGAIN" variant="ghost" onPress={retry} />
+              <GoldButton label="Try again" variant="ghost" onPress={retry} />
             </>
           ) : null}
           {offline && data ? <OfflineNote savedAt={savedAt} /> : null}
@@ -55,7 +56,7 @@ export default function YearAheadScreen() {
               <Text style={styles.body}>
                 We could not load your year ahead just now. Check your connection and try again.
               </Text>
-              <GoldButton label="TRY AGAIN" variant="ghost" onPress={() => refresh()} />
+              <GoldButton label="Try again" variant="ghost" onPress={() => refresh()} />
             </>
           ) : null}
 
@@ -64,12 +65,12 @@ export default function YearAheadScreen() {
               <Text style={styles.lede}>
                 Your year runs from {dayLabel(y.startsOn)} to {dayLabel(y.endsOn)}. You are {y.age}.
               </Text>
-              <View style={[styles.card, { borderLeftColor: colors.gold }]}>
+              <AccentView style={[styles.card, { borderLeftColor: colors.gold }]}>
                 <Text style={styles.cardEyebrow}>THE SHORT VERSION</Text>
                 <Text style={styles.body}>{y.summary}</Text>
-              </View>
+              </AccentView>
 
-              <View style={[styles.card, { borderLeftColor: colors.stoplight }]}>
+              <AccentView style={[styles.card, { borderLeftColor: colors.stoplight }]}>
                 <Text style={[styles.cardEyebrow, { color: colors.stoplight }]}>● THE TOPIC OF THE YEAR</Text>
                 <Text accessibilityRole="header" style={styles.cardTitle}>
                   {y.topic.houseName} (house {y.topic.house}) in {y.topic.sign}
@@ -77,9 +78,9 @@ export default function YearAheadScreen() {
                 <Text style={styles.body}>{y.topic.theme}</Text>
                 <Text style={styles.cardTitle}>Lord of the Year: {y.topic.lord}</Text>
                 {y.topic.lordQuote ? <Text style={styles.body}>{yearQuote(y.topic.lordQuote)}</Text> : null}
-              </View>
+              </AccentView>
 
-              <View style={[styles.card, { borderLeftColor: colors.road }]}>
+              <AccentView style={[styles.card, { borderLeftColor: colors.road }]}>
                 <Text style={[styles.cardEyebrow, { color: colors.road }]}>▲ THE PACE OF THE YEAR</Text>
                 {y.pace.personalYear ? (
                   <>
@@ -90,9 +91,9 @@ export default function YearAheadScreen() {
                   </>
                 ) : null}
                 <Text style={styles.small}>Universal Year {y.pace.universalYear}.</Text>
-              </View>
+              </AccentView>
 
-              <View style={[styles.card, { borderLeftColor: colors.vehicle }]}>
+              <AccentView style={[styles.card, { borderLeftColor: colors.vehicle }]}>
                 <Text style={[styles.cardEyebrow, { color: colors.vehicle }]}>◆ THE LONGER CHAPTER</Text>
                 {y.chapter.items.length === 0 ? (
                   <Text style={styles.body}>{y.chapter.none}</Text>
@@ -107,7 +108,7 @@ export default function YearAheadScreen() {
                     </View>
                   ))
                 )}
-              </View>
+              </AccentView>
 
               <Text style={styles.small}>{y.closing}</Text>
             </>

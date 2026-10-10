@@ -65,7 +65,9 @@ export function contactSentence(contact: MoonAspectContact, direction: 'ahead' |
 }
 
 /** The framework's reading of the Moon's phase. */
-export function phaseMeaning(waxing: boolean): string {
+export function phaseMeaning(waxing: boolean, phase?: string): string {
+  if (phase === 'New Moon') return 'Dark sky: a time for quiet, setting intentions, and beginning again.';
+  if (phase === 'Full Moon') return 'Fullest light: a time of clarity, culmination, and release.';
   return waxing
     ? 'Waxing light: a time for building, growing, and gathering.'
     : 'Waning light: a time for releasing, harvesting, and consolidating.';

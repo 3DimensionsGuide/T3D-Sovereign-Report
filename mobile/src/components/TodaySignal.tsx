@@ -62,7 +62,7 @@ export function TodaySignal({ today, triad, isToday }: Props) {
       {triad ? (
         <Row lens="road" line={`Personal Day ${triad.road.numberText}: ${triad.road.label}`} sub={`Lean in: ${triad.road.leanIn}`} />
       ) : null}
-      <Row lens="stoplight" line={skyLine} sub={today.moon.formatted} signal={top ? natureToSignal(top.nature) : 'neutral'} />
+      <Row lens="stoplight" line={skyLine} sub={`Moon in ${today.moon.sign} · ${today.moon.phase}`} signal={top ? natureToSignal(top.nature) : 'neutral'} />
 
       <View style={styles.tally} accessible accessibilityLabel={`In the sky: ${flow} flow, ${friction} friction, ${retro} retrograde.`}>
         <View style={styles.tallyItem}><SignalMarker kind="flow" size={14} /><Text style={styles.tallyText}>{flow} flow</Text></View>

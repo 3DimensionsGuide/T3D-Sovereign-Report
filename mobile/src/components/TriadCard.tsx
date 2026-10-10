@@ -3,6 +3,7 @@ import { Term } from '@/components/Explain';
 import { LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 export interface TriadRow {
   label: string;
   value: string;
@@ -24,7 +25,7 @@ interface Props {
 
 export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
   return (
-    <View
+    <AccentView
       style={[styles.card, { borderLeftColor: accent }]}
     >
       <View style={styles.header}>
@@ -46,7 +47,7 @@ export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
           </View>
         ))}
       </View>
-    </View>
+    </AccentView>
   );
 }
 

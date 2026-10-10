@@ -49,8 +49,8 @@ function Dash({ color, dashed }: { color: string; dashed?: boolean }) {
 // ───────────────────────── natal wheel ─────────────────────────
 
 const ZODIAC_OPTIONS = [
-  { value: 'tropical', label: 'TROPICAL' },
-  { value: 'sidereal', label: 'SIDEREAL' },
+  { value: 'tropical', label: 'Tropical' },
+  { value: 'sidereal', label: 'Sidereal' },
 ] as const;
 
 export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sidereal: WheelChart }) {

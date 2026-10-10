@@ -13,6 +13,7 @@ import type { ExplainEntry, GlossaryGroup } from '@/lib/explainTypes';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 export const GROUP_ACCENT: Record<GlossaryGroup, string> = {
   'Human Design': colors.vehicle,
   Astrology: colors.stoplight,
@@ -151,10 +152,10 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
                     <Text key={p} style={styles.body}>{p}</Text>
                   ))}
                   {entry.yours ? (
-                    <View style={[styles.yours, { borderLeftColor: accent }]}>
+                    <AccentView style={[styles.yours, { borderLeftColor: accent }]}>
                       <Text style={styles.yoursLabel}>IN YOUR CHART</Text>
                       <Text style={styles.body}>{entry.yours}</Text>
-                    </View>
+                    </AccentView>
                   ) : null}
                   {entry.relatedEntries.length ? (
                     <View style={styles.related}>

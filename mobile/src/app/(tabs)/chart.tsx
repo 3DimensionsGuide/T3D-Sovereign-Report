@@ -18,9 +18,9 @@ import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const VIEW_OPTIONS = [
-  { value: 'overview', label: 'OVERVIEW' },
-  { value: 'wheel', label: 'WHEEL' },
-  { value: 'bodygraph', label: 'BODYGRAPH' },
+  { value: 'overview', label: 'Overview' },
+  { value: 'wheel', label: 'Wheel' },
+  { value: 'bodygraph', label: 'Bodygraph' },
 ] as const;
 
 export default function Chart() {
@@ -135,7 +135,7 @@ export default function Chart() {
           ) : drawing.error ? (
             <View style={styles.centerBox}>
               <Text accessibilityRole="alert" style={styles.errorText}>{drawing.error}</Text>
-              <GoldButton label="TRY AGAIN" variant="ghost" onPress={drawing.retry} />
+              <GoldButton label="Try again" variant="ghost" onPress={drawing.retry} />
             </View>
           ) : (
             <View style={styles.centerBox} accessibilityLiveRegion="polite">
@@ -148,9 +148,9 @@ export default function Chart() {
 
       <FadeIn delay={400}>
         <View style={styles.actions}>
-          <GoldButton label="SHARE YOUR T3D CARD" onPress={() => router.push('/share-card' as Href)} />
-          <GoldButton label="GLOSSARY · TAP ANY TERM" variant="ghost" onPress={() => router.push('/glossary')} />
-          <GoldButton label="EDIT BIRTH DETAILS" variant="ghost" onPress={() => router.push('/onboarding')} />
+          <GoldButton label="Share your T3D card" onPress={() => router.push('/share-card' as Href)} />
+          <GoldButton label="Glossary · tap any term" variant="ghost" onPress={() => router.push('/glossary')} />
+          <GoldButton label="Edit birth details" variant="ghost" onPress={() => router.push('/onboarding')} />
         </View>
       </FadeIn>
     </Screen>
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   name: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
   meta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, marginTop: space.sm },
-  actions: { marginTop: space.md },
+  actions: { marginTop: space.md, gap: 12 },
   chartArea: { marginTop: space.md },
   centerBox: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
   errorText: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },

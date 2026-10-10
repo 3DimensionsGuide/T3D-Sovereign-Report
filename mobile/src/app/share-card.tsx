@@ -15,14 +15,14 @@ import { colors, fonts, space } from '@/theme/tokens';
 type Kind = 'profile' | 'today';
 
 const KINDS = [
-  { value: 'profile', label: 'MY TRIAD' },
-  { value: 'today', label: 'TODAY' },
+  { value: 'profile', label: 'My Triad' },
+  { value: 'today', label: 'Today' },
 ] as const;
 
 type Shape = 'post' | 'story';
 const SHAPES = [
-  { value: 'post', label: 'POST' },
-  { value: 'story', label: 'STORY' },
+  { value: 'post', label: 'Post' },
+  { value: 'story', label: 'Story' },
 ] as const;
 
 /** Each card type carries its own tag, so we can count visits that come from it. */
@@ -119,15 +119,15 @@ export default function ShareCard() {
         <Switch
           value={withName}
           onValueChange={setWithName}
-          trackColor={{ false: colors.hairline, true: colors.gold }}
+          trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
           accessibilityLabel="Add my first name"
         />
       </View>
 
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-      <GoldButton label="SHARE OR SAVE IMAGE" onPress={onShare} loading={busy} disabled={kind === 'today' && !triad.data} />
+      <GoldButton label="Share or save image" onPress={onShare} loading={busy} disabled={kind === 'today' && !triad.data} />
       <Text style={styles.small}>In the share sheet, choose “Save Image” to keep it in Photos.</Text>
-      <GoldButton label="SHARE THE LINK ONLY" variant="ghost" onPress={onShareLink} />
+      <GoldButton label="Share the link only" variant="ghost" onPress={onShareLink} />
       <Text style={styles.small}>
         Some apps, such as Notes, keep only the picture. Share the link on its own to add it there.
       </Text>

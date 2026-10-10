@@ -28,6 +28,7 @@ import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 const MIN_DATE = new Date(1950, 0, 1);
 const MAX_DATE = new Date(2100, 11, 31);
 
@@ -237,7 +238,7 @@ export default function Today() {
           </Pressable>
         </View>
         {!isToday ? (
-          <GoldButton label="BACK TO TODAY" variant="ghost" onPress={() => setViewDate(null)} />
+          <GoldButton label="Back to today" variant="ghost" onPress={() => setViewDate(null)} />
         ) : null}
       </FadeIn>
 
@@ -255,7 +256,7 @@ export default function Today() {
       {error ? (
         <View style={styles.errorBox}>
           <Text accessibilityLiveRegion="polite" style={styles.errorText}>{'⚠  '}{error}</Text>
-          <GoldButton label="TRY AGAIN" variant="ghost" onPress={onRefresh} loading={refreshing} />
+          <GoldButton label="Try again" variant="ghost" onPress={onRefresh} loading={refreshing} />
         </View>
       ) : null}
 
@@ -272,7 +273,7 @@ export default function Today() {
           ) : null}
 
           <FadeIn delay={80}>
-            <View style={[styles.card, { borderLeftColor: colors.stoplight }]}>
+            <AccentView style={[styles.card, { borderLeftColor: colors.stoplight }]}>
               <View style={styles.moonHead}>
                 <Text accessibilityElementsHidden style={styles.moonGlyph}>{moonGlyph(today.moon.phase)}</Text>
                 <View style={styles.flex}>
@@ -283,7 +284,7 @@ export default function Today() {
                   </Text>
                 </View>
               </View>
-              <Text style={styles.body}>{phaseMeaning(today.moon.waxing)}</Text>
+              <Text style={styles.body}>{phaseMeaning(today.moon.waxing, today.moon.phase)}</Text>
               <Text style={styles.body}>
                 Moving through your <Term id={houseId(today.moon.house)} style={styles.strong}>{ordinal(today.moon.house)} house</Term>:{' '}
                 {houseTheme(today.moon.house)}.
@@ -300,11 +301,11 @@ export default function Today() {
                   {contactSentence(today.moon.lastSeparating, 'behind')}.
                 </Text>
               ) : null}
-            </View>
+            </AccentView>
           </FadeIn>
 
           <FadeIn delay={160}>
-            <View style={[styles.card, { borderLeftColor: colors.stoplight }]}>
+            <AccentView style={[styles.card, { borderLeftColor: colors.stoplight }]}>
               <Text style={styles.cardEyebrow}>THE SUN</Text>
               <Text style={styles.cardTitle}>{today.sun.formatted}</Text>
               <Text style={styles.body}>
@@ -322,7 +323,7 @@ export default function Today() {
                   ))}
                 </Text>
               ) : null}
-            </View>
+            </AccentView>
           </FadeIn>
 
           {dayNum ? (
@@ -353,7 +354,7 @@ export default function Today() {
 
           {!triad ? (
           <FadeIn delay={320}>
-            <View style={[styles.card, { borderLeftColor: colors.vehicle }]}>
+            <AccentView style={[styles.card, { borderLeftColor: colors.vehicle }]}>
               <Text style={styles.cardEyebrow}>YOUR VEHICLE DECIDES</Text>
               {today.vehicle.type ? (
                 <Text style={styles.cardTitle}>{today.vehicle.type}</Text>
@@ -365,7 +366,7 @@ export default function Today() {
                 <Text style={styles.body}><Text style={styles.strong}>Authority: </Text>{today.vehicle.authority}</Text>
               ) : null}
               <Text style={styles.body}>{today.reminder}</Text>
-            </View>
+            </AccentView>
           </FadeIn>
           ) : (
             <Text style={styles.body}>{today.reminder}</Text>

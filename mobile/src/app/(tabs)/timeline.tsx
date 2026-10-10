@@ -14,13 +14,14 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
 
 const FILTERS = [
-  { value: 'all', label: 'ALL' },
-  { value: 'moon', label: 'MOON' },
-  { value: 'sky', label: 'SKY' },
-  { value: 'transits', label: 'TRANSITS' },
+  { value: 'all', label: 'All' },
+  { value: 'moon', label: 'Moon' },
+  { value: 'sky', label: 'Sky' },
+  { value: 'transits', label: 'Transits' },
 ] as const;
 
 const FILTER_KINDS: Record<Filter, readonly TimelineKind[] | null> = {
@@ -130,7 +131,7 @@ function YearCard({ data }: { data: TimelineResult }) {
         ) : null}
         <CycleBlock title="Pinnacle" cycle={data.pinnacle.current} next={data.pinnacle.next} />
         <CycleBlock title="Challenge" cycle={data.challenge.current} next={data.challenge.next} />
-        <GoldButton label="YOUR YEAR AHEAD ›" variant="ghost" onPress={() => router.push('/year' as Href)} />
+        <GoldButton label="Your year ahead ›" variant="ghost" onPress={() => router.push('/year' as Href)} />
       </Panel>
     </FadeIn>
   );
@@ -158,7 +159,7 @@ function SeasonRow({ s }: { s: ActiveSeason }) {
     ? `Exact ${s.exactAt.map((a) => shortDate(localKey(new Date(a)))).join(', ')}`
     : `Closest ${s.closest.orb.toFixed(1)}° on ${shortDate(localKey(new Date(s.closest.at)))}, never quite exact`;
   return (
-    <View
+    <AccentView
       accessible
       accessibilityLabel={`${phrase}. ${SIGNAL_LABEL[NATURE_KIND[s.nature]]}. In effect ${shortDate(s.windowStart)} to ${shortDate(s.windowEnd)}. ${reaches}.`}
       style={[styles.season, s.nature === 'friction' && styles.seasonFriction]}
@@ -168,7 +169,7 @@ function SeasonRow({ s }: { s: ActiveSeason }) {
         In effect {shortDate(s.windowStart)} to {shortDate(s.windowEnd)} · {reaches}
       </Text>
       <NatureTag nature={s.nature} />
-    </View>
+    </AccentView>
   );
 }
 
@@ -190,7 +191,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
           <Text style={styles.eventKind}>{KIND_LABEL[e.kind]} · {timeOf(e.at)}</Text>
           <Text style={styles.eventTitle}>{e.title}</Text>
         </View>
-        <Text style={styles.chevron}>{open ? '–' : '+'}</Text>
+        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
       </View>
       {e.kind === 'transit' || e.kind === 'return' ? (
         <NatureTag nature={e.nature} />
@@ -261,7 +262,7 @@ export default function Timeline() {
       ) : error && !data ? (
         <View style={styles.center}>
           <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
-          <GoldButton label="TRY AGAIN" variant="ghost" onPress={retry} />
+          <GoldButton label="Try again" variant="ghost" onPress={retry} />
         </View>
       ) : data ? (
         <>

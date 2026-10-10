@@ -13,6 +13,7 @@ import { usePracticeStore } from '@/store/usePracticeStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 interface Section {
   glyph: string;
   accent: string;
@@ -90,13 +91,13 @@ export default function YourData() {
           <Text accessibilityRole="header" style={styles.title}>About and your data</Text>
 
           {SECTIONS.map((s) => (
-            <View key={s.title} style={[styles.card, { borderLeftColor: s.accent }]}>
+            <AccentView key={s.title} style={[styles.card, { borderLeftColor: s.accent }]}>
               <Text style={[styles.cardEyebrow, { color: s.accent }]}>{s.glyph}</Text>
               <Text accessibilityRole="header" style={styles.cardTitle}>{s.title}</Text>
               {s.paragraphs.map((p) => (
                 <Text key={p} style={styles.body}>{p}</Text>
               ))}
-            </View>
+            </AccentView>
           ))}
 
           <GoldButton
@@ -106,10 +107,10 @@ export default function YourData() {
           />
 
           {__DEV__ && crashReportingOn ? (
-            <GoldButton label="SEND A TEST CRASH REPORT" variant="ghost" onPress={sendTestCrashReport} />
+            <GoldButton label="Send a test crash report" variant="ghost" onPress={sendTestCrashReport} />
           ) : null}
 
-          <View style={[styles.card, { borderLeftColor: colors.danger }]}>
+          <AccentView style={[styles.card, { borderLeftColor: colors.danger }]}>
             <Text style={[styles.cardEyebrow, { color: colors.danger }]}>✕</Text>
             <Text accessibilityRole="header" style={styles.cardTitle}>Delete my data</Text>
             <Text style={styles.body}>
@@ -130,7 +131,7 @@ export default function YourData() {
             >
               <Text style={styles.deleteText}>{busy ? 'DELETING…' : 'DELETE MY DATA'}</Text>
             </Pressable>
-          </View>
+          </AccentView>
         </ScrollView>
       </SafeAreaView>
     </View>

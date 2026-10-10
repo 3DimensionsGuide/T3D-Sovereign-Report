@@ -213,9 +213,9 @@ export default function Onboarding() {
             why={codeStep.notice ?? 'The code works for 15 minutes.'} />
         </View>
         <View style={styles.actions}>
-          <GoldButton label="CONFIRM" onPress={onConfirmCode} loading={codeBusy} disabled={code.length !== 6} />
-          <GoldButton label="SEND A NEW CODE" variant="ghost" onPress={onResendCode} disabled={codeBusy} />
-          <GoldButton label="SKIP FOR NOW" variant="ghost" onPress={() => router.replace('/today')} disabled={codeBusy} />
+          <GoldButton label="Confirm" onPress={onConfirmCode} loading={codeBusy} disabled={code.length !== 6} />
+          <GoldButton label="Send a new code" variant="ghost" onPress={onResendCode} disabled={codeBusy} />
+          <GoldButton label="Skip for now" variant="ghost" onPress={() => router.replace('/today')} disabled={codeBusy} />
         </View>
       </Screen>
     );
@@ -276,8 +276,8 @@ export default function Onboarding() {
               {submitError}
             </Text>
           ) : null}
-          <GoldButton label="CALCULATE MY CHART" onPress={onSubmit} loading={loading} />
-          <GoldButton label="CHANGE MY DETAILS" variant="ghost" onPress={() => setCandidates(null)} />
+          <GoldButton label="Calculate my chart" onPress={onSubmit} loading={loading} />
+          <GoldButton label="Change my details" variant="ghost" onPress={() => setCandidates(null)} />
         </View>
       </Screen>
     );
@@ -332,7 +332,7 @@ export default function Onboarding() {
             <View style={styles.pickerRow}>
               <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
               <Switch value={emailOptIn} onValueChange={setEmailOptIn}
-                trackColor={{ false: colors.hairline, true: colors.gold }}
+                trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
                 accessibilityLabel="Email me occasional T3D insights" />
             </View>
             {emailOptIn ? <Text style={styles.hint}>We will email a 6-digit code at the end to confirm it is really you.</Text> : null}
@@ -361,7 +361,7 @@ export default function Onboarding() {
             <View style={styles.pickerRow}>
               <Text style={styles.pickerLabel}>I know my birth time</Text>
               <Switch value={timeKnown} onValueChange={setTimeKnown}
-                trackColor={{ false: colors.hairline, true: colors.gold }}
+                trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
                 accessibilityLabel="I know my birth time" />
             </View>
             <Text style={styles.hint}>
@@ -391,9 +391,9 @@ export default function Onboarding() {
           </Text>
         ) : null}
         {step < 3 ? (
-          <GoldButton label="CONTINUE" onPress={onContinue} />
+          <GoldButton label="Continue" onPress={onContinue} />
         ) : (
-          <GoldButton label="CHECK MY BIRTH PLACE" onPress={onCheckPlace} loading={loading} />
+          <GoldButton label="Check my birth place" onPress={onCheckPlace} loading={loading} />
         )}
         {step > 0 ? <GoldButton label="BACK" variant="ghost" onPress={() => setStep((n) => n - 1)} /> : null}
       </View>

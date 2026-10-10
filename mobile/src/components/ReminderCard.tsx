@@ -32,7 +32,7 @@ export function ReminderPrompt() {
             Notifications are turned off for T3D on this iPhone. You can allow them in Settings, then come back
             here and turn the reminder on.
           </Text>
-          <GoldButton label="OPEN IPHONE SETTINGS" variant="ghost" onPress={() => void Linking.openSettings()} />
+          <GoldButton label="Open iphone settings" variant="ghost" onPress={() => void Linking.openSettings()} />
         </>
       ) : (
         <>
@@ -41,7 +41,7 @@ export function ReminderPrompt() {
             One notification at {formatReminderTime(hour, minute)}, saying Today{'’'}s frame is ready. It never
             says anything about your day. You can change the time or turn it off at any time on the Chart tab.
           </Text>
-          <GoldButton label="TURN ON DAILY REMINDER" onPress={() => void turnOn()} loading={busy} />
+          <GoldButton label="Turn on daily reminder" onPress={() => void turnOn()} loading={busy} />
           <GoldButton
             label="NOT NOW"
             variant="ghost"
@@ -84,7 +84,7 @@ export function ReminderCard() {
           value={enabled}
           disabled={busy}
           onValueChange={(v) => void toggle(v)}
-          trackColor={{ false: colors.hairline, true: colors.gold }}
+          trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
           accessibilityLabel="Daily reminder"
         />
       </View>
@@ -108,7 +108,7 @@ export function ReminderCard() {
           <Text accessibilityLiveRegion="polite" style={styles.body}>
             Notifications are turned off for T3D on this iPhone. Allow them in Settings to use the reminder.
           </Text>
-          <GoldButton label="OPEN IPHONE SETTINGS" variant="ghost" onPress={() => void Linking.openSettings()} />
+          <GoldButton label="Open iphone settings" variant="ghost" onPress={() => void Linking.openSettings()} />
         </>
       ) : null}
     </View>

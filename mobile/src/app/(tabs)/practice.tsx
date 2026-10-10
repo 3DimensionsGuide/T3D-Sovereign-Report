@@ -14,10 +14,10 @@ import { colors, fonts, space } from '@/theme/tokens';
 type Mode = 'decide' | 'together' | 'log' | 'week';
 
 const OPTIONS = [
-  { value: 'decide', label: 'DECIDE' },
-  { value: 'together', label: 'TOGETHER' },
-  { value: 'log', label: 'LOG' },
-  { value: 'week', label: '7 DAYS' },
+  { value: 'decide', label: 'Decide' },
+  { value: 'together', label: 'Together' },
+  { value: 'log', label: 'Log' },
+  { value: 'week', label: '7 days' },
 ] as const;
 
 export default function Practice() {

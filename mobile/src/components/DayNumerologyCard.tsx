@@ -4,6 +4,7 @@ import { Term } from '@/components/Explain';
 import { numberId } from '@/lib/termIds';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 function numberText(m: DayNumberMeaning): string {
   return m.root ? `${m.number}/${m.root}` : String(m.number);
 }
@@ -39,11 +40,11 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
         ))}
       </View>
       <Text style={styles.body}>
-        <Text style={styles.strong}>{'▲  Lean in: '}</Text>
+        <Text style={styles.strong}>{'Lean in: '}</Text>
         {meaning.leanIn}
       </Text>
       <Text style={styles.body}>
-        <Text style={styles.strong}>{'◼  Watch for: '}</Text>
+        <Text style={styles.strong}>{'Watch for: '}</Text>
         {meaning.watchFor}
       </Text>
     </View>
@@ -52,7 +53,7 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
 
 export function DayNumerologyCard({ data }: { data: DayNumerology }) {
   return (
-    <View style={styles.card}>
+    <AccentView style={styles.card}>
       <Text style={styles.cardEyebrow}>THE ROAD · NUMEROLOGY OF THE DAY</Text>
       <DayBlock kind="GLOBAL" meaning={data.universal} />
       <View style={styles.divider} />
@@ -62,7 +63,7 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
         <Term id="num:personalyear">Personal Year</Term> {data.personalYear} ·{' '}
         <Term id="num:personalmonth">Personal Month</Term> {data.personalMonth}
       </Text>
-    </View>
+    </AccentView>
   );
 }
 

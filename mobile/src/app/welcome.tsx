@@ -12,6 +12,7 @@ import { ChartRequestError, requestBirthPreview } from '@/lib/api';
 import type { BirthPreview } from '@/lib/previewTypes';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+import { AccentView } from '@/components/AccentView';
 const pad = (n: number) => String(n).padStart(2, '0');
 const toDateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
@@ -72,7 +73,7 @@ export default function Welcome() {
         ) : null}
         {!preview ? (
           <View style={styles.actions}>
-            <GoldButton label="SHOW ME A FIRST LOOK" onPress={onShow} loading={loading} />
+            <GoldButton label="See my first look" onPress={onShow} loading={loading} />
           </View>
         ) : null}
       </FadeIn>
@@ -80,14 +81,14 @@ export default function Welcome() {
       {preview ? (
         <FadeIn>
           <View style={styles.results} accessibilityLiveRegion="polite">
-            <View style={[styles.card, { borderLeftColor: colors.road }]}>
+            <AccentView style={[styles.card, { borderLeftColor: colors.road }]}>
               <LensLabel lens="road">The Road · Life Path {preview.lifePath.number}</LensLabel>
               <Text accessibilityRole="header" style={styles.cardTitle}>{preview.lifePath.name}</Text>
               <Text style={styles.body}>{preview.lifePath.direction}</Text>
               <Text style={styles.body}>{preview.lifePath.plain}</Text>
-            </View>
+            </AccentView>
 
-            <View style={[styles.card, { borderLeftColor: colors.stoplight }]}>
+            <AccentView style={[styles.card, { borderLeftColor: colors.stoplight }]}>
               <LensLabel lens="stoplight">The Stoplight · Sun in {preview.sun.sign}</LensLabel>
               <Text accessibilityRole="header" style={styles.cardTitle}>{preview.sun.sign}, {preview.sun.element}</Text>
               <Text style={styles.body}>{preview.sun.orientation}</Text>
@@ -97,18 +98,18 @@ export default function Welcome() {
                   will confirm your Sun sign.
                 </Text>
               ) : null}
-            </View>
+            </AccentView>
 
-            <View style={[styles.card, { borderLeftColor: colors.vehicle }]}>
+            <AccentView style={[styles.card, { borderLeftColor: colors.vehicle }]}>
               <LensLabel lens="vehicle">The Vehicle · waiting for your details</LensLabel>
               <Text accessibilityRole="header" style={styles.cardTitle}>Your full chart adds</Text>
               {preview.locked.map((line) => (
                 <Text key={line} style={styles.body}>◇  {line}</Text>
               ))}
-            </View>
+            </AccentView>
 
             <View style={styles.actions}>
-              <GoldButton label="CREATE MY FULL CHART" onPress={goOn} />
+              <GoldButton label="Create my full chart" onPress={goOn} />
             </View>
           </View>
         </FadeIn>

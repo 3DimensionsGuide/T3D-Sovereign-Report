@@ -57,12 +57,12 @@ export function BirthDataCard({ profile }: { profile: BirthProfile }) {
       <View style={[styles.badge, known ? styles.badgeOk : styles.badgeWarn]}>
         <Text style={styles.badgeText}>
           {known
-            ? '●  BIRTH TIME ENTERED · FULL ACCURACY'
-            : '◇  BIRTH TIME NOT ENTERED · RISING, HOUSES AND HUMAN DESIGN ARE APPROXIMATE'}
+            ? '●  Birth time entered · full accuracy'
+            : '◇  Birth time not entered · Rising, houses and Human Design are approximate'}
         </Text>
       </View>
-      <GoldButton label="HOW THIS IS CALCULATED" variant="ghost" onPress={() => router.push('/method' as Href)} />
-      <GoldButton label="ABOUT & YOUR DATA" variant="ghost" onPress={() => router.push('/your-data' as Href)} />
+      <GoldButton label="How this is calculated" variant="ghost" onPress={() => router.push('/method' as Href)} />
+      <GoldButton label="About & your data" variant="ghost" onPress={() => router.push('/your-data' as Href)} />
     </View>
   );
 }
@@ -80,5 +80,5 @@ const styles = StyleSheet.create({
   badge: { padding: space.md, borderRadius: radius.md, borderWidth: 1 },
   badgeOk: { borderColor: colors.road },
   badgeWarn: { borderColor: colors.gold },
-  badgeText: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.2, lineHeight: 17, color: colors.parchment },
+  badgeText: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.2, lineHeight: 19, color: colors.parchment },
 });
