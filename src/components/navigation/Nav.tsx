@@ -3,11 +3,11 @@
 /**
  * T3D Navigation — Mobile-first responsive
  *
- * Desktop (≥768px): Logo + links + gold CTA button in one row
+ * Desktop (≥768px): Logo + links + crimson CTA button in one row
  * Mobile  (<768px): Logo + hamburger → full-screen slide-down menu
  *
  * The hamburger animates: three lines → X on open
- * Menu overlay: dark frosted panel, large tap targets, gold CTA at bottom
+ * Menu overlay: dark frosted panel, large tap targets, crimson CTA at bottom
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -142,7 +142,7 @@ export default function Nav() {
               <Link
                 href="/#calculator"
                 className="t3d-cta"
-                style={{ marginLeft: 12, width: 'auto', padding: '12px 20px', minHeight: 48 }}
+                style={{ marginLeft: 12, width: 'auto', padding: '10px 20px', minHeight: 40 }}
               >
                 CALCULATE FREE
               </Link>

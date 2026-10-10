@@ -16,7 +16,7 @@ const S = {
   cta:   {
     display: 'inline-block', fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
     fontSize: 13, letterSpacing: 1, textTransform: 'uppercase' as const,
-    color: 'var(--base)', background: 'var(--gold)',
+    color: 'var(--base)', background: 'var(--crimson)',
     padding: '16px 32px', textDecoration: 'none', marginTop: 8,
   },
 };

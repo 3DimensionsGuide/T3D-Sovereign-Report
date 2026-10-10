@@ -16,7 +16,7 @@ export default function CalculatorPage() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ borderBottom: '1px solid var(--grid)', padding: 'clamp(32px,5vh,56px) clamp(16px,4vw,40px) clamp(24px,4vh,40px)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-              <span style={{ width: 6, height: 6, background: 'var(--gold)', display: 'block' }} aria-hidden />
+              <span style={{ width: 6, height: 6, background: 'var(--crimson)', display: 'block' }} aria-hidden />
               <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--parchment-faint)', letterSpacing: '0.18em' }}>
                 [T3D.CALCULATOR] — THREE DIMENSIONS · ONE SUBMISSION
               </span>
