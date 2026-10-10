@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SkeletonCards } from '@/components/Skeleton';
+import { AppState, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -243,10 +244,7 @@ export default function Today() {
       </FadeIn>
 
       {loading && !today ? (
-        <View accessibilityLiveRegion="polite" style={styles.center}>
-          <ActivityIndicator color={colors.gold} />
-          <Text style={styles.sub}>Reading the sky…</Text>
-        </View>
+        <SkeletonCards label="Reading the sky…" />
       ) : null}
 
       {today ? <ReminderPrompt /> : null}

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
+import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
@@ -255,10 +256,7 @@ export default function Timeline() {
       </FadeIn>
 
       {loading && !data ? (
-        <View style={styles.center} accessibilityLiveRegion="polite">
-          <ActivityIndicator color={colors.gold} />
-          <Text style={styles.sub}>Reading the sky…</Text>
-        </View>
+        <SkeletonCards label="Reading the sky…" />
       ) : error && !data ? (
         <View style={styles.center}>
           <Text accessibilityRole="alert" style={styles.error}>{error}</Text>

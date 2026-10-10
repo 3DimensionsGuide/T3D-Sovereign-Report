@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { SkeletonCards } from '@/components/Skeleton';
+import { StyleSheet, Text, View } from 'react-native';
 import { Redirect, router, type Href } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -138,10 +139,7 @@ export default function Chart() {
               <GoldButton label="Try again" variant="ghost" onPress={drawing.retry} />
             </View>
           ) : (
-            <View style={styles.centerBox} accessibilityLiveRegion="polite">
-              <ActivityIndicator color={colors.gold} />
-              <Text style={styles.note}>Drawing your chart…</Text>
-            </View>
+            <SkeletonCards count={2} label="Drawing your chart…" />
           )}
         </View>
       )}

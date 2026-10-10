@@ -1,11 +1,13 @@
-import { Text, View, type ColorValue } from 'react-native';
+import { Platform, View, type ColorValue } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { useStoreHydrated, useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts } from '@/theme/tokens';
+import { TabIcon, type TabName } from '@/components/TabIcons';
 
-function TabGlyph({ glyph, color }: { glyph: string; color: ColorValue }) {
-  return <Text style={{ color, fontSize: 20 }}>{glyph}</Text>;
-}
+const icon = (name: TabName) => ({ color, focused }: { color: ColorValue; focused: boolean }) => (
+  <TabIcon name={name} color={color as string} focused={focused} />
+);
+
 
 export default function TabsLayout() {
   const hydrated = useStoreHydrated();
@@ -21,43 +23,48 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.obsidian },
         tabBarActiveTintColor: colors.gold,
         tabBarInactiveTintColor: colors.parchmentMuted,
-        tabBarStyle: { backgroundColor: colors.charcoal, borderTopColor: colors.hairline },
-        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12 },
+        tabBarStyle: {
+          backgroundColor: colors.charcoal,
+          borderTopColor: colors.hairline,
+          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12, marginTop: 2 },
       }}
     >
       <Tabs.Screen
         name="today"
         options={{
           title: 'Today',
-          tabBarIcon: ({ color }) => <TabGlyph glyph="◐" color={color} />,
+          tabBarIcon: icon('today'),
         }}
       />
       <Tabs.Screen
         name="timeline"
         options={{
           title: 'Timeline',
-          tabBarIcon: ({ color }) => <TabGlyph glyph="◷" color={color} />,
+          tabBarIcon: icon('timeline'),
         }}
       />
       <Tabs.Screen
         name="readings"
         options={{
           title: 'Readings',
-          tabBarIcon: ({ color }) => <TabGlyph glyph="◈" color={color} />,
+          tabBarIcon: icon('readings'),
         }}
       />
       <Tabs.Screen
         name="practice"
         options={{
           title: 'Practice',
-          tabBarIcon: ({ color }) => <TabGlyph glyph="✦" color={color} />,
+          tabBarIcon: icon('practice'),
         }}
       />
       <Tabs.Screen
         name="chart"
         options={{
           title: 'My Chart',
-          tabBarIcon: ({ color }) => <TabGlyph glyph="◆" color={color} />,
+          tabBarIcon: icon('chart'),
         }}
       />
     </Tabs>

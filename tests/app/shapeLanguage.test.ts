@@ -123,3 +123,14 @@ test('step 9: Stories card is 9:16, uses the Triad portrait, and never shows bir
   assert.match(s, /height: tall \? 1920 : 1350/);
   assert.match(read('mobile/src/components/ProfileShareCard.tsx'), /<TriadSeal /);
 });
+
+test('pass A: tab bar uses drawn icons that change shape when selected, and loading shows skeleton cards', () => {
+  const tabs = read('mobile/src/app/(tabs)/_layout.tsx');
+  for (const n of ['today', 'timeline', 'readings', 'practice', 'chart']) assert.ok(tabs.includes(`icon('${n}')`), `${n} tab has a drawn icon`);
+  assert.ok(!/TabGlyph/.test(tabs));
+  const icons = read('mobile/src/components/TabIcons.tsx');
+  assert.match(icons, /focused \? color : 'none'/);
+  for (const f of ['today', 'timeline', 'chart']) assert.match(read(`mobile/src/app/(tabs)/${f}.tsx`), /<SkeletonCards /);
+  const sk = read('mobile/src/components/Skeleton.tsx');
+  assert.match(sk, /isReduceMotionEnabled/);
+});

@@ -17,7 +17,7 @@ export function GoldButton({ label, onPress, loading = false, disabled = false, 
   const ghost = variant === 'ghost';
 
   const animateTo = (value: number) =>
-    Animated.timing(scale, { toValue: value, duration: 120, useNativeDriver: true }).start();
+    Animated.spring(scale, { toValue: value, speed: 40, bounciness: value < 1 ? 0 : 8, useNativeDriver: true }).start();
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
@@ -27,7 +27,7 @@ export function GoldButton({ label, onPress, loading = false, disabled = false, 
         accessibilityState={{ disabled: inactive, busy: loading }}
         disabled={inactive}
         onPress={onPress}
-        onPressIn={() => animateTo(0.98)}
+        onPressIn={() => animateTo(0.97)}
         onPressOut={() => animateTo(1)}
         style={[
           styles.base,
