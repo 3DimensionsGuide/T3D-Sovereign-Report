@@ -5,6 +5,7 @@ import { captureRef } from 'react-native-view-shot';
 import { Screen } from '@/components/Screen';
 import { GoldButton } from '@/components/GoldButton';
 import { ProfileShareCard } from '@/components/ProfileShareCard';
+import { StoryShareCard } from '@/components/StoryShareCard';
 import { TodayShareCard } from '@/components/TodayShareCard';
 import { Segmented } from '@/components/Segmented';
 import { useTriadToday } from '@/lib/useTriadToday';
@@ -18,6 +19,12 @@ const KINDS = [
   { value: 'today', label: 'TODAY' },
 ] as const;
 
+type Shape = 'post' | 'story';
+const SHAPES = [
+  { value: 'post', label: 'POST' },
+  { value: 'story', label: 'STORY' },
+] as const;
+
 /** Each card type carries its own tag, so we can count visits that come from it. */
 const LINKS: Record<Kind, string> = {
   profile: 'https://3dimensions.guide/?ref=card-profile',
@@ -29,6 +36,8 @@ export default function ShareCard() {
   const profile = useT3DStore((s) => s.profile);
   const cardRef = useRef<View>(null);
   const [kind, setKind] = useState<Kind>('profile');
+  const [shape, setShape] = useState<Shape>('post');
+  const tall = kind === 'profile' && shape === 'story';
   const triad = useTriadToday(chart?.leadId, profile?.email.trim());
   const [withName, setWithName] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -40,7 +49,7 @@ export default function ShareCard() {
     setError(null);
     setBusy(true);
     try {
-      const uri = await captureRef(cardRef, { format: 'png', quality: 1, width: 1080, height: 1350, result: 'tmpfile' });
+      const uri = await captureRef(cardRef, { format: 'png', quality: 1, width: 1080, height: tall ? 1920 : 1350, result: 'tmpfile' });
       const message = `${kind === 'today' ? 'My frame for today' : 'My T3D Triad'} · ${LINKS[kind]}`;
       await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
     } catch {
@@ -64,16 +73,16 @@ export default function ShareCard() {
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>SHARE</Text>
         <Text accessibilityRole="header" style={styles.title}>Your T3D card</Text>
         <Text style={styles.small}>
           {kind === 'today'
             ? 'The card shows today’s date, your Type and Authority, your Personal Day and the main sky contact. It never shows your birth date, time, place or last name.'
-            : 'The card shows your Type, Life Path and Sun sign. It never shows your birth date, time, place or last name.'}
+            : 'The card shows your Type, Life Path and Sun sign. Choose Story for the tall Instagram Stories shape. It never shows your birth date, time, place or last name.'}
         </Text>
       </View>
 
       <Segmented options={KINDS} value={kind} onChange={setKind} compact />
+      {kind === 'profile' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
 
       <View style={styles.preview}>
         {kind === 'today' ? (
@@ -84,6 +93,13 @@ export default function ShareCard() {
               {triad.error ?? 'Getting today’s frame…'}
             </Text>
           )
+        ) : tall ? (
+          <StoryShareCard
+            ref={cardRef}
+            chart={chart}
+            firstName={withName && first ? first : null}
+            birthTimeKnown={profile.birthTimeKnown}
+          />
         ) : (
           <ProfileShareCard
             ref={cardRef}
@@ -122,7 +138,6 @@ export default function ShareCard() {
 
 const styles = StyleSheet.create({
   header: { gap: 6, paddingTop: space.lg },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   preview: { alignItems: 'center', marginVertical: space.md },

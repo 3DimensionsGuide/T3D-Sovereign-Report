@@ -112,3 +112,14 @@ test('step 8: glossary is grouped by lens, folds gates and channels, and titles 
   const defs = listEntries().filter((e) => e.id.startsWith('hd:definition:')).map((e) => e.summary);
   assert.equal(new Set(defs).size, defs.length, 'definition one-liners are distinct');
 });
+
+test('step 9: Stories card is 9:16, uses the Triad portrait, and never shows birth details', () => {
+  const c = read('mobile/src/components/StoryShareCard.tsx');
+  assert.match(c, /STORY_WIDTH = 340/);
+  assert.match(c, /STORY_HEIGHT = 604/);
+  assert.match(c, /<TriadPortrait /);
+  assert.ok(!/birthDate|birthTime\b|\.city|lastName/.test(c.replace(/birthTimeKnown/g, '')));
+  const s = read('mobile/src/app/share-card.tsx');
+  assert.match(s, /height: tall \? 1920 : 1350/);
+  assert.match(read('mobile/src/components/ProfileShareCard.tsx'), /<TriadSeal /);
+});

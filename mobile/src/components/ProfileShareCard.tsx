@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatLongitude, type ChartResult } from '@/lib/api';
 import { Glow } from '@/components/Glow';
+import { TriadSeal } from '@/components/TriadSeal';
 import { LENS_TEXT, LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts } from '@/theme/tokens';
 
@@ -46,7 +47,10 @@ export const ProfileShareCard = forwardRef<View, Props>(function ProfileShareCar
   return (
     <View ref={ref} collapsable={false} style={styles.card}>
       <Glow color={colors.purple} opacity={0.75} style={styles.glow} />
-      <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
+      <View style={styles.brandRow}>
+        <TriadSeal size={22} />
+        <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
+      </View>
       <View style={styles.rule} />
       <Text style={styles.title}>{firstName ? `${firstName}'s T3D Triad` : 'My T3D Triad'}</Text>
 
@@ -70,6 +74,7 @@ const styles = StyleSheet.create({
     borderRadius: 18, padding: 24, overflow: 'hidden', justifyContent: 'space-between',
   },
   glow: { height: 280 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
   rule: { height: 1, backgroundColor: colors.gold, opacity: 0.6, marginTop: 8 },
   title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 35, color: colors.parchment, marginTop: 14 },

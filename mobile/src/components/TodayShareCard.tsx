@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { TriadToday } from '@/lib/triadTypes';
 import { Glow } from '@/components/Glow';
+import { TriadSeal } from '@/components/TriadSeal';
 import { LENS_TEXT, LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts } from '@/theme/tokens';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/components/ProfileShareCard';
@@ -33,7 +34,10 @@ export const TodayShareCard = forwardRef<View, Props>(function TodayShareCard({ 
   return (
     <View ref={ref} collapsable={false} style={styles.card}>
       <Glow color={colors.purple} opacity={0.75} style={styles.glow} />
-      <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
+      <View style={styles.brandRow}>
+        <TriadSeal size={22} />
+        <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
+      </View>
       <View style={styles.rule} />
       <Text style={styles.title}>{firstName ? `${firstName}'s frame for today` : 'My frame for today'}</Text>
       <Text style={styles.date}>{date}</Text>
@@ -58,6 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 18, padding: 24, overflow: 'hidden', justifyContent: 'space-between',
   },
   glow: { height: 280 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
   rule: { height: 1, backgroundColor: colors.gold, opacity: 0.6, marginTop: 8 },
   title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment, marginTop: 14 },
