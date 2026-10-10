@@ -51,8 +51,8 @@
   },
   "moscow-1950": {
     "astroCom": "match",
-    "jovian": "unchecked",
-    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+3, same as ours. Midheaven differs by about 1.3 arc-minutes because of city coordinates (Astro.com 55n45, 37e35)."
+    "jovian": "match",
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+3, same as ours. Midheaven differs by about 1.3 arc-minutes because of city coordinates (Astro.com 55n45, 37e35). Jovian Archive (checked 2026-10-09): Projector, Splenic, 2/4, Right Angle Cross of the Sphinx, centers and channels 1-8, 10-57, 47-64 match. Jovian uses 14:30 UTC for 17:30 local (UTC+3), same as ours."
   },
   "berlin-dstgap-1993": {
     "astroCom": "match",
