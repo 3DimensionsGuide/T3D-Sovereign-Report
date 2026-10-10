@@ -183,6 +183,13 @@ function CheckoutForm({ email, leadId, orderId, productSlug, priceLabel }: { ema
       <p className="t3d-label" style={{ textAlign: 'center', color: 'var(--parchment-40)' }}>
         SECURED BY STRIPE · 256-BIT ENCRYPTION · NO CARD DATA STORED
       </p>
+
+      <p className="t3d-body" style={{ textAlign: 'center', fontSize: 13, color: 'var(--parchment-40)', margin: 0 }}>
+        Your report is a digital product, sent to your email after payment. It is for
+        reflection and entertainment, not advice. Questions? Email{' '}
+        <a href="mailto:privacy@3dimensions.guide" style={{ color: 'inherit', textDecoration: 'underline' }}>privacy@3dimensions.guide</a>.
+        See our <a href="/privacy" style={{ color: 'inherit', textDecoration: 'underline' }}>privacy policy</a>.
+      </p>
     </form>
   );
 }

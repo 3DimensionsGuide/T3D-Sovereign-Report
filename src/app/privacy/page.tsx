@@ -152,9 +152,17 @@ export default function PrivacyPage() {
 
           <h2 style={S.h2}>Cookies &amp; Analytics</h2>
           <p style={S.p}>
-            We use minimal, standard web analytics to understand how visitors use the site.
-            We do not use tracking cookies for advertising purposes, and we do not sell
-            browsing data to third parties.
+            We do not run a third-party analytics tool on the website, and we do not use
+            advertising or tracking cookies. We do not sell your data. Our hosting provider
+            keeps standard server logs (such as your IP address and the pages requested) for
+            security and reliability.
+          </p>
+          <p style={S.p}>
+            When you run the calculator, your browser saves your name and email on your own
+            device (local storage) so the checkout page can fill them in for you. If you open
+            a link shared from a T3D card, your browser also notes for the rest of that visit
+            that it has been counted, and we count the visit anonymously. You can clear this
+            any time in your browser settings.
           </p>
 
           <h2 style={S.h2}>Changes to This Policy</h2>

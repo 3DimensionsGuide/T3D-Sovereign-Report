@@ -19,7 +19,8 @@ export default function Footer() {
           </Link>
           <p className="font-mono" style={{ fontSize: '0.62rem', color: 'var(--parchment-faint)', letterSpacing: '0.12em', lineHeight: 1.6 }}>
             T3D is a reflective self-navigation tool.<br />
-            Read it as a lens, not a mandate.
+            Read it as a lens, not a mandate.<br />
+            For reflection and entertainment only. Not medical, psychological, legal or financial advice.
           </p>
         </div>
 
@@ -31,6 +32,7 @@ export default function Footer() {
           {[
             { href: '/calculator', label: 'Calculator'   },
             { href: '/report',     label: 'Full Report'  },
+            { href: '/privacy',    label: 'Privacy'      },
           ].map((l) => (
             <Link key={l.href} href={l.href} style={{
               display: 'block', fontFamily: "'JetBrains Mono', monospace",
