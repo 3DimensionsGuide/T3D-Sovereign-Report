@@ -6,10 +6,10 @@ import { colors } from '@/theme/tokens';
  * so meaning never depends on colour alone.
  *
  *  Lenses : Vehicle = diamond, Road = triangle, Stoplight = dot.
- *  Signals: Flow = ringed check, Friction = square with a bar, Caution = hexagon with a mark.
+ *  Signals: Flow = ringed check, Friction = square with a bar, Caution = hexagon with a mark, Neutral = plain ring.
  */
 export type LensName = 'vehicle' | 'road' | 'stoplight';
-export type SignalKind = 'flow' | 'friction' | 'caution';
+export type SignalKind = 'flow' | 'friction' | 'caution' | 'neutral';
 
 export const LENS_COLOR: Record<LensName, string> = {
   vehicle: colors.vehicle,
@@ -27,6 +27,7 @@ export const SIGNAL_LABEL: Record<SignalKind, string> = {
   flow: 'Flow',
   friction: 'Friction',
   caution: 'Caution',
+  neutral: 'Neutral',
 };
 
 /** Signal colours are not lens colours: flow is a calm teal, friction a warm coral, caution the gold. */
@@ -34,6 +35,7 @@ export const SIGNAL_COLOR: Record<SignalKind, string> = {
   flow: '#4FD1B5',
   friction: '#F0836B',
   caution: colors.sun,
+  neutral: colors.parchmentMuted,
 };
 
 /** Maps the old text glyphs to a lens, so older screens can move over one at a time. */
@@ -85,6 +87,7 @@ export function SignalMarker({ kind, size = 16, color }: SignalMarkerProps) {
           <Path d="M7 12 H17" stroke={c} strokeWidth={2.4} strokeLinecap="round" />
         </>
       ) : null}
+      {kind === 'neutral' ? <Circle cx="12" cy="12" r="10" fill="none" stroke={c} strokeWidth={2.4} /> : null}
       {kind === 'caution' ? (
         <>
           <Polygon points="12,2 20.5,7 20.5,17 12,22 3.5,17 3.5,7" fill="none" stroke={c} strokeWidth={2.4} strokeLinejoin="round" />

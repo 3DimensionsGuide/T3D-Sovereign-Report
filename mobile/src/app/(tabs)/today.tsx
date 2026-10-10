@@ -20,6 +20,8 @@ import {
 import { Term } from '@/components/Explain';
 import { TimeNote } from '@/components/TimeNote';
 import { TriadTodayCard } from '@/components/TriadTodayCard';
+import { TodaySignal } from '@/components/TodaySignal';
+import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
 import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
@@ -47,7 +49,7 @@ interface TodayBundle {
 /** If the app has been in the background this long, the live day reloads when it returns. */
 const STALE_AFTER_MS = 30 * 60 * 1000;
 
-const NATURE_LABEL = { flow: '◯  Flow', friction: '◼  Friction', neutral: '◇  Neutral' } as const;
+const NATURE_KIND: Record<DailyTransitHit['nature'], SignalKind> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
 
 function TransitRow({ hit, onSelect }: { hit: DailyTransitHit; onSelect: (hit: DailyTransitHit) => void }) {
   const phrase = `${bodyName(hit.transiting)} ${aspectWord(hit.aspect)} your ${natalName(hit.natal)}`;
@@ -55,7 +57,7 @@ function TransitRow({ hit, onSelect }: { hit: DailyTransitHit; onSelect: (hit: D
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${phrase}. ${NATURE_LABEL[hit.nature].replace(/[^A-Za-z]/g, '')}. ${detail}. Opens the full meaning.`}
+      accessibilityLabel={`${phrase}. ${SIGNAL_LABEL[NATURE_KIND[hit.nature]]}. ${detail}. Opens the full meaning.`}
       onPress={() => onSelect(hit)}
       style={({ pressed }) => [styles.transitRow, hit.nature === 'friction' && styles.transitFriction, pressed && { opacity: 0.8 }]}
     >
@@ -65,7 +67,10 @@ function TransitRow({ hit, onSelect }: { hit: DailyTransitHit; onSelect: (hit: D
         <Term id={natalId(hit.natal)}>{natalName(hit.natal)}</Term>
       </Text>
       <Text style={styles.transitDetail}>{detail}</Text>
-      <Text style={styles.transitNature}>{NATURE_LABEL[hit.nature]}</Text>
+      <View style={styles.transitNatureRow}>
+        <SignalMarker kind={NATURE_KIND[hit.nature]} size={14} />
+        <Text style={styles.transitNature}>{SIGNAL_LABEL[NATURE_KIND[hit.nature]]}</Text>
+      </View>
       <Text style={styles.transitMore}>TAP FOR FULL MEANING ›</Text>
     </Pressable>
   );
@@ -257,6 +262,9 @@ export default function Today() {
       {today ? (
         <>
           <TimeNote scope="sky" />
+          <FadeIn delay={20}>
+            <TodaySignal today={today} triad={triad} isToday={isToday} />
+          </FadeIn>
           {triad ? (
             <FadeIn delay={60}>
               <TriadTodayCard data={triad} isToday={isToday} />
@@ -402,9 +410,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.md, borderWidth: 1,
     borderColor: colors.hairline, padding: space.md, gap: 4,
   },
-  transitFriction: { borderColor: colors.stoplight },
+  transitFriction: { borderColor: SIGNAL_COLOR.friction },
+  transitNatureRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   transitPhrase: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   transitDetail: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   transitMore: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, color: colors.gold, marginTop: 2 },
-  transitNature: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1, color: colors.parchment },
+  transitNature: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4, color: colors.parchment },
 });

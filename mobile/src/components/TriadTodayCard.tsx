@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { TriadToday } from '@/lib/triadTypes';
+import { LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 function Lens({ glyph, accent, label, title, lines }: {
@@ -7,7 +8,10 @@ function Lens({ glyph, accent, label, title, lines }: {
 }) {
   return (
     <View style={[styles.lens, { borderLeftColor: accent }]}>
-      <Text style={[styles.lensLabel, { color: accent }]}>{glyph}  {label}</Text>
+      <View style={styles.lensHead}>
+        {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={12} color={accent} /> : null}
+        <Text style={[styles.lensLabel, { color: accent }]}>{label}</Text>
+      </View>
       <Text style={styles.lensTitle}>{title}</Text>
       {lines.filter((l): l is string => !!l).map((l) => (
         <Text key={l} style={styles.body}>{l}</Text>
@@ -66,6 +70,7 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment },
   frame: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 25, color: colors.parchment },
   lens: { gap: 6, paddingLeft: space.md, borderLeftWidth: 4 },
+  lensHead: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   lensLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8 },
   lensTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },

@@ -31,3 +31,11 @@ test('onboarding lets people enter the emailed code or skip it', () => {
   assert.match(api, /\/api\/email-optin\/confirm/);
   assert.match(api, /\/api\/email-optin\/send/);
 });
+
+test('Today opens with a signal block and uses the shared markers for every transit', () => {
+  const today = read('mobile/src/app/(tabs)/today.tsx');
+  assert.match(today, /<TodaySignal /);
+  assert.ok(!today.includes('NATURE_LABEL'), 'the old mixed text markers are gone');
+  const signal = read('mobile/src/components/TodaySignal.tsx');
+  for (const word of ['flow', 'friction', 'retrograde']) assert.ok(signal.includes(word));
+});
