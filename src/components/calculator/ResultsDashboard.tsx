@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
 import { PRODUCT_DISPLAY } from '@/lib/products/catalog';
+import EmailOptInConfirm from './EmailOptInConfirm';
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function fmtLon(lon: unknown): string {
@@ -168,6 +169,8 @@ export default function ResultsDashboard() {
           RECALCULATE
         </button>
       </div>
+
+      <EmailOptInConfirm />
 
       {/*
        * UPGRADE 6 — Three result cards

@@ -30,6 +30,8 @@ export const BUCKETS = {
   preview: { limit: 30, windowSec: 10 * 60 },
   /** Looking up a birth city. */
   place: { limit: 40, windowSec: 10 * 60 },
+  /** Sending or checking an email code for the marketing opt-in. */
+  optIn: { limit: 20, windowSec: 60 * 60 },
   /** Starting a checkout. */
   checkout: { limit: 10, windowSec: 60 * 60 },
   /** Asking for a download link after paying. */

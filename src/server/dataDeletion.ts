@@ -35,5 +35,8 @@ export function blankedLead(id: number) {
     emailOptIn: false,
     emailOptInAt: null,
     emailOptInSource: null,
+    optInCodeHash: null,
+    optInCodeExpiresAt: null,
+    optInCodeAttempts: 0,
   };
 }

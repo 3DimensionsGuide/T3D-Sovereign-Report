@@ -5,6 +5,9 @@ import { devtools } from 'zustand/middleware';
 
 export interface CalculationResults {
   leadId: number;
+  email?: string;
+  /** Where the marketing opt-in stands after the calculation. */
+  optInCode?: 'not-requested' | 'sent' | 'failed' | 'already-opted-in';
   astrology:   Record<string, unknown>;
   numerology:  Record<string, unknown>;
   humanDesign: Record<string, unknown>;

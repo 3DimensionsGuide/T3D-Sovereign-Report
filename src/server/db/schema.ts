@@ -64,6 +64,10 @@ export const leads = pgTable(
     // When and where the person ticked the marketing box (null = never, or given before we recorded it)
     emailOptInAt:     timestamp('email_opt_in_at', { withTimezone: true }),
     emailOptInSource: text('email_opt_in_source'),
+    // A pending one-time email code (keyed hash only, never the code itself)
+    optInCodeHash:      text('opt_in_code_hash'),
+    optInCodeExpiresAt: timestamp('opt_in_code_expires_at', { withTimezone: true }),
+    optInCodeAttempts:  integer('opt_in_code_attempts').default(0).notNull(),
     reportPurchased: boolean('report_purchased').default(false).notNull(),
 
     // Timestamps

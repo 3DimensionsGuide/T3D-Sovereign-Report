@@ -11,7 +11,8 @@ import { NextResponse } from 'next/server';
 import { db }    from '@/server/db';
 import { eq } from 'drizzle-orm';
 import { leads } from '@/server/db/schema';
-import { findExistingLead, optInFields, type StoredLead } from '@/server/leadMatch';
+import { findExistingLead, type StoredLead } from '@/server/leadMatch';
+import { issueOptInCode } from '@/server/optInCode';
 import { calculateNumerology }  from '@/server/engines/numerology';
 import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
@@ -136,7 +137,6 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
-        ...optInFields(existing, body.emailOptIn, new Date()),
         updatedAt:  new Date(),
       }).where(eq(leads.id, existing.id));
       leadId = existing.id;
@@ -148,16 +148,24 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
-        ...optInFields(null, body.emailOptIn, new Date()),
       }).returning({ id: leads.id });
       leadId = inserted[0]?.id;
     }
     if (!leadId) throw new Error('Database write returned no ID.');
 
+    // 5b. Marketing opt-in is only recorded after the person types back an emailed code.
+    //     Ticking the box here just sends the code.
+    let optInCode: 'not-requested' | 'sent' | 'failed' | 'already-opted-in' = 'not-requested';
+    if (body.emailOptIn === true) {
+      const issued = await issueOptInCode(leadId, email);
+      optInCode = issued === 'sent' ? 'sent' : issued === 'already-opted-in' ? 'already-opted-in' : 'failed';
+    }
+
     // 6. Return curated response (raw formulas stay server-side)
     return NextResponse.json({
       success: true,
       leadId,
+      optInCode,
       data: {
         astrology: {
           tropicalSun:       astrologyResults.tropical.sun,

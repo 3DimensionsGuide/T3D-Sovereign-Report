@@ -379,7 +379,7 @@ export default function CalculatorForm() {
         localStorage.setItem('t3d_email', data.email.toLowerCase().trim());
         localStorage.setItem('t3d_name',  [data.firstName, data.lastName].filter(Boolean).join(' '));
       }
-      setResults({ leadId:json.leadId, astrology:json.data.astrology, numerology:json.data.numerology, humanDesign:json.data.humanDesign });
+      setResults({ leadId:json.leadId, email:data.email.toLowerCase().trim(), optInCode:json.optInCode, astrology:json.data.astrology, numerology:json.data.numerology, humanDesign:json.data.humanDesign });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
       setIsCalculating(false);
@@ -583,7 +583,7 @@ export default function CalculatorForm() {
               <input type="checkbox" checked={data.emailOptIn}
                 onChange={e => { set('emailOptIn', e.target.checked); setTouched(t => ({ ...t, emailOptIn:true })); }} />
               <span className="t3d-body" style={{ fontSize:14 }}>
-                Optional: email me occasional T3D insights. No spam. Unsubscribe anytime.
+                Optional: email me occasional T3D insights. We will email you a code to confirm. No spam. Unsubscribe anytime.
               </span>
             </label>
             <p className="t3d-body" style={{ fontSize:13, color:'var(--parchment-40)', margin:0 }}>
