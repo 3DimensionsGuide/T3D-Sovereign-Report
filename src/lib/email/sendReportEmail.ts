@@ -81,7 +81,9 @@ export async function sendReportEmail({
     </div>
   `;
 
-  await resend.emails.send({
+  // Resend reports a refusal (for example an unverified domain) as a returned
+  // error, not a thrown one. Throw it so the order is not marked delivered.
+  const { error } = await resend.emails.send({
     from:    fromAddress,
     to,
     subject: `Your T3D ${productName} is ready`,
@@ -94,4 +96,5 @@ export async function sendReportEmail({
       },
     ],
   });
+  if (error) throw new Error(`Resend error: ${error.message}`);
 }
