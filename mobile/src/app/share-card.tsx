@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { success } from '@/lib/haptics';
 import { Platform, Share, StyleSheet, Switch, Text, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { captureRef } from 'react-native-view-shot';
@@ -51,7 +52,8 @@ export default function ShareCard() {
     try {
       const uri = await captureRef(cardRef, { format: 'png', quality: 1, width: 1080, height: tall ? 1920 : 1350, result: 'tmpfile' });
       const message = `${kind === 'today' ? 'My frame for today' : 'My T3D Triad'} · ${LINKS[kind]}`;
-      await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
+      const result = await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
+      if (result.action === Share.sharedAction) success();
     } catch {
       setError('We could not make the image. Please try again.');
     } finally {

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
+import { select } from '@/lib/haptics';
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -31,7 +32,10 @@ export function Segmented<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             accessibilityLabel={opt.label}
-            onPress={() => onChange(opt.value)}
+            onPress={() => {
+              if (!selected) select();
+              onChange(opt.value);
+            }}
             style={({ pressed }) => [
               styles.item,
               compact && styles.compact,

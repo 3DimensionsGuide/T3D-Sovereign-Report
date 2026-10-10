@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { select } from '@/lib/haptics';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
@@ -117,7 +118,10 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
               accessibilityRole="radio"
               accessibilityState={{ selected }}
               accessibilityLabel={c.label}
-              onPress={() => setAnswers((a) => ({ ...a, [step.key]: c.id }))}
+              onPress={() => {
+                select();
+                setAnswers((a) => ({ ...a, [step.key]: c.id }));
+              }}
               style={[styles.choice, selected && { borderColor: colors.gold, backgroundColor: colors.amethyst }]}
             >
               <Text style={styles.choiceMark}>{selected ? '●' : '○'}</Text>

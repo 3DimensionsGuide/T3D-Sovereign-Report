@@ -134,3 +134,13 @@ test('pass A: tab bar uses drawn icons that change shape when selected, and load
   const sk = read('mobile/src/components/Skeleton.tsx');
   assert.match(sk, /isReduceMotionEnabled/);
 });
+
+test('pass A: haptics are wired to buttons, segments, tabs, Decide choices and a finished share', () => {
+  const h = read('mobile/src/lib/haptics.ts');
+  for (const f of ['tap', 'select', 'success']) assert.match(h, new RegExp(`export function ${f}\\(`));
+  assert.match(read('mobile/src/components/GoldButton.tsx'), /tap\(\);/);
+  assert.match(read('mobile/src/components/Segmented.tsx'), /select\(\);/);
+  assert.match(read('mobile/src/app/(tabs)/_layout.tsx'), /tabPress: \(\) => select\(\)/);
+  assert.match(read('mobile/src/components/practice/DecideFlow.tsx'), /select\(\);/);
+  assert.match(read('mobile/src/app/share-card.tsx'), /sharedAction\) success\(\)/);
+});

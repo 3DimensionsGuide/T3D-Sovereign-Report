@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
+import { tap } from '@/lib/haptics';
 
 interface Props {
   label: string;
@@ -26,7 +27,10 @@ export function GoldButton({ label, onPress, loading = false, disabled = false, 
         accessibilityLabel={label}
         accessibilityState={{ disabled: inactive, busy: loading }}
         disabled={inactive}
-        onPress={onPress}
+        onPress={() => {
+          tap();
+          onPress();
+        }}
         onPressIn={() => animateTo(0.97)}
         onPressOut={() => animateTo(1)}
         style={[

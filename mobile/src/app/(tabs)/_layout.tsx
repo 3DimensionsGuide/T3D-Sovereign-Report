@@ -3,6 +3,7 @@ import { Redirect, Tabs } from 'expo-router';
 import { useStoreHydrated, useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts } from '@/theme/tokens';
 import { TabIcon, type TabName } from '@/components/TabIcons';
+import { select } from '@/lib/haptics';
 
 const icon = (name: TabName) => ({ color, focused }: { color: ColorValue; focused: boolean }) => (
   <TabIcon name={name} color={color as string} focused={focused} />
@@ -18,6 +19,7 @@ export default function TabsLayout() {
 
   return (
     <Tabs
+      screenListeners={{ tabPress: () => select() }}
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: colors.obsidian },
