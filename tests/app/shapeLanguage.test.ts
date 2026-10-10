@@ -76,3 +76,15 @@ test('Timeline: signal ribbon, road rail, shared markers and the copy fixes', ()
   assert.match(read('mobile/src/app/year.tsx'), /yearQuote\(/);
   assert.match(read('mobile/src/components/readings/StoplightReading.tsx'), /yearQuote\(/);
 });
+
+test('step 6: readings pieces exist and are wired', async () => {
+  const { readFileSync } = await import('node:fs');
+  const r = (p: string) => readFileSync(new URL(`../../mobile/src/${p}`, import.meta.url), 'utf8');
+  assert.match(r('components/readings/NumerologyReading.tsx'), /<RoadPath /);
+  assert.match(r('components/readings/VehicleReading.tsx'), /<VehicleSnapshot \/>/);
+  const sl = r('components/readings/StoplightReading.tsx');
+  assert.match(sl, /<StoplightCompare /);
+  assert.match(sl, /<ElementBalance /);
+  assert.match(r('components/readings/StoplightCompare.tsx'), /Different sign/);
+  assert.match(r('components/readings/StoplightCompare.tsx'), /of 3/);
+});

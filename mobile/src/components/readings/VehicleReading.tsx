@@ -4,6 +4,7 @@ import {
   Accordion as BaseAccordion, Block, Bullets, Footnote, NoteCard, ReadingStatus, SectionTitle,
 } from '@/components/ReadingBlocks';
 import type { Bridge, VehicleDetail } from '@/lib/vehicleTypes';
+import { VehicleSnapshot } from '@/components/readings/VehicleSnapshot';
 import { TimeNote } from '@/components/TimeNote';
 import { useVehicle } from '@/lib/useVehicle';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -66,6 +67,7 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
   return (
     <View style={{ gap: space.md }}>
       <TimeNote scope="vehicle" />
+      <VehicleSnapshot />
       {data.type ? (
         <>
           <SectionTitle eyebrow="YOUR MACHINERY" title="Type" note="How your energy is built to work, and what it feels like when you are on or off track." />

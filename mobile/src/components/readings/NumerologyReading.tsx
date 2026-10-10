@@ -6,6 +6,7 @@ import {
 import type {
   ChallengeCard, HiddenPassionContent, LifePathContent, NameNumberContent, NumerologyDetail, PinnacleCard,
 } from '@/lib/numerologyTypes';
+import { RoadPath } from '@/components/readings/RoadPath';
 import { useNumerology } from '@/lib/useNumerology';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, space } from '@/theme/tokens';
@@ -129,6 +130,7 @@ export function NumerologyReading({ onRefreshReady }: { onRefreshReady?: (r: { r
 function NumerologyBody({ data }: { data: NumerologyDetail }) {
   return (
     <View style={{ gap: space.md }}>
+        <RoadPath pinnacles={data.pinnacles} challenges={data.challenges} />
 
         <SectionTitle eyebrow="YOUR MISSION" title="Life Path" note="From your birth date. The direction your whole life leans toward." />
         {data.lifePath.content ? (

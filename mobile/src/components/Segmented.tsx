@@ -1,9 +1,12 @@
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
 
 export interface SegmentOption<T extends string> {
   value: T;
   label: string;
+  /** Optional drawn icon shown before the label. */
+  icon?: ReactNode;
 }
 
 /** A row of mutually exclusive choices (like iOS segmented control), 52pt tall. */
@@ -36,7 +39,10 @@ export function Segmented<T extends string>({
               pressed && !selected && styles.pressed,
             ]}
           >
-            <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
+            <View style={styles.inner}>
+              {opt.icon}
+              <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
+            </View>
           </Pressable>
         );
       })}
@@ -62,6 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm + 2,
   },
   compact: { minHeight: 44 },
+  inner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   selected: { backgroundColor: colors.gold },
   pressed: { backgroundColor: colors.amethyst },
   label: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.4, color: colors.parchmentMuted },

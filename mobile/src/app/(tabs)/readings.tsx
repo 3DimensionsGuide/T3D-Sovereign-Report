@@ -1,45 +1,49 @@
-import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { Segmented } from '@/components/Segmented';
+import { LENS_COLOR, LensIcon, LensLabel } from '@/components/Lens';
+import { ReadingContents, ReadingJumpProvider, ReadingLensProvider } from '@/components/ReadingBlocks';
 import { NumerologyReading } from '@/components/readings/NumerologyReading';
 import { StoplightReading } from '@/components/readings/StoplightReading';
 import { VehicleReading } from '@/components/readings/VehicleReading';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const OPTIONS = [
-  { value: 'vehicle', label: 'VEHICLE' },
-  { value: 'road', label: 'ROAD' },
-  { value: 'stoplight', label: 'STOPLIGHT' },
+  { value: 'vehicle', label: 'VEHICLE', icon: <LensIcon lens="vehicle" size={13} /> },
+  { value: 'road', label: 'ROAD', icon: <LensIcon lens="road" size={13} /> },
+  { value: 'stoplight', label: 'STOPLIGHT', icon: <LensIcon lens="stoplight" size={13} /> },
 ] as const;
 
 type Lens = (typeof OPTIONS)[number]['value'];
 
 const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; accent: string }> = {
   vehicle: {
-    eyebrow: 'THE VEHICLE',
+    eyebrow: 'The Vehicle',
     title: 'Human Design',
     sub: 'The machinery you drive: how your energy works and how you decide.',
-    accent: colors.vehicle,
+    accent: LENS_COLOR.vehicle,
   },
   road: {
-    eyebrow: 'THE ROAD',
+    eyebrow: 'The Road',
     title: 'Numerology',
     sub: 'What your numbers mean, and how they work together.',
-    accent: colors.road,
+    accent: LENS_COLOR.road,
   },
   stoplight: {
-    eyebrow: 'THE STOPLIGHT',
+    eyebrow: 'The Stoplight',
     title: 'Astrology',
     sub: 'Your sky at birth, and where you are in time.',
-    accent: colors.stoplight,
+    accent: LENS_COLOR.stoplight,
   },
 };
 
 export default function Readings() {
   const [lens, setLens] = useState<Lens>('vehicle');
   const head = HEADINGS[lens];
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollOffset = useRef(0);
   const [refresher, setRefresher] = useState<{ run: () => Promise<void> } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
@@ -48,22 +52,27 @@ export default function Readings() {
   }, [refresher]);
 
   return (
-    <Screen refreshing={refreshing} onRefresh={onRefresh}>
-      <FadeIn>
-        <View style={styles.header}>
-          <Text style={[styles.eyebrow, { color: head.accent }]}>{head.eyebrow}</Text>
-          <Text accessibilityRole="header" style={styles.title}>{head.title}</Text>
-          <Text style={styles.sub}>{head.sub}</Text>
-        </View>
-      </FadeIn>
-      <Segmented options={OPTIONS} value={lens} onChange={setLens} />
-      {lens === 'vehicle' ? (
-        <VehicleReading onRefreshReady={setRefresher} />
-      ) : lens === 'road' ? (
-        <NumerologyReading onRefreshReady={setRefresher} />
-      ) : (
-        <StoplightReading onRefreshReady={setRefresher} />
-      )}
+    <Screen refreshing={refreshing} onRefresh={onRefresh} scrollRef={scrollRef} scrollOffset={scrollOffset}>
+      <ReadingLensProvider value={lens}>
+        <ReadingJumpProvider scrollRef={scrollRef} scrollOffset={scrollOffset}>
+          <FadeIn>
+            <View style={styles.header}>
+              <LensLabel lens={lens}>{head.eyebrow}</LensLabel>
+              <Text accessibilityRole="header" style={styles.title}>{head.title}</Text>
+              <Text style={styles.sub}>{head.sub}</Text>
+            </View>
+          </FadeIn>
+          <Segmented options={OPTIONS} value={lens} onChange={setLens} />
+          <ReadingContents />
+          {lens === 'vehicle' ? (
+            <VehicleReading onRefreshReady={setRefresher} />
+          ) : lens === 'road' ? (
+            <NumerologyReading onRefreshReady={setRefresher} />
+          ) : (
+            <StoplightReading onRefreshReady={setRefresher} />
+          )}
+        </ReadingJumpProvider>
+      </ReadingLensProvider>
     </Screen>
   );
 }

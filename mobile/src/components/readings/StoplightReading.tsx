@@ -4,6 +4,7 @@ import {
   Accordion as BaseAccordion, Block, Bullets, Footnote, NoteCard, ReadingStatus, SectionTitle,
 } from '@/components/ReadingBlocks';
 import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, StoplightPlanet } from '@/lib/stoplightTypes';
+import { ElementBalance, StoplightCompare } from '@/components/readings/StoplightCompare';
 import { useStoplight } from '@/lib/useStoplight';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -131,6 +132,11 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
   return (
     <View style={{ gap: space.md }}>
       {data.timeNote ? <NoteCard text={data.timeNote} /> : null}
+
+      <SectionTitle eyebrow="AT A GLANCE" title="Two lenses, side by side" note="Most Western charts use the tropical lens. Some traditions use sidereal, which is based on the visible stars." />
+      <StoplightCompare tropical={data.tropical} sidereal={data.sidereal} />
+      <SectionTitle eyebrow="YOUR BALANCE" title="Elements in your Big Three" />
+      <ElementBalance lens={data.tropical} />
 
       <SectionTitle eyebrow="YOUR SKY AT BIRTH" title="Your Big Three" note={data.lensNote} />
       <BigThree lens={data.tropical} prefix="Tropical" />
