@@ -45,29 +45,29 @@
     "notes": ""
   },
   "kathmandu-2012": {
-    "astroCom": "unchecked",
+    "astroCom": "match",
     "jovian": "unchecked",
-    "notes": ""
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+5:45, same as ours."
   },
   "moscow-1950": {
-    "astroCom": "unchecked",
+    "astroCom": "match",
     "jovian": "unchecked",
-    "notes": ""
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+3, same as ours. Midheaven differs by about 1.3 arc-minutes because of city coordinates (Astro.com 55n45, 37e35)."
   },
   "berlin-dstgap-1993": {
-    "astroCom": "unchecked",
+    "astroCom": "match",
     "jovian": "unchecked",
-    "notes": ""
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com also treats 02:30 as non-existent and assumes unchanged clock (UT 01:30), same as ours. Sidereal (Lahiri) spot-checked: matches."
   },
   "nyc-ambiguous-2005": {
-    "astroCom": "unchecked",
+    "astroCom": "match",
     "jovian": "unchecked",
-    "notes": ""
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com picks the first 1:30 (daylight time, UT 05:30), same as ours."
   },
   "paris-1920": {
-    "astroCom": "unchecked",
+    "astroCom": "match",
     "jovian": "unchecked",
-    "notes": ""
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+0, same as ours. Ascendant differs by about 1.2 arc-minutes because of city coordinates."
   },
   "london-equinox-2024": {
     "astroCom": "unchecked",
@@ -94,9 +94,9 @@
     "jovian": "unchecked",
     "notes": ""
   },
-  "singapore-1985": {
-    "astroCom": "unchecked",
+  "singapore-1975": {
+    "astroCom": "match",
     "jovian": "unchecked",
-    "notes": ""
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+7:30, same as ours. Midheaven differs by about 1.8 arc-minutes because Astro.com places Singapore at 1n16, 103e51."
   }
 }
