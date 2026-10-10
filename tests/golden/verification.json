@@ -46,8 +46,8 @@
   },
   "kathmandu-2012": {
     "astroCom": "match",
-    "jovian": "unchecked",
-    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+5:45, same as ours."
+    "jovian": "match",
+    "notes": "Checked 2026-10-09 on Astro.com (Whole Sign, True Node, Tropical): all planets and nodes match to within an arc-second or two. Asc/MC agree within about 1 arc-minute; the small gap comes from Astro.com using slightly different city coordinates. Astro.com uses the same Swiss Ephemeris, so this confirms time zone, daylight saving and settings, not independent astronomy. Astro.com uses UT+5:45, same as ours. Jovian Archive (checked 2026-10-09): Generator, Sacral, 2/4, Right Angle Cross of the Vessel of Love, centers and channels 16-48, 5-15 match. Jovian uses 05:26 UTC for 11:11 local (UTC+5:45), same as ours."
   },
   "moscow-1950": {
     "astroCom": "match",
