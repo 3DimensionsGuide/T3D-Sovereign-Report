@@ -5,6 +5,7 @@ import {
 } from '@/components/ReadingBlocks';
 import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, StoplightPlanet } from '@/lib/stoplightTypes';
 import { useStoplight } from '@/lib/useStoplight';
+import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, space } from '@/theme/tokens';
 
@@ -200,7 +201,7 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
       >
         <Block label="YOUR YEAR'S ARENA" text={data.lordOfYear.houseTheme} />
         <Block label="THE SIGN ON THIS HOUSE" text={`${data.lordOfYear.sign}, ruled by ${data.lordOfYear.lord}.`} />
-        <Block label="ITS RULER" text={data.lordOfYear.lordQuote} />
+        <Block label="ITS RULER" text={data.lordOfYear.lordQuote ? yearQuote(data.lordOfYear.lordQuote) : data.lordOfYear.lordQuote} />
       </Accordion>
 
       <SectionTitle

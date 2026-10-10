@@ -5,7 +5,9 @@ import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { Segmented } from '@/components/Segmented';
-import { aspectWord, bodyName, houseTheme, natalName, ordinal } from '@/lib/skyText';
+import { aspectWord, bodyName, capFirst, houseTheme, natalName, ordinal } from '@/lib/skyText';
+import { LENS_TEXT, LensIcon, LensLabel, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
+import { SignalRibbon } from '@/components/SignalRibbon';
 import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineResult } from '@/lib/timelineTypes';
 import { useTimeline } from '@/lib/useTimeline';
 import { OfflineNote } from '@/components/OfflineNote';
@@ -29,12 +31,12 @@ const FILTER_KINDS: Record<Filter, readonly TimelineKind[] | null> = {
 };
 
 const KIND_LABEL: Record<TimelineKind, string> = {
-  lunation: 'MOON PHASE',
-  eclipse: 'ECLIPSE',
-  station: 'STATION',
-  ingress: 'SIGN CHANGE',
-  transit: 'TRANSIT',
-  return: 'RETURN',
+  lunation: 'Moon phase',
+  eclipse: 'Eclipse',
+  station: 'Station',
+  ingress: 'Sign change',
+  transit: 'Transit',
+  return: 'Return',
 };
 
 const KIND_GLYPH: Record<TimelineKind, string> = {
@@ -46,7 +48,16 @@ const KIND_GLYPH: Record<TimelineKind, string> = {
   return: '↻',
 };
 
-const NATURE_LABEL = { flow: '◯  Flow', friction: '◼  Friction', neutral: '◇  Neutral' } as const;
+const NATURE_KIND: Record<ActiveSeason['nature'], SignalKind> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
+
+function NatureTag({ nature }: { nature: ActiveSeason['nature'] }) {
+  return (
+    <View style={styles.natureTag}>
+      <SignalMarker kind={NATURE_KIND[nature]} size={14} />
+      <Text style={styles.natureWord}>{SIGNAL_LABEL[NATURE_KIND[nature]]}</Text>
+    </View>
+  );
+}
 
 function numLabel(n: number): string {
   if (n === 11) return '11/2';
@@ -78,10 +89,13 @@ function timeOf(at: string): string {
   return new Date(at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
 
-function Panel({ children, label }: { children: React.ReactNode; label: string }) {
+function Panel({ children, label, lens }: { children: React.ReactNode; label: string; lens: LensName }) {
   return (
     <View style={styles.panel}>
-      <Text accessibilityRole="header" style={styles.panelLabel}>{label}</Text>
+      <View style={styles.panelHead}>
+        <LensIcon lens={lens} size={13} />
+        <Text accessibilityRole="header" style={[styles.panelLabel, { color: LENS_TEXT[lens] }]}>{label}</Text>
+      </View>
       {children}
     </View>
   );
@@ -94,14 +108,14 @@ function YearCard({ data }: { data: TimelineResult }) {
   const p = data.profection;
   return (
     <FadeIn>
-      <Panel label="YOUR YEAR">
+      <Panel label="Your year" lens="road">
         <View style={styles.block}>
           <Text style={styles.blockTitle}>
             Lord of the Year: {bodyName(p.lord)}
           </Text>
           <Text style={styles.blockBody}>
             Your {ordinal(p.house)} house ({p.sign}) is activated from {shortDate(p.startsOn)} to{' '}
-            {shortDate(p.endsOn)}. {houseTheme(p.house)}
+            {shortDate(p.endsOn)}. {capFirst(houseTheme(p.house))}
           </Text>
         </View>
         {py ? (
@@ -146,14 +160,14 @@ function SeasonRow({ s }: { s: ActiveSeason }) {
   return (
     <View
       accessible
-      accessibilityLabel={`${phrase}. ${NATURE_LABEL[s.nature].replace(/[^A-Za-z]/g, '')}. In effect ${shortDate(s.windowStart)} to ${shortDate(s.windowEnd)}. ${reaches}.`}
+      accessibilityLabel={`${phrase}. ${SIGNAL_LABEL[NATURE_KIND[s.nature]]}. In effect ${shortDate(s.windowStart)} to ${shortDate(s.windowEnd)}. ${reaches}.`}
       style={[styles.season, s.nature === 'friction' && styles.seasonFriction]}
     >
       <Text style={styles.seasonTitle}>{phrase}{s.lord ? '  ★' : ''}</Text>
       <Text style={styles.seasonMeta}>
         In effect {shortDate(s.windowStart)} to {shortDate(s.windowEnd)} · {reaches}
       </Text>
-      <Text style={styles.seasonNature}>{NATURE_LABEL[s.nature]}</Text>
+      <NatureTag nature={s.nature} />
     </View>
   );
 }
@@ -179,7 +193,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
         <Text style={styles.chevron}>{open ? '–' : '+'}</Text>
       </View>
       {e.kind === 'transit' || e.kind === 'return' ? (
-        <Text style={styles.eventNature}>{NATURE_LABEL[e.nature]}</Text>
+        <NatureTag nature={e.nature} />
       ) : null}
       {flags.length ? <Text style={styles.eventFlags}>{flags.join('   ')}</Text> : null}
       {open ? (
@@ -233,7 +247,7 @@ export default function Timeline() {
     <Screen refreshing={refreshing} onRefresh={refresh}>
       <FadeIn>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>THE ROAD AHEAD</Text>
+          <LensLabel lens="road">The road ahead</LensLabel>
           <Text accessibilityRole="header" style={styles.title}>Timeline</Text>
           <Text style={styles.sub}>The next 60 days, measured against your own chart.</Text>
         </View>
@@ -252,11 +266,14 @@ export default function Timeline() {
       ) : data ? (
         <>
           {offline ? <OfflineNote savedAt={savedAt} /> : null}
+          <FadeIn delay={40}>
+            <SignalRibbon data={data} />
+          </FadeIn>
           <YearCard data={data} />
 
           {data.seasons.length > 0 ? (
             <FadeIn delay={100}>
-              <Panel label="SEASONS IN EFFECT">
+              <Panel label="Seasons in effect" lens="stoplight">
                 {data.seasons.map((s, i) => (
                   <SeasonRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={s} />
                 ))}
@@ -277,6 +294,7 @@ export default function Timeline() {
             groups.map(([day, events]) => (
               <View key={day} style={styles.day}>
                 <View style={styles.dayHead}>
+                  <View style={[styles.node, day === groups[0]?.[0] && styles.nodeFirst]} />
                   <Text accessibilityRole="header" style={styles.dayTitle}>{longDate(day)}</Text>
                   {personalByDate.get(day) ? (
                     <Text style={styles.dayBadge}>Personal Day {numLabel(personalByDate.get(day)!)}</Text>
@@ -316,7 +334,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.hairline,
   },
-  panelLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.gold },
+  panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  panelLabel: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
+  natureTag: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  natureWord: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchment },
   block: { gap: 4 },
   blockTitle: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchment },
   blockBody: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
@@ -327,14 +348,16 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: colors.amethyst,
     borderLeftWidth: 4,
-    borderLeftColor: colors.road,
+    borderLeftColor: '#4FD1B5',
   },
-  seasonFriction: { borderLeftColor: colors.stoplight },
+  seasonFriction: { borderLeftColor: '#F0836B' },
   seasonTitle: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchment },
   seasonMeta: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
   seasonNature: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.5, color: colors.parchment },
-  day: { gap: space.sm, marginTop: space.sm },
+  day: { gap: space.sm, marginTop: space.sm, marginLeft: 8, paddingLeft: 18, borderLeftWidth: 2, borderLeftColor: 'rgba(31,138,77,0.55)' },
   dayHead: { gap: 2 },
+  node: { position: 'absolute', left: -28, top: 7, width: 14, height: 14, borderRadius: 7, backgroundColor: colors.obsidian, borderWidth: 3, borderColor: '#1F8A4D' },
+  nodeFirst: { backgroundColor: colors.gold, borderColor: colors.gold },
   dayTitle: { fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
   dayBadge: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.6, color: colors.gold },
   event: {
@@ -350,7 +373,7 @@ const styles = StyleSheet.create({
   eventHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   eventGlyph: { width: 28, fontSize: 22, color: colors.gold, textAlign: 'center' },
   eventTitleWrap: { flex: 1, gap: 2 },
-  eventKind: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, color: colors.parchmentMuted },
+  eventKind: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   eventTitle: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 22, color: colors.parchment },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 20, color: colors.parchmentMuted, width: 24, textAlign: 'center' },
   eventNature: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.5, color: colors.parchmentMuted },

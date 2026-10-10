@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoldButton } from '@/components/GoldButton';
 import { OfflineNote } from '@/components/OfflineNote';
 import { useTimeline } from '@/lib/useTimeline';
+import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
@@ -75,7 +76,7 @@ export default function YearAheadScreen() {
                 </Text>
                 <Text style={styles.body}>{y.topic.theme}</Text>
                 <Text style={styles.cardTitle}>Lord of the Year: {y.topic.lord}</Text>
-                {y.topic.lordQuote ? <Text style={styles.body}>{y.topic.lordQuote}</Text> : null}
+                {y.topic.lordQuote ? <Text style={styles.body}>{yearQuote(y.topic.lordQuote)}</Text> : null}
               </View>
 
               <View style={[styles.card, { borderLeftColor: colors.road }]}>

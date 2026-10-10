@@ -83,3 +83,12 @@ export function moonGlyph(phase: string): string {
     default: return '🌘';
   }
 }
+
+/** Capitalises the first letter, for lines that are joined after a full stop. */
+export const capFirst = (text: string): string => (text ? text.charAt(0).toUpperCase() + text.slice(1) : text);
+
+/**
+ * The Lord of the Year line comes from the ten-year Firdaria texts ("A decade ruled by ..."),
+ * which is the wrong span for a one-year house. This rewrites it to a year.
+ */
+export const yearQuote = (quote: string): string => quote.replace(/^A decade ruled by/, 'A year ruled by');

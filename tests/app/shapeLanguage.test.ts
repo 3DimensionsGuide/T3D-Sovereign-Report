@@ -65,3 +65,14 @@ test('onboarding asks one question at a time, shows the calculation, and the wel
   assert.match(read('mobile/src/app/welcome.tsx'), /<TriadSeal /);
   assert.match(read('mobile/src/components/CalculatingView.tsx'), /isReduceMotionEnabled/);
 });
+
+test('Timeline: signal ribbon, road rail, shared markers and the copy fixes', () => {
+  const timeline = read('mobile/src/app/(tabs)/timeline.tsx');
+  assert.match(timeline, /<SignalRibbon /);
+  assert.ok(!timeline.includes('NATURE_LABEL'));
+  assert.match(timeline, /capFirst\(houseTheme/);
+  const sky = read('mobile/src/lib/skyText.ts');
+  assert.match(sky, /A year ruled by/);
+  assert.match(read('mobile/src/app/year.tsx'), /yearQuote\(/);
+  assert.match(read('mobile/src/components/readings/StoplightReading.tsx'), /yearQuote\(/);
+});
