@@ -85,9 +85,13 @@ export interface ChartResult {
   };
 }
 
+/** What happened to the optional "email me insights" code (only present if they ticked the switch). */
+export type OptInCodeStatus = 'not-requested' | 'sent' | 'failed' | 'already-opted-in';
+
 interface ApiSuccess {
   success: true;
   leadId: number;
+  optInCode?: OptInCodeStatus;
   data: Omit<ChartResult, 'leadId'>;
 }
 
@@ -100,7 +104,7 @@ export class ChartRequestError extends Error {}
 
 const REQUEST_TIMEOUT_MS = 45000;
 
-export async function requestChart(profile: BirthProfile): Promise<ChartResult> {
+export async function requestChart(profile: BirthProfile): Promise<{ chart: ChartResult; optInCode: OptInCodeStatus }> {
   let response: Response;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -144,7 +148,7 @@ export async function requestChart(profile: BirthProfile): Promise<ChartResult> 
   if (!payload.success) {
     throw new ChartRequestError(payload.error || 'The calculation failed. Please try again.');
   }
-  return { leadId: payload.leadId, ...payload.data };
+  return { chart: { leadId: payload.leadId, ...payload.data }, optInCode: payload.optInCode ?? 'not-requested' };
 }
 
 const SIGNS = [
@@ -445,6 +449,16 @@ async function postApp<T>(path: string, body: Record<string, unknown>, failure: 
   }
   if (!payload.success) throw new ChartRequestError(payload.error || failure);
   return payload.data;
+}
+
+/** Emails a fresh 6-digit code for the optional insights list. */
+export function requestOptInCode(leadId: number, email: string): Promise<void> {
+  return postApp<void>('/api/email-optin/send', { leadId, email }, 'We could not send the code. Please try again.');
+}
+
+/** Checks the emailed code. Only a correct code records the opt-in. */
+export function confirmOptInCode(leadId: number, email: string, code: string): Promise<void> {
+  return postApp<void>('/api/email-optin/confirm', { leadId, email, code }, 'That code did not work. Please try again.');
 }
 
 /** One glossary entry ("tap any term"), with an "In your chart" line. */

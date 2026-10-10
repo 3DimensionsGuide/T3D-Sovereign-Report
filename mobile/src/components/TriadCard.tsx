@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Term } from '@/components/Explain';
+import { LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 export interface TriadRow {
@@ -27,7 +28,7 @@ export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
       style={[styles.card, { borderLeftColor: accent }]}
     >
       <View style={styles.header}>
-        <Text style={[styles.glyph, { color: accent }]}>{glyph}</Text>
+        {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={26} color={accent} /> : <Text style={[styles.glyph, { color: accent }]}>{glyph}</Text>}
         <View>
           <Text style={styles.metaphor}>{metaphor}</Text>
           <Text style={styles.system}>{system}</Text>

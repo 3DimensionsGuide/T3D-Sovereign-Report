@@ -8,7 +8,7 @@ import { FadeIn } from '@/components/FadeIn';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import {
-  ChartRequestError, requestChart, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
+  ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
 } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
@@ -47,6 +47,11 @@ export default function Onboarding() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  /** Set after the chart is built, when the person asked for emails and a code was sent. */
+  const [codeStep, setCodeStep] = useState<{ leadId: number; email: string; notice: string | null } | null>(null);
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [codeBusy, setCodeBusy] = useState(false);
   const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
   const [chosen, setChosen] = useState(0);
   const onDateChange = (_event: unknown, value: Date) => setBirthDate(value);
@@ -110,9 +115,17 @@ export default function Onboarding() {
 
     setLoading(true);
     try {
-      const chart = await requestChart(profile);
+      const { chart, optInCode } = await requestChart(profile);
       setChart(profile, chart);
-      router.replace('/today');
+      if (profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')) {
+        setCodeStep({
+          leadId: chart.leadId,
+          email: profile.email,
+          notice: optInCode === 'failed' ? 'We could not send the code just now. Tap "Send a new code" to try again.' : null,
+        });
+      } else {
+        router.replace('/today');
+      }
     } catch (error) {
       setSubmitError(
         error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
@@ -120,6 +133,62 @@ export default function Onboarding() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onConfirmCode() {
+    if (!codeStep) return;
+    setCodeError(null);
+    setCodeBusy(true);
+    try {
+      await confirmOptInCode(codeStep.leadId, codeStep.email, code.trim());
+      router.replace('/today');
+    } catch (error) {
+      setCodeError(error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.');
+    } finally {
+      setCodeBusy(false);
+    }
+  }
+
+  async function onResendCode() {
+    if (!codeStep) return;
+    setCodeError(null);
+    setCodeBusy(true);
+    try {
+      await requestOptInCode(codeStep.leadId, codeStep.email);
+      setCodeStep({ ...codeStep, notice: 'A new code is on its way. It can take a minute to arrive.' });
+    } catch (error) {
+      setCodeError(error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.');
+    } finally {
+      setCodeBusy(false);
+    }
+  }
+
+  if (codeStep) {
+    return (
+      <Screen>
+        <FadeIn>
+          <View style={styles.hero}>
+            <Text style={styles.eyebrow}>ONE LAST STEP</Text>
+            <Text accessibilityRole="header" style={styles.title}>Check your email</Text>
+            <Text style={styles.lede}>
+              We sent a 6-digit code to {codeStep.email}. Type it below to confirm you want occasional T3D insights.
+              Your chart is already ready, so you can skip this and nothing is lost.
+            </Text>
+          </View>
+        </FadeIn>
+        <View style={styles.form}>
+          <Field label="6-digit code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))}
+            keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" textContentType="oneTimeCode"
+            error={codeError ?? undefined} placeholder="123456"
+            why={codeStep.notice ?? 'The code works for 15 minutes.'} />
+        </View>
+        <View style={styles.actions}>
+          <GoldButton label="CONFIRM" onPress={onConfirmCode} loading={codeBusy} disabled={code.length !== 6} />
+          <GoldButton label="SEND A NEW CODE" variant="ghost" onPress={onResendCode} disabled={codeBusy} />
+          <GoldButton label="SKIP FOR NOW" variant="ghost" onPress={() => router.replace('/today')} disabled={codeBusy} />
+        </View>
+      </Screen>
+    );
   }
 
   if (candidates) {
