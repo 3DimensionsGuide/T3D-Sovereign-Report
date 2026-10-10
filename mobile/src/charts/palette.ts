@@ -14,7 +14,7 @@ export const chartColors = {
   personality: '#F5F5F3',
   design: '#E0605C',
   /** Aspect line colors (always also distinguished by dash style + legend). */
-  flow: '#5FD39A',
-  friction: '#F08A84',
+  flow: '#4FD1B5',
+  friction: '#F0836B',
   conjunction: '#D4AF37',
 } as const;

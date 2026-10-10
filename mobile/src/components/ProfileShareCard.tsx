@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { formatLongitude, type ChartResult } from '@/lib/api';
 import { Glow } from '@/components/Glow';
-import { LensIcon, lensFromGlyph } from '@/components/Lens';
+import { LENS_TEXT, LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts } from '@/theme/tokens';
 
 /** Logical size of the card. It is saved as a 1080 x 1350 image (4:5). */
@@ -24,7 +24,7 @@ function Row({ glyph, accent, label, main, sub }: { glyph: string; accent: strin
     <View style={[styles.row, { borderLeftColor: accent }]}>
       <View style={styles.labelRow}>
         {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={11} color={accent} /> : null}
-        <Text style={[styles.rowLabel, { color: accent }]}>{label}</Text>
+        <Text style={[styles.rowLabel, { color: lensFromGlyph(glyph) ? LENS_TEXT[lensFromGlyph(glyph)!] : accent }]}>{label}</Text>
       </View>
       <Text style={styles.rowMain}>{main}</Text>
       {sub ? <Text style={styles.rowSub}>{sub}</Text> : null}

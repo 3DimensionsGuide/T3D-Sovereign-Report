@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Term, TermPressable } from '@/components/Explain';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TermPressable, useExplain } from '@/components/Explain';
+import { LENS_TEXT, LensIcon, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
 import { aspectId, centerId, channelId, gateId, natalId } from '@/lib/termIds';
 import { buildBodygraphScene } from '@/charts/bodygraph';
 import { chartColors } from '@/charts/palette';
-import type { BodygraphData, WheelChart } from '@/charts/chartTypes';
+import type { BodygraphData, WheelAspect, WheelBody, WheelChart } from '@/charts/chartTypes';
 import { ASPECT_NAMES, BODY_GLYPHS, BODY_NAMES, buildWheelScene } from '@/charts/wheel';
 import { Segmented } from '@/components/Segmented';
 import { SceneView } from '@/components/SceneView';
@@ -12,14 +13,21 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 
 // ───────────────────────── shared bits ─────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, lens, children }: { title: string; lens: LensName; children: React.ReactNode }) {
   return (
     <View style={styles.section}>
-      <Text accessibilityRole="header" style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.sectionHead}>
+        <LensIcon lens={lens} size={13} />
+        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: LENS_TEXT[lens] }]}>{title}</Text>
+      </View>
       {children}
     </View>
   );
 }
+
+const ASPECT_SIGNAL: Record<WheelAspect, SignalKind> = {
+  trine: 'flow', sextile: 'flow', square: 'friction', opposition: 'friction', conjunction: 'neutral',
+};
 
 function KeyItem({ swatch, label }: { swatch: React.ReactNode; label: string }) {
   return (
@@ -49,6 +57,9 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
   const [zodiac, setZodiac] = useState<'tropical' | 'sidereal'>('tropical');
   const chart = zodiac === 'tropical' ? tropical : sidereal;
   const scene = useMemo(() => buildWheelScene(chart), [chart]);
+  const { open } = useExplain();
+  const [figureWidth, setFigureWidth] = useState(0);
+  const scale = figureWidth / scene.w;
   const sun = chart.planets.find((p) => p.body === 'sun');
   const moon = chart.planets.find((p) => p.body === 'moon');
   const label =
@@ -58,22 +69,32 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
   return (
     <View style={styles.panel}>
       <Segmented options={ZODIAC_OPTIONS} value={zodiac} onChange={setZodiac} compact />
-      <View style={styles.figure}>
+      <View style={styles.figure} onLayout={(e) => setFigureWidth(e.nativeEvent.layout.width)}>
         <SceneView scene={scene} label={label} />
+        {scale > 0 ? scene.hotspots?.map((h) => (
+          <Pressable
+            key={h.key}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+            onPress={() => open(natalId(h.key as WheelBody))}
+            style={[styles.hotspot, { left: h.x * scale - 22, top: h.y * scale - 22 }]}
+          />
+        )) : null}
       </View>
+      <Text style={styles.note}>Tap any planet on the wheel to learn what it means in your chart.</Text>
 
       <View style={styles.keyRow}>
-        <KeyItem swatch={<Dash color={chartColors.flow} />} label="Trine (flow)" />
-        <KeyItem swatch={<Dash color={chartColors.flow} dashed />} label="Sextile (flow)" />
-        <KeyItem swatch={<Dash color={chartColors.friction} />} label="Square (friction)" />
-        <KeyItem swatch={<Dash color={chartColors.friction} dashed />} label="Opposition (friction)" />
-        <KeyItem swatch={<Dash color={chartColors.conjunction} />} label="Conjunction" />
+        <KeyItem swatch={<><Dash color={chartColors.flow} /><SignalMarker kind="flow" size={14} /></>} label="Trine · flow" />
+        <KeyItem swatch={<><Dash color={chartColors.flow} dashed /><SignalMarker kind="flow" size={14} /></>} label="Sextile · flow" />
+        <KeyItem swatch={<><Dash color={chartColors.friction} /><SignalMarker kind="friction" size={14} /></>} label="Square · friction" />
+        <KeyItem swatch={<><Dash color={chartColors.friction} dashed /><SignalMarker kind="friction" size={14} /></>} label="Opposition · friction" />
+        <KeyItem swatch={<><Dash color={chartColors.conjunction} /><SignalMarker kind="neutral" size={14} /></>} label="Conjunction · neutral" />
       </View>
       <Text style={styles.note}>
         Whole-sign houses, counted from your rising sign. Thicker lines are within 1° of exact.
       </Text>
 
-      <Section title="PLANETS & POINTS">
+      <Section title="Planets and points" lens="stoplight">
         {chart.planets.map((p) => (
           <TermPressable key={p.body} id={natalId(p.body)} style={styles.row} label={
             `${BODY_NAMES[p.body]} in ${p.formatted}, house ${p.house}${p.retrograde ? ', retrograde' : ''}`}>
@@ -86,12 +107,14 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
         ))}
       </Section>
 
-      <Section title="ASPECTS">
+      <Section title="Aspects" lens="stoplight">
         {chart.aspects.length === 0 ? (
           <Text style={styles.note}>No major aspects within 3°.</Text>
         ) : (
           chart.aspects.map((a, i) => (
-            <TermPressable key={`${a.a}-${a.b}-${i}`} id={aspectId(a.aspect)} style={styles.row}>
+            <TermPressable key={`${a.a}-${a.b}-${i}`} id={aspectId(a.aspect)} style={styles.row}
+              label={`${pointName(a.a)} ${ASPECT_NAMES[a.aspect]} ${pointName(a.b)}. ${SIGNAL_LABEL[ASPECT_SIGNAL[a.aspect]]}. ${a.orb.toFixed(1)} degrees${a.peak ? ', exact' : ''}`}>
+              <SignalMarker kind={ASPECT_SIGNAL[a.aspect]} size={15} />
               <Text style={styles.aspectText}>
                 {pointName(a.a)} · {ASPECT_NAMES[a.aspect]} · {pointName(a.b)}
               </Text>
@@ -136,7 +159,7 @@ export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
       </View>
 
       <View style={styles.figure}>
-        <SceneView scene={scene} label={label} />
+        <SceneView scene={scene} label={label} reveal />
       </View>
 
       <View style={styles.keyRow}>
@@ -148,22 +171,14 @@ export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
         <KeyItem swatch={<Dot fill={colors.charcoal} ring={colors.parchment} />} label="Open center" />
       </View>
 
-      <Section title="CENTERS">
-        <Text style={styles.paragraph}>
-          <Text style={styles.strong}>Defined: </Text>
-          {hd.definedCenters.length ? hd.definedCenters.map((c, i) => (
-            <Text key={c}>{i > 0 ? ', ' : ''}<Term id={centerId(c)}>{CENTER_NAMES[c] ?? c}</Term></Text>
-          )) : 'None'}
-        </Text>
-        <Text style={styles.paragraph}>
-          <Text style={styles.strong}>Open: </Text>
-          {hd.undefinedCenters.length ? hd.undefinedCenters.map((c, i) => (
-            <Text key={c}>{i > 0 ? ', ' : ''}<Term id={centerId(c)}>{CENTER_NAMES[c] ?? c}</Term></Text>
-          )) : 'None'}
-        </Text>
+      <Section title={`Defined centers (${hd.definedCenters.length})`} lens="vehicle">
+        <CenterChips ids={hd.definedCenters} defined />
+      </Section>
+      <Section title={`Open centers (${hd.undefinedCenters.length})`} lens="vehicle">
+        <CenterChips ids={hd.undefinedCenters} defined={false} />
       </Section>
 
-      <Section title={`CHANNELS (${hd.channels.length})`}>
+      <Section title={`Channels (${hd.channels.length})`} lens="vehicle">
         {hd.channels.length === 0 ? (
           <Text style={styles.note}>No complete channels. All gates are hanging.</Text>
         ) : (
@@ -176,11 +191,11 @@ export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
         )}
       </Section>
 
-      <Section title="PERSONALITY GATES (CONSCIOUS)">
-        <GateList gates={byEpoch('personality')} />
-      </Section>
-      <Section title="DESIGN GATES (UNCONSCIOUS)">
-        <GateList gates={byEpoch('design')} />
+      <Section title="Gates" lens="vehicle">
+        <View style={styles.twoCol}>
+          <GateColumn title="Personality" sub="conscious" swatch={<Dot fill={chartColors.personality} />} gates={byEpoch('personality')} />
+          <GateColumn title="Design" sub="unconscious" swatch={<Dot fill={chartColors.design} />} gates={byEpoch('design')} />
+        </View>
       </Section>
     </View>
   );
@@ -192,15 +207,36 @@ const PLANET_LABEL: Record<string, string> = {
   northNode: 'North Node', southNode: 'South Node',
 };
 
-function GateList({ gates }: { gates: BodygraphData['gates'] }) {
+function GateColumn({ title, sub, swatch, gates }: { title: string; sub: string; swatch: React.ReactNode; gates: BodygraphData['gates'] }) {
   return (
-    <View style={styles.gateWrap}>
+    <View style={styles.gateCol}>
+      <View style={styles.gateColHead}>
+        {swatch}
+        <View>
+          <Text style={styles.gateColTitle}>{title}</Text>
+          <Text style={styles.gateColSub}>{sub}</Text>
+        </View>
+      </View>
       {gates.map((g, i) => (
-        <TermPressable key={`${g.planet}-${i}`} id={gateId(g.gate)} style={styles.gateChip}
+        <TermPressable key={`${g.planet}-${i}`} id={gateId(g.gate)} style={styles.gateRow}
           label={`${PLANET_LABEL[g.planet] ?? g.planet}, gate ${g.gate} line ${g.line}`}>
-          <Text style={styles.gateChipText}>
-            {PLANET_LABEL[g.planet] ?? g.planet} <Text style={styles.gateNum}>{g.gate}.{g.line}</Text>
-          </Text>
+          <Text style={styles.gatePlanet}>{PLANET_LABEL[g.planet] ?? g.planet}</Text>
+          <Text style={styles.gateNum}>{g.gate}.{g.line}</Text>
+        </TermPressable>
+      ))}
+    </View>
+  );
+}
+
+function CenterChips({ ids, defined }: { ids: string[]; defined: boolean }) {
+  if (!ids.length) return <Text style={styles.note}>None</Text>;
+  return (
+    <View style={styles.chipWrap}>
+      {ids.map((c) => (
+        <TermPressable key={c} id={centerId(c)} style={[styles.centerChip, defined ? styles.centerChipOn : styles.centerChipOff]}
+          label={`${CENTER_NAMES[c] ?? c} center, ${defined ? 'defined' : 'open'}`}>
+          <View style={[styles.centerMark, defined ? styles.centerMarkOn : styles.centerMarkOff]} />
+          <Text style={styles.centerChipText}>{CENTER_NAMES[c] ?? c}</Text>
         </TermPressable>
       ))}
     </View>
@@ -226,7 +262,9 @@ const styles = StyleSheet.create({
   headType: { fontFamily: fonts.display, fontSize: 26, color: colors.parchment },
   headMeta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   section: { gap: space.sm, marginTop: space.sm },
-  sectionTitle: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.gold },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sectionTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
+  hotspot: { position: 'absolute', width: 44, height: 44, borderRadius: 22 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -242,15 +280,20 @@ const styles = StyleSheet.create({
   aspectText: { flexShrink: 1, fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   paragraph: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   strong: { fontFamily: fonts.bodyBold, color: colors.parchment },
-  gateWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  gateChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: radius.sm,
-    backgroundColor: colors.amethyst,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  gateChipText: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted },
+  twoCol: { flexDirection: 'row', gap: space.md },
+  gateCol: { flex: 1, gap: 2 },
+  gateColHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: colors.hairline },
+  gateColTitle: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
+  gateColSub: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
+  gateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.hairline },
+  gatePlanet: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted, flexShrink: 1 },
+  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  centerChip: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 12, borderRadius: radius.sm, borderWidth: 1 },
+  centerChipOn: { backgroundColor: 'rgba(229,169,60,0.14)', borderColor: colors.vehicle },
+  centerChipOff: { backgroundColor: 'transparent', borderColor: colors.hairline, borderStyle: 'dashed' },
+  centerMark: { width: 11, height: 11, borderRadius: 3, borderWidth: 1.5, borderColor: colors.vehicle },
+  centerMarkOn: { backgroundColor: colors.vehicle },
+  centerMarkOff: { backgroundColor: 'transparent', borderStyle: 'dashed', borderColor: colors.parchmentMuted },
+  centerChipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
   gateNum: { fontFamily: fonts.bodyBold, color: colors.parchment },
 });

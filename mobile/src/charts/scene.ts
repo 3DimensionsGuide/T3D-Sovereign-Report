@@ -6,7 +6,8 @@
 /** 'symbol' = the phone's own system font (astrological glyphs aren't in our brand fonts). */
 export type SceneFont = 'display' | 'body' | 'bold' | 'symbol';
 
-export type Prim =
+/** `layer` lets a scene fade in group by group (0 first). */
+export type Prim = (
   | { k: 'line'; x1: number; y1: number; x2: number; y2: number; stroke: string; w: number; dash?: string; op?: number }
   | { k: 'path'; d: string; fill?: string; stroke?: string; w?: number; op?: number; dash?: string }
   | { k: 'circle'; cx: number; cy: number; r: number; fill?: string; stroke?: string; w?: number; op?: number }
@@ -20,10 +21,20 @@ export type Prim =
       anchor?: 'start' | 'middle' | 'end';
       font?: SceneFont;
       op?: number;
-    };
+    }
+) & { layer?: number };
+
+/** A tappable spot on the drawing, in the scene's own coordinates. */
+export interface Hotspot {
+  x: number;
+  y: number;
+  key: string;
+  label: string;
+}
 
 export interface Scene {
   w: number;
   h: number;
   prims: Prim[];
+  hotspots?: Hotspot[];
 }

@@ -1,6 +1,10 @@
-import Svg, { Circle, Line, Path, Text as SvgText } from 'react-native-svg';
+import { useEffect, useMemo } from 'react';
+import { AccessibilityInfo, Animated } from 'react-native';
+import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 import type { Prim, Scene, SceneFont } from '@/charts/scene';
 import { fonts } from '@/theme/tokens';
+
+const AnimatedG = Animated.createAnimatedComponent(G);
 
 function fontFamily(font: SceneFont | undefined): string | undefined {
   switch (font) {
@@ -38,8 +42,41 @@ function renderPrim(p: Prim, i: number) {
   }
 }
 
+interface Props {
+  scene: Scene;
+  label: string;
+  /** Fade the scene in layer by layer (skipped when the phone's Reduce Motion is on). */
+  reveal?: boolean;
+}
+
 /** Draws a chart Scene at full width. `label` is read aloud by screen readers. */
-export function SceneView({ scene, label }: { scene: Scene; label: string }) {
+export function SceneView({ scene, label, reveal = false }: Props) {
+  const layerIds = useMemo(
+    () => Array.from(new Set(scene.prims.map((p) => p.layer ?? 0))).sort((a, b) => a - b),
+    [scene],
+  );
+  const values = useMemo(() => layerIds.map(() => new Animated.Value(reveal ? 0 : 1)), [layerIds, reveal]);
+
+  useEffect(() => {
+    if (!reveal) return undefined;
+    let cancelled = false;
+    void AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
+      if (cancelled) return;
+      if (reduce) {
+        values.forEach((v) => v.setValue(1));
+        return;
+      }
+      Animated.stagger(
+        380,
+        values.map((v) => Animated.timing(v, { toValue: 1, duration: 520, useNativeDriver: false })),
+      ).start();
+    });
+    return () => {
+      cancelled = true;
+      values.forEach((v) => v.stopAnimation());
+    };
+  }, [values, reveal]);
+
   return (
     <Svg
       width="100%"
@@ -49,7 +86,11 @@ export function SceneView({ scene, label }: { scene: Scene; label: string }) {
       accessibilityRole="image"
       accessibilityLabel={label}
     >
-      {scene.prims.map(renderPrim)}
+      {layerIds.map((id, i) => (
+        <AnimatedG key={id} opacity={values[i]}>
+          {scene.prims.filter((p) => (p.layer ?? 0) === id).map(renderPrim)}
+        </AnimatedG>
+      ))}
     </Svg>
   );
 }

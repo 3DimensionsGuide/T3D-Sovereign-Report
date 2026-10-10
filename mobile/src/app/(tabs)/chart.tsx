@@ -8,6 +8,7 @@ import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/ter
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
 import { TriadCard } from '@/components/TriadCard';
+import { TriadPortrait } from '@/components/TriadPortrait';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
 import { OfflineNote } from '@/components/OfflineNote';
 import { Segmented } from '@/components/Segmented';
@@ -56,6 +57,10 @@ export default function Chart() {
 
       {view === 'overview' ? (
         <>
+      <FadeIn delay={80}>
+        <TriadPortrait chart={chart} />
+      </FadeIn>
+
       <FadeIn delay={100}>
         <TriadCard
           accent={colors.vehicle}

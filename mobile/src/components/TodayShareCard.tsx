@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { TriadToday } from '@/lib/triadTypes';
 import { Glow } from '@/components/Glow';
-import { LensIcon, lensFromGlyph } from '@/components/Lens';
+import { LENS_TEXT, LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts } from '@/theme/tokens';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/components/ProfileShareCard';
 
@@ -17,7 +17,7 @@ function Row({ glyph, accent, label, main }: { glyph: string; accent: string; la
     <View style={[styles.row, { borderLeftColor: accent }]}>
       <View style={styles.labelRow}>
         {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={11} color={accent} /> : null}
-        <Text style={[styles.rowLabel, { color: accent }]}>{label}</Text>
+        <Text style={[styles.rowLabel, { color: lensFromGlyph(glyph) ? LENS_TEXT[lensFromGlyph(glyph)!] : accent }]}>{label}</Text>
       </View>
       <Text style={styles.rowMain}>{main}</Text>
     </View>

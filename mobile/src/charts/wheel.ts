@@ -1,5 +1,5 @@
 import { chartColors as c } from './palette';
-import type { Prim, Scene } from './scene';
+import type { Hotspot, Prim, Scene } from './scene';
 import type { WheelAspect, WheelBody, WheelChart, WheelPoint } from './chartTypes';
 
 export const WHEEL_SIZE = 400;
@@ -95,6 +95,7 @@ function aspectStyle(aspect: WheelAspect, peak: boolean): { stroke: string; w: n
 
 export function buildWheelScene(chart: WheelChart): Scene {
   const prims: Prim[] = [];
+  const hotspots: Hotspot[] = [];
   const asc = chart.ascendant;
 
   // Background disc
@@ -146,13 +147,14 @@ export function buildWheelScene(chart: WheelChart): Scene {
 
   // Planets: tick at the true longitude, glyph at a spread-out position.
   const lons = chart.planets.map((p) => p.longitude);
-  const spread = spreadAngles(lons, 11);
+  const spread = spreadAngles(lons, 12);
   chart.planets.forEach((pl, i) => {
     const [t1x, t1y] = polar(pl.longitude, asc, R_HOUSE_IN);
     const [t2x, t2y] = polar(pl.longitude, asc, R_HOUSE_IN - 7);
     prims.push({ k: 'line', x1: t1x, y1: t1y, x2: t2x, y2: t2y, stroke: c.gold, w: 1.4 });
     const [gx, gy] = polar(spread[i], asc, R_PLANET);
-    prims.push({ k: 'text', x: gx, y: gy, s: BODY_GLYPHS[pl.body] + TEXT_STYLE, size: 16, fill: c.parchment, font: 'symbol' });
+    hotspots.push({ x: gx, y: gy, key: pl.body, label: `${BODY_NAMES[pl.body]} in ${pl.formatted}` });
+    prims.push({ k: 'text', x: gx, y: gy, s: BODY_GLYPHS[pl.body] + TEXT_STYLE, size: 19, fill: c.parchment, font: 'symbol' });
     if (pl.retrograde) {
       const [rx, ry] = polar(spread[i], asc, R_PLANET - 13);
       prims.push({ k: 'text', x: rx, y: ry, s: 'R', size: 7, fill: c.friction, font: 'bold' });
@@ -169,5 +171,5 @@ export function buildWheelScene(chart: WheelChart): Scene {
   label(chart.midheaven, 'MC');
   label(chart.midheaven + 180, 'IC');
 
-  return { w: WHEEL_SIZE, h: WHEEL_SIZE, prims };
+  return { w: WHEEL_SIZE, h: WHEEL_SIZE, prims, hotspots };
 }

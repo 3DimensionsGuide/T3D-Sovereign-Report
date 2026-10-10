@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { LENS_COLOR, LENS_LABEL, LensIcon, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
+import { LENS_COLOR, LENS_LABEL, LENS_TEXT, LensIcon, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
 import type { DailyTransitHit, TodayResult } from '@/lib/api';
 import type { TriadToday } from '@/lib/triadTypes';
 import { aspectWord, bodyName, natalName } from '@/lib/skyText';
@@ -23,7 +23,7 @@ function Row({ lens, line, sub, signal }: { lens: LensName; line: string; sub: s
     >
       <View style={styles.rowHead}>
         <LensIcon lens={lens} size={13} />
-        <Text style={[styles.lensName, { color: LENS_COLOR[lens] }]}>{LENS_LABEL[lens]}</Text>
+        <Text style={[styles.lensName, { color: LENS_TEXT[lens] }]}>{LENS_LABEL[lens]}</Text>
         {signal ? (
           <View style={styles.signalTag}>
             <SignalMarker kind={signal} size={13} />

@@ -39,3 +39,19 @@ test('Today opens with a signal block and uses the shared markers for every tran
   const signal = read('mobile/src/components/TodaySignal.tsx');
   for (const word of ['flow', 'friction', 'retrograde']) assert.ok(signal.includes(word));
 });
+
+test('My Chart: the Triad portrait, tappable wheel, and a bodygraph that switches on in layers', () => {
+  assert.match(read('mobile/src/app/(tabs)/chart.tsx'), /<TriadPortrait /);
+  const panels = read('mobile/src/components/ChartPanels.tsx');
+  assert.match(panels, /scene\.hotspots/);
+  assert.match(panels, /reveal/);
+  assert.match(panels, /SignalMarker kind=\{ASPECT_SIGNAL/);
+  assert.match(read('mobile/src/charts/bodygraph.ts'), /prim\.layer =/);
+  assert.match(read('mobile/src/components/SceneView.tsx'), /isReduceMotionEnabled/);
+});
+
+test('small lens-coloured text uses the lighter AAA tints', () => {
+  const lens = read('mobile/src/components/Lens.tsx');
+  assert.match(lens, /LENS_TEXT/);
+  assert.match(read('mobile/src/components/TodaySignal.tsx'), /LENS_TEXT\[lens\]/);
+});

@@ -75,6 +75,8 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
     }
   }
 
+  const afterStructure = prims.length;
+
   // 2. Active channels.
   for (const ch of data.channels) {
     const [a, b] = ch.gates;
@@ -97,6 +99,8 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
       draw(c.personality, 0, 5);
     }
   }
+
+  const afterChannels = prims.length;
 
   // 3. Centers, drawn on top of the channel ends.
   for (const shape of CENTER_SHAPES) {
@@ -122,6 +126,8 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
     });
   }
 
+  const afterCenters = prims.length;
+
   // 4. Gates: tiny dots for every gate, numbered discs for activated ones.
   for (let g = 1; g <= 64; g++) {
     const p = GATE_ANCHORS[g];
@@ -143,6 +149,11 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
       fill: fill === c.design ? '#FFFFFF' : c.obsidian, font: 'bold',
     });
   }
+
+  // Fade-in order: faint structure, active channels, centers switching on, then the gates.
+  prims.forEach((prim, i) => {
+    prim.layer = i < afterStructure ? 0 : i < afterChannels ? 1 : i < afterCenters ? 2 : 3;
+  });
 
   return { w: BODYGRAPH_W, h: BODYGRAPH_H, prims };
 }
