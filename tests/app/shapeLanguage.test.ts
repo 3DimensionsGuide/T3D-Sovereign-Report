@@ -55,3 +55,13 @@ test('small lens-coloured text uses the lighter AAA tints', () => {
   assert.match(lens, /LENS_TEXT/);
   assert.match(read('mobile/src/components/TodaySignal.tsx'), /LENS_TEXT\[lens\]/);
 });
+
+test('onboarding asks one question at a time, shows the calculation, and the welcome screen has the seal', () => {
+  const onboarding = read('mobile/src/app/onboarding.tsx');
+  assert.match(onboarding, /Step \$\{step \+ 1\} of 4/);
+  assert.match(onboarding, /validateStep/);
+  assert.match(onboarding, /<CalculatingView /);
+  assert.match(onboarding, /CALCULATE MY CHART/);
+  assert.match(read('mobile/src/app/welcome.tsx'), /<TriadSeal /);
+  assert.match(read('mobile/src/components/CalculatingView.tsx'), /isReduceMotionEnabled/);
+});

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path, Polygon, Rect } from 'react-native-svg';
 import { colors } from '@/theme/tokens';
 
@@ -105,3 +107,18 @@ export function SignalMarker({ kind, size = 16, color }: SignalMarkerProps) {
     </Svg>
   );
 }
+
+/** A lens icon followed by a short label, in the AAA-safe lens text colour. */
+export function LensLabel({ lens, children }: { lens: LensName; children: ReactNode }) {
+  return (
+    <View style={labelStyles.row}>
+      <LensIcon lens={lens} size={13} />
+      <Text style={[labelStyles.text, { color: LENS_TEXT[lens] }]}>{children}</Text>
+    </View>
+  );
+}
+
+const labelStyles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  text: { fontFamily: 'DMSans_700Bold', fontSize: 13, letterSpacing: 0.3 },
+});

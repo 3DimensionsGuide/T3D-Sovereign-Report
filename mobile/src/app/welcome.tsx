@@ -6,6 +6,8 @@ import * as WebBrowser from 'expo-web-browser';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { LensLabel } from '@/components/Lens';
+import { TriadSeal } from '@/components/TriadSeal';
 import { ChartRequestError, requestBirthPreview } from '@/lib/api';
 import type { BirthPreview } from '@/lib/previewTypes';
 import { colors, fonts, radius, space } from '@/theme/tokens';
@@ -46,7 +48,8 @@ export default function Welcome() {
     <Screen>
       <FadeIn>
         <View style={styles.hero}>
-          <Text style={styles.eyebrow}>THE 3 DIMENSIONS</Text>
+          <TriadSeal size={92} />
+          <Text style={styles.eyebrow}>The 3 Dimensions</Text>
           <Text accessibilityRole="header" style={styles.title}>
             Your vehicle,{'\n'}your road,{'\n'}your timing.
           </Text>
@@ -78,14 +81,14 @@ export default function Welcome() {
         <FadeIn>
           <View style={styles.results} accessibilityLiveRegion="polite">
             <View style={[styles.card, { borderLeftColor: colors.road }]}>
-              <Text style={[styles.cardEyebrow, { color: colors.road }]}>▲  THE ROAD · LIFE PATH {preview.lifePath.number}</Text>
+              <LensLabel lens="road">The Road · Life Path {preview.lifePath.number}</LensLabel>
               <Text accessibilityRole="header" style={styles.cardTitle}>{preview.lifePath.name}</Text>
               <Text style={styles.body}>{preview.lifePath.direction}</Text>
               <Text style={styles.body}>{preview.lifePath.plain}</Text>
             </View>
 
             <View style={[styles.card, { borderLeftColor: colors.stoplight }]}>
-              <Text style={[styles.cardEyebrow, { color: colors.stoplight }]}>●  THE STOPLIGHT · SUN IN {preview.sun.sign.toUpperCase()}</Text>
+              <LensLabel lens="stoplight">The Stoplight · Sun in {preview.sun.sign}</LensLabel>
               <Text accessibilityRole="header" style={styles.cardTitle}>{preview.sun.sign}, {preview.sun.element}</Text>
               <Text style={styles.body}>{preview.sun.orientation}</Text>
               {preview.sun.cusp ? (
@@ -97,7 +100,7 @@ export default function Welcome() {
             </View>
 
             <View style={[styles.card, { borderLeftColor: colors.vehicle }]}>
-              <Text style={[styles.cardEyebrow, { color: colors.vehicle }]}>◆  THE VEHICLE · WAITING FOR YOUR DETAILS</Text>
+              <LensLabel lens="vehicle">The Vehicle · waiting for your details</LensLabel>
               <Text accessibilityRole="header" style={styles.cardTitle}>Your full chart adds</Text>
               {preview.locked.map((line) => (
                 <Text key={line} style={styles.body}>◇  {line}</Text>
@@ -129,7 +132,7 @@ export default function Welcome() {
 
 const styles = StyleSheet.create({
   hero: { gap: space.md, paddingTop: space.lg },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyMedium, fontSize: 15, letterSpacing: 0.5, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
   lede: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
   pickerRow: {

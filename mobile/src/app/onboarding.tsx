@@ -7,6 +7,8 @@ import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
+import { CalculatingView } from '@/components/CalculatingView';
+import { TriadSeal } from '@/components/TriadSeal';
 import {
   ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
 } from '@/lib/api';
@@ -44,6 +46,10 @@ export default function Onboarding() {
   );
   const [timeKnown, setTimeKnown] = useState(saved?.birthTimeKnown ?? true);
   const [emailOptIn, setEmailOptIn] = useState(saved?.emailOptIn ?? false);
+  /** 0 name, 1 email, 2 birth date and time, 3 birth place. */
+  const [step, setStep] = useState(0);
+  const [calculating, setCalculating] = useState(false);
+  const [calcDone, setCalcDone] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,25 +63,36 @@ export default function Onboarding() {
   const onDateChange = (_event: unknown, value: Date) => setBirthDate(value);
   const onTimeChange = (_event: unknown, value: Date) => setBirthTime(value);
 
-  function validate(): boolean {
+  function validateStep(which: number): boolean {
     const next: FieldErrors = {};
-    if (!firstName.trim()) next.firstName = 'Please enter your first name.';
-    if (!lastName.trim()) next.lastName = 'Please enter your last name.';
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = 'Please enter a valid email address.';
-    if (!city.trim()) next.city = 'Please enter your birth city.';
-    if (!country.trim()) next.country = 'Please enter your birth country.';
-    const cutoff = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-    if (birthDate > cutoff) {
-      next.birthDate = 'T3D is for people 13 and older. We can\u2019t create a profile for this birth date.';
+    if (which === 0) {
+      if (!firstName.trim()) next.firstName = 'Please enter your first name.';
+      if (!lastName.trim()) next.lastName = 'Please enter your last name.';
+    }
+    if (which === 1 && !/^\S+@\S+\.\S+$/.test(email.trim())) next.email = 'Please enter a valid email address.';
+    if (which === 2) {
+      const cutoff = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
+      if (birthDate > cutoff) {
+        next.birthDate = 'T3D is for people 13 and older. We can\u2019t create a profile for this birth date.';
+      }
+    }
+    if (which === 3) {
+      if (!city.trim()) next.city = 'Please enter your birth city.';
+      if (!country.trim()) next.country = 'Please enter your birth country.';
     }
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
+  function onContinue() {
+    if (!validateStep(step)) return;
+    setStep((n) => Math.min(n + 1, 3));
+  }
+
   /** Step 1: look the place up and show it back before anything is calculated. */
   async function onCheckPlace() {
     setSubmitError(null);
-    if (!validate()) return;
+    if (!validateStep(3)) return;
     setLoading(true);
     try {
       const found = await requestPlaceCheck(city.trim(), country.trim(), toDateString(birthDate));
@@ -114,9 +131,13 @@ export default function Onboarding() {
     };
 
     setLoading(true);
+    setCalcDone(false);
+    setCalculating(true);
     try {
       const { chart, optInCode } = await requestChart(profile);
       setChart(profile, chart);
+      setCalcDone(true);
+      await new Promise((resolve) => setTimeout(resolve, 900));
       if (profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')) {
         setCodeStep({
           leadId: chart.leadId,
@@ -127,6 +148,7 @@ export default function Onboarding() {
         router.replace('/today');
       }
     } catch (error) {
+      setCalculating(false);
       setSubmitError(
         error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
       );
@@ -163,12 +185,20 @@ export default function Onboarding() {
     }
   }
 
+  if (calculating && !codeStep) {
+    return (
+      <Screen>
+        <CalculatingView done={calcDone} />
+      </Screen>
+    );
+  }
+
   if (codeStep) {
     return (
       <Screen>
         <FadeIn>
           <View style={styles.hero}>
-            <Text style={styles.eyebrow}>ONE LAST STEP</Text>
+            <Text style={styles.stepNote}>One last step</Text>
             <Text accessibilityRole="header" style={styles.title}>Check your email</Text>
             <Text style={styles.lede}>
               We sent a 6-digit code to {codeStep.email}. Type it below to confirm you want occasional T3D insights.
@@ -195,41 +225,45 @@ export default function Onboarding() {
     const dateText = birthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     const timeText = timeKnown
       ? birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-      : '12:00 PM (assumed, no birth time entered)';
+      : '12:00 PM (we are assuming noon)';
     return (
       <Screen>
         <FadeIn>
           <View style={styles.hero}>
-            <Text style={styles.eyebrow}>CONFIRM YOUR BIRTH DETAILS</Text>
-            <Text accessibilityRole="header" style={styles.title}>Is this right?</Text>
+            <Text style={styles.stepNote}>Last check</Text>
+            <Text accessibilityRole="header" style={styles.title}>Is this where you were born?</Text>
             <Text style={styles.lede}>
-              Your chart is only as accurate as these details. Check the place especially, since a wrong match
-              changes your Rising sign and Human Design.
+              The place sets your Rising sign and your Human Design, so it is worth a second look.
+              {candidates.length > 1 ? ' We found more than one match. Tap the right one.' : ''}
             </Text>
           </View>
         </FadeIn>
         <View style={styles.form}>
           <View style={styles.confirmCard}>
-            <Text style={styles.confirmLine}>Born {dateText}</Text>
-            <Text style={styles.confirmLine}>at {timeText}</Text>
+            <Text style={styles.confirmLabel}>Your birth</Text>
+            <Text style={styles.confirmLine}>{dateText}</Text>
+            <Text style={styles.confirmLine}>{timeText}</Text>
           </View>
-          <Text style={styles.pickerLabel}>Which place is yours?</Text>
           {candidates.map((c, i) => (
             <Pressable
               key={`${c.label}-${c.latitude}`}
               accessibilityRole="radio"
               accessibilityState={{ selected: i === chosen }}
-              accessibilityLabel={`${c.label}, time zone ${c.timezone}`}
+              accessibilityLabel={`${c.label}, time zone ${c.timezone}${i === chosen ? ', selected' : ''}`}
               onPress={() => setChosen(i)}
               style={[styles.placeRow, i === chosen && styles.placeRowOn]}
             >
-              <Text style={styles.placeMark}>{i === chosen ? '◉' : '○'}</Text>
+              <View style={[styles.radio, i === chosen && styles.radioOn]}>
+                {i === chosen ? <View style={styles.radioDot} /> : null}
+              </View>
               <View style={styles.placeText}>
                 <Text style={styles.placeLabel}>{c.label}</Text>
                 <Text style={styles.hint}>
+                  {c.timezone}{c.utcOffset ? ` · ${c.utcOffset} on your birth date` : ''}
+                </Text>
+                <Text style={styles.hintSmall}>
                   {Math.abs(c.latitude).toFixed(2)}° {c.latitude >= 0 ? 'N' : 'S'},{' '}
-                  {Math.abs(c.longitude).toFixed(2)}° {c.longitude >= 0 ? 'E' : 'W'} · {c.timezone}
-                  {c.utcOffset ? ` (${c.utcOffset} on your birth date)` : ''}
+                  {Math.abs(c.longitude).toFixed(2)}° {c.longitude >= 0 ? 'E' : 'W'}
                 </Text>
               </View>
             </Pressable>
@@ -242,29 +276,135 @@ export default function Onboarding() {
               {submitError}
             </Text>
           ) : null}
-          <GoldButton label="CONFIRM AND CALCULATE" onPress={onSubmit} loading={loading} />
+          <GoldButton label="CALCULATE MY CHART" onPress={onSubmit} loading={loading} />
           <GoldButton label="CHANGE MY DETAILS" variant="ghost" onPress={() => setCandidates(null)} />
         </View>
       </Screen>
     );
   }
 
+  const TITLES = ['What is your name?', 'Where can we reach you?', 'When were you born?', 'Where were you born?'];
+  const LEDES = [
+    'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can.',
+    'Only used to find your chart again and to send your report if you buy one. We never sell it.',
+    'Your birth date and time set your Life Path, Sun sign, Rising sign and Human Design.',
+    'The place gives us the coordinates and time zone for the exact moment you were born.',
+  ];
+
   return (
     <Screen>
       <FadeIn>
         <View style={styles.hero}>
-          <Text style={styles.eyebrow}>THE 3 DIMENSIONS</Text>
-          <Text accessibilityRole="header" style={styles.title}>
-            Your vehicle,{'\n'}your road,{'\n'}your timing.
+          {step === 0 ? <TriadSeal size={64} /> : null}
+          <View
+            accessible
+            accessibilityLabel={`Step ${step + 1} of 4`}
+            style={styles.progress}
+          >
+            {[0, 1, 2, 3].map((i) => (
+              <View key={i} style={[styles.progressBar, i <= step && styles.progressBarOn]} />
+            ))}
+          </View>
+          <Text style={styles.stepNote}>Step {step + 1} of 4</Text>
+          <Text accessibilityRole="header" style={styles.title}>{TITLES[step]}</Text>
+          <Text style={styles.lede}>{LEDES[step]}</Text>
+        </View>
+      </FadeIn>
+
+      <View style={styles.form}>
+        {step === 0 ? (
+          <>
+            <Field label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
+              autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
+            <Field label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
+              autoCapitalize="words" autoComplete="additional-name" textContentType="middleName" returnKeyType="next"
+              placeholder="As written on your birth certificate" />
+            <Field label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}
+              autoCapitalize="words" autoComplete="family-name" textContentType="familyName" returnKeyType="done" />
+          </>
+        ) : null}
+
+        {step === 1 ? (
+          <>
+            <Field label="Email" value={email} onChangeText={setEmail} error={errors.email}
+              autoCapitalize="none" autoCorrect={false} keyboardType="email-address"
+              autoComplete="email" textContentType="emailAddress" />
+            <View style={styles.pickerRow}>
+              <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
+              <Switch value={emailOptIn} onValueChange={setEmailOptIn}
+                trackColor={{ false: colors.hairline, true: colors.gold }}
+                accessibilityLabel="Email me occasional T3D insights" />
+            </View>
+            {emailOptIn ? <Text style={styles.hint}>We will email a 6-digit code at the end to confirm it is really you.</Text> : null}
+          </>
+        ) : null}
+
+        {step === 2 ? (
+          <>
+            <View style={styles.pickerRow}>
+              <Text style={styles.pickerLabel}>Birth date</Text>
+              <DateTimePicker value={birthDate} mode="date" display="compact" themeVariant="dark"
+                maximumDate={today} onValueChange={onDateChange} accessibilityLabel="Birth date" />
+            </View>
+            {errors.birthDate ? (
+              <Text accessibilityLiveRegion="polite" style={styles.submitError}>{errors.birthDate}</Text>
+            ) : null}
+            <View style={styles.pickerRow}>
+              <Text style={styles.pickerLabel}>Birth time</Text>
+              {timeKnown ? (
+                <DateTimePicker value={birthTime} mode="time" display="compact" themeVariant="dark"
+                  onValueChange={onTimeChange} accessibilityLabel="Birth time" />
+              ) : (
+                <Text style={styles.unknownTime}>Using 12:00 noon</Text>
+              )}
+            </View>
+            <View style={styles.pickerRow}>
+              <Text style={styles.pickerLabel}>I know my birth time</Text>
+              <Switch value={timeKnown} onValueChange={setTimeKnown}
+                trackColor={{ false: colors.hairline, true: colors.gold }}
+                accessibilityLabel="I know my birth time" />
+            </View>
+            <Text style={styles.hint}>
+              {timeKnown
+                ? 'Your birth time is on most birth certificates.'
+                : 'Without a birth time, your Rising sign and some Human Design details can be off. Check your birth certificate when you can.'}
+            </Text>
+          </>
+        ) : null}
+
+        {step === 3 ? (
+          <>
+            <Field label="Birth city" value={city} onChangeText={setCity} error={errors.city}
+              autoCapitalize="words" placeholder="e.g. Harbor City, California" />
+            <Field label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
+              autoCapitalize="words" placeholder="e.g. United States"
+              why="Time zones and daylight saving rules differ by country and by year." />
+          </>
+        ) : null}
+      </View>
+
+      <View style={styles.actions}>
+        {submitError ? (
+          <Text accessibilityLiveRegion="polite" style={styles.submitError}>
+            {'⚠  '}
+            {submitError}
           </Text>
-          <Text style={styles.lede}>
-            Enter your birth details once. We use them to calculate your Human Design, Numerology
-            and Astrology. They are saved on this phone and on our server so your readings load
-            every time. You can delete them at any time from the My Chart tab.
-          </Text>
-          <Text style={styles.lede}>
-            T3D is a reflection tool for self-understanding and entertainment. It does not predict
-            events and is not medical, legal or financial advice. T3D is for people 13 and older.
+        ) : null}
+        {step < 3 ? (
+          <GoldButton label="CONTINUE" onPress={onContinue} />
+        ) : (
+          <GoldButton label="CHECK MY BIRTH PLACE" onPress={onCheckPlace} loading={loading} />
+        )}
+        {step > 0 ? <GoldButton label="BACK" variant="ghost" onPress={() => setStep((n) => n - 1)} /> : null}
+      </View>
+
+      {step === 0 ? (
+        <View style={styles.fineWrap}>
+          <Text style={styles.fine}>
+            We save your details on this phone and on our server so your readings load every time. You can delete
+            them at any time from the My Chart tab. T3D is a reflection tool for self-understanding and
+            entertainment. It does not predict events and is not medical, legal or financial advice. T3D is for
+            people 13 and older.
           </Text>
           <Pressable
             accessibilityRole="link"
@@ -275,95 +415,24 @@ export default function Onboarding() {
             <Text style={styles.link}>Read our privacy policy</Text>
           </Pressable>
         </View>
-      </FadeIn>
-
-      <FadeIn delay={120}>
-        <View style={styles.form}>
-          <Field label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
-            autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next"
-            why="Used to greet you and to personalise your readings." />
-          <Field label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
-            autoCapitalize="words" autoComplete="additional-name" textContentType="middleName" returnKeyType="next"
-            placeholder="As written on your birth certificate"
-            why="Numerology uses your full birth name, so add it if you have one." />
-          <Field label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}
-            autoCapitalize="words" autoComplete="family-name" textContentType="familyName" returnKeyType="next"
-            why="Part of your full birth name, which numerology reads letter by letter." />
-          <Field label="Email" value={email} onChangeText={setEmail} error={errors.email}
-            autoCapitalize="none" autoCorrect={false} keyboardType="email-address"
-            autoComplete="email" textContentType="emailAddress"
-            why="Only used to find your chart again and to send your report if you buy one. We never sell it." />
-
-          <View style={styles.pickerRow}>
-            <Text style={styles.pickerLabel}>Birth date</Text>
-            <DateTimePicker value={birthDate} mode="date" display="compact" themeVariant="dark"
-              maximumDate={today} onValueChange={onDateChange} accessibilityLabel="Birth date" />
-          </View>
-          <Text style={styles.hint}>Your Life Path, Sun sign and Human Design all start from this date.</Text>
-          {errors.birthDate ? (
-            <Text accessibilityLiveRegion="polite" style={styles.submitError}>{errors.birthDate}</Text>
-          ) : null}
-
-          <View style={styles.pickerRow}>
-            <Text style={styles.pickerLabel}>Birth time</Text>
-            {timeKnown ? (
-              <DateTimePicker value={birthTime} mode="time" display="compact" themeVariant="dark"
-                onValueChange={onTimeChange} accessibilityLabel="Birth time" />
-            ) : (
-              <Text style={styles.unknownTime}>Using 12:00 noon</Text>
-            )}
-          </View>
-          <Text style={styles.hint}>
-            Your birth time sets your Rising sign, your houses and your Human Design details. It is on most birth certificates.
-          </Text>
-
-          <View style={styles.pickerRow}>
-            <Text style={styles.pickerLabel}>I know my birth time</Text>
-            <Switch value={timeKnown} onValueChange={setTimeKnown}
-              trackColor={{ false: colors.hairline, true: colors.gold }}
-              accessibilityLabel="I know my birth time" />
-          </View>
-          {!timeKnown && (
-            <Text style={styles.hint}>
-              Without a birth time, your Rising sign and some Human Design details can be off.
-              Check your birth certificate when you can for the most accurate chart.
-            </Text>
-          )}
-
-          <Field label="Birth city" value={city} onChangeText={setCity} error={errors.city}
-            autoCapitalize="words" placeholder="e.g. Harbor City, California"
-            why="Gives us the coordinates and time zone for the exact moment you were born." />
-          <Field label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
-            autoCapitalize="words" placeholder="e.g. United States"
-            why="Time zones and daylight saving rules differ by country and by year." />
-
-          <View style={styles.pickerRow}>
-            <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
-            <Switch value={emailOptIn} onValueChange={setEmailOptIn}
-              trackColor={{ false: colors.hairline, true: colors.gold }}
-              accessibilityLabel="Email me occasional T3D insights" />
-          </View>
-        </View>
-      </FadeIn>
-
-      <FadeIn delay={240}>
-        <View style={styles.actions}>
-          {submitError ? (
-            <Text accessibilityLiveRegion="polite" style={styles.submitError}>
-              {'⚠  '}
-              {submitError}
-            </Text>
-          ) : null}
-          <GoldButton label="CHECK MY BIRTH PLACE" onPress={onCheckPlace} loading={loading} />
-        </View>
-      </FadeIn>
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   hero: { gap: space.md, paddingTop: space.lg },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
+  stepNote: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchmentMuted },
+  progress: { flexDirection: 'row', gap: 6 },
+  progressBar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: colors.hairline },
+  progressBarOn: { backgroundColor: colors.gold },
+  fineWrap: { gap: space.xs, marginBottom: space.lg },
+  fine: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
+  hintSmall: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
+  confirmLabel: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
+  radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.parchmentMuted, alignItems: 'center', justifyContent: 'center' },
+  radioOn: { borderColor: colors.gold },
+  radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
   linkRow: { minHeight: 48, justifyContent: 'center' },
   link: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold, textDecorationLine: 'underline' },
@@ -388,7 +457,6 @@ const styles = StyleSheet.create({
     borderRadius: 12, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
   },
   placeRowOn: { borderColor: colors.gold },
-  placeMark: { fontSize: 20, color: colors.gold },
   placeText: { flex: 1, gap: 2 },
   placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
 });
