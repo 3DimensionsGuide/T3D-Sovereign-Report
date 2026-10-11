@@ -162,3 +162,13 @@ test('the Sun and Moon longitudes stay on the server and feed the Vehicle lamp',
   assert.match(triad, /longitudeToGate\(sky\.skyLongitudes\.sun\)/);
   assert.match(triad, /buildTriadToday\(/);
 });
+
+test('the Road strip writes its numbers out and opens the Timeline', () => {
+  const strip = read('mobile/src/components/RoadStrip.tsx');
+  assert.match(strip, /Numbers on the strip are Pinnacles/);
+  assert.match(strip, /accessibilityRole="button"/);
+  assert.match(strip, /router\.push\('\/timeline'/);
+  assert.match(strip, /spokenSummary/);
+  const today = read('mobile/src/app/(tabs)/today.tsx');
+  assert.match(today, /<RoadStrip /);
+});
