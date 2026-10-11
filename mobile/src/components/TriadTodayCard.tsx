@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { TriadToday } from '@/lib/triadTypes';
+import { Disclosure } from '@/components/Disclosure';
 import { LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -20,19 +21,38 @@ function Lens({ glyph, accent, label, title, lines }: {
   );
 }
 
+/** Splits a paragraph after its first sentence: ["Let your Sacral Authority lead.", "the rest"]. */
+export function firstSentence(text: string): [string, string] {
+  const m = /^(.+?[.!?])(\s+|$)/.exec(text.trim());
+  if (!m) return [text.trim(), ''];
+  return [m[1]!, text.trim().slice(m[0].length)];
+}
+
 export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isToday?: boolean }) {
   // With the signal lamp and the Road strip above, the Road is covered by the day-number card below
   // and the Moon by its own card, so this card keeps only what is new: Strategy and the sky contact.
   const compact = !!data.signal;
+  const [lead, restOfFrame] = compact ? firstSentence(data.frame) : [data.frame, ''];
+  const steps = (
+    <View style={styles.steps}>
+      <Text style={styles.stepsLabel}>YOUR FOUR CHECKS</Text>
+      {data.steps.map((s, i) => (
+        <View key={s} style={styles.stepRow}>
+          <Text style={styles.stepNum}>{i + 1}</Text>
+          <Text style={[styles.body, styles.stepText]}>{s}</Text>
+        </View>
+      ))}
+    </View>
+  );
   return (
     <View style={styles.card}>
       <Text style={styles.eyebrow}>{isToday ? "TODAY'S TRIAD" : "THIS DAY'S TRIAD"}</Text>
       <Text accessibilityRole="header" style={styles.title}>{isToday ? 'One frame for today' : 'One frame for this day'}</Text>
-      <Text style={styles.frame}>{data.frame}</Text>
+      <Text style={styles.frame}>{lead}</Text>
 
       <Lens
         glyph="◆" accent={colors.vehicle} label="THE VEHICLE" title={data.vehicle.heading}
-        lines={[data.vehicle.strategy, data.vehicle.authority, data.vehicle.cue]}
+        lines={[data.vehicle.strategy, data.vehicle.authority, compact ? null : data.vehicle.cue]}
       />
       {compact ? null : (
         <Lens
@@ -51,17 +71,19 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
         ]}
       />
 
-      <View style={styles.steps}>
-        <Text style={styles.stepsLabel}>YOUR FOUR CHECKS</Text>
-        {data.steps.map((s, i) => (
-          <View key={s} style={styles.stepRow}>
-            <Text style={styles.stepNum}>{i + 1}</Text>
-            <Text style={[styles.body, styles.stepText]}>{s}</Text>
-          </View>
-        ))}
-      </View>
-
-      <Text style={styles.closing}>{data.closing}</Text>
+      {compact ? (
+        <Disclosure label="How to use today">
+          {restOfFrame ? <Text style={styles.body}>{restOfFrame}</Text> : null}
+          {data.vehicle.cue ? <Text style={styles.body}>{data.vehicle.cue}</Text> : null}
+          {steps}
+          <Text style={styles.closing}>{data.closing}</Text>
+        </Disclosure>
+      ) : (
+        <>
+          {steps}
+          <Text style={styles.closing}>{data.closing}</Text>
+        </>
+      )}
     </View>
   );
 }

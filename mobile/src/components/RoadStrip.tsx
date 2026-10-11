@@ -45,6 +45,7 @@ export function RoadStrip({ date, personalYear }: Props) {
       <View style={styles.head}>
         <LensIcon lens="road" size={13} />
         <Text accessibilityRole="header" style={[styles.lens, { color: LENS_TEXT.road }]}>Where you are on the Road</Text>
+        <Text accessibilityElementsHidden style={styles.chevron}>›</Text>
       </View>
 
       <View style={styles.stripWrap} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -80,8 +81,6 @@ export function RoadStrip({ date, personalYear }: Props) {
 
       <Text style={styles.sentence}>{model.sentence}</Text>
       {model.match ? <Text style={styles.match}>{model.match}</Text> : null}
-      <Text style={styles.key}>The numbers are your Pinnacles. C is the Challenge beside each.</Text>
-      <Text style={styles.more}>Open your timeline ›</Text>
     </Pressable>
   );
 }
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
     padding: space.lg, gap: space.sm,
   },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  lens: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3 },
+  lens: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3, flexShrink: 1 },
   stripWrap: { gap: 4, paddingTop: space.xs },
   strip: { flexDirection: 'row', gap: 3 },
   segment: {
@@ -109,6 +108,5 @@ const styles = StyleSheet.create({
   marker: { position: 'absolute', top: 0, marginLeft: -8 },
   sentence: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 23, color: colors.parchment },
   match: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: LENS_TEXT.road },
-  key: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
-  more: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.gold, marginTop: 2 },
+  chevron: { fontFamily: fonts.bodyBold, fontSize: 22, lineHeight: 24, color: colors.gold, marginLeft: 'auto' },
 });

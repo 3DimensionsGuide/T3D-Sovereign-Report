@@ -163,20 +163,42 @@ test('the Sun and Moon longitudes stay on the server and feed the Vehicle lamp',
   assert.match(triad, /buildTriadToday\(/);
 });
 
-test('the Road strip writes its numbers out and opens the Timeline', () => {
+test('the Road strip writes its numbers out, opens the Timeline and stays short', () => {
   const strip = read('mobile/src/components/RoadStrip.tsx');
-  assert.match(strip, /The numbers are your Pinnacles/);
   assert.match(strip, /accessibilityRole="button"/);
   assert.match(strip, /router\.push\('\/timeline'/);
   assert.match(strip, /spokenSummary/);
+  assert.match(strip, /styles\.chevron/, 'the whole card is the tap target, marked by a chevron');
+  assert.doesNotMatch(strip, /Open your timeline/, 'no separate link line');
+  assert.doesNotMatch(strip, /The numbers are your Pinnacles/, 'no key line under the strip');
   const today = read('mobile/src/app/(tabs)/today.tsx');
   assert.match(today, /<RoadStrip /);
 });
 
 test('with the signal lamp, Today drops the cards that repeat it', () => {
   const today = read('mobile/src/app/(tabs)/today.tsx');
-  assert.match(today, /triad\?\.signal \? null : \(/, 'the old three-lens card only shows without the lamp');
   assert.match(today, /<SkyTally today=\{today\} bare \/>/, 'the sky tally moves to the transits');
+  assert.match(today, /triad\?\.signal \? \(/, 'the three-lens lamp card or the old signal card, never both');
   const card = read('mobile/src/components/TriadTodayCard.tsx');
   assert.match(card, /const compact = !!data\.signal/);
+});
+
+test('Today is condensed: frame before the Road strip, one sky card, collapsed details', () => {
+  const today = read('mobile/src/app/(tabs)/today.tsx');
+  assert.ok(today.indexOf('<SignalLamp') < today.indexOf('<TriadTodayCard'), 'lamp first');
+  assert.ok(today.indexOf('<TriadTodayCard') < today.indexOf('<RoadStrip'), 'the frame comes before the Road strip');
+  assert.match(today, /<SkyTodayCard today=\{today\} \/>/);
+  assert.doesNotMatch(today, /THE MOON|THE SUN/, 'Moon and Sun are one card');
+  assert.match(today, /TRANSITS_SHOWN/);
+  assert.match(today, /Show all \$\{today\.transits\.length\}/);
+  const card = read('mobile/src/components/TriadTodayCard.tsx');
+  assert.match(card, /<Disclosure label="How to use today">/);
+  assert.match(card, /firstSentence\(data\.frame\)/);
+  const sky = read('mobile/src/components/SkyTodayCard.tsx');
+  assert.match(sky, /<Disclosure label="More about the Moon">/);
+  const day = read('mobile/src/components/DayNumerologyCard.tsx');
+  assert.match(day, /accessibilityState=\{\{ expanded: open \}\}/, 'the day-number card collapses');
+  const lamp = read('mobile/src/components/SignalLamp.tsx');
+  assert.match(lamp, /numberOfLines=\{open \? undefined : 1\}/, 'lens rows are one line until tapped');
+  assert.match(lamp, /Conditions, not a decision\./);
 });

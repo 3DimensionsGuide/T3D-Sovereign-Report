@@ -15,19 +15,19 @@ import { useLocalDate } from '@/lib/useLocalDate';
 import { getCached, setCached } from '@/lib/persistentCache';
 import { OfflineNote } from '@/components/OfflineNote';
 import { ReminderPrompt } from '@/components/ReminderCard';
-import {
-  aspectWord, bodyName, contactSentence, houseTheme, moonGlyph, natalName, ordinal, phaseMeaning,
-} from '@/lib/skyText';
+import { aspectWord, bodyName, natalName } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
 import { TimeNote } from '@/components/TimeNote';
 import { TriadTodayCard } from '@/components/TriadTodayCard';
 import { SkyTally, TodaySignal } from '@/components/TodaySignal';
 import { SignalLamp } from '@/components/SignalLamp';
 import { RoadStrip } from '@/components/RoadStrip';
+import { SkyTodayCard } from '@/components/SkyTodayCard';
+import { select } from '@/lib/haptics';
 import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
-import { aspectId, houseId, natalId, planetId } from '@/lib/termIds';
+import { aspectId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -52,6 +52,9 @@ interface TodayBundle {
 
 /** If the app has been in the background this long, the live day reloads when it returns. */
 const STALE_AFTER_MS = 30 * 60 * 1000;
+
+/** Transits shown before "Show all": the tightest few carry the day. */
+const TRANSITS_SHOWN = 3;
 
 const NATURE_KIND: Record<DailyTransitHit['nature'], SignalKind> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
 
@@ -90,6 +93,7 @@ export default function Today() {
   const [loading, setLoading] = useState(true);
   const [triad, setTriad] = useState<TriadToday | null>(null);
   const [selectedHit, setSelectedHit] = useState<DailyTransitHit | null>(null);
+  const [allTransits, setAllTransits] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [offline, setOffline] = useState(false);
   const [savedCopyAt, setSavedCopyAt] = useState<number | null>(null);
@@ -155,6 +159,9 @@ export default function Today() {
       }
     }
   }, [profile, chart, viewDate, liveDate]);
+
+  // A different day starts with the short list again.
+  useEffect(() => setAllTransits(false), [viewDate, liveDate]);
 
   const goTo = useCallback((date: Date) => {
     if (date < MIN_DATE || date > MAX_DATE) return;
@@ -267,71 +274,20 @@ export default function Today() {
             <FadeIn delay={10}>
               <SignalLamp signal={triad.signal} isToday={isToday} />
             </FadeIn>
-          ) : null}
-          <RoadStrip date={localDateString(shown)} personalYear={dayNum?.personalYear ?? null} />
-          {triad?.signal ? null : (
+          ) : (
             <FadeIn delay={20}>
               <TodaySignal today={today} triad={triad} isToday={isToday} />
             </FadeIn>
           )}
           {triad ? (
-            <FadeIn delay={60}>
+            <FadeIn delay={40}>
               <TriadTodayCard data={triad} isToday={isToday} />
             </FadeIn>
           ) : null}
+          <RoadStrip date={localDateString(shown)} personalYear={dayNum?.personalYear ?? null} />
 
           <FadeIn delay={80}>
-            <AccentView style={[styles.card, { borderLeftColor: colors.stoplight }]}>
-              <View style={styles.moonHead}>
-                <Text accessibilityElementsHidden style={styles.moonGlyph}>{moonGlyph(today.moon.phase)}</Text>
-                <View style={styles.flex}>
-                  <Text style={styles.cardEyebrow}>THE MOON</Text>
-                  <Text style={styles.cardTitle}>{today.moon.formatted}</Text>
-                  <Text style={styles.body}>
-                    <Term id="astro:phase">{today.moon.phase}</Term> · {today.moon.illuminationPercent}% lit
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.body}>{phaseMeaning(today.moon.waxing, today.moon.phase)}</Text>
-              <Text style={styles.body}>
-                Moving through your <Term id={houseId(today.moon.house)} style={styles.strong}>{ordinal(today.moon.house)} house</Term>:{' '}
-                {houseTheme(today.moon.house)}.
-              </Text>
-              {today.moon.nextApplying ? (
-                <Text style={styles.body}>
-                  <Text style={styles.strong}>Next: </Text>
-                  {contactSentence(today.moon.nextApplying, 'ahead')}.
-                </Text>
-              ) : null}
-              {today.moon.lastSeparating ? (
-                <Text style={styles.body}>
-                  <Text style={styles.strong}>Just left: </Text>
-                  {contactSentence(today.moon.lastSeparating, 'behind')}.
-                </Text>
-              ) : null}
-            </AccentView>
-          </FadeIn>
-
-          <FadeIn delay={160}>
-            <AccentView style={[styles.card, { borderLeftColor: colors.stoplight }]}>
-              <Text style={styles.cardEyebrow}>THE SUN</Text>
-              <Text style={styles.cardTitle}>{today.sun.formatted}</Text>
-              <Text style={styles.body}>
-                Lighting up your <Term id={houseId(today.sun.house)} style={styles.strong}>{ordinal(today.sun.house)} house</Term>:{' '}
-                {houseTheme(today.sun.house)}.
-              </Text>
-              {today.retrograde.length ? (
-                <Text style={styles.body}>
-                  <Term id="astro:retrograde" style={styles.strong}>Retrograde now: </Term>
-                  {today.retrograde.map((b, i) => (
-                    <Text key={b}>
-                      {i > 0 ? ', ' : ''}
-                      <Term id={planetId(b)}>{`${bodyName(b)} ℞`}</Term>
-                    </Text>
-                  ))}
-                </Text>
-              ) : null}
-            </AccentView>
+            <SkyTodayCard today={today} />
           </FadeIn>
 
           {dayNum ? (
@@ -350,9 +306,25 @@ export default function Today() {
             </View>
             {today.transits.length ? (
               <View style={styles.transitList}>
-                {today.transits.map((hit) => (
+                {(allTransits ? today.transits : today.transits.slice(0, TRANSITS_SHOWN)).map((hit) => (
                   <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} onSelect={setSelectedHit} />
                 ))}
+                {today.transits.length > TRANSITS_SHOWN ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ expanded: allTransits }}
+                    accessibilityLabel={allTransits ? 'Show fewer transits' : `Show all ${today.transits.length} transits`}
+                    onPress={() => {
+                      select();
+                      setAllTransits((v) => !v);
+                    }}
+                    style={({ pressed }) => [styles.showAll, pressed && { opacity: 0.7 }]}
+                  >
+                    <Text style={styles.showAllText}>
+                      {allTransits ? 'Show fewer' : `Show all ${today.transits.length}`}
+                    </Text>
+                  </Pressable>
+                ) : null}
               </View>
             ) : (
               <Text style={styles.body}>
@@ -388,7 +360,6 @@ export default function Today() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   header: { gap: 6, paddingTop: space.lg },
   dateBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm, marginVertical: space.sm },
   stepBtn: {
@@ -407,8 +378,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
     borderColor: colors.hairline, borderLeftWidth: 4, padding: space.lg, gap: 10,
   },
-  moonHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  moonGlyph: { fontSize: 44 },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   cardTitle: { fontFamily: fonts.display, fontSize: 24, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
@@ -416,6 +385,8 @@ const styles = StyleSheet.create({
   sectionHead: { gap: 4, marginTop: space.sm, marginBottom: space.sm },
   sectionTitle: { fontFamily: fonts.display, fontSize: 22, color: colors.parchment },
   transitList: { gap: 10 },
+  showAll: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  showAllText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
   transitRow: {
     backgroundColor: colors.charcoal, borderRadius: radius.md, borderWidth: 1,
     borderColor: colors.hairline, padding: space.md, gap: 4,

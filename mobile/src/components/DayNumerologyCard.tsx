@@ -1,4 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { select } from '@/lib/haptics';
 import type { DayNumberMeaning, DayNumerology } from '@/lib/dayNumerologyTypes';
 import { Term } from '@/components/Explain';
 import { numberId } from '@/lib/termIds';
@@ -51,18 +53,47 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
   );
 }
 
+/**
+ * Collapsed, this is one line: "Personal Day 6: Care". Tap it for your Personal Day in full,
+ * the Universal Day and how the two blend.
+ */
 export function DayNumerologyCard({ data }: { data: DayNumerology }) {
+  const [open, setOpen] = useState(false);
+  const p = data.personal;
   return (
     <AccentView style={styles.card}>
-      <Text style={styles.cardEyebrow}>THE ROAD · NUMEROLOGY OF THE DAY</Text>
-      <DayBlock kind="GLOBAL" meaning={data.universal} />
-      <View style={styles.divider} />
-      <DayBlock kind="YOURS" meaning={data.personal} />
-      <Text style={styles.body}>{data.blend}</Text>
-      <Text style={styles.caption}>
-        <Term id="num:personalyear">Personal Year</Term> {data.personalYear} ·{' '}
-        <Term id="num:personalmonth">Personal Month</Term> {data.personalMonth}
-      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: open }}
+        accessibilityLabel={`The Road, number of the day. Personal Day ${numberText(p)}, ${p.label}. Personal Year ${data.personalYear}, Personal Month ${data.personalMonth}. ${open ? 'Expanded.' : 'Double tap to read more.'}`}
+        onPress={() => {
+          select();
+          setOpen((o) => !o);
+        }}
+        style={({ pressed }) => [styles.summary, pressed && { opacity: 0.8 }]}
+      >
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{numberText(p)}</Text>
+        </View>
+        <View style={styles.flex}>
+          <Text style={styles.eyebrow}>THE ROAD · PERSONAL DAY</Text>
+          <Text style={styles.label}>{p.label}</Text>
+          <Text style={styles.caption}>{`Personal Year ${data.personalYear} · Personal Month ${data.personalMonth}`}</Text>
+        </View>
+        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+      </Pressable>
+      {open ? (
+        <>
+          <DayBlock kind="YOURS" meaning={p} />
+          <View style={styles.divider} />
+          <DayBlock kind="GLOBAL" meaning={data.universal} />
+          <Text style={styles.body}>{data.blend}</Text>
+          <Text style={styles.caption}>
+            <Term id="num:personalyear">Personal Year</Term> {data.personalYear} ·{' '}
+            <Term id="num:personalmonth">Personal Month</Term> {data.personalMonth}
+          </Text>
+        </>
+      ) : null}
     </AccentView>
   );
 }
@@ -74,6 +105,8 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, borderLeftWidth: 4, borderLeftColor: colors.road,
     padding: space.lg, gap: 14,
   },
+  summary: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 56 },
+  chevron: { fontFamily: fonts.bodyBold, fontSize: 24, lineHeight: 26, color: colors.gold },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   block: { gap: 10 },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md },

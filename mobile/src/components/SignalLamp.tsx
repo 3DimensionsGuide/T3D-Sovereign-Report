@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LENS_LABEL, LENS_TEXT, LensIcon, SIGNAL_COLOR, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
+import { select } from '@/lib/haptics';
 import type { DailySignal, Lamp, LampState } from '@/lib/triadTypes';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -70,21 +71,54 @@ function Housing({ state }: { state: LampState }) {
   );
 }
 
+/** "2 go, 1 pause": a plain count of the lens lamps, so the overall line needs no paragraph. */
+export function lampTally(signal: DailySignal): string {
+  const states = [signal.vehicle, signal.road, signal.stoplight].filter((l): l is Lamp => !!l).map((l) => l.state);
+  const part = (s: LampState) => {
+    const n = states.filter((x) => x === s).length;
+    return n ? `${n} ${s}` : null;
+  };
+  return `${[part('go'), part('slow'), part('pause')].filter(Boolean).join(', ')}. Conditions, not a decision.`;
+}
+
+/**
+ * One line per lens: shape, word and the start of the reason. Tap it to read the full sentence.
+ * A lens with nothing to read is a plain line with no tap.
+ */
 function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; missing: string }) {
+  const [open, setOpen] = useState(false);
   const word = lamp ? WORD[lamp.state] : 'Not read';
   const text = lamp ? lamp.reason : missing;
-  return (
-    <View accessible accessibilityLabel={`${LENS_LABEL[lens]}, ${word}. ${text}`} style={styles.row}>
+  const body = (
+    <>
       <View style={styles.rowHead}>
         <LensIcon lens={lens} size={13} />
         <Text style={[styles.lensName, { color: LENS_TEXT[lens] }]}>{LENS_LABEL[lens]}</Text>
         <View style={styles.rowWord}>
           {lamp ? <SignalMarker kind={SHAPE[lamp.state]} size={14} color={COLOR[lamp.state]} /> : null}
           <Text style={styles.rowWordText}>{word}</Text>
+          {text ? <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text> : null}
         </View>
       </View>
-      <Text style={styles.rowText}>{text}</Text>
-    </View>
+      {text ? <Text style={styles.rowText} numberOfLines={open ? undefined : 1}>{text}</Text> : null}
+    </>
+  );
+  if (!text) {
+    return <View accessible accessibilityLabel={`${LENS_LABEL[lens]}, ${word}.`} style={styles.row}>{body}</View>;
+  }
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ expanded: open }}
+      accessibilityLabel={`${LENS_LABEL[lens]}, ${word}. ${text} ${open ? 'Expanded.' : 'Double tap to read in full.'}`}
+      onPress={() => {
+        select();
+        setOpen((o) => !o);
+      }}
+      style={({ pressed }) => [styles.row, pressed && { opacity: 0.75 }]}
+    >
+      {body}
+    </Pressable>
   );
 }
 
@@ -109,7 +143,7 @@ export function SignalLamp({ signal, isToday }: Props) {
         <View style={styles.heroText}>
           <Text style={[styles.word, { color: COLOR[overall.state] }]}>{WORD[overall.state]}</Text>
           <Text style={styles.phrase}>{PHRASE[overall.state]}</Text>
-          <Text style={styles.reason}>{overall.reason}</Text>
+          <Text style={styles.reason}>{lampTally(signal)}</Text>
         </View>
       </View>
 
@@ -142,11 +176,12 @@ const styles = StyleSheet.create({
   word: { fontFamily: fonts.display, fontSize: 40, lineHeight: 46 },
   phrase: { fontFamily: fonts.bodyBold, fontSize: 16, lineHeight: 22, color: colors.parchment },
   reason: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
-  rows: { gap: space.md, paddingTop: space.md, borderTopWidth: 1, borderTopColor: colors.hairline },
-  row: { gap: 4 },
+  rows: { gap: space.xs, paddingTop: space.sm, borderTopWidth: 1, borderTopColor: colors.hairline },
+  row: { gap: 4, minHeight: 48, justifyContent: 'center' },
   rowHead: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   lensName: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4 },
   rowWord: { flexDirection: 'row', alignItems: 'center', gap: 5, marginLeft: 'auto' },
   rowWordText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchment },
+  chevron: { fontFamily: fonts.bodyBold, fontSize: 20, lineHeight: 22, color: colors.gold, marginLeft: 2 },
   rowText: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
 });
