@@ -9,8 +9,6 @@ interface Props {
   today: TodayResult;
   triad: TriadToday | null;
   isToday: boolean;
-  /** True when the signal lamp is shown above, so this card is the plain reading of the three lenses. */
-  hasLamp?: boolean;
 }
 
 const natureToSignal = (nature: DailyTransitHit['nature']): SignalKind =>
@@ -39,16 +37,26 @@ function Row({ lens, line, sub, signal }: { lens: LensName; line: string; sub: s
   );
 }
 
+/** The day's count of flow contacts, friction contacts and retrograde planets. Every marker has its word. */
+export function SkyTally({ today, bare = false }: { today: TodayResult; bare?: boolean }) {
+  const flow = today.transits.filter((t) => t.nature === 'flow').length;
+  const friction = today.transits.filter((t) => t.nature === 'friction').length;
+  const retro = today.retrograde.length;
+  return (
+    <View style={[styles.tally, bare && styles.tallyBare]} accessible accessibilityLabel={`In the sky: ${flow} flow, ${friction} friction, ${retro} retrograde.`}>
+        <View style={styles.tallyItem}><SignalMarker kind="flow" size={14} /><Text style={styles.tallyText}>{flow} flow</Text></View>
+        <View style={styles.tallyItem}><SignalMarker kind="friction" size={14} /><Text style={styles.tallyText}>{friction} friction</Text></View>
+        <View style={styles.tallyItem}><SignalMarker kind="caution" size={14} /><Text style={styles.tallyText}>{retro} retrograde</Text></View>
+      </View>
+  );
+}
+
 /**
  * The first thing on Today: one line per lens, the signal of the tightest sky contact,
  * and a tally of the day's flow, friction and retrogrades. Every marker is paired with its word.
  */
-export function TodaySignal({ today, triad, isToday, hasLamp = false }: Props) {
+export function TodaySignal({ today, triad, isToday }: Props) {
   const top = today.transits[0] ?? null;
-  const flow = today.transits.filter((t) => t.nature === 'flow').length;
-  const friction = today.transits.filter((t) => t.nature === 'friction').length;
-  const retro = today.retrograde.length;
-
   const vehicleLine = triad?.vehicle.strategy ?? today.vehicle.strategy ?? today.vehicle.type ?? 'Your Vehicle';
   const vehicleSub = triad?.vehicle.heading ?? today.vehicle.type;
   const skyLine = triad?.stoplight.lead
@@ -59,20 +67,14 @@ export function TodaySignal({ today, triad, isToday, hasLamp = false }: Props) {
 
   return (
     <View style={styles.card}>
-      <Text accessibilityRole="header" style={styles.title}>{hasLamp
-          ? (isToday ? 'Your three lenses today' : 'Your three lenses for this day')
-          : (isToday ? 'Your signal today' : 'Your signal for this day')}</Text>
+      <Text accessibilityRole="header" style={styles.title}>{isToday ? 'Your signal today' : 'Your signal for this day'}</Text>
       <Row lens="vehicle" line={vehicleLine} sub={vehicleSub && vehicleSub !== vehicleLine ? vehicleSub : null} />
       {triad ? (
         <Row lens="road" line={`Personal Day ${triad.road.numberText}: ${triad.road.label}`} sub={`Lean in: ${triad.road.leanIn}`} />
       ) : null}
       <Row lens="stoplight" line={skyLine} sub={`Moon in ${today.moon.sign} · ${today.moon.phase}`} signal={top ? natureToSignal(top.nature) : 'neutral'} />
 
-      <View style={styles.tally} accessible accessibilityLabel={`In the sky: ${flow} flow, ${friction} friction, ${retro} retrograde.`}>
-        <View style={styles.tallyItem}><SignalMarker kind="flow" size={14} /><Text style={styles.tallyText}>{flow} flow</Text></View>
-        <View style={styles.tallyItem}><SignalMarker kind="friction" size={14} /><Text style={styles.tallyText}>{friction} friction</Text></View>
-        <View style={styles.tallyItem}><SignalMarker kind="caution" size={14} /><Text style={styles.tallyText}>{retro} retrograde</Text></View>
-      </View>
+      <SkyTally today={today} />
     </View>
   );
 }
@@ -94,6 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', flexWrap: 'wrap', columnGap: space.md, rowGap: space.sm,
     paddingTop: space.md, borderTopWidth: 1, borderTopColor: colors.hairline,
   },
+  tallyBare: { borderTopWidth: 0, paddingTop: 0 },
   tallyItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   tallyText: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted },
 });

@@ -165,10 +165,18 @@ test('the Sun and Moon longitudes stay on the server and feed the Vehicle lamp',
 
 test('the Road strip writes its numbers out and opens the Timeline', () => {
   const strip = read('mobile/src/components/RoadStrip.tsx');
-  assert.match(strip, /Numbers on the strip are Pinnacles/);
+  assert.match(strip, /The numbers are your Pinnacles/);
   assert.match(strip, /accessibilityRole="button"/);
   assert.match(strip, /router\.push\('\/timeline'/);
   assert.match(strip, /spokenSummary/);
   const today = read('mobile/src/app/(tabs)/today.tsx');
   assert.match(today, /<RoadStrip /);
+});
+
+test('with the signal lamp, Today drops the cards that repeat it', () => {
+  const today = read('mobile/src/app/(tabs)/today.tsx');
+  assert.match(today, /triad\?\.signal \? null : \(/, 'the old three-lens card only shows without the lamp');
+  assert.match(today, /<SkyTally today=\{today\} bare \/>/, 'the sky tally moves to the transits');
+  const card = read('mobile/src/components/TriadTodayCard.tsx');
+  assert.match(card, /const compact = !!data\.signal/);
 });

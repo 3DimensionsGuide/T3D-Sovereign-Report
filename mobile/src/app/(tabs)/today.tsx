@@ -21,7 +21,7 @@ import {
 import { Term } from '@/components/Explain';
 import { TimeNote } from '@/components/TimeNote';
 import { TriadTodayCard } from '@/components/TriadTodayCard';
-import { TodaySignal } from '@/components/TodaySignal';
+import { SkyTally, TodaySignal } from '@/components/TodaySignal';
 import { SignalLamp } from '@/components/SignalLamp';
 import { RoadStrip } from '@/components/RoadStrip';
 import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
@@ -269,9 +269,11 @@ export default function Today() {
             </FadeIn>
           ) : null}
           <RoadStrip date={localDateString(shown)} personalYear={dayNum?.personalYear ?? null} />
-          <FadeIn delay={20}>
-            <TodaySignal today={today} triad={triad} isToday={isToday} hasLamp={!!triad?.signal} />
-          </FadeIn>
+          {triad?.signal ? null : (
+            <FadeIn delay={20}>
+              <TodaySignal today={today} triad={triad} isToday={isToday} />
+            </FadeIn>
+          )}
           {triad ? (
             <FadeIn delay={60}>
               <TriadTodayCard data={triad} isToday={isToday} />
@@ -344,6 +346,7 @@ export default function Today() {
               <Text style={styles.sub}>
                 Tightest first. Within 1° is peak; within 3° is still active.
               </Text>
+              {triad?.signal ? <SkyTally today={today} bare /> : null}
             </View>
             {today.transits.length ? (
               <View style={styles.transitList}>

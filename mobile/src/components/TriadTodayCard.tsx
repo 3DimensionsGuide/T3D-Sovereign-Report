@@ -21,6 +21,9 @@ function Lens({ glyph, accent, label, title, lines }: {
 }
 
 export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isToday?: boolean }) {
+  // With the signal lamp and the Road strip above, the Road is covered by the day-number card below
+  // and the Moon by its own card, so this card keeps only what is new: Strategy and the sky contact.
+  const compact = !!data.signal;
   return (
     <View style={styles.card}>
       <Text style={styles.eyebrow}>{isToday ? "TODAY'S TRIAD" : "THIS DAY'S TRIAD"}</Text>
@@ -31,17 +34,19 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
         glyph="◆" accent={colors.vehicle} label="THE VEHICLE" title={data.vehicle.heading}
         lines={[data.vehicle.strategy, data.vehicle.authority, data.vehicle.cue]}
       />
-      <Lens
-        glyph="▲" accent={colors.road} label="THE ROAD"
-        title={`Personal Day ${data.road.numberText}: ${data.road.label}`}
-        lines={[data.road.theme, `Lean in: ${data.road.leanIn}`, `Watch for: ${data.road.watchFor}`]}
-      />
+      {compact ? null : (
+        <Lens
+          glyph="▲" accent={colors.road} label="THE ROAD"
+          title={`Personal Day ${data.road.numberText}: ${data.road.label}`}
+          lines={[data.road.theme, `Lean in: ${data.road.leanIn}`, `Watch for: ${data.road.watchFor}`]}
+        />
+      )}
       <Lens
         glyph="●" accent={colors.stoplight} label="THE STOPLIGHT"
         title={data.stoplight.lead ? data.stoplight.lead.title : 'A quiet sky'}
         lines={[
           data.stoplight.lead ? data.stoplight.lead.natureLine : data.stoplight.quiet,
-          data.stoplight.moon,
+          compact ? null : data.stoplight.moon,
           data.stoplight.lead ? data.stoplight.lead.invitation : null,
         ]}
       />

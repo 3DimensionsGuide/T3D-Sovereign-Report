@@ -80,7 +80,7 @@ export function RoadStrip({ date, personalYear }: Props) {
 
       <Text style={styles.sentence}>{model.sentence}</Text>
       {model.match ? <Text style={styles.match}>{model.match}</Text> : null}
-      <Text style={styles.key}>Numbers on the strip are Pinnacles. C is the Challenge beside each.</Text>
+      <Text style={styles.key}>The numbers are your Pinnacles. C is the Challenge beside each.</Text>
       <Text style={styles.more}>Open your timeline ›</Text>
     </Pressable>
   );
