@@ -144,3 +144,21 @@ test('pass A: haptics are wired to buttons, segments, tabs, Decide choices and a
   assert.match(read('mobile/src/components/practice/DecideFlow.tsx'), /select\(\);/);
   assert.match(read('mobile/src/app/share-card.tsx'), /sharedAction\) success\(\)/);
 });
+
+test('the signal lamp pairs every lamp with a shape and a word, and honours Reduce Motion', () => {
+  const lamp = read('mobile/src/components/SignalLamp.tsx');
+  for (const word of ["go: 'Go'", "slow: 'Slow'", "pause: 'Pause'"]) assert.ok(lamp.includes(word), `${word} is written out`);
+  assert.match(lamp, /go: 'flow', slow: 'caution', pause: 'friction'/, 'each lamp has its own shape');
+  assert.match(lamp, /isReduceMotionEnabled/);
+  assert.match(lamp, /Conditions favor waiting/);
+  const today = read('mobile/src/app/(tabs)/today.tsx');
+  assert.match(today, /<SignalLamp /);
+});
+
+test('the Sun and Moon longitudes stay on the server and feed the Vehicle lamp', () => {
+  const route = read('src/app/api/app/today/route.ts');
+  assert.match(route, /skyLongitudes: _serverOnly/, 'stripped before the sky leaves the server');
+  const triad = read('src/app/api/app/triad-today/route.ts');
+  assert.match(triad, /longitudeToGate\(sky\.skyLongitudes\.sun\)/);
+  assert.match(triad, /buildTriadToday\(/);
+});

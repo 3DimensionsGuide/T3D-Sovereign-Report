@@ -16,6 +16,8 @@ import { leads } from '@/server/db/schema';
 import { buildTriadToday } from '@/lib/app/triadToday';
 import { calculateDailySky, type NatalSkyPoints } from '@/server/engines/dailySky';
 import { calculateDayNumerology } from '@/server/engines/dayNumerology';
+import { GATE_CENTER_MAP, UNIQUE_CHANNELS, longitudeToGate } from '@/server/engines/human_design';
+import type { VehicleGateData } from '@/lib/app/signal';
 import type { AstrologyResult } from '@/server/engines/types';
 import { parseSkyInstant } from '@/lib/app/skyDate';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
@@ -61,7 +63,12 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const results = lead.results as unknown as {
       astrology?: AstrologyResult;
-      humanDesign?: { type?: string; authority?: string };
+      humanDesign?: {
+        type?: string;
+        authority?: string;
+        activeGates?: Array<{ gate?: number }>;
+        undefinedCenters?: string[];
+      };
     } | null;
     const t = results?.astrology?.tropical;
     const birthDate = (lead.birthData as { date?: string } | null)?.date;
@@ -83,11 +90,33 @@ export async function POST(request: Request): Promise<NextResponse> {
       saturn: t.saturn.longitude, ascendant: t.houses.ascendant, midheaven: t.houses.mc,
     };
 
+    const sky = calculateDailySky(natal, at);
+    const hd = results?.humanDesign;
+    const natalGates = (hd?.activeGates ?? [])
+      .map((g) => g.gate)
+      .filter((g): g is number => typeof g === 'number');
+    // Without the person's gates there is no Vehicle lamp; the Road and Stoplight lamps still show.
+    const gateData: VehicleGateData | null = natalGates.length && Array.isArray(hd?.undefinedCenters)
+      ? {
+          type: hd?.type ?? null,
+          authority: hd?.authority ?? null,
+          natalGates,
+          undefinedCenters: hd?.undefinedCenters ?? [],
+          transit: {
+            sun: longitudeToGate(sky.skyLongitudes.sun).gate,
+            moon: longitudeToGate(sky.skyLongitudes.moon).gate,
+          },
+          channels: UNIQUE_CHANNELS.map((c) => c.gates),
+          gateCenter: GATE_CENTER_MAP,
+        }
+      : null;
+
     const data = buildTriadToday(
-      { type: results?.humanDesign?.type ?? null, authority: results?.humanDesign?.authority ?? null },
+      { type: hd?.type ?? null, authority: hd?.authority ?? null },
       calculateDayNumerology(birthDate, localDate),
-      calculateDailySky(natal, at),
+      sky,
       body.isToday === false ? 'this day' : 'today',
+      gateData,
     );
 
     return NextResponse.json({ success: true, data }, { status: 200, headers: { 'Cache-Control': 'no-store' } });

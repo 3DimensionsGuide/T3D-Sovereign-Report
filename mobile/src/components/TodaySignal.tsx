@@ -9,6 +9,8 @@ interface Props {
   today: TodayResult;
   triad: TriadToday | null;
   isToday: boolean;
+  /** True when the signal lamp is shown above, so this card is the plain reading of the three lenses. */
+  hasLamp?: boolean;
 }
 
 const natureToSignal = (nature: DailyTransitHit['nature']): SignalKind =>
@@ -41,7 +43,7 @@ function Row({ lens, line, sub, signal }: { lens: LensName; line: string; sub: s
  * The first thing on Today: one line per lens, the signal of the tightest sky contact,
  * and a tally of the day's flow, friction and retrogrades. Every marker is paired with its word.
  */
-export function TodaySignal({ today, triad, isToday }: Props) {
+export function TodaySignal({ today, triad, isToday, hasLamp = false }: Props) {
   const top = today.transits[0] ?? null;
   const flow = today.transits.filter((t) => t.nature === 'flow').length;
   const friction = today.transits.filter((t) => t.nature === 'friction').length;
@@ -57,7 +59,9 @@ export function TodaySignal({ today, triad, isToday }: Props) {
 
   return (
     <View style={styles.card}>
-      <Text accessibilityRole="header" style={styles.title}>{isToday ? 'Your signal today' : 'Your signal for this day'}</Text>
+      <Text accessibilityRole="header" style={styles.title}>{hasLamp
+          ? (isToday ? 'Your three lenses today' : 'Your three lenses for this day')
+          : (isToday ? 'Your signal today' : 'Your signal for this day')}</Text>
       <Row lens="vehicle" line={vehicleLine} sub={vehicleSub && vehicleSub !== vehicleLine ? vehicleSub : null} />
       {triad ? (
         <Row lens="road" line={`Personal Day ${triad.road.numberText}: ${triad.road.label}`} sub={`Lean in: ${triad.road.leanIn}`} />

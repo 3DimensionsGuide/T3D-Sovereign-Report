@@ -104,6 +104,11 @@ export interface DailySkyResult {
   retrograde: SkyBody[];
   /** Tightest-orb first. */
   transits: DailyTransitHit[];
+  /**
+   * The Sun's and Moon's tropical longitudes right now. SERVER ONLY: used to find their Human Design
+   * gates for the Signal, and removed before any result leaves the server.
+   */
+  skyLongitudes: { sun: number; moon: number };
 }
 
 // ─── EPHEMERIS SETUP (duplicated from transits.ts on purpose) ───────────────
@@ -383,5 +388,6 @@ export function calculateDailySky(natal: NatalSkyPoints, at: Date = new Date()):
     },
     retrograde: RETROGRADE_CHECKED.filter((body) => sky[body].retrograde),
     transits: hits.slice(0, MAX_TRANSITS_RETURNED),
+    skyLongitudes: { sun: sky.sun.longitude, moon: sky.moon.longitude },
   };
 }

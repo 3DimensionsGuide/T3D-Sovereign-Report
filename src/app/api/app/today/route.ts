@@ -104,7 +104,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       midheaven: tropical.houses.mc,
     };
 
-    const sky = calculateDailySky(natal, at);
+    // The luminaries' longitudes stay on the server; only the curated sky leaves.
+    const { skyLongitudes: _serverOnly, ...sky } = calculateDailySky(natal, at);
 
     return NextResponse.json(
       {

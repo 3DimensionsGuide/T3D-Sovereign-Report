@@ -12,6 +12,7 @@ import { HOUSE_THEMES } from '@/lib/report/advanced/stoplight/transits-content';
 import { buildTransitCard, pickAuthorityContent, pickTypeContent } from '@/lib/app/transitCard';
 import type { DayNumerology } from '@/server/engines/dayNumerology';
 import type { DailySkyResult } from '@/server/engines/dailySky';
+import { buildDailySignal, type DailySignal, type VehicleGateData } from '@/lib/app/signal';
 
 export interface TriadToday {
   vehicle: {
@@ -33,6 +34,8 @@ export interface TriadToday {
     lead: { title: string; natureLine: string; invitation: string } | null;
     quiet: string | null;
   };
+  /** Go, Slow or Pause per lens and overall. Conditions, never a decision. */
+  signal: DailySignal;
   frame: string;
   steps: string[];
   closing: string;
@@ -54,6 +57,8 @@ export function buildTriadToday(
   sky: DailySkyResult,
   /** "today" for the live day, "this day" when the person is looking at another date. */
   dayWord: 'today' | 'this day' = 'today',
+  /** The Vehicle's gate data for the Signal; null when the chart has no Human Design data. */
+  gateData: VehicleGateData | null = null,
 ): TriadToday {
   const typeContent = pickTypeContent(vehicle.type);
   const authContent = pickAuthorityContent(vehicle.authority);
@@ -88,7 +93,15 @@ export function buildTriadToday(
     ? `Authority (${authContent.authority}): ${authContent.doList[0]}.`
     : 'Authority: let your inner authority speak before you commit.';
 
+  const signal = buildDailySignal({
+    personal: { number: p.number, root: p.root, label: p.label },
+    top: hit ? { nature: hit.nature, peak: hit.peak } : null,
+    topTitle: card ? card.title : null,
+    vehicle: gateData,
+  });
+
   return {
+    signal,
     vehicle: {
       heading: typeContent && authContent ? `${typeContent.type} · ${authorityName}` : 'Your Strategy and Authority',
       strategy: typeContent ? typeContent.strategyPractice : null,

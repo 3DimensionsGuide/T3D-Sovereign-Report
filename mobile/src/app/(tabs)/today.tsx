@@ -22,6 +22,7 @@ import { Term } from '@/components/Explain';
 import { TimeNote } from '@/components/TimeNote';
 import { TriadTodayCard } from '@/components/TriadTodayCard';
 import { TodaySignal } from '@/components/TodaySignal';
+import { SignalLamp } from '@/components/SignalLamp';
 import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
@@ -261,8 +262,13 @@ export default function Today() {
       {today ? (
         <>
           <TimeNote scope="sky" />
+          {triad?.signal ? (
+            <FadeIn delay={10}>
+              <SignalLamp signal={triad.signal} isToday={isToday} />
+            </FadeIn>
+          ) : null}
           <FadeIn delay={20}>
-            <TodaySignal today={today} triad={triad} isToday={isToday} />
+            <TodaySignal today={today} triad={triad} isToday={isToday} hasLamp={!!triad?.signal} />
           </FadeIn>
           {triad ? (
             <FadeIn delay={60}>
