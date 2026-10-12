@@ -128,3 +128,15 @@ test('the wheel draws one line and one dot per contact, and lights only the pick
   const faint = lit.prims.filter((p) => p.k === 'line' && p.op === 0.12).length;
   assert.equal(faint, contacts.length - 1);
 });
+
+test('every planet on the outer ring is tappable, without changing the birth planets\' taps', () => {
+  const now = nowPlanets(
+    [{ body: 'sun', longitude: 100, retrograde: false }, { body: 'moon', longitude: 250, retrograde: false }],
+    0,
+  );
+  const plain = buildWheelScene(tropical);
+  const scene = buildWheelScene(tropical, null, now);
+  const keys = scene.hotspots!.map((h) => h.key);
+  assert.ok(keys.includes('now:sun') && keys.includes('now:moon'));
+  assert.deepEqual(plain.hotspots!.map((h) => h.key), scene.hotspots!.filter((h) => !h.key.startsWith('now:')).map((h) => h.key));
+});

@@ -59,7 +59,7 @@ const ZODIAC_OPTIONS = [
 
 const SKY_OPTIONS = [
   { value: 'birth', label: 'Birth sky' },
-  { value: 'now', label: 'Birth + today' },
+  { value: 'now', label: 'Birth + Today' },
 ] as const;
 
 export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: WheelChart; sidereal: WheelChart; sky?: SkyPosition[] | null }) {
@@ -100,7 +100,7 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
             key={h.key}
             accessibilityElementsHidden
             importantForAccessibility="no"
-            onPress={() => open(natalId(h.key as WheelBody))}
+            onPress={() => open(natalId(h.key.replace(/^now:/, '') as WheelBody))}
             style={[styles.hotspot, { left: h.x * scale - 22, top: h.y * scale - 22 }]}
           />
         )) : null}
@@ -198,11 +198,11 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
             The outer ring of crimson symbols is where the planets are right now. The inner wheel is your birth chart. The house is the part of your life each one is moving through today.
           </Text>
           {todayRows.map((p) => (
-            <View key={p.body} style={styles.row} accessible accessibilityLabel={`${BODY_NAMES[p.body]} today in ${p.formatted}${p.retrograde ? ', retrograde' : ''}, in your house ${p.house}`}>
+            <TermPressable key={p.body} id={natalId(p.body)} style={styles.row} label={`${BODY_NAMES[p.body]} today in ${p.formatted}${p.retrograde ? ', retrograde' : ''}, in your house ${p.house}`}>
               <Text style={styles.glyph}>{BODY_GLYPHS[p.body]}</Text>
               <Text style={styles.rowName}>{BODY_NAMES[p.body]}</Text>
               <Text style={styles.rowValue}>{p.formatted}{p.retrograde ? ' ℞' : ''} · House {p.house}</Text>
-            </View>
+            </TermPressable>
           ))}
         </Section>
       ) : null}

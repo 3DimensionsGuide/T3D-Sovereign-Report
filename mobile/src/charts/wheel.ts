@@ -271,6 +271,7 @@ export function buildWheelScene(
         const [cx1, cy1] = polar(nowSpread[i], asc, rNow - 10);
         prims.push({ k: 'line', x1: t2x, y1: t2y, x2: cx1, y2: cy1, stroke: c.stoplight, w: 0.9, op: 0.7 });
       }
+      hotspots.push({ x: gx, y: gy, key: `now:${pl.body}`, label: `${BODY_NAMES[pl.body]} today` });
       prims.push({ k: 'text', x: gx, y: gy, s: BODY_GLYPHS[pl.body] + TEXT_STYLE, size: 17, fill: c.stoplight, font: 'symbol' });
       if (pl.retrograde) {
         const [rx, ry] = polar(nowSpread[i], asc, rNow + 12);
