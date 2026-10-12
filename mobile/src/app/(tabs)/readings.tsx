@@ -5,12 +5,15 @@ import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { Segmented } from '@/components/Segmented';
 import { LENS_COLOR, LensIcon, LensLabel } from '@/components/Lens';
-import { ReadingContents, ReadingJumpProvider, ReadingLensProvider } from '@/components/ReadingBlocks';
+import { ReadingCardOpenProvider, ReadingContents, ReadingJumpProvider, ReadingLensProvider } from '@/components/ReadingBlocks';
 import { NumerologyReading } from '@/components/readings/NumerologyReading';
 import { StoplightReading } from '@/components/readings/StoplightReading';
 import { StickyMiniBody } from '@/components/readings/StickyMiniBody';
+import { StickyMiniRoad } from '@/components/readings/StickyMiniRoad';
+import { StickyMiniWheel } from '@/components/readings/StickyMiniWheel';
 import { VehicleReading } from '@/components/readings/VehicleReading';
 import { nextFocus } from '@/lib/bodygraphFocus';
+import { nextOpenCard } from '@/lib/pinnedBar';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const OPTIONS = [
@@ -42,8 +45,8 @@ const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; acce
   },
 };
 
-/** How far the reading scrolls before the full bodygraph is out of view and the small one pins to the top. */
-const PIN_AT = 560;
+/** How far each reading scrolls before its big drawing is out of view and the small one pins to the top. */
+const PIN_AT: Record<Lens, number> = { vehicle: 560, road: 520, stoplight: 520 };
 
 export default function Readings() {
   const [lens, setLens] = useState<Lens>('vehicle');
@@ -56,7 +59,11 @@ export default function Readings() {
   const [pinned, setPinned] = useState(false);
   const [focusCenter, setFocusCenter] = useState<string | null>(null);
   const onFocusCenter = useCallback((id: string, open: boolean) => setFocusCenter((cur) => nextFocus(cur, id, open)), []);
-  const onScrollY = useCallback((y: number) => { const p = y > PIN_AT; setPinned((prev) => (prev === p ? prev : p)); }, []);
+  // The Road and Stoplight bars name the card opened last; it resets when the lens changes.
+  const [openCard, setOpenCard] = useState<string | null>(null);
+  const onCardOpen = useCallback((title: string, open: boolean) => setOpenCard((cur) => nextOpenCard(cur, title, open)), []);
+  useEffect(() => { setOpenCard(null); }, [lens]);
+  const onScrollY = useCallback((y: number) => { const p = y > PIN_AT[lens]; setPinned((prev) => (prev === p ? prev : p)); }, [lens]);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffset = useRef(0);
   const [refresher, setRefresher] = useState<{ run: () => Promise<void> } | null>(null);
@@ -73,9 +80,15 @@ export default function Readings() {
       scrollRef={scrollRef}
       scrollOffset={scrollOffset}
       onScrollY={onScrollY}
-      overlay={lens === 'vehicle' && pinned ? <StickyMiniBody focusId={focusCenter} /> : null}
+      overlay={
+        !pinned ? null
+        : lens === 'vehicle' ? <StickyMiniBody focusId={focusCenter} />
+        : lens === 'road' ? <StickyMiniRoad openCard={openCard} />
+        : <StickyMiniWheel openCard={openCard} />
+      }
     >
       <ReadingLensProvider value={lens}>
+        <ReadingCardOpenProvider value={onCardOpen}>
         <ReadingJumpProvider scrollRef={scrollRef} scrollOffset={scrollOffset}>
           <FadeIn>
             <View style={styles.header}>
@@ -94,6 +107,7 @@ export default function Readings() {
             <StoplightReading onRefreshReady={setRefresher} />
           )}
         </ReadingJumpProvider>
+        </ReadingCardOpenProvider>
       </ReadingLensProvider>
     </Screen>
   );

@@ -19,6 +19,10 @@ const LensContext = createContext<LensName>('vehicle');
 export const ReadingLensProvider = LensContext.Provider;
 export const useReadingLens = (): LensName => useContext(LensContext);
 
+/** Lets a pinned bar hear which card was opened or closed, without every card passing a handler. */
+const CardOpenContext = createContext<(title: string, open: boolean) => void>(() => undefined);
+export const ReadingCardOpenProvider = CardOpenContext.Provider;
+
 /** "YOUR MACHINERY" becomes "Your machinery". */
 const sentence = (text: string): string => capFirst(text.toLowerCase());
 
@@ -200,10 +204,11 @@ export function Accordion({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  const reportOpen = useContext(CardOpenContext);
   return (
     <View style={[styles.card, now && { borderColor: accent, borderWidth: 2 }]}>
       <Pressable
-        onPress={() => { setOpen(!open); onOpenChange?.(!open); }}
+        onPress={() => { setOpen(!open); onOpenChange?.(!open); reportOpen(title, !open); }}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${title}. ${subtitle ?? ''}${now ? ' Active now.' : ''} ${open ? 'Expanded.' : 'Double tap to read.'}`}

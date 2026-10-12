@@ -1,0 +1,36 @@
+import type { ReactNode } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, fonts, radius, space } from '@/theme/tokens';
+
+/**
+ * The shared frame for the small drawing pinned to the top of a reading once the full one has scrolled out of view.
+ * Decorative: the same facts are written in the reading, so it is hidden from screen readers.
+ */
+export function PinnedBar({ visual, title, line, lineColor }: { visual: ReactNode; title: string; line: string; lineColor: string }) {
+  // The bar is positioned from the very top of the screen, so it starts below the status bar and camera area.
+  const top = useSafeAreaInsets().top + 6;
+  return (
+    <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={[styles.bar, { top }]}>
+      {visual}
+      <View style={styles.text}>
+        <Text style={styles.type} numberOfLines={1}>{title}</Text>
+        <Text style={[styles.line, { color: lineColor }]} numberOfLines={1}>{line}</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  bar: {
+    position: 'absolute', left: space.md, right: space.md,
+    flexDirection: 'row', alignItems: 'center', gap: space.md,
+    paddingVertical: 8, paddingHorizontal: space.md,
+    borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,
+    // Fully solid, so reading text never shows through.
+    backgroundColor: '#121214',
+  },
+  text: { flex: 1, gap: 2 },
+  type: { fontFamily: fonts.display, fontSize: 16, color: colors.parchment },
+  line: { fontFamily: fonts.bodyMedium, fontSize: 13 },
+});

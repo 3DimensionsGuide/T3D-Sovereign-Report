@@ -8,7 +8,7 @@ import type { ChartResult } from '@/lib/api';
  * Your birth sky in miniature: the twelve signs round a ring (Aries at the left), the Sun as a solid dot,
  * the Moon as an open ring and the Rising sign as a bar through the ring. The signs are written beside it.
  */
-export function MiniWheel({ astro }: { astro: ChartResult['astrology'] }) {
+export function MiniWheel({ astro, size = 64 }: { astro: ChartResult['astrology']; size?: number }) {
   const wheel = useMemo(
     () =>
       buildMiniWheel(
@@ -16,8 +16,9 @@ export function MiniWheel({ astro }: { astro: ChartResult['astrology'] }) {
         longitudeFromPlacement(astro.tropicalMoon.sign, astro.tropicalMoon.degreeInSign, astro.tropicalMoon.minuteInSign),
         Number.isFinite(astro.tropicalAscendant) ? ((astro.tropicalAscendant % 360) + 360) % 360 : null,
         { sun: astro.tropicalSun.sign, moon: astro.tropicalMoon.sign, rising: signOf(astro.tropicalAscendant) },
+        size,
       ),
-    [astro],
+    [astro, size],
   );
   return (
     <Svg width={wheel.size} height={wheel.size} accessibilityRole="image" accessibilityLabel={wheel.spoken}>
