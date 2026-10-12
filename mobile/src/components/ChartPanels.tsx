@@ -4,6 +4,8 @@ import { TermPressable, useExplain } from '@/components/Explain';
 import { LENS_TEXT, LensIcon, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
 import { aspectId, centerId, channelId, gateId, natalId } from '@/lib/termIds';
 import { buildBodygraphScene } from '@/charts/bodygraph';
+import { CENTER_SHAPES } from '@/charts/bodygraphLayout';
+import { centerFocusInfo, centerLabel, focusSentence } from '@/lib/bodygraphFocus';
 import { chartColors } from '@/charts/palette';
 import type { BodygraphData, WheelAspect, WheelBody, WheelChart } from '@/charts/chartTypes';
 import { ASPECT_NAMES, ASPECT_SYMBOLS, BODY_GLYPHS, BODY_NAMES, buildWheelScene, sameFocus, type WheelFocus } from '@/charts/wheel';
@@ -185,7 +187,17 @@ const CENTER_NAMES: Record<string, string> = {
 const EPOCH_LABEL = { personality: 'Personality', design: 'Design', both: 'Personality + Design' } as const;
 
 export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
-  const scene = useMemo(() => buildBodygraphScene(hd), [hd]);
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
+  const scene = useMemo(() => buildBodygraphScene(hd, focusId), [hd, focusId]);
+  const info = useMemo(() => (focusId ? centerFocusInfo(hd, focusId) : null), [hd, focusId]);
+  const { open } = useExplain();
+  const [figureWidth, setFigureWidth] = useState(0);
+  const scale = figureWidth / scene.w;
+  const pick = (id: string) => {
+    setTouched(true);
+    setFocusId((cur) => (cur === id ? null : id));
+  };
   const label =
     `Human Design bodygraph. ${hd.type}, ${hd.authority} authority, profile ${hd.profile}. ` +
     `Defined centers: ${hd.definedCenters.map((c) => CENTER_NAMES[c] ?? c).join(', ') || 'none'}.`;
@@ -200,8 +212,61 @@ export function BodygraphPanel({ hd }: { hd: BodygraphData }) {
         <Text style={styles.headMeta}>{hd.authority} authority · Profile {hd.profile}</Text>
       </View>
 
-      <View style={styles.figure}>
-        <SceneView scene={scene} label={label} reveal />
+      <View style={styles.figure} onLayout={(e) => setFigureWidth(e.nativeEvent.layout.width)}>
+        <SceneView scene={scene} label={label} reveal={!touched} />
+        {scale > 0 ? scene.hotspots?.map((h) => (
+          <Pressable
+            key={h.key}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+            onPress={() => pick(h.key)}
+            style={[styles.hotspot, { left: h.x * scale - 22, top: h.y * scale - 22 }]}
+          />
+        )) : null}
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+        {CENTER_SHAPES.map((c) => {
+          const isDefined = hd.definedCenters.includes(c.id);
+          const on = focusId === c.id;
+          return (
+            <Pressable
+              key={c.id}
+              accessibilityRole="button"
+              accessibilityState={{ selected: on }}
+              accessibilityLabel={`${centerLabel(c.id)} center, ${isDefined ? 'defined' : 'open'}. ${on ? 'Showing on the bodygraph. Double tap to clear.' : 'Double tap to show on the bodygraph.'}`}
+              onPress={() => pick(c.id)}
+              style={[styles.aspectChip, on && styles.aspectChipOn]}
+            >
+              <View style={[styles.centerMark, isDefined ? styles.centerMarkOn : styles.centerMarkOff]} />
+              <Text style={styles.centerChipText}>{centerLabel(c.id)}</Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+      <View accessibilityLiveRegion="polite" style={{ gap: space.sm }}>
+        {info ? (
+          <>
+            <Text style={styles.focusLine}>{info.name} · {info.defined ? 'Defined' : 'Open'}</Text>
+            <Text style={styles.note}>{focusSentence(info)}</Text>
+            {info.channels.map((ch) => (
+              <TermPressable key={ch.gates.join('-')} id={channelId(Math.min(...ch.gates), Math.max(...ch.gates))} style={styles.row}>
+                <Text style={styles.rowName}>{ch.gates[0]}–{ch.gates[1]}  {ch.name}</Text>
+                <Text style={styles.rowValue}>to {centerLabel(ch.other)}</Text>
+              </TermPressable>
+            ))}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`What is the ${info.name} center?`}
+              onPress={() => open(centerId(info.id))}
+              style={styles.learnBtn}
+            >
+              <Text style={styles.learnText}>{`What is the ${info.name} center?`}</Text>
+            </Pressable>
+          </>
+        ) : (
+          <Text style={styles.note}>Tap a center on the bodygraph, or one of the names above, to light it with its channels.</Text>
+        )}
       </View>
 
       <View style={styles.keyRow}>
@@ -298,6 +363,8 @@ const styles = StyleSheet.create({
   aspectChip: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal },
   aspectChipOn: { borderColor: colors.gold, backgroundColor: colors.amethyst },
   aspectChipText: { fontSize: 17, color: colors.parchment },
+  learnBtn: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
+  learnText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
   focusLine: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 22, color: colors.parchment },
   keyRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space.md, rowGap: space.sm },
   keyItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },

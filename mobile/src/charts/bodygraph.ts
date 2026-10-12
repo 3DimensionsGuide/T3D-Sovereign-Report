@@ -1,6 +1,6 @@
 import { BODYGRAPH_H, BODYGRAPH_W, CENTER_SHAPES, CURVED_CHANNELS, GATE_ANCHORS, type Pt } from './bodygraphLayout';
 import { chartColors as c } from './palette';
-import type { Prim, Scene } from './scene';
+import type { Hotspot, Prim, Scene } from './scene';
 import type { BodygraphData, Epoch } from './chartTypes';
 
 const key = (a: number, b: number) => (a < b ? `${a}-${b}` : `${b}-${a}`);
@@ -30,7 +30,10 @@ function line(a: Pt, b: Pt, stroke: string, w: number, op?: number, dash?: strin
  * A gate that is active but whose partner gate is open is drawn as a short
  * "hanging gate" stub from its center toward the empty partner.
  */
-export function buildBodygraphScene(data: BodygraphData): Scene {
+/** How faint everything not connected to the focused center is drawn. */
+export const FOCUS_DIM = 0.22;
+
+export function buildBodygraphScene(data: BodygraphData, focus: string | null = null): Scene {
   const prims: Prim[] = [];
   const defined = new Set(data.definedCenters);
 
@@ -81,13 +84,15 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
   for (const ch of data.channels) {
     const [a, b] = ch.gates;
     const geo = pathFor(a, b);
+    const dim = focus !== null && ch.fromCenter !== focus && ch.toCenter !== focus;
+    const op = dim ? FOCUS_DIM : undefined;
     const draw = (col: string, off: number, w: number) => {
       if (geo.d) {
         // Curved channels: draw the same curve, shifted by a small x/y offset.
-        prims.push({ k: 'path', d: `M ${geo.pa[0] + off} ${geo.pa[1]} Q ${geo.curve![0] + off} ${geo.curve![1]} ${geo.pb[0] + off} ${geo.pb[1]}`, stroke: col, w });
+        prims.push({ k: 'path', d: `M ${geo.pa[0] + off} ${geo.pa[1]} Q ${geo.curve![0] + off} ${geo.curve![1]} ${geo.pb[0] + off} ${geo.pb[1]}`, stroke: col, w, op });
       } else {
         const [p, q] = off === 0 ? [geo.pa, geo.pb] : offsetLine(geo.pa, geo.pb, off);
-        prims.push(line(p, q, col, w));
+        prims.push(line(p, q, col, w, op));
       }
     };
     if (ch.activatedBy === 'both') {
@@ -105,6 +110,7 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
   // 3. Centers, drawn on top of the channel ends.
   for (const shape of CENTER_SHAPES) {
     const isDefined = defined.has(shape.id);
+    const faded = focus !== null && focus !== shape.id;
     const d = shape.polygon.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ') + ' Z';
     prims.push({
       k: 'path',
@@ -112,7 +118,7 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
       fill: isDefined ? c.vehicle : c.charcoal,
       stroke: isDefined ? c.vehicle : c.parchment,
       w: isDefined ? 1.5 : 1.6,
-      op: isDefined ? 1 : 0.9,
+      op: faded ? 0.3 : isDefined ? 1 : 0.9,
       dash: isDefined ? undefined : '5 3',
     });
     prims.push({
@@ -123,7 +129,12 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
       size: shape.id === 'solar_plexus' ? 7 : 8,
       fill: isDefined ? c.obsidian : c.muted,
       font: 'bold',
+      op: faded ? 0.4 : undefined,
     });
+    if (focus === shape.id) {
+      // A bright outline marks the center that was picked.
+      prims.push({ k: 'path', d, stroke: c.gold, w: 3.4 });
+    }
   }
 
   const afterCenters = prims.length;
@@ -133,9 +144,11 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
     const p = GATE_ANCHORS[g];
     const eps = gateEpochs.get(g);
     if (!eps) {
-      prims.push({ k: 'circle', cx: p[0], cy: p[1], r: 2, fill: c.parchment, op: 0.35 });
+      prims.push({ k: 'circle', cx: p[0], cy: p[1], r: 2, fill: c.parchment, op: focus ? 0.15 : 0.35 });
       continue;
     }
+    const gateDim = focus !== null && !data.gates.some((x) => x.gate === g && x.center === focus);
+    const gOp = gateDim ? 0.35 : undefined;
     const both = eps.has('personality') && eps.has('design');
     const fill = both || eps.has('personality') ? c.personality : c.design;
     prims.push({
@@ -143,10 +156,11 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
       fill,
       stroke: both ? c.design : c.obsidian,
       w: both ? 2.4 : 1.2,
+      op: gOp,
     });
     prims.push({
       k: 'text', x: p[0], y: p[1], s: String(g), size: g > 9 ? 7.2 : 8,
-      fill: fill === c.design ? '#FFFFFF' : c.obsidian, font: 'bold',
+      fill: fill === c.design ? '#FFFFFF' : c.obsidian, font: 'bold', op: gOp,
     });
   }
 
@@ -155,7 +169,15 @@ export function buildBodygraphScene(data: BodygraphData): Scene {
     prim.layer = i < afterStructure ? 0 : i < afterChannels ? 1 : i < afterCenters ? 2 : 3;
   });
 
-  return { w: BODYGRAPH_W, h: BODYGRAPH_H, prims };
+  // One tap target per center, at the middle of its shape.
+  const hotspots: Hotspot[] = CENTER_SHAPES.map((shape) => ({
+    x: shape.polygon.reduce((sum, pt) => sum + pt[0], 0) / shape.polygon.length,
+    y: shape.polygon.reduce((sum, pt) => sum + pt[1], 0) / shape.polygon.length,
+    key: shape.id,
+    label: `${shape.label} center`,
+  }));
+
+  return { w: BODYGRAPH_W, h: BODYGRAPH_H, prims, hotspots };
 }
 
 /** The 36 canonical channels as gate pairs (layout only — which are ACTIVE is server data). */
