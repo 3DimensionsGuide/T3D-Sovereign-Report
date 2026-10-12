@@ -5,6 +5,7 @@ import {
 } from '@/components/ReadingBlocks';
 import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, StoplightPlanet } from '@/lib/stoplightTypes';
 import { ElementBalance, StoplightCompare } from '@/components/readings/StoplightCompare';
+import { TimeLordBar } from '@/components/readings/TimeLordBar';
 import { useStoplight } from '@/lib/useStoplight';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -182,6 +183,13 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
         eyebrow="YOUR TIMING"
         title="Where you are in time"
         note="Two classical timing tools, read as weather and not as predictions."
+      />
+      <TimeLordBar
+        planet={data.timeLord.planet}
+        startYear={data.timeLord.startYear}
+        endYear={data.timeLord.endYear}
+        yearsRemaining={data.timeLord.yearsRemaining}
+        next={data.timeLord.next}
       />
       <Accordion
         badge={data.timeLord.planet.slice(0, 2)}
