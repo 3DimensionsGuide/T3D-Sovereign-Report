@@ -1,4 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { success } from '@/lib/haptics';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import type { PracticeData } from '@/lib/practiceTypes';
@@ -33,12 +36,56 @@ function DayStrip({ startedOn, todayIndex }: { startedOn: string; todayIndex: nu
   );
 }
 
-function Today({ data, date }: { data: PracticeData; date: string }) {
+/**
+ * The moment a day closes: a gold ring with a check draws in once, with a soft haptic, and says which day
+ * it was. It only plays when the third check-in is marked while this screen is open, never on a revisit.
+ * With Reduce Motion on it appears finished.
+ */
+function DayComplete({ day, play }: { day: number; play: boolean }) {
+  const grow = useRef(new Animated.Value(play ? 0 : 1)).current;
+  useEffect(() => {
+    if (!play) return;
+    let cancelled = false;
+    success();
+    void AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
+      if (cancelled) return;
+      if (reduce) grow.setValue(1);
+      else Animated.spring(grow, { toValue: 1, friction: 6, tension: 80, useNativeDriver: true }).start();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [play, grow]);
+  return (
+    <View style={styles.complete} accessible accessibilityLiveRegion="polite" accessibilityLabel={`Day ${day} complete. All three check-ins done.`}>
+      <Animated.View style={{ opacity: grow, transform: [{ scale: grow.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) }] }}>
+        <Svg width={44} height={44} viewBox="0 0 24 24">
+          <Circle cx="12" cy="12" r="10" fill="none" stroke={colors.gold} strokeWidth={2.4} />
+          <Path d="M7 12.5 L10.5 16 L17 8.5" fill="none" stroke={colors.gold} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
+      </Animated.View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.completeTitle}>{`Day ${day} complete`}</Text>
+        <Text style={styles.small}>All three check-ins are done. See you tomorrow.</Text>
+      </View>
+    </View>
+  );
+}
+
+function Today({ data, date, day }: { data: PracticeData; date: string; day: number }) {
   const entry = usePracticeStore((s) => s.entries[date]);
   const toggleCheckin = usePracticeStore((s) => s.toggleCheckin);
   const setAnswer = usePracticeStore((s) => s.setAnswer);
+  const allDone = !!entry && entry.done.every(Boolean);
+  // Only celebrate a day that closes while the screen is open, not one that was already finished.
+  const wasDone = useRef(allDone);
+  const justClosed = allDone && !wasDone.current;
+  useEffect(() => {
+    if (!allDone) wasDone.current = false;
+  }, [allDone]);
   return (
     <View style={{ gap: 14 }}>
+      {allDone ? <DayComplete day={day} play={justClosed} /> : null}
       {data.experiment.checkins.map((c, i) => {
         const index = i as 0 | 1 | 2;
         const done = entry?.done[index] ?? false;
@@ -72,6 +119,9 @@ function Finale({ data, startedOn }: { data: PracticeData; startedOn: string }) 
   const setReview = usePracticeStore((s) => s.setReview);
   const restart = usePracticeStore((s) => s.restartExperiment);
   const start = usePracticeStore((s) => s.startExperiment);
+  useEffect(() => {
+    success();
+  }, []);
   const full = Array.from({ length: DAYS }, (_, i) => entries[addDays(startedOn, i)]).filter((e) => e && e.done.every(Boolean)).length;
   const total = Array.from({ length: DAYS }, (_, i) => entries[addDays(startedOn, i)]).reduce(
     (n, e) => n + (e ? e.done.filter(Boolean).length : 0), 0,
@@ -128,7 +178,7 @@ export function SevenDay({ data }: { data: PracticeData }) {
         <DayStrip startedOn={startedOn} todayIndex={dayIndex} />
         <Text style={styles.small}>{data.experiment.premise}</Text>
       </View>
-      <Today data={data} date={addDays(startedOn, dayIndex)} />
+      <Today data={data} date={addDays(startedOn, dayIndex)} day={dayIndex + 1} />
       <GoldButton label="Stop this experiment" variant="ghost" onPress={restart} />
     </View>
   );
@@ -147,5 +197,7 @@ const styles = StyleSheet.create({
   dotToday: { borderColor: colors.gold, borderWidth: 2 },
   dotText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
   checkin: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
+  complete: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.gold, backgroundColor: colors.amethyst },
+  completeTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
   when: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
 });

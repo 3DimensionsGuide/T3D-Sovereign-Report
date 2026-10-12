@@ -13,14 +13,14 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
  * never depends on colour: Go = ringed check, Slow = hexagon with a mark, Pause = square with a bar.
  * These are conditions, never a decision: the words say so.
  */
-const WORD: Record<LampState, string> = { go: 'Go', slow: 'Slow', pause: 'Pause' };
-const PHRASE: Record<LampState, string> = {
+export const WORD: Record<LampState, string> = { go: 'Go', slow: 'Slow', pause: 'Pause' };
+export const PHRASE: Record<LampState, string> = {
   go: 'Conditions are open',
   slow: 'Go carefully',
   pause: 'Conditions favor waiting',
 };
-const SHAPE: Record<LampState, SignalKind> = { go: 'flow', slow: 'caution', pause: 'friction' };
-const COLOR: Record<LampState, string> = {
+export const SHAPE: Record<LampState, SignalKind> = { go: 'flow', slow: 'caution', pause: 'friction' };
+export const COLOR: Record<LampState, string> = {
   go: SIGNAL_COLOR.flow, slow: SIGNAL_COLOR.caution, pause: SIGNAL_COLOR.friction,
 };
 const HOUSING_ORDER: LampState[] = ['pause', 'slow', 'go'];
@@ -49,7 +49,7 @@ function usePulse(): Animated.Value {
   return pulse;
 }
 
-function Housing({ state }: { state: LampState }) {
+export function Housing({ state }: { state: LampState }) {
   const pulse = usePulse();
   return (
     <View style={styles.housing} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">

@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
+import { SignalMarker } from '@/components/Lens';
+import { COLOR, SHAPE } from '@/components/SignalLamp';
+import { LAMP_WORD, VERDICT_LAMP } from '@/lib/practiceLamps';
 import type { PracticeData, VerdictKey } from '@/lib/practiceTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { usePracticeStore, type Decision, type Followed, type Outcome } from '@/store/usePracticeStore';
@@ -81,7 +84,13 @@ function DecisionCard({ decision, verdicts }: { decision: Decision; verdicts: Pr
         <Text style={styles.status}>{decision.closed ? 'CLOSED' : due ? 'TIME TO LOOK AGAIN' : 'OPEN'}</Text>
       </View>
       <Text style={styles.decisionText}>{decision.text}</Text>
-      <Text style={styles.small}>{verdict?.title}</Text>
+      {VERDICT_LAMP[decision.verdict as VerdictKey] ? (
+        <View style={styles.lampLine} accessible accessibilityLabel={`${LAMP_WORD[VERDICT_LAMP[decision.verdict as VerdictKey]]}. ${verdict?.title ?? ''}`}>
+          <SignalMarker kind={SHAPE[VERDICT_LAMP[decision.verdict as VerdictKey]]} size={16} color={COLOR[VERDICT_LAMP[decision.verdict as VerdictKey]]} />
+          <Text style={styles.lampWord}>{LAMP_WORD[VERDICT_LAMP[decision.verdict as VerdictKey]]}</Text>
+          <Text style={[styles.small, { flex: 1 }]}>{verdict?.title}</Text>
+        </View>
+      ) : null}
       {!decision.closed && decision.revisitOn ? (
         <Text style={styles.small}>Look again on {decision.revisitOn}</Text>
       ) : null}
@@ -163,6 +172,8 @@ const styles = StyleSheet.create({
   decisionText: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 25, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  lampLine: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  lampWord: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   closer: { gap: 12 },
   closerLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
   pickRow: { gap: 8 },
