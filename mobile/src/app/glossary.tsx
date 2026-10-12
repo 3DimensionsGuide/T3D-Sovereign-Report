@@ -21,7 +21,9 @@ const SUBJECT: Record<LensName, string> = { vehicle: 'Human Design', road: 'Nume
 
 /** Same wording the server now sends, so older servers read cleanly too. */
 /** One clean sentence for the list, never cut mid-word. */
-function previewOf(text: string): string {
+function previewOf(text: string, id = ''): string {
+  // A sign's summary is "Air · Fixed. Independence, ideas and collective vision." and both halves matter.
+  if (id.startsWith('astro:sign:')) return text;
   const first = text.split(/(?<=[.!?])\s/)[0] ?? text;
   if (first.length <= 120) return first;
   const cut = first.slice(0, 117);
@@ -31,6 +33,7 @@ function previewOf(text: string): string {
 function cleanTitle(t: string): string {
   return t
     .replace(/\s*\(℞\)/, '')
+    .replace(/^None Circuitry$/, 'No Dominant Circuitry')
     .replace(/\)\s+Center$/, ')')
     .replace(/^(No Inner Authority \(Mental\)) authority$/i, '$1')
     .replace(/ (center|circuitry|authority)$/, (_m, w: string) => ` ${w[0]!.toUpperCase()}${w.slice(1)}`)
@@ -228,7 +231,7 @@ export default function Glossary() {
                 <View style={[styles.bar, { backgroundColor: LENS_COLOR[LENS_OF[row.item.group]] }]} />
                 <View style={styles.rowText}>
                   <Text style={styles.rowTitle}>{row.title}</Text>
-                  <Text style={styles.rowSummary}>{previewOf(row.item.summary)}</Text>
+                  <Text style={styles.rowSummary}>{previewOf(row.item.summary, row.item.id)}</Text>
                 </View>
               </TermPressable>
             )

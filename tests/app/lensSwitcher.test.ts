@@ -51,3 +51,10 @@ test('Glossary offers an In your chart filter, Timeline offers Road and Stopligh
   assert.match(t, /type TimelineLens = 'all' \| 'road' \| 'stoplight'/);
   assert.doesNotMatch(t, /value: 'vehicle'/);
 });
+
+test('Glossary shows a sign\'s full line and renames the "None" circuitry entry', () => {
+  const g = read('mobile/src/app/glossary.tsx');
+  assert.match(g, /id\.startsWith\('astro:sign:'\)\) return text/);
+  assert.match(g, /None Circuitry\$\/, 'No Dominant Circuitry'/);
+  assert.match(read('src/lib/app/glossary.ts'), /key === 'None' \? 'No Dominant Circuitry'/);
+});

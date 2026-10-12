@@ -213,7 +213,7 @@ for (const [key, m] of Object.entries(DEFINITION_MEANING)) {
   add(`hd:definition:${key}`, 'Human Design', key === 'No Definition' ? key : `${key} Definition`, m.split('. ')[0]!.replace(/\.?$/, '.'), [m], ['hd:defined']);
 }
 for (const [key, m] of Object.entries(CIRCUIT_GROUP_MEANING)) {
-  add(`hd:circuit:${key}`, 'Human Design', `${key} Circuitry`, m.keynote, [m.passage], ['hd:channel']);
+  add(`hd:circuit:${key}`, 'Human Design', key === 'None' ? 'No Dominant Circuitry' : `${key} Circuitry`, m.keynote, [m.passage], ['hd:channel']);
 }
 
 // Numerology
