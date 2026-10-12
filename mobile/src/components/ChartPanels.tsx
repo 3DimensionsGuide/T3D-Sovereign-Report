@@ -105,8 +105,47 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
           />
         )) : null}
       </View>
+      {today ? (
+      <>
+      {todayContacts.length > 0 ? (
+        <>
+        <Text accessibilityRole="header" style={styles.chipLabel}>Today's contacts with your chart</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+            {todayContacts.map((ct) => {
+              const on = sameContact(nowFocus, ct);
+              return (
+                <Pressable
+                  key={`${ct.transit}-${ct.natal}-${ct.aspect}`}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  accessibilityLabel={`Today's ${BODY_NAMES[ct.transit]} ${ASPECT_NAMES[ct.aspect].toLowerCase()} your ${pointName(ct.natal)}. ${SIGNAL_LABEL[ASPECT_SIGNAL[ct.aspect]]}. ${on ? 'Showing on the wheel. Double tap to clear.' : 'Double tap to show on the wheel.'}`}
+                  onPress={() => setNowFocus(on ? null : { transit: ct.transit, natal: ct.natal })}
+                  style={[styles.aspectChip, on && styles.aspectChipOn]}
+                >
+                  <SignalMarker kind={ASPECT_SIGNAL[ct.aspect]} size={14} />
+                  <Text style={styles.aspectChipText}>
+                    {BODY_GLYPHS[ct.transit]} {ASPECT_SYMBOLS[ct.aspect]} {pointGlyph(ct.natal)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          <View accessibilityLiveRegion="polite">
+            <Text style={litContact ? styles.focusLine : styles.note}>
+              {litContact
+                ? `Today's ${BODY_NAMES[litContact.transit]} ${ASPECT_NAMES[litContact.aspect].toLowerCase()} your ${pointName(litContact.natal)} · ${SIGNAL_LABEL[ASPECT_SIGNAL[litContact.aspect]]} · ${litContact.orb.toFixed(1)}°${litContact.peak ? ' · exact' : ''}`
+                : 'Tap a contact to light its line. Each line joins a planet in today\'s sky to the part of your chart it touches. Closest first.'}
+            </Text>
+          </View>
+        </>
+      ) : (
+        <Text style={styles.note}>No planet is in a close aspect to your chart today.</Text>
+      )}
+      </>
+      ) : null}
       {chart.aspects.length > 0 ? (
         <>
+          {today ? <Text accessibilityRole="header" style={styles.chipLabel}>Birth aspects</Text> : null}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
             {chart.aspects.map((a, i) => {
               const on = sameFocus(focus, a);
@@ -147,6 +186,7 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
         <KeyItem swatch={<><Dash color={chartColors.friction} /><SignalMarker kind="friction" size={14} /></>} label="Square · friction" />
         <KeyItem swatch={<><Dash color={chartColors.friction} dashed /><SignalMarker kind="friction" size={14} /></>} label="Opposition · friction" />
         <KeyItem swatch={<><Dash color={chartColors.conjunction} /><SignalMarker kind="neutral" size={14} /></>} label="Conjunction · neutral" />
+        {today ? <KeyItem swatch={<Dot fill={chartColors.stoplight} />} label="Crimson dot · where today's line meets your chart" /> : null}
       </View>
       <Text style={styles.note}>
         Whole-sign houses, counted from your rising sign. Thicker lines are within 1° of exact. Aspects are the same in both zodiacs, because the sidereal zodiac moves every point by the same amount. Only the signs and houses change.
@@ -157,39 +197,6 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
           <Text style={styles.note}>
             The outer ring of crimson symbols is where the planets are right now. The inner wheel is your birth chart. The house is the part of your life each one is moving through today.
           </Text>
-          {todayContacts.length > 0 ? (
-            <>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
-                {todayContacts.map((ct) => {
-                  const on = sameContact(nowFocus, ct);
-                  return (
-                    <Pressable
-                      key={`${ct.transit}-${ct.natal}-${ct.aspect}`}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: on }}
-                      accessibilityLabel={`Today's ${BODY_NAMES[ct.transit]} ${ASPECT_NAMES[ct.aspect].toLowerCase()} your ${pointName(ct.natal)}. ${SIGNAL_LABEL[ASPECT_SIGNAL[ct.aspect]]}. ${on ? 'Showing on the wheel. Double tap to clear.' : 'Double tap to show on the wheel.'}`}
-                      onPress={() => setNowFocus(on ? null : { transit: ct.transit, natal: ct.natal })}
-                      style={[styles.aspectChip, on && styles.aspectChipOn]}
-                    >
-                      <SignalMarker kind={ASPECT_SIGNAL[ct.aspect]} size={14} />
-                      <Text style={styles.aspectChipText}>
-                        {BODY_GLYPHS[ct.transit]} {ASPECT_SYMBOLS[ct.aspect]} {pointGlyph(ct.natal)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-              <View accessibilityLiveRegion="polite">
-                <Text style={litContact ? styles.focusLine : styles.note}>
-                  {litContact
-                    ? `Today's ${BODY_NAMES[litContact.transit]} ${ASPECT_NAMES[litContact.aspect].toLowerCase()} your ${pointName(litContact.natal)} · ${SIGNAL_LABEL[ASPECT_SIGNAL[litContact.aspect]]} · ${litContact.orb.toFixed(1)}°${litContact.peak ? ' · exact' : ''}`
-                    : 'Tap a contact to light its line. Each line joins a planet in today\'s sky to the part of your chart it touches. Closest first.'}
-                </Text>
-              </View>
-            </>
-          ) : (
-            <Text style={styles.note}>No planet is in a close aspect to your chart today.</Text>
-          )}
           {todayRows.map((p) => (
             <View key={p.body} style={styles.row} accessible accessibilityLabel={`${BODY_NAMES[p.body]} today in ${p.formatted}${p.retrograde ? ', retrograde' : ''}, in your house ${p.house}`}>
               <Text style={styles.glyph}>{BODY_GLYPHS[p.body]}</Text>
@@ -427,6 +434,7 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline,
     backgroundColor: colors.obsidian,
   },
+  chipLabel: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment, marginTop: space.sm },
   chipScroll: { gap: 8, paddingVertical: 2 },
   aspectChip: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal },
   aspectChipOn: { borderColor: colors.gold, backgroundColor: colors.amethyst },
