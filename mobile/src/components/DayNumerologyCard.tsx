@@ -11,7 +11,8 @@ function numberText(m: DayNumberMeaning): string {
   return m.root ? `${m.number}/${m.root}` : String(m.number);
 }
 
-function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNumberMeaning }) {
+/** `bare` leaves out the badge and title, for when the summary row above already shows them. */
+function DayBlock({ kind, meaning, bare = false }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNumberMeaning; bare?: boolean }) {
   const title = kind === 'GLOBAL' ? 'UNIVERSAL DAY' : 'YOUR PERSONAL DAY';
   const caption = kind === 'GLOBAL' ? 'The energy of this date, felt by everyone' : 'The energy of this date, for you';
   return (
@@ -19,6 +20,11 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
       accessibilityLabel={`${title} ${numberText(meaning)}, ${meaning.label}. ${meaning.theme} Key themes: ${meaning.keyThemes.join(', ')}. Lean in: ${meaning.leanIn} Watch for: ${meaning.watchFor}`}
       style={styles.block}
     >
+      {bare ? (
+        <Text style={styles.caption}>
+          <Term id="num:personalday">{caption}</Term>
+        </Text>
+      ) : (
       <View style={styles.head}>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{numberText(meaning)}</Text>
@@ -33,6 +39,7 @@ function DayBlock({ kind, meaning }: { kind: 'GLOBAL' | 'YOURS'; meaning: DayNum
           <Text style={styles.caption}>{caption}</Text>
         </View>
       </View>
+      )}
       <Text style={styles.body}>{meaning.theme}</Text>
       <View style={styles.chips}>
         {meaning.keyThemes.map((t) => (
@@ -84,7 +91,7 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
       </Pressable>
       {open ? (
         <>
-          <DayBlock kind="YOURS" meaning={p} />
+          <DayBlock kind="YOURS" meaning={p} bare />
           <View style={styles.divider} />
           <DayBlock kind="GLOBAL" meaning={data.universal} />
           <Text style={styles.body}>{data.blend}</Text>
