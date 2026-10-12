@@ -16,15 +16,15 @@ import { colors, fonts, space } from '@/theme/tokens';
  * the server sends them (Sun a solid dot, Moon a ring). Everything is also written in a sentence, and
  * a tap opens the full bodygraph on My Chart.
  */
-export function BodygraphChip({ today }: { today: TodayResult }) {
+export function BodygraphChip({ today }: { today?: TodayResult | null }) {
   const router = useRouter();
   const chart = useT3DStore((s) => s.chart);
   const profile = useT3DStore((s) => s.profile);
   const hd = useChartData(chart?.leadId, profile?.email.trim()).data?.humanDesign;
 
   const chip = useMemo(
-    () => (hd ? buildBodygraphChip(hd.definedCenters, today.gates, hd.gates.map((g) => g.gate)) : null),
-    [hd, today.gates],
+    () => (hd ? buildBodygraphChip(hd.definedCenters, today?.gates, hd.gates.map((g) => g.gate)) : null),
+    [hd, today?.gates],
   );
 
   const glow = useRef(new Animated.Value(0)).current;
@@ -44,7 +44,7 @@ export function BodygraphChip({ today }: { today: TodayResult }) {
     return () => {
       cancelled = true;
     };
-  }, [hasGates, glow, today.asOf]);
+  }, [hasGates, glow, today?.asOf]);
 
   if (!chip) return null;
 

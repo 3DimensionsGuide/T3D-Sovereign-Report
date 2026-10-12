@@ -25,6 +25,7 @@ import { RoadStrip } from '@/components/RoadStrip';
 import { TriadSeal } from '@/components/TriadSeal';
 import { SkyTodayCard } from '@/components/SkyTodayCard';
 import { BodygraphChip } from '@/components/BodygraphChip';
+import { MeetTriadCard } from '@/components/MeetTriadCard';
 import { TransitMiniWheel } from '@/components/TransitMiniWheel';
 import { NumberBadge } from '@/components/NumberBadge';
 import { hasWheelPositions, MAX_WHEEL_CHORDS } from '@/lib/transitWheel';
@@ -328,6 +329,7 @@ export default function Today() {
               <TodaySignal today={today} triad={triad} isToday={isToday} />
             </FadeIn>
           )}
+          {isToday ? <MeetTriadCard /> : null}
           {triad ? (
             <FadeIn delay={40}>
               <TriadTodayCard data={triad} isToday={isToday} />
