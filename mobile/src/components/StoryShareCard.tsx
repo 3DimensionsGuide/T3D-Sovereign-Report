@@ -25,7 +25,6 @@ const signOf = (longitude: number) => formatLongitude(longitude).split(' ').pop(
  */
 export const StoryShareCard = forwardRef<View, Props>(function StoryShareCard({ chart, firstName, birthTimeKnown }, ref) {
   const { humanDesign: hd, astrology: astro } = chart;
-  const profileLines = hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile;
   const sky = birthTimeKnown ? `Rising ${signOf(astro.tropicalAscendant)}` : null;
   return (
     <View ref={ref} collapsable={false} style={styles.card}>
@@ -35,10 +34,11 @@ export const StoryShareCard = forwardRef<View, Props>(function StoryShareCard({ 
         <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
       </View>
       <View style={styles.middle}>
-        <Text style={styles.title}>{firstName ? `${firstName}'s T3D Triad` : 'My T3D Triad'}</Text>
+        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.65}>{firstName ? `${firstName}'s T3D Triad` : 'My T3D Triad'}</Text>
         <TriadPortrait chart={chart} />
-        <Text style={styles.line}>{`${hd.type} · Profile ${profileLines} · ${hd.authority} Authority`}</Text>
-        {sky ? <Text style={styles.line}>{sky}</Text> : null}
+        <Text style={styles.line} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>
+          {sky ? `${hd.authority} Authority · ${sky}` : `${hd.authority} Authority`}
+        </Text>
       </View>
       <View style={styles.footer}>
         <Text style={styles.footerSmall}>VEHICLE · ROAD · STOPLIGHT</Text>
@@ -51,13 +51,13 @@ export const StoryShareCard = forwardRef<View, Props>(function StoryShareCard({ 
 const styles = StyleSheet.create({
   card: {
     width: STORY_WIDTH, height: STORY_HEIGHT, backgroundColor: colors.obsidian, borderWidth: 1, borderColor: colors.gold,
-    borderRadius: 18, paddingHorizontal: 24, paddingTop: 56, paddingBottom: 64, overflow: 'hidden', justifyContent: 'space-between',
+    borderRadius: 18, paddingHorizontal: 24, paddingTop: 48, paddingBottom: 56, overflow: 'hidden', justifyContent: 'space-between',
   },
   glow: { height: 420 },
   top: { alignItems: 'center', gap: 10 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
-  middle: { gap: 14 },
-  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 37, color: colors.parchment, textAlign: 'center' },
+  middle: { gap: 10 },
+  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.parchment, textAlign: 'center' },
   line: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.parchment, textAlign: 'center' },
   footer: { alignItems: 'center', gap: 3 },
   footerSmall: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 2, color: colors.parchmentMuted },

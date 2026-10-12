@@ -218,7 +218,7 @@ export function Accordion({
       >
         <View style={[styles.badge, { borderColor: accent }]}>
           {typeof badge === 'string' ? (
-            <Text style={styles.badgeText} numberOfLines={1} adjustsFontSizeToFit>
+            <Text style={[styles.badgeText, [...badge].length >= 3 && styles.badgeTextLong]} numberOfLines={1} adjustsFontSizeToFit>
               {badge}
             </Text>
           ) : (
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   badge: {
     minWidth: 48,
     height: 48,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     borderRadius: 24,
     borderWidth: 2,
     backgroundColor: colors.amethyst,
@@ -311,6 +311,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchment },
+  /** Three-letter badges (CAR, IND) are set smaller so the circle stays a circle. */
+  badgeTextLong: { fontSize: 13, letterSpacing: 0.4 },
   headText: { flex: 1, gap: 2 },
   nowTag: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   cardTitle: { fontFamily: fonts.bodyBold, fontSize: 17, lineHeight: 23, color: colors.parchment },

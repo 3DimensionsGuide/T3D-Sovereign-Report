@@ -7,13 +7,13 @@ import { colors, fonts } from '@/theme/tokens';
 
 /**
  * The T3D triangle: one corner per lens, joined by lines that blend the lens colours.
- * Drawn in a 100 x 95 box that scales to any width. Each corner carries its lens shape,
+ * Drawn in a 100 x 100 box that scales to any width. Each corner carries its lens shape,
  * its name and one headline fact, written out so nothing depends on colour alone.
  */
-const V = { x: 50, y: 26 };
-const R = { x: 17, y: 69 };
-const S = { x: 83, y: 69 };
-const HEIGHT_UNITS = 95;
+const V = { x: 50, y: 28 };
+const R = { x: 17, y: 66 };
+const S = { x: 83, y: 66 };
+const HEIGHT_UNITS = 100;
 const pct = (y: number) => `${(y / HEIGHT_UNITS) * 100}%` as const;
 
 interface Props {
@@ -87,7 +87,7 @@ export function TriadPortrait({ chart, onOpenLens }: Props) {
         <Text style={[styles.head, styles.alignRight]}>{stoplight.head}</Text>
         <Text style={[styles.sub, styles.alignRight]}>{stoplight.sub}</Text>
       </Pressable>
-      <Text importantForAccessibility="no" accessibilityElementsHidden style={[styles.centre, { top: pct(54) }]}>T3D</Text>
+      <Text importantForAccessibility="no" accessibilityElementsHidden style={[styles.centre, { top: pct(51) }]}>T3D</Text>
     </View>
   );
 }
