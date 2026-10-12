@@ -30,6 +30,9 @@ export interface TodayGates {
   moon: { gate: number; line: number };
 }
 
+/** Closest the Sun and Moon markers may sit, in drawing units. */
+export const GATE_GAP = 12;
+
 const CENTER_WORDS: Record<string, string> = {
   head: 'Head', ajna: 'Ajna', throat: 'Throat', g_center: 'G Center', heart: 'Heart',
   sacral: 'Sacral', spleen: 'Spleen', solar_plexus: 'Solar Plexus', root: 'Root',
@@ -70,6 +73,20 @@ export function buildBodygraphChip(
       const anchor = GATE_ANCHORS[gate];
       if (!anchor) continue;
       gates.push({ who, gate, line, x: fmt(anchor[0] * scale), y: fmt(anchor[1] * scale), yours: yourGates.includes(gate) });
+    }
+  }
+
+  // Neighbouring gates (both in one center, say) would sit on top of each other: nudge the Moon aside.
+  if (gates.length === 2) {
+    const [sun, moon] = gates;
+    const dx = moon.x - sun.x;
+    const dy = moon.y - sun.y;
+    const d = Math.hypot(dx, dy);
+    if (d < GATE_GAP) {
+      const ux = d > 0.01 ? dx / d : 1;
+      const uy = d > 0.01 ? dy / d : 0;
+      moon.x = fmt(sun.x + ux * GATE_GAP);
+      moon.y = fmt(sun.y + uy * GATE_GAP);
     }
   }
 

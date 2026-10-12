@@ -64,6 +64,34 @@ const ASPECT_WORD: Record<DailyAspect, string> = {
 const NATURE_WORD: Record<AspectNature, string> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
 
 export const MAX_WHEEL_CHORDS = 6;
+export const MIN_LABEL_GAP = 16;
+
+/** Pushes crowded labels apart (same ring) so neighbours such as Mercury and the Moon stay readable. */
+export function spreadLabels(dots: WheelDot[]): void {
+  for (let pass = 0; pass < 12; pass++) {
+    let moved = false;
+    for (let i = 0; i < dots.length; i++) {
+      for (let j = i + 1; j < dots.length; j++) {
+        const a = dots[i];
+        const b = dots[j];
+        let dx = b.lx - a.lx;
+        let dy = b.ly - a.ly;
+        let d = Math.hypot(dx, dy);
+        if (d >= MIN_LABEL_GAP) continue;
+        if (d < 0.01) { dx = 1; dy = 0; d = 1; }
+        const push = (MIN_LABEL_GAP - d) / 2 + 0.5;
+        const ux = dx / d;
+        const uy = dy / d;
+        a.lx = Math.round((a.lx - ux * push) * 100) / 100;
+        a.ly = Math.round((a.ly - uy * push) * 100) / 100;
+        b.lx = Math.round((b.lx + ux * push) * 100) / 100;
+        b.ly = Math.round((b.ly + uy * push) * 100) / 100;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+}
 
 /** Aries 0° sits at the left, signs run counter-clockwise like a printed chart. Returns radians. */
 export function wheelAngle(longitude: number): number {
@@ -128,5 +156,8 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
         .join('. ') + '.'
     : 'No close contacts to your chart today.';
 
-  return { size, cx: c, cy: c, outerR, innerR, dots: [...dots.values()], chords, spoken };
+  const list = [...dots.values()];
+  spreadLabels(list.filter((d) => d.ring === 'outer'));
+  spreadLabels(list.filter((d) => d.ring === 'inner'));
+  return { size, cx: c, cy: c, outerR, innerR, dots: list, chords, spoken };
 }

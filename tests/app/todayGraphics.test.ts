@@ -73,3 +73,19 @@ test('wheel ignores hits without positions and reports a quiet sky', () => {
   assert.equal(w.chords.length, 0);
   assert.match(w.spoken, /No close contacts/);
 });
+
+test('wheel labels of close neighbours are pushed apart', () => {
+  const w = buildTransitWheel([
+    hit({ transiting: 'mercury', transitLongitude: 100, natalLongitude: 10 }),
+    hit({ transiting: 'moon', transitLongitude: 105, natalLongitude: 200, orb: 1 }),
+  ]);
+  const outer = w.dots.filter((d) => d.ring === 'outer');
+  assert.equal(outer.length, 2);
+  assert.ok(Math.hypot(outer[0].lx - outer[1].lx, outer[0].ly - outer[1].ly) >= 15.5);
+});
+
+test('chip keeps the Sun and Moon markers apart when their gates are neighbours', () => {
+  const chip = buildBodygraphChip(['spleen'], { sun: { gate: 57, line: 5 }, moon: { gate: 44, line: 2 } });
+  const [s, m] = chip.gates;
+  assert.ok(Math.hypot(m.x - s.x, m.y - s.y) >= 11.9);
+});

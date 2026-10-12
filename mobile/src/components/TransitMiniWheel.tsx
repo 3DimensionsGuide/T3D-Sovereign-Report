@@ -88,8 +88,6 @@ export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; 
               {d.label}
             </SvgText>
           ))}
-          <SvgText x={wheel.cx} y={wheel.cy - 2} fontSize={11} fill={colors.parchmentMuted} textAnchor="middle">Sky outside</SvgText>
-          <SvgText x={wheel.cx} y={wheel.cy + 13} fontSize={11} fill={colors.parchmentMuted} textAnchor="middle">You inside</SvgText>
         </Svg>
         {wheel.chords.map((c, i) => (
           <Animated.View
@@ -115,6 +113,7 @@ export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; 
         ))}
       </View>
 
+      <Text style={styles.rings}>Outer ring: today's sky. Inner ring: your chart.</Text>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <SignalMarker kind="flow" size={16} />
@@ -146,6 +145,7 @@ export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; 
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', gap: space.sm, marginBottom: space.md },
   figure: { width: SIZE, height: SIZE, position: 'relative' },
+  rings: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted, textAlign: 'center' },
   legend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendText: { fontFamily: fonts.body, fontSize: 13, color: colors.parchment },
