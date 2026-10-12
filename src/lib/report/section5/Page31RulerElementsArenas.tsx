@@ -76,7 +76,7 @@ const RULER_NOTE: Record<string, string> = {
 
 const HOUSE_NAMES: Record<number, string> = {
   1:'Identity & First Impression', 2:'Resources & Values',
-  3:'Communication & Local', 4:'Home & Roots',
+  3:'Communication & Local Life', 4:'Home & Roots',
   5:'Creativity & Expression', 6:'Work & Daily Practice',
   7:'Partnership & Relationship', 8:'Depth & Transformation',
   9:'Philosophy & Expansion', 10:'Career & Reputation',

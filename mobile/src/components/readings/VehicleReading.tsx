@@ -4,6 +4,7 @@ import {
   Accordion as BaseAccordion, Block, Bullets, Footnote, NoteCard, ReadingStatus, SectionTitle,
 } from '@/components/ReadingBlocks';
 import type { Bridge, VehicleDetail } from '@/lib/vehicleTypes';
+import { CenterIcon } from '@/components/CenterIcon';
 import { VehicleSnapshot } from '@/components/readings/VehicleSnapshot';
 import { TimeNote } from '@/components/TimeNote';
 import { useVehicle } from '@/lib/useVehicle';
@@ -127,7 +128,7 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
         <NoteCard text="No Center is defined in your design. Everything in you is open and responsive, which is the Reflector configuration." />
       ) : (
         data.centers.defined.map((c) => (
-          <Accordion key={c.id} badge="●" title={`${c.name} (defined)`} subtitle={c.title}>
+          <Accordion key={c.id} badge={<CenterIcon id={c.id} defined />} title={`${c.name} (defined)`} subtitle={c.title}>
             <Block label={c.title.toUpperCase()} text={c.description} />
           </Accordion>
         ))
@@ -138,7 +139,7 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
         <NoteCard text="All nine Centers are defined in your design, so none of them is open." />
       ) : (
         data.centers.open.map((c) => (
-          <Accordion key={c.id} badge="○" title={`${c.name} (open)`} subtitle={c.title}>
+          <Accordion key={c.id} badge={<CenterIcon id={c.id} defined={false} />} title={`${c.name} (open)`} subtitle={c.title}>
             <Block label="WHAT GETS AMPLIFIED" text={c.sensitivity} />
             <Block label="THE WISDOM IT BUILDS" text={c.wisdom} />
             <Block label="A KINDER READ" text={c.notDefect} />
