@@ -391,7 +391,7 @@ export default function Timeline() {
 
           {lens !== 'road' && data.seasons.length > 0 ? (
             <FadeIn delay={100}>
-              <Panel label="Seasons in effect" lens="stoplight">
+              <Panel label="Slow transits in effect" lens="stoplight">
                 <SpineAxis from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} fromLabel="Today" toLabel={shortDate(localKey(new Date(data.to)))} />
                 {data.seasons.map((s, i) => (
                   <SpineRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={spineSeason(s, i)} from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} />

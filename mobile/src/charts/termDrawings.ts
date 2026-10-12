@@ -273,7 +273,7 @@ function season(): TermDrawing {
     text(160, 14, 'A slow planet can touch the same point three times', { size: 11 }),
     text(32, 97, 'Orb zone', { size: 10, anchor: 'start' }),
   );
-  return { scene: scene(prims), label: 'A slow planet\'s distance from one point over time. It crosses the exact line three times: forward, back again while retrograde, and forward for good. Together they make one season.' };
+  return { scene: scene(prims), label: 'A slow planet\'s distance from one point over time. It crosses the exact line three times: forward, back again while retrograde, and forward for good. Together they make one slow transit.' };
 }
 
 /* ───────────────────────── Human Design ───────────────────────── */
