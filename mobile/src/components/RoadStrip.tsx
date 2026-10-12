@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
-import { LENS_COLOR, LENS_TEXT, LensIcon } from '@/components/Lens';
+import { LENS_COLOR, LENS_TEXT, LensIcon, SIGNAL_COLOR } from '@/components/Lens';
 import { MotionLensIcon } from '@/components/LensMotion';
 import { lensTap } from '@/lib/haptics';
 import { buildRoadStrip } from '@/lib/roadStrip';
@@ -31,6 +31,25 @@ export function RoadStrip({ date, personalYear }: Props) {
     () => (data ? buildRoadStrip(data.pinnacles, data.challenges, date, personalYear) : null),
     [data, date, personalYear],
   );
+  const [trackWidth, setTrackWidth] = useState(0);
+  const slide = useRef(new Animated.Value(0)).current;
+  const markerPct = model?.markerPct ?? 0;
+  useEffect(() => {
+    if (!model || trackWidth === 0) return;
+    let cancelled = false;
+    void AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
+      if (cancelled) return;
+      if (reduce) {
+        slide.setValue(1);
+        return;
+      }
+      slide.setValue(0);
+      Animated.timing(slide, { toValue: 1, duration: 900, delay: 150, useNativeDriver: true }).start();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [model, trackWidth, markerPct, slide]);
   if (!model) return null;
 
   return (
@@ -68,15 +87,26 @@ export function RoadStrip({ date, personalYear }: Props) {
           {model.segments.map((s) => (
             <View key={s.index} style={{ flex: s.widthPct, alignItems: 'center' }}>
               {s.challenge === null ? null : (
-                <Text style={[styles.challenge, s.past && styles.dim]}>{`C${s.challenge}`}</Text>
+                <View style={[styles.bump, s.past && styles.dim, s.current && styles.bumpNow]}>
+                  <Text style={styles.challenge}>{`C${s.challenge}`}</Text>
+                </View>
               )}
             </View>
           ))}
         </View>
-        <View style={styles.markerTrack}>
-          <View style={[styles.marker, { left: `${model.markerPct}%` }]}>
+        <View style={styles.markerTrack} onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}>
+          <Animated.View
+            style={[
+              styles.marker,
+              {
+                left: 0,
+                opacity: slide.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 1, 1] }),
+                transform: [{ translateX: slide.interpolate({ inputRange: [0, 1], outputRange: [0, (model.markerPct / 100) * trackWidth] }) }],
+              },
+            ]}
+          >
             <LensIcon lens="road" size={16} color={LENS_TEXT.road} />
-          </View>
+          </Animated.View>
         </View>
       </View>
 
@@ -104,7 +134,12 @@ const styles = StyleSheet.create({
   segNumber: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   dim: { opacity: 0.7 },
   challengeRow: { flexDirection: 'row', gap: 3 },
-  challenge: { fontFamily: fonts.bodyMedium, fontSize: 12, color: colors.parchmentMuted },
+  challenge: { fontFamily: fonts.bodyMedium, fontSize: 12, color: colors.parchment },
+  bump: {
+    minWidth: 26, height: 22, borderRadius: 5, borderWidth: 1.5, borderColor: SIGNAL_COLOR.friction,
+    alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4,
+  },
+  bumpNow: { borderColor: colors.gold, borderWidth: 2 },
   markerTrack: { height: 18, position: 'relative' },
   marker: { position: 'absolute', top: 0, marginLeft: -8 },
   sentence: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 23, color: colors.parchment },
