@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, type Href } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';

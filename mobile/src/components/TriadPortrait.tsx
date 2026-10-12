@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import Svg, { Circle, Defs, LinearGradient, Line, Polygon, Stop } from 'react-native-svg';
 import type { ChartResult } from '@/lib/api';
 import { LENS_COLOR, LENS_LABEL, LENS_TEXT, type LensName } from '@/components/Lens';

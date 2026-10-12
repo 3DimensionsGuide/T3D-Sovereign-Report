@@ -1,7 +1,8 @@
 import { teaser } from '@/lib/teaser';
 import { readMoreSplit } from '@/lib/readMore';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode, type RefObject } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { LENS_COLOR, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
 import { capFirst } from '@/lib/skyText';
 import { GoldButton } from '@/components/GoldButton';

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import Svg, { Circle, Line, Rect, Text as SvgText } from 'react-native-svg';
 import { SIGNAL_COLOR, SignalMarker } from '@/components/Lens';
 import type { DailyTransitHit } from '@/lib/api';
@@ -139,19 +140,19 @@ export function TransitMiniWheel({ hits, onPickNumber }: { hits: DailyTransitHit
         ))}
       </View>
 
-      <Text style={styles.rings}>Outer ring: today's sky. Inner ring: your chart.</Text>
+      <Text maxFontSizeMultiplier={1.3} style={styles.rings}>Outer ring: today's sky. Inner ring: your chart.</Text>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <SignalMarker kind="flow" size={16} />
-          <Text style={styles.legendText}>Flow: solid line</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.legendText}>Flow: solid line</Text>
         </View>
         <View style={styles.legendItem}>
           <SignalMarker kind="friction" size={16} />
-          <Text style={styles.legendText}>Friction: dashed line</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.legendText}>Friction: dashed line</Text>
         </View>
       </View>
 
-      <Text style={styles.rings}>
+      <Text maxFontSizeMultiplier={1.3} style={styles.rings}>
         {more > 0 ? `The ${wheel.chords.length} closest, numbered to match the list. ${more} more below.` : 'Numbered to match the list below.'}
       </Text>
     </View>

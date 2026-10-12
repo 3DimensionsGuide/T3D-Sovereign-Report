@@ -26,6 +26,6 @@ const styles = StyleSheet.create({
     gap: 6, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold,
     backgroundColor: colors.amethyst,
   },
-  label: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
+  label: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   body: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchment },
 });

@@ -66,10 +66,10 @@ export function PersonalDial({ kind, number, text, word }: Props) {
           <RollingNumber value={text} style={styles.number} />
         </View>
       </View>
-      <Text style={styles.label}>
+      <Text maxFontSizeMultiplier={1.3} style={styles.label}>
         <Term id={kind === 'Year' ? 'num:personalyear' : kind === 'Month' ? 'num:personalmonth' : 'num:personalday'}>{kind}</Term>
       </Text>
-      {word ? <Text style={styles.word}>{word}</Text> : null}
+      {word ? <Text maxFontSizeMultiplier={1.3} style={styles.word}>{word}</Text> : null}
     </View>
   );
 }

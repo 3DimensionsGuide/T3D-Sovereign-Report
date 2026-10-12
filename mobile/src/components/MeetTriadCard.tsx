@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { router, type Href } from 'expo-router';
 import { LensIcon } from '@/components/Lens';
 import { lensTap } from '@/lib/haptics';

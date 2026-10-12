@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
   progressBarOn: { backgroundColor: colors.gold },
   fineWrap: { gap: space.xs, marginBottom: space.lg },
   fine: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
-  hintSmall: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
+  hintSmall: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   confirmLabel: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.parchmentMuted, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: colors.gold },

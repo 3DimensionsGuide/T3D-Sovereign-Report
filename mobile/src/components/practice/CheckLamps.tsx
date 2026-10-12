@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.hairline,
     backgroundColor: colors.obsidian,
   },
-  name: { fontFamily: fonts.bodyBold, fontSize: 12 },
+  name: { fontFamily: fonts.bodyBold, fontSize: 13 },
   word: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   wordText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchment },
 });

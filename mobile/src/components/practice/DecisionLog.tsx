@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import { SignalMarker } from '@/components/Lens';
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between' },
   date: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
-  status: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, color: colors.gold },
+  status: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
   decisionText: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 25, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
   lampLine: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   lampWord: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   closer: { gap: 12 },
-  closerLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
+  closerLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   pickRow: { gap: 8 },
   pick: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
   pickText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },

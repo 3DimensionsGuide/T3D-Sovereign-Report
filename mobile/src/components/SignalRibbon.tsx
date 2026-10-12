@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { LensIcon, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TimelineEvent, TimelineResult } from '@/lib/timelineTypes';
 import { colors, fonts, radius, space } from '@/theme/tokens';
@@ -62,8 +63,8 @@ export function SignalRibbon({ data }: Props) {
 
   return (
     <View style={styles.wrap}>
-      <Text accessibilityRole="header" style={styles.title}>The next 60 days</Text>
-      <Text style={styles.sub}>
+      <Text maxFontSizeMultiplier={1.3} accessibilityRole="header" style={styles.title}>The next 60 days</Text>
+      <Text maxFontSizeMultiplier={1.3} style={styles.sub}>
         {counts('flow')} flow, {counts('friction')} friction and {counts('caution')} caution days. Swipe the ribbon and tap a day.
       </Text>
 
@@ -81,30 +82,30 @@ export function SignalRibbon({ data }: Props) {
               onPress={() => setSelected(i)}
               style={[styles.cell, isSel && styles.cellOn]}
             >
-              <Text style={styles.weekday}>{i === 0 ? 'Today' : dt.toLocaleDateString(undefined, { weekday: 'narrow' })}</Text>
-              <Text style={styles.dayNum}>{dt.getDate()}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={styles.weekday}>{i === 0 ? 'Today' : dt.toLocaleDateString(undefined, { weekday: 'narrow' })}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={styles.dayNum}>{dt.getDate()}</Text>
               <View style={styles.markerSlot}>
                 {sig ? <SignalMarker kind={sig} size={16} /> : d.events.some((e) => e.kind === 'gate') ? <LensIcon lens="vehicle" size={13} /> : <View style={styles.quiet} />}
               </View>
-              <Text style={styles.pd}>PD {d.personalDay}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={styles.pd}>PD {d.personalDay}</Text>
             </Pressable>
           );
         })}
       </ScrollView>
 
       <View style={styles.detail} accessibilityLiveRegion="polite">
-        <Text style={styles.detailTitle}>
+        <Text maxFontSizeMultiplier={1.3} style={styles.detailTitle}>
           {date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} · Personal Day {current.personalDay}
         </Text>
         {current.events.length === 0 ? (
-          <Text style={styles.sub}>A quiet day. Nothing close to your chart.</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.sub}>A quiet day. Nothing close to your chart.</Text>
         ) : (
           current.events.map((e) => {
             const s = eventSignal(e);
             return (
               <View key={e.id} style={styles.eventLine}>
                 {s ? <SignalMarker kind={s} size={15} /> : e.kind === 'gate' ? <LensIcon lens="vehicle" size={13} /> : <View style={styles.noMarker} />}
-                <Text style={styles.eventText}>
+                <Text maxFontSizeMultiplier={1.3} style={styles.eventText}>
                   {e.title}{s ? ` · ${SIGNAL_LABEL[s]}` : ''}
                 </Text>
               </View>
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   dayNum: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchment },
   markerSlot: { height: 18, alignItems: 'center', justifyContent: 'center' },
   quiet: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.hairline },
-  pd: { fontFamily: fonts.body, fontSize: 11, color: colors.parchmentMuted },
+  pd: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
   detail: {
     gap: 8, padding: space.md, borderRadius: radius.md, backgroundColor: colors.charcoal,
     borderWidth: 1, borderColor: colors.hairline,

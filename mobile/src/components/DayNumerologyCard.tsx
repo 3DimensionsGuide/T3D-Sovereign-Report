@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { select } from '@/lib/haptics';
 import type { DayNumberMeaning, DayNumerology } from '@/lib/dayNumerologyTypes';
 import { Term } from '@/components/Explain';

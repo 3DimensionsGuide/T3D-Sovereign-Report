@@ -57,7 +57,7 @@ export function LetterStrip({ letters, onJump }: { letters: string[]; onJump: (l
     <View pointerEvents="box-none" style={styles.wrap}>
       {active ? (
         <View pointerEvents="none" style={styles.bubble} accessibilityElementsHidden importantForAccessibility="no">
-          <Text style={styles.bubbleText}>{active}</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.bubbleText}>{active}</Text>
         </View>
       ) : null}
       <View
@@ -72,7 +72,7 @@ export function LetterStrip({ letters, onJump }: { letters: string[]; onJump: (l
       >
         {letters.map((L) => (
           <View key={L} pointerEvents="none" style={styles.item}>
-            <Text style={[styles.letter, active === L && styles.letterOn]}>{L}</Text>
+            <Text maxFontSizeMultiplier={1.3} style={[styles.letter, active === L && styles.letterOn]}>{L}</Text>
           </View>
         ))}
       </View>

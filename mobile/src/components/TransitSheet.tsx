@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useExplain } from '@/components/Explain';
 import { ChartRequestError, requestTransitCard, type DailyTransitHit } from '@/lib/api';
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.vehicle,
     backgroundColor: colors.amethyst,
   },
-  meetLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.vehicle },
+  meetLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.vehicle },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     minHeight: 44,

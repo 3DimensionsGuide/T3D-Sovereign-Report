@@ -15,11 +15,11 @@ export function SpineAxis({ from, to, fromLabel, toLabel }: { from: string; to: 
       <View style={[styles.today, { left: 0 }]} />
       {ticks.map((t) => (
         <View key={t.label + t.x} style={[styles.tick, { left: pct(t.x) }]}>
-          <Text style={styles.tickLabel}>{t.label}</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.tickLabel}>{t.label}</Text>
         </View>
       ))}
-      <Text style={[styles.endLabel, { left: 0 }]}>{fromLabel}</Text>
-      <Text style={[styles.endLabel, { right: 0 }]}>{toLabel}</Text>
+      <Text maxFontSizeMultiplier={1.3} style={[styles.endLabel, { left: 0 }]}>{fromLabel}</Text>
+      <Text maxFontSizeMultiplier={1.3} style={[styles.endLabel, { right: 0 }]}>{toLabel}</Text>
     </View>
   );
 }
@@ -28,7 +28,7 @@ export function SpineAxis({ from, to, fromLabel, toLabel }: { from: string; to: 
 export function SpineKey() {
   return (
     <View accessible accessibilityLabel="Key. A left arrow means the transit began earlier. A right arrow means it continues later. A dark mark is the exact day." style={styles.key}>
-      <Text style={styles.keyText}>{'‹ began earlier   › continues later   ▮ exact day'}</Text>
+      <Text maxFontSizeMultiplier={1.3} style={styles.keyText}>{'‹ began earlier   › continues later   ▮ exact day'}</Text>
     </View>
   );
 }
@@ -52,7 +52,7 @@ export function SpineRow({ s, from, to }: { s: SpineSeason; from: string; to: st
     <View accessible accessibilityLabel={`${s.title}. ${SIGNAL_LABEL[s.nature]}. ${s.meta}`} style={styles.row}>
       <View style={styles.rowHead}>
         <SignalMarker kind={s.nature} size={15} />
-        <Text style={styles.rowTitle}>{s.title}{s.lord ? '  ★' : ''}</Text>
+        <Text maxFontSizeMultiplier={1.3} style={styles.rowTitle}>{s.title}{s.lord ? '  ★' : ''}</Text>
       </View>
       <View style={styles.track}>
         <View
@@ -63,13 +63,13 @@ export function SpineRow({ s, from, to }: { s: SpineSeason; from: string; to: st
             bar.cutRight && styles.cutRight,
           ]}
         />
-        {bar.cutLeft ? <Text style={[styles.cut, { left: bar.exact.some((f) => f < 0.05) ? 12 : 4 }]}>{'‹'}</Text> : null}
-        {bar.cutRight ? <Text style={[styles.cut, { right: bar.exact.some((f) => f > 0.95) ? 12 : 4 }]}>{'›'}</Text> : null}
+        {bar.cutLeft ? <Text maxFontSizeMultiplier={1.3} style={[styles.cut, { left: bar.exact.some((f) => f < 0.05) ? 12 : 4 }]}>{'‹'}</Text> : null}
+        {bar.cutRight ? <Text maxFontSizeMultiplier={1.3} style={[styles.cut, { right: bar.exact.some((f) => f > 0.95) ? 12 : 4 }]}>{'›'}</Text> : null}
         {bar.exact.map((f, i) => (
           <View key={i} style={[styles.exact, { left: pct(f) }]} />
         ))}
       </View>
-      <Text style={styles.meta}>{SIGNAL_LABEL[s.nature]}. {s.meta}</Text>
+      <Text maxFontSizeMultiplier={1.3} style={styles.meta}>{SIGNAL_LABEL[s.nature]}. {s.meta}</Text>
     </View>
   );
 }
@@ -96,14 +96,14 @@ export function CycleBar({ name, current, next, today }: { name: string; current
             key={seg.which}
             style={[styles.segment, { width: pct(seg.width) }, seg.which === 'now' ? styles.segNow : styles.segNext]}
           >
-            <Text style={[styles.segText, seg.which === 'now' && styles.segTextNow]} numberOfLines={1}>
+            <Text maxFontSizeMultiplier={1.3} style={[styles.segText, seg.which === 'now' && styles.segTextNow]} numberOfLines={1}>
               {seg.which === 'now' ? `Now ${label(seg.number)}` : `Next ${label(seg.number)}`}
             </Text>
           </View>
         ))}
         <View style={[styles.cycleToday, { left: pct(m.todayX) }]} />
       </View>
-      <Text style={styles.meta}>{progressWords(m.progress)}.</Text>
+      <Text maxFontSizeMultiplier={1.3} style={styles.meta}>{progressWords(m.progress)}.</Text>
     </View>
   );
 }
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   tickLabel: { position: 'absolute', top: 11, left: -12, width: 26, textAlign: 'center', fontFamily: fonts.body, fontSize: 11, color: colors.parchmentMuted },
   endLabel: { position: 'absolute', top: 19, fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.parchment },
   key: { paddingBottom: 4 },
-  keyText: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
+  keyText: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   row: { gap: 6, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline },
   rowHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rowTitle: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 21, color: colors.parchment },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   segment: { justifyContent: 'center', paddingHorizontal: 8 },
   segNow: { backgroundColor: LENS_COLOR.road },
   segNext: { backgroundColor: colors.amethyst, borderLeftWidth: 1, borderLeftColor: colors.hairline },
-  segText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.parchmentMuted },
+  segText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
   segTextNow: { color: colors.parchment },
   cycleToday: { position: 'absolute', top: 0, bottom: 0, width: 3, marginLeft: -1, backgroundColor: colors.gold },
 });

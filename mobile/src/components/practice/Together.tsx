@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Field } from '@/components/Field';
 import { Segmented } from '@/components/Segmented';

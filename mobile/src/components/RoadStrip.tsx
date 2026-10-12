@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { useRouter, type Href } from 'expo-router';
 import { LENS_COLOR, LENS_TEXT, LensIcon, SIGNAL_COLOR } from '@/components/Lens';
 import { MotionLensIcon } from '@/components/LensMotion';
@@ -64,8 +65,8 @@ export function RoadStrip({ date, personalYear }: Props) {
     >
       <View style={styles.head}>
         <MotionLensIcon lens="road" size={13} />
-        <Text accessibilityRole="header" style={[styles.lens, { color: LENS_TEXT.road }]}>Where you are on the Road</Text>
-        <Text accessibilityElementsHidden style={styles.chevron}>›</Text>
+        <Text maxFontSizeMultiplier={1.3} accessibilityRole="header" style={[styles.lens, { color: LENS_TEXT.road }]}>Where you are on the Road</Text>
+        <Text maxFontSizeMultiplier={1.3} accessibilityElementsHidden style={styles.chevron}>›</Text>
       </View>
 
       <View style={styles.stripWrap} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -95,7 +96,7 @@ export function RoadStrip({ date, personalYear }: Props) {
                 s.current ? styles.segmentNow : s.past ? styles.segmentPast : styles.segmentAhead,
               ]}
             >
-              <Text style={[styles.segNumber, s.past && styles.dim]}>{s.number}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={[styles.segNumber, s.past && styles.dim]}>{s.number}</Text>
             </View>
           ))}
         </View>
@@ -104,7 +105,7 @@ export function RoadStrip({ date, personalYear }: Props) {
             <View key={s.index} style={{ flex: s.widthPct, alignItems: 'center' }}>
               {s.challenge === null ? null : (
                 <View style={[styles.bump, s.past && styles.dim, s.current && styles.bumpNow]}>
-                  <Text style={styles.challenge}>{`C${s.challenge}`}</Text>
+                  <Text maxFontSizeMultiplier={1.3} style={styles.challenge}>{`C${s.challenge}`}</Text>
                 </View>
               )}
             </View>
@@ -112,8 +113,8 @@ export function RoadStrip({ date, personalYear }: Props) {
         </View>
       </View>
 
-      <Text style={styles.sentence}>{model.sentence}</Text>
-      {model.match ? <Text style={styles.match}>{model.match}</Text> : null}
+      <Text maxFontSizeMultiplier={1.3} style={styles.sentence}>{model.sentence}</Text>
+      {model.match ? <Text maxFontSizeMultiplier={1.3} style={styles.match}>{model.match}</Text> : null}
     </Pressable>
   );
 }

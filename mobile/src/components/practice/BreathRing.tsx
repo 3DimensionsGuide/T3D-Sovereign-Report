@@ -62,11 +62,11 @@ export function BreathRing() {
         <Animated.View style={[styles.ring, !reduce && { opacity, transform: [{ scale }] }]} />
         <View style={styles.center}>
           <LensIcon lens="vehicle" size={20} />
-          <Text style={styles.word}>{word}</Text>
-          {running ? <Text style={styles.count}>{`Breath ${breathNo} of ${BREATHS}`}</Text> : null}
+          <Text maxFontSizeMultiplier={1.3} style={styles.word}>{word}</Text>
+          {running ? <Text maxFontSizeMultiplier={1.3} style={styles.count}>{`Breath ${breathNo} of ${BREATHS}`}</Text> : null}
         </View>
       </View>
-      <Text style={styles.note}>
+      <Text maxFontSizeMultiplier={1.3} style={styles.note}>
         {finished
           ? 'Put your question in plain yes-or-no words and notice the first response in your body.'
           : reduce
@@ -86,6 +86,6 @@ const styles = StyleSheet.create({
   ring: { position: 'absolute', width: SIZE, height: SIZE, borderRadius: SIZE / 2, borderWidth: 3, borderColor: colors.vehicle, backgroundColor: 'rgba(229,169,60,0.10)' },
   center: { alignItems: 'center', gap: 3 },
   word: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
-  count: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
+  count: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   note: { alignSelf: 'stretch', fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, textAlign: 'center' },
 });

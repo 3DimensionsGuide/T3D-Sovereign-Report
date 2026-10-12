@@ -14,7 +14,7 @@ export function NumberBadge({ n, nature, size = 26 }: { n: number; nature: Aspec
         { width: size, height: size, borderColor: SIGNAL_COLOR[nature], borderRadius: nature === 'friction' ? 5 : size / 2 },
       ]}
     >
-      <Text style={styles.n}>{n}</Text>
+      <Text maxFontSizeMultiplier={1.3} style={styles.n}>{n}</Text>
     </View>
   );
 }

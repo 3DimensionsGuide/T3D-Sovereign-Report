@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SkeletonCards } from '@/components/Skeleton';
-import { AccessibilityInfo, AppState, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, AppState, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
@@ -467,6 +468,6 @@ const styles = StyleSheet.create({
   transitHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   transitPhrase: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   transitDetail: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
-  transitMore: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, color: colors.gold, marginTop: 2 },
+  transitMore: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.gold, marginTop: 2 },
   transitNature: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4, color: colors.parchment },
 });

@@ -1,6 +1,7 @@
 import { teaser } from '@/lib/teaser';
 import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { LENS_LABEL, LENS_TEXT, SIGNAL_COLOR, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
 import { lensTap } from '@/lib/haptics';
 import { MotionLensIcon } from '@/components/LensMotion';
@@ -95,14 +96,14 @@ function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; m
     <>
       <View style={styles.rowHead}>
         <MotionLensIcon lens={lens} size={13} replayKey={lamp?.state ?? null} />
-        <Text style={[styles.lensName, { color: LENS_TEXT[lens] }]}>{LENS_LABEL[lens]}</Text>
+        <Text maxFontSizeMultiplier={1.3} style={[styles.lensName, { color: LENS_TEXT[lens] }]}>{LENS_LABEL[lens]}</Text>
         <View style={styles.rowWord}>
           {lamp ? <SignalMarker kind={SHAPE[lamp.state]} size={14} color={COLOR[lamp.state]} /> : null}
-          <Text style={styles.rowWordText}>{word}</Text>
-          {text ? <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text> : null}
+          <Text maxFontSizeMultiplier={1.3} style={styles.rowWordText}>{word}</Text>
+          {text ? <Text maxFontSizeMultiplier={1.3} style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text> : null}
         </View>
       </View>
-      {text ? <Text style={styles.rowText} numberOfLines={open ? undefined : 1}>{open ? text : teaser(text, 40)}</Text> : null}
+      {text ? <Text maxFontSizeMultiplier={1.3} style={styles.rowText} numberOfLines={open ? undefined : 1}>{open ? text : teaser(text, 40)}</Text> : null}
     </>
   );
   if (!text) {
@@ -133,7 +134,7 @@ export function SignalLamp({ signal, isToday }: Props) {
   const { overall } = signal;
   return (
     <View style={styles.card}>
-      <Text accessibilityRole="header" style={styles.title}>{isToday ? 'The signal today' : 'The signal for this day'}</Text>
+      <Text maxFontSizeMultiplier={1.3} accessibilityRole="header" style={styles.title}>{isToday ? 'The signal today' : 'The signal for this day'}</Text>
 
       <View
         accessible
@@ -143,9 +144,9 @@ export function SignalLamp({ signal, isToday }: Props) {
       >
         <Housing state={overall.state} />
         <View style={styles.heroText}>
-          <Text style={[styles.word, { color: COLOR[overall.state] }]}>{WORD[overall.state]}</Text>
-          <Text style={styles.phrase}>{PHRASE[overall.state]}</Text>
-          <Text style={styles.reason}>{lampTally(signal)}</Text>
+          <Text maxFontSizeMultiplier={1.3} style={[styles.word, { color: COLOR[overall.state] }]}>{WORD[overall.state]}</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.phrase}>{PHRASE[overall.state]}</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.reason}>{lampTally(signal)}</Text>
         </View>
       </View>
 

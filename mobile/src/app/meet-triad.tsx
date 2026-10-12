@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { router, type Href } from 'expo-router';
 import Svg, { Circle } from 'react-native-svg';
 import { AccentView } from '@/components/AccentView';
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
   dayLabel: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4 },
   stopTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26, color: colors.parchment },
   statusCol: { alignItems: 'center', gap: 2, minWidth: 64 },
-  statusWord: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.parchment, textAlign: 'center' },
+  statusWord: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchment, textAlign: 'center' },
   content: { gap: space.md },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchment },
   strong: { fontFamily: fonts.bodyBold, fontSize: 16, lineHeight: 24, color: colors.parchment },

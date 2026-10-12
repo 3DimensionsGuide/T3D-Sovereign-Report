@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { select } from '@/lib/haptics';
 import { Term } from '@/components/Explain';
 import { LensIcon, lensFromGlyph } from '@/components/Lens';

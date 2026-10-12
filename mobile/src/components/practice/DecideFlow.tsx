@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { select } from '@/lib/haptics';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import { LENS_COLOR, LensLabel, SignalMarker } from '@/components/Lens';
@@ -162,5 +163,5 @@ const styles = StyleSheet.create({
   choiceLampText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
   choiceText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.parchment },
   recap: { gap: 4, paddingLeft: space.md, borderLeftWidth: 4 },
-  recapLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8 },
+  recapLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8 },
 });

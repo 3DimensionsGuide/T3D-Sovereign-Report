@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { TermPressable, useExplain } from '@/components/Explain';
 import { LENS_TEXT, LensIcon, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
 import { aspectId, centerId, channelId, gateId, natalId } from '@/lib/termIds';
@@ -474,7 +475,7 @@ const styles = StyleSheet.create({
   gateCol: { flex: 1, gap: 2 },
   gateColHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: colors.hairline },
   gateColTitle: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
-  gateColSub: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
+  gateColSub: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   gateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.hairline },
   gatePlanet: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted, flexShrink: 1 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

@@ -31,6 +31,7 @@ export default function TabsLayout() {
           height: Platform.OS === 'ios' ? 88 : 68,
           paddingTop: 8,
         },
+        tabBarAllowFontScaling: false,
         tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12, marginTop: 2 },
       }}
     >

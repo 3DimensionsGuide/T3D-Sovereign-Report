@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import Svg, { Circle, Polygon } from 'react-native-svg';
 import { useRouter, type Href } from 'expo-router';
 import { AccentView } from '@/components/AccentView';

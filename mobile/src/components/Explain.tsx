@@ -2,10 +2,8 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
   type ReactNode,
 } from 'react';
-import {
-  ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View,
-  type StyleProp, type TextStyle, type ViewStyle,
-} from 'react-native';
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChartRequestError, requestExplain } from '@/lib/api';
@@ -307,7 +305,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.gold, borderStyle: 'dashed',
   },
   lockedText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold },
-  yoursLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
+  yoursLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   related: { gap: 8 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {

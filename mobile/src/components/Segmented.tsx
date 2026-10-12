@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Pressable } from '@/components/Pressable';
 import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
 import { select } from '@/lib/haptics';
 
@@ -45,7 +46,7 @@ export function Segmented<T extends string>({
           >
             <View style={styles.inner}>
               {typeof opt.icon === 'function' ? opt.icon(selected) : opt.icon}
-              <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
+              <Text numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.3} style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
             </View>
           </Pressable>
         );
