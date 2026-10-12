@@ -63,8 +63,11 @@ export default function Readings() {
   const [openCardState, setOpenCardState] = useState<{ lens: Lens; title: string | null } | null>(null);
   const openCard = openCardState && openCardState.lens === lens ? openCardState.title : null;
   const onCardOpen = useCallback(
-    (title: string, open: boolean, initial = false) =>
-      setOpenCardState((cur) => ({ lens, title: nextOpenCard(cur && cur.lens === lens ? cur.title : null, title, open, initial) })),
+    (title: string, open: boolean, initial = false) => {
+      // Opening a card that is not a center lets go of the lit center. A center card then lights itself again right after.
+      if (open && !initial) setFocusCenter(null);
+      setOpenCardState((cur) => ({ lens, title: nextOpenCard(cur && cur.lens === lens ? cur.title : null, title, open, initial) }));
+    },
     [lens],
   );
   const onScrollY = useCallback((y: number) => { const p = y > PIN_AT[lens]; setPinned((prev) => (prev === p ? prev : p)); }, [lens]);
@@ -86,7 +89,7 @@ export default function Readings() {
       onScrollY={onScrollY}
       overlay={
         !pinned ? null
-        : lens === 'vehicle' ? <StickyMiniBody focusId={focusCenter} />
+        : lens === 'vehicle' ? <StickyMiniBody focusId={focusCenter} openCard={openCard} />
         : lens === 'road' ? <StickyMiniRoad openCard={openCard} />
         : <StickyMiniWheel openCard={openCard} />
       }

@@ -210,7 +210,7 @@ export function Accordion({
   return (
     <View style={[styles.card, now && { borderColor: accent, borderWidth: 2 }]}>
       <Pressable
-        onPress={() => { setOpen(!open); onOpenChange?.(!open); reportOpen(title, !open); }}
+        onPress={() => { setOpen(!open); reportOpen(title, !open); onOpenChange?.(!open); }}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${title}. ${subtitle ?? ''}${now ? ' Active now.' : ''} ${open ? 'Expanded.' : 'Double tap to read.'}`}
