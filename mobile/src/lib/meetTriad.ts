@@ -101,3 +101,40 @@ export function showTodayCard(startedOn: string | null, todayKey: string, done: 
 
 const WORD: Record<StopStatus, string> = { done: 'Done', open: 'Open now', soon: 'Opens soon', premium: 'Premium' };
 export const statusWord = (s: StopStatus): string => WORD[s];
+
+export type CheckLens = 'vehicle' | 'road' | 'stoplight';
+export type CheckState = 'go' | 'slow' | 'pause';
+
+export interface DecisionCheck {
+  step: number;
+  lens: CheckLens;
+  question: string;
+  /** Today's answer for this lens, or null when it could not be read. */
+  state: CheckState | null;
+  reason: string;
+}
+
+interface LampLike { state: CheckState; reason: string }
+
+/** The three checks for Day 6, always in the same order: Authority, then Road, then Stoplight. */
+export function decisionChecks(
+  signal: { vehicle: LampLike | null; road: LampLike; stoplight: LampLike } | null | undefined,
+): DecisionCheck[] {
+  const make = (step: number, lens: CheckLens, question: string, lamp: LampLike | null | undefined): DecisionCheck => ({
+    step, lens, question, state: lamp?.state ?? null, reason: lamp?.reason ?? '',
+  });
+  return [
+    make(1, 'vehicle', 'Does it fit your Strategy and Authority?', signal?.vehicle),
+    make(2, 'road', 'Does it fit today’s number?', signal?.road),
+    make(3, 'stoplight', 'Do today’s conditions allow it?', signal?.stoplight),
+  ];
+}
+
+/** One plain sentence on the week for Day 7: which stops were finished. */
+export function weekRecap(done: readonly number[]): string {
+  const titles = STOPS.filter((s) => done.includes(s.day)).map((s) => s.title);
+  if (!titles.length) return 'You have not marked a stop done yet. Open one and tap done when you have tried it.';
+  if (titles.length === 1) return `You finished one stop: ${titles[0]}.`;
+  const last = titles[titles.length - 1];
+  return `You finished ${titles.length} stops: ${titles.slice(0, -1).join(', ')} and ${last}.`;
+}

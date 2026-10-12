@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  currentStop, daysBetween, FREE_DAYS, opensOn, showTodayCard, STOPS, stopStatus, statusWord, TOTAL_DAYS,
+  currentStop, daysBetween, decisionChecks, weekRecap, FREE_DAYS, opensOn, showTodayCard, STOPS, stopStatus, statusWord, TOTAL_DAYS,
 } from '../../mobile/src/lib/meetTriad';
 
 test('there are seven stops, the first three free and the rest Premium', () => {
@@ -90,4 +90,37 @@ test('the first three stops reuse the bodygraph chip, the Road dials and the sig
 test('Today shows the first-week card only for the live day', () => {
   const today = read('mobile/src/app/(tabs)/today.tsx');
   assert.match(today, /isToday \? <MeetTriadCard \/> : null/);
+});
+
+test('Day 6 checks always run Authority, then Road, then Stoplight, with today\u2019s lamp for each', () => {
+  const checks = decisionChecks({
+    vehicle: { state: 'go', reason: 'v' }, road: { state: 'slow', reason: 'r' }, stoplight: { state: 'pause', reason: 's' },
+  });
+  assert.deepEqual(checks.map((c) => c.lens), ['vehicle', 'road', 'stoplight']);
+  assert.deepEqual(checks.map((c) => c.step), [1, 2, 3]);
+  assert.deepEqual(checks.map((c) => c.state), ['go', 'slow', 'pause']);
+  for (const c of checks) assert.ok(c.question.endsWith('?'));
+});
+
+test('Day 6 checks still list all three when the signal is missing', () => {
+  const checks = decisionChecks(null);
+  assert.equal(checks.length, 3);
+  assert.ok(checks.every((c) => c.state === null && c.reason === ''));
+  assert.equal(decisionChecks({ vehicle: null, road: { state: 'go', reason: 'r' }, stoplight: { state: 'go', reason: 's' } })[0]!.state, null);
+});
+
+test('the week recap names the stops that were finished', () => {
+  assert.match(weekRecap([]), /not marked a stop done/);
+  assert.equal(weekRecap([1]), 'You finished one stop: Your Vehicle.');
+  assert.equal(weekRecap([1, 2, 3]), 'You finished 3 stops: Your Vehicle, Your Road and Your Stoplight.');
+  assert.equal(weekRecap([2, 1]), 'You finished 2 stops: Your Vehicle and Your Road.');
+});
+
+test('the screen scrolls an opened stop into view, and Day 6 and 7 show real content', () => {
+  const screen = read('mobile/src/app/meet-triad.tsx');
+  assert.match(screen, /scrollRef=\{scrollRef\}/);
+  assert.match(screen, /if \(!open\) scrollTo\(stop\.day\)/);
+  assert.match(screen, /decisionChecks\(/);
+  assert.match(screen, /<TriadPortrait/);
+  assert.match(screen, /weekRecap\(done\)/);
 });

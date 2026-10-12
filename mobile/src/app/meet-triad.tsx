@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, type Href } from 'expo-router';
 import Svg, { Circle } from 'react-native-svg';
 import { AccentView } from '@/components/AccentView';
@@ -7,16 +7,17 @@ import { BodygraphChip } from '@/components/BodygraphChip';
 import { DayNumerologyCard } from '@/components/DayNumerologyCard';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
-import { LENS_TEXT, LensIcon, SIGNAL_COLOR, SignalMarker } from '@/components/Lens';
+import { LENS_LABEL, LENS_TEXT, LensIcon, SIGNAL_COLOR, SignalMarker } from '@/components/Lens';
 import { LockIcon } from '@/components/LockIcon';
 import { RoadStrip } from '@/components/RoadStrip';
 import { Screen } from '@/components/Screen';
 import { SignalLamp } from '@/components/SignalLamp';
 import { TransitMiniWheel } from '@/components/TransitMiniWheel';
-import { TriadSeal } from '@/components/TriadSeal';
+import { TriadPortrait } from '@/components/TriadPortrait';
+import { COLOR as LAMP_COLOR, SHAPE as LAMP_SHAPE, WORD as LAMP_WORD } from '@/components/SignalLamp';
 import { select } from '@/lib/haptics';
 import { localDateString } from '@/lib/localDate';
-import { currentStop, opensOn, STOPS, statusWord, stopStatus, TOTAL_DAYS, type StopStatus, type TriadStop } from '@/lib/meetTriad';
+import { currentStop, decisionChecks, opensOn, STOPS, statusWord, stopStatus, TOTAL_DAYS, weekRecap, type StopStatus, type TriadStop } from '@/lib/meetTriad';
 import { loadLiveBundle, savedLiveBundle, type TodayBundle } from '@/lib/todayBundle';
 import { useLocalDate } from '@/lib/useLocalDate';
 import { useMeetTriadHydrated, useMeetTriadStore } from '@/store/useMeetTriadStore';
@@ -69,6 +70,23 @@ export default function MeetYourTriad() {
   const [openDay, setOpenDay] = useState<number | null>(null);
   const [bundle, setBundle] = useState<TodayBundle | null>(null);
   const [failed, setFailed] = useState(false);
+  const scrollRef = useRef<ScrollView | null>(null);
+  const scrollOffset = useRef(0);
+  const cardRefs = useRef<Record<number, View | null>>({});
+
+  /** Bring an opened stop to the top of the screen, once the one above it has folded away. */
+  const scrollTo = useCallback((day: number) => {
+    setTimeout(() => {
+      const card = cardRefs.current[day];
+      const scroller = scrollRef.current as unknown as { measureInWindow?: (cb: (x: number, y: number, w: number, h: number) => void) => void } | null;
+      if (!card || !scroller || typeof scroller.measureInWindow !== 'function') return;
+      scroller.measureInWindow((_sx, scrollerTop) => {
+        card.measureInWindow((_x, top) => {
+          scrollRef.current?.scrollTo({ y: Math.max(0, scrollOffset.current + (top - scrollerTop) - 12), animated: true });
+        });
+      });
+    }, 120);
+  }, []);
 
   useEffect(() => {
     if (hydrated) start(liveDate);
@@ -178,21 +196,45 @@ export default function MeetYourTriad() {
             <GoldButton label="Open your Timeline" variant="ghost" onPress={() => router.push('/timeline' as Href)} />
           </>
         );
-      case 6:
+      case 6: {
+        const checks = decisionChecks(bundle?.triad?.signal);
         return (
           <>
             <Text style={styles.body}>{stop.blurb}</Text>
+            <View style={styles.checks}>
+              {checks.map((c) => (
+                <View
+                  key={c.lens}
+                  accessible
+                  accessibilityLabel={`Check ${c.step}, ${LENS_LABEL[c.lens]}. ${c.question} ${c.state ? `${LAMP_WORD[c.state]}. ${c.reason}` : 'Not read just now.'}`}
+                  style={styles.check}
+                >
+                  <View style={styles.checkHead}>
+                    <Text style={styles.checkStep}>{c.step}</Text>
+                    <LensIcon lens={c.lens} size={14} />
+                    <Text style={[styles.checkLens, { color: LENS_TEXT[c.lens] }]}>{LENS_LABEL[c.lens]}</Text>
+                    <View style={styles.checkWord}>
+                      {c.state ? <SignalMarker kind={LAMP_SHAPE[c.state]} size={14} color={LAMP_COLOR[c.state]} /> : null}
+                      <Text style={styles.checkWordText}>{c.state ? LAMP_WORD[c.state] : 'Not read'}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.checkQuestion}>{c.question}</Text>
+                  {c.reason ? <Text style={styles.checkReason}>{c.reason}</Text> : null}
+                </View>
+              ))}
+            </View>
+            <Text style={styles.body}>These are conditions, not a decision. The choice is still yours.</Text>
             {tail}
             <GoldButton label="Open Practice" variant="ghost" onPress={() => router.push('/practice' as Href)} />
           </>
         );
+      }
       default:
         return (
           <>
             <Text style={styles.body}>{stop.blurb}</Text>
-            <View style={styles.sealRow}>
-              <TriadSeal size={88} />
-            </View>
+            {chart ? <TriadPortrait chart={chart} /> : null}
+            <Text style={styles.body}>{weekRecap(done)}</Text>
             {tail}
             <GoldButton label="Open My Chart" variant="ghost" onPress={() => router.push('/chart' as Href)} />
           </>
@@ -201,7 +243,7 @@ export default function MeetYourTriad() {
   }
 
   return (
-    <Screen>
+    <Screen scrollRef={scrollRef} scrollOffset={scrollOffset}>
       <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={styles.back}>
         <Text style={styles.backText}>← BACK</Text>
       </Pressable>
@@ -226,6 +268,7 @@ export default function MeetYourTriad() {
         const accent = stop.lens === 'triad' ? colors.gold : stop.lens === 'vehicle' ? colors.vehicle : stop.lens === 'road' ? colors.road : colors.stoplight;
         return (
           <FadeIn key={stop.day} delay={40 * i}>
+            <View ref={(node) => { cardRefs.current[stop.day] = node; }} collapsable={false}>
             <AccentView style={[styles.card, status === 'premium' && styles.cardLocked, stop.day === now && styles.cardNow]} accent={accent}>
               <Pressable
                 accessibilityRole="button"
@@ -234,6 +277,7 @@ export default function MeetYourTriad() {
                 onPress={() => {
                   select();
                   setOpenDay(open ? null : stop.day);
+                  if (!open) scrollTo(stop.day);
                 }}
                 style={({ pressed }) => [styles.head, pressed && { opacity: 0.8 }]}
               >
@@ -260,6 +304,7 @@ export default function MeetYourTriad() {
                 />
               ) : null}
             </AccentView>
+            </View>
           </FadeIn>
         );
       })}
@@ -301,7 +346,15 @@ const styles = StyleSheet.create({
   preview: { opacity: 0.45 },
   premiumNote: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   premiumText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold },
-  sealRow: { alignItems: 'center' },
+  checks: { gap: space.sm },
+  check: { gap: 4, borderLeftWidth: 2, borderLeftColor: colors.hairline, paddingLeft: space.md },
+  checkHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  checkStep: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, width: 14 },
+  checkLens: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4 },
+  checkWord: { flexDirection: 'row', alignItems: 'center', gap: 5, marginLeft: 'auto' },
+  checkWordText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchment },
+  checkQuestion: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 22, color: colors.parchment },
+  checkReason: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   errorBox: { gap: space.sm },
   dev: { minHeight: 48, justifyContent: 'center', alignItems: 'center' },
   devText: { fontFamily: fonts.body, fontSize: 13, color: SIGNAL_COLOR.neutral },
