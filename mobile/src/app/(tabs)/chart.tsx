@@ -8,6 +8,8 @@ import { GoldButton } from '@/components/GoldButton';
 import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/termIds';
 import { Disclosure } from '@/components/Disclosure';
 import { MiniBody } from '@/components/MiniBody';
+import { MiniRoad } from '@/components/MiniRoad';
+import { MiniWheel } from '@/components/MiniWheel';
 import type { LensName } from '@/components/Lens';
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
@@ -98,6 +100,7 @@ export default function Chart() {
           glyph="▲"
           metaphor="THE ROAD"
           system="Numerology"
+          drawing={<MiniRoad />}
           rows={[
             { label: 'Life Path', value: String(num.lifePath), labelId: 'num:lifepath', valueId: `num:${num.lifePath}` },
             { label: 'Destiny', value: String(num.destiny), labelId: 'num:destiny', valueId: `num:${num.destiny}` },
@@ -124,6 +127,7 @@ export default function Chart() {
           glyph="●"
           metaphor="THE STOPLIGHT"
           system="Astrology"
+          drawing={<MiniWheel astro={astro} />}
           rows={[
             { label: 'Sun', value: astro.tropicalSun.formatted, labelId: planetId('sun') },
             { label: 'Moon', value: astro.tropicalMoon.formatted, labelId: planetId('moon') },
