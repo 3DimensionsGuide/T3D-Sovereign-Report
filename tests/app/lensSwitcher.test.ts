@@ -43,13 +43,13 @@ test('drawing data adds gates, channels, centers, planets and houses', () => {
   }
 });
 
-test('Glossary offers an In your chart filter, Timeline offers Road and Stoplight', () => {
+test('Glossary offers an In your chart filter, Timeline offers Vehicle, Road and Stoplight', () => {
   const g = read('mobile/src/app/glossary.tsx');
   assert.match(g, /\['all', 'yours', \.\.\.ORDER\]/);
   assert.match(g, /yours\.has\(r\.item\.id\)/);
   const t = read('mobile/src/app/(tabs)/timeline.tsx');
-  assert.match(t, /type TimelineLens = 'all' \| 'road' \| 'stoplight'/);
-  assert.doesNotMatch(t, /value: 'vehicle'/);
+  assert.match(t, /type TimelineLens = 'all' \| 'vehicle' \| 'road' \| 'stoplight'/);
+  assert.match(t, /value: 'vehicle'/);
 });
 
 test('Glossary shows a sign\'s full line and renames the "None" circuitry entry', () => {
