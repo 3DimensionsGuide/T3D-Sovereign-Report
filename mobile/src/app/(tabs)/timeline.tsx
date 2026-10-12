@@ -345,7 +345,7 @@ export default function Timeline() {
                   <SpineRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={spineSeason(s, i)} from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} />
                 ))}
                 <Text style={styles.footnote}>
-                  Each bar runs from when the planet comes within 3° of your chart to when it leaves. Dark marks show the exact days. A flat end means it began earlier or lasts beyond this stretch. ★ marks your Lord of the Year.
+                  Each bar runs from when the planet comes within 3° of your chart to when it leaves. Dark marks show the exact days. An arrow at the end of a bar means it began earlier or lasts beyond this stretch. ★ marks your Lord of the Year.
                 </Text>
               </Panel>
             </FadeIn>

@@ -7,7 +7,8 @@ const pct = (n: number) => `${n * 100}%` as `${number}%`;
 
 /** The axis for the spine: today at the left, month starts along it, the last day at the right. */
 export function SpineAxis({ from, to, fromLabel, toLabel }: { from: string; to: string; fromLabel: string; toLabel: string }) {
-  const ticks = monthTicks(from, to);
+  // A month label too close to the last-day label would print on top of it, so it is left out.
+  const ticks = monthTicks(from, to).filter((t) => t.x < 0.86);
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.axis}>
       <View style={styles.axisLine} />
@@ -53,6 +54,8 @@ export function SpineRow({ s, from, to }: { s: SpineSeason; from: string; to: st
             bar.cutRight && styles.cutRight,
           ]}
         />
+        {bar.cutLeft ? <Text style={[styles.cut, { left: 4 }]}>{'‹'}</Text> : null}
+        {bar.cutRight ? <Text style={[styles.cut, { right: 4 }]}>{'›'}</Text> : null}
         {bar.exact.map((f, i) => (
           <View key={i} style={[styles.exact, { left: pct(f) }]} />
         ))}
@@ -110,6 +113,7 @@ const styles = StyleSheet.create({
   bar: { position: 'absolute', top: 0, bottom: 0, borderRadius: 7 },
   cutLeft: { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 },
   cutRight: { borderTopRightRadius: 0, borderBottomRightRadius: 0 },
+  cut: { position: 'absolute', top: -3, fontFamily: fonts.bodyBold, fontSize: 18, lineHeight: 20, color: colors.obsidian },
   exact: { position: 'absolute', top: 2, bottom: 2, width: 3, marginLeft: -1, borderRadius: 1, backgroundColor: colors.obsidian },
   meta: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
   cycle: { gap: 6 },
