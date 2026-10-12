@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, type Href } from 'expo-router';
+import Svg, { Circle } from 'react-native-svg';
 import { AccentView } from '@/components/AccentView';
 import { BodygraphChip } from '@/components/BodygraphChip';
 import { DayNumerologyCard } from '@/components/DayNumerologyCard';
@@ -30,20 +31,33 @@ function weekdayOf(key: string): string {
 function StopMark({ status }: { status: StopStatus }) {
   if (status === 'done') return <SignalMarker kind="flow" size={18} />;
   if (status === 'premium') return <LockIcon size={18} />;
-  return <SignalMarker kind={status === 'open' ? 'caution' : 'neutral'} size={18} color={status === 'open' ? colors.gold : colors.parchmentMuted} />;
+  if (status === 'open') {
+    // A gold ring with a dot: ready for you. (Not the warning hexagon, which means Slow.)
+    return (
+      <Svg width={18} height={18} viewBox="0 0 24 24" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <Circle cx="12" cy="12" r="10" fill="none" stroke={colors.gold} strokeWidth={2.4} />
+        <Circle cx="12" cy="12" r="4.5" fill={colors.gold} />
+      </Svg>
+    );
+  }
+  return <SignalMarker kind="neutral" size={18} color={colors.parchmentMuted} />;
 }
 
 function LensGlyph({ lens }: { lens: TriadStop['lens'] }) {
   if (lens === 'triad') {
     return (
       <View style={styles.trio}>
-        <LensIcon lens="vehicle" size={12} />
-        <LensIcon lens="road" size={12} />
-        <LensIcon lens="stoplight" size={12} />
+        <LensIcon lens="vehicle" size={9} />
+        <LensIcon lens="road" size={9} />
+        <LensIcon lens="stoplight" size={9} />
       </View>
     );
   }
-  return <LensIcon lens={lens} size={20} />;
+  return (
+    <View style={styles.glyph}>
+      <LensIcon lens={lens} size={22} />
+    </View>
+  );
 }
 
 export default function MeetYourTriad() {
@@ -273,7 +287,8 @@ const styles = StyleSheet.create({
   cardNow: { borderColor: colors.gold },
   cardLocked: { opacity: 0.92 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 },
-  trio: { flexDirection: 'row', gap: 2, width: 40, flexWrap: 'wrap' },
+  glyph: { width: 30, alignItems: 'center' },
+  trio: { flexDirection: 'row', gap: 1, width: 30, justifyContent: 'center' },
   dayLabel: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4 },
   stopTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26, color: colors.parchment },
   statusCol: { alignItems: 'center', gap: 2, minWidth: 64 },
