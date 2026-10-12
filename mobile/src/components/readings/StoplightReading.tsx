@@ -1,3 +1,4 @@
+import { SIGN_GLYPH } from '@/lib/signGlyphs';
 import { useEffect, type ComponentProps } from 'react';
 import { View } from 'react-native';
 import {
@@ -6,6 +7,7 @@ import {
 import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, StoplightPlanet } from '@/lib/stoplightTypes';
 import { ElementBalance, StoplightCompare } from '@/components/readings/StoplightCompare';
 import { TimeLordBar } from '@/components/readings/TimeLordBar';
+import { periodQuote } from '@/lib/timeLordBar';
 import { useStoplight } from '@/lib/useStoplight';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -15,11 +17,6 @@ import { colors, space } from '@/theme/tokens';
 function Accordion(props: Omit<ComponentProps<typeof BaseAccordion>, 'accent'>) {
   return <BaseAccordion accent={colors.stoplight} {...props} />;
 }
-
-const SIGN_GLYPH: Record<string, string> = {
-  Aries: '♈', Taurus: '♉', Gemini: '♊', Cancer: '♋', Leo: '♌', Virgo: '♍',
-  Libra: '♎', Scorpio: '♏', Sagittarius: '♐', Capricorn: '♑', Aquarius: '♒', Pisces: '♓',
-};
 
 const PLANET_GLYPH: Record<string, string> = {
   mercury: '☿', venus: '♀', mars: '♂', jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇',
@@ -199,7 +196,7 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
         now
       >
         <Block label="THE THEME OF THIS PERIOD" text={data.timeLord.tagline} />
-        <Block label="IN THIS PERIOD" text={data.timeLord.quote} />
+        <Block label="IN THIS PERIOD" text={periodQuote(data.timeLord.quote, data.timeLord.startYear, data.timeLord.endYear)} />
         {data.timeLord.paragraphs.map((t, i) => (
           <Block key={t} label={i === 0 ? 'WHAT THIS LOOKS LIKE' : 'HOW IT PLAYS OUT'} text={t} />
         ))}

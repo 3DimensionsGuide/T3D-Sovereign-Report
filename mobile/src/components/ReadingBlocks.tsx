@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   contents: { gap: 6 },
   contentsLabel: { fontFamily: fonts.bodyBold, fontSize: 13 },
   contentsRow: { gap: 8, paddingRight: space.md },
-  contentsChip: { minHeight: 44, maxWidth: 190, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: colors.charcoal },
+  contentsChip: { minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: colors.charcoal },
   contentsChipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },

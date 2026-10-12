@@ -1,12 +1,8 @@
+import { SIGN_GLYPH } from '@/lib/signGlyphs';
 import { StyleSheet, Text, View } from 'react-native';
 import type { BigThreeLens } from '@/lib/stoplightTypes';
 import { LENS_TEXT } from '@/components/Lens';
 import { colors, fonts, radius, space } from '@/theme/tokens';
-
-const SIGN_GLYPH: Record<string, string> = {
-  Aries: '♈', Taurus: '♉', Gemini: '♊', Cancer: '♋', Leo: '♌', Virgo: '♍',
-  Libra: '♎', Scorpio: '♏', Sagittarius: '♐', Capricorn: '♑', Aquarius: '♒', Pisces: '♓',
-};
 
 /** Tropical and sidereal Big Three side by side; differing signs are marked in words. */
 export function StoplightCompare({ tropical, sidereal }: { tropical: BigThreeLens; sidereal: BigThreeLens }) {

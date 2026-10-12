@@ -45,7 +45,7 @@ export function TimeLordBar({ planet, startYear, endYear, yearsRemaining, next }
 
   return (
     <View style={styles.card} accessible accessibilityRole="image" accessibilityLabel={model.spoken}>
-      <Text style={styles.title}>{`${planet}: about ${model.yearsLeft} years left`}</Text>
+      <Text style={styles.title}>{`${planet}: about ${model.yearsIn} of ${model.total} years in`}</Text>
       <View style={styles.markerRow} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
         <Animated.View style={[styles.marker, { transform: [{ translateX: markX }] }]}>
           <LensIcon lens="stoplight" size={14} color={LENS_TEXT.stoplight} />

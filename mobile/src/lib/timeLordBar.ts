@@ -28,3 +28,20 @@ export function buildTimeLordBar(
     (next ? ` After ${planet} comes ${next}.` : '');
   return { fraction, yearsIn, yearsLeft, total, spoken };
 }
+
+const NUMBER_WORDS: Record<number, string> = {
+  1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
+  10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen',
+};
+
+/**
+ * The Time Lord texts open with "A decade ruled by ...", but the periods run 7 to 13 years. This names the
+ * real length, taken from the start and end years the server sends. Any other opening is left alone.
+ */
+export function periodQuote(quote: string, startYear: number, endYear: number): string {
+  const years = endYear - startYear;
+  if (!/^A decade ruled by/.test(quote) || years <= 0) return quote;
+  if (years === 10) return quote;
+  const word = NUMBER_WORDS[years] ?? String(years);
+  return quote.replace(/^A decade ruled by/, `A ${word}-year period ruled by`);
+}
