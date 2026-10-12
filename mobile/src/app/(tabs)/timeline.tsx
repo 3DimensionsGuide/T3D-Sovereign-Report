@@ -10,6 +10,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { Segmented } from '@/components/Segmented';
 import { aspectWord, bodyName, capFirst, houseTheme, natalName, ordinal } from '@/lib/skyText';
 import { LENS_TEXT, LensIcon, LensLabel, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
+import { CycleBar, SpineAxis, SpineRow, type SpineSeason } from '@/components/TimeSpine';
 import { SignalRibbon } from '@/components/SignalRibbon';
 import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineResult } from '@/lib/timelineTypes';
 import { useTimeline } from '@/lib/useTimeline';
@@ -17,7 +18,6 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
-import { AccentView } from '@/components/AccentView';
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
 /** Timeline lenses. Human Design has no dated events here yet, so it is not offered. */
 type TimelineLens = 'all' | 'road' | 'stoplight';
@@ -142,15 +142,15 @@ function YearCard({ data }: { data: TimelineResult }) {
             </Text>
           </View>
         ) : null}
-        <CycleBlock title="Pinnacle" cycle={data.pinnacle.current} next={data.pinnacle.next} />
-        <CycleBlock title="Challenge" cycle={data.challenge.current} next={data.challenge.next} />
+        <CycleBlock title="Pinnacle" cycle={data.pinnacle.current} next={data.pinnacle.next} today={localKey(new Date())} />
+        <CycleBlock title="Challenge" cycle={data.challenge.current} next={data.challenge.next} today={localKey(new Date())} />
         <GoldButton label="Your year ahead ›" variant="ghost" onPress={() => router.push('/year' as Href)} />
       </Panel>
     </FadeIn>
   );
 }
 
-function CycleBlock({ title, cycle, next }: { title: string; cycle: CycleWindow; next: CycleWindow | null }) {
+function CycleBlock({ title, cycle, next, today }: { title: string; cycle: CycleWindow; next: CycleWindow | null; today: string }) {
   return (
     <View style={styles.block}>
       <Text style={styles.blockTitle}>
@@ -162,28 +162,25 @@ function CycleBlock({ title, cycle, next }: { title: string; cycle: CycleWindow;
           ? ` Ages ${cycle.startAge}–${cycle.endAge}, until ${shortDate(cycle.endsOn)}${next ? `, then your ${title.toLowerCase()} becomes ${numLabel(next.number)}` : ''}.`
           : ` From age ${cycle.startAge} onward.`}
       </Text>
+      <CycleBar name={title} current={cycle} next={next} today={today} />
     </View>
   );
 }
 
-function SeasonRow({ s }: { s: ActiveSeason }) {
-  const phrase = `${bodyName(s.body)} ${aspectWord(s.aspect)} your ${natalName(s.natal)}`;
+function spineSeason(s: ActiveSeason, i: number): SpineSeason {
   const reaches = s.exactAt.length > 0
     ? `Exact ${s.exactAt.map((a) => shortDate(localKey(new Date(a)))).join(', ')}`
     : `Closest ${s.closest.orb.toFixed(1)}° on ${shortDate(localKey(new Date(s.closest.at)))}, never quite exact`;
-  return (
-    <AccentView
-      accessible
-      accessibilityLabel={`${phrase}. ${SIGNAL_LABEL[NATURE_KIND[s.nature]]}. In effect ${shortDate(s.windowStart)} to ${shortDate(s.windowEnd)}. ${reaches}.`}
-      style={[styles.season, s.nature === 'friction' && styles.seasonFriction]}
-    >
-      <Text style={styles.seasonTitle}>{phrase}{s.lord ? '  ★' : ''}</Text>
-      <Text style={styles.seasonMeta}>
-        In effect {shortDate(s.windowStart)} to {shortDate(s.windowEnd)} · {reaches}
-      </Text>
-      <NatureTag nature={s.nature} />
-    </AccentView>
-  );
+  return {
+    key: `${s.body}-${s.natal}-${s.aspect}-${i}`,
+    title: `${bodyName(s.body)} ${aspectWord(s.aspect)} your ${natalName(s.natal)}`,
+    nature: NATURE_KIND[s.nature],
+    windowStart: s.windowStart,
+    windowEnd: s.windowEnd,
+    exactAt: s.exactAt,
+    lord: s.lord,
+    meta: `In effect ${shortDate(s.windowStart)} to ${shortDate(s.windowEnd)}. ${reaches}.`,
+  };
 }
 
 function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onToggle: () => void }) {
@@ -343,11 +340,12 @@ export default function Timeline() {
           {lens !== 'road' && data.seasons.length > 0 ? (
             <FadeIn delay={100}>
               <Panel label="Seasons in effect" lens="stoplight">
+                <SpineAxis from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} fromLabel="Today" toLabel={shortDate(localKey(new Date(data.to)))} />
                 {data.seasons.map((s, i) => (
-                  <SeasonRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={s} />
+                  <SpineRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={spineSeason(s, i)} from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} />
                 ))}
                 <Text style={styles.footnote}>
-                  Slow planets within 3° of your chart. ★ marks your Lord of the Year.
+                  Each bar runs from when the planet comes within 3° of your chart to when it leaves. Dark marks show the exact days. A flat end means it began earlier or lasts beyond this stretch. ★ marks your Lord of the Year.
                 </Text>
               </Panel>
             </FadeIn>
@@ -447,18 +445,6 @@ const styles = StyleSheet.create({
   blockTitle: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchment },
   blockBody: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   footnote: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
-  season: {
-    gap: 4,
-    padding: space.md,
-    borderRadius: radius.md,
-    backgroundColor: colors.amethyst,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4FD1B5',
-  },
-  seasonFriction: { borderLeftColor: '#F0836B' },
-  seasonTitle: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchment },
-  seasonMeta: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
-  seasonNature: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.5, color: colors.parchment },
   day: { gap: space.sm, marginTop: space.sm, marginLeft: 8, paddingLeft: 18, borderLeftWidth: 2, borderLeftColor: 'rgba(31,138,77,0.55)' },
   dayHead: { gap: 2 },
   node: { position: 'absolute', left: -28, top: 7, width: 14, height: 14, borderRadius: 7, backgroundColor: colors.obsidian, borderWidth: 3, borderColor: '#1F8A4D' },
