@@ -119,12 +119,13 @@ interface LampLike { state: CheckState; reason: string }
 /** The three checks for Day 6, always in the same order: Authority, then Road, then Stoplight. */
 export function decisionChecks(
   signal: { vehicle: LampLike | null; road: LampLike; stoplight: LampLike } | null | undefined,
+  vehicle?: { authority?: string | null; strategy?: string | null } | null,
 ): DecisionCheck[] {
   const make = (step: number, lens: CheckLens, question: string, lamp: LampLike | null | undefined): DecisionCheck => ({
     step, lens, question, state: lamp?.state ?? null, reason: lamp?.reason ?? '',
   });
   return [
-    make(1, 'vehicle', 'Does it fit your Strategy and Authority?', signal?.vehicle),
+    { ...make(1, 'vehicle', 'Does it fit your Strategy and Authority?', signal?.vehicle), reason: vehicleReason(vehicle) ?? signal?.vehicle?.reason ?? '' },
     make(2, 'road', 'Does it fit today’s number?', signal?.road),
     make(3, 'stoplight', 'Do today’s conditions allow it?', signal?.stoplight),
   ];
@@ -137,4 +138,15 @@ export function weekRecap(done: readonly number[]): string {
   if (titles.length === 1) return `You finished one stop: ${titles[0]}.`;
   const last = titles[titles.length - 1];
   return `You finished ${titles.length} stops: ${titles.slice(0, -1).join(', ')} and ${last}.`;
+}
+
+/** Day 6, check 1: what the person's own Authority and Strategy ask, in plain words (not the sky). */
+function vehicleReason(v?: { authority?: string | null; strategy?: string | null } | null): string | null {
+  const authority = v?.authority?.trim();
+  const strategy = v?.strategy?.trim();
+  if (!authority && !strategy) return null;
+  const first = strategy ? strategy.charAt(0).toLowerCase() + strategy.slice(1).replace(/[.]+$/, '') : null;
+  if (authority && first) return `Your Authority is ${authority}, and your Strategy is to ${first}. Check the choice against both.`;
+  if (authority) return `Your Authority is ${authority}. Check the choice against it.`;
+  return `Your Strategy is to ${first}. Check the choice against it.`;
 }

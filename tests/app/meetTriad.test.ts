@@ -124,3 +124,13 @@ test('the screen scrolls an opened stop into view, and Day 6 and 7 show real con
   assert.match(screen, /<TriadPortrait/);
   assert.match(screen, /weekRecap\(done\)/);
 });
+
+test('Day 6 check 1 states the person\u2019s own Authority and Strategy, not the sky', () => {
+  const signal = { vehicle: { state: 'go' as const, reason: 'The Sun is in Gate 57' }, road: { state: 'go' as const, reason: 'r' }, stoplight: { state: 'go' as const, reason: 's' } };
+  const first = decisionChecks(signal, { authority: 'Sacral', strategy: 'Wait to respond, then inform' })[0]!;
+  assert.equal(first.reason, 'Your Authority is Sacral, and your Strategy is to wait to respond, then inform. Check the choice against both.');
+  assert.equal(first.state, 'go', 'the lamp is unchanged');
+  assert.match(decisionChecks(signal, { authority: 'Sacral' })[0]!.reason, /^Your Authority is Sacral\./);
+  assert.equal(decisionChecks(signal, null)[0]!.reason, 'The Sun is in Gate 57', 'falls back to the lamp reason');
+  assert.equal(decisionChecks(signal, { authority: ' ', strategy: null })[0]!.reason, 'The Sun is in Gate 57');
+});

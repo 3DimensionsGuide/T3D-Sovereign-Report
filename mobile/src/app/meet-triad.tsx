@@ -199,7 +199,7 @@ export default function MeetYourTriad() {
           </>
         );
       case 6: {
-        const checks = decisionChecks(bundle?.triad?.signal);
+        const checks = decisionChecks(bundle?.triad?.signal, bundle?.today.vehicle);
         return (
           <>
             <Text style={styles.body}>{stop.blurb}</Text>
