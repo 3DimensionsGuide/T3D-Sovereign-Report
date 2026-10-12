@@ -8,7 +8,7 @@ const pct = (n: number) => `${n * 100}%` as `${number}%`;
 /** The axis for the spine: today at the left, month starts along it, the last day at the right. */
 export function SpineAxis({ from, to, fromLabel, toLabel }: { from: string; to: string; fromLabel: string; toLabel: string }) {
   // A month label too close to the last-day label would print on top of it, so it is left out.
-  const ticks = monthTicks(from, to).filter((t) => t.x < 0.86);
+  const ticks = monthTicks(from, to).filter((t) => t.x < 0.76);
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.axis}>
       <View style={styles.axisLine} />
@@ -54,8 +54,8 @@ export function SpineRow({ s, from, to }: { s: SpineSeason; from: string; to: st
             bar.cutRight && styles.cutRight,
           ]}
         />
-        {bar.cutLeft ? <Text style={[styles.cut, { left: 4 }]}>{'‹'}</Text> : null}
-        {bar.cutRight ? <Text style={[styles.cut, { right: 4 }]}>{'›'}</Text> : null}
+        {bar.cutLeft ? <Text style={[styles.cut, { left: bar.exact.some((f) => f < 0.05) ? 12 : 4 }]}>{'‹'}</Text> : null}
+        {bar.cutRight ? <Text style={[styles.cut, { right: bar.exact.some((f) => f > 0.95) ? 12 : 4 }]}>{'›'}</Text> : null}
         {bar.exact.map((f, i) => (
           <View key={i} style={[styles.exact, { left: pct(f) }]} />
         ))}
