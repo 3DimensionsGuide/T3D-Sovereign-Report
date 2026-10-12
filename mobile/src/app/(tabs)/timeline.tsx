@@ -1,6 +1,6 @@
 import { yearRangeLabel } from '@/lib/teaser';
 import { useMemo, useState } from 'react';
-import { joinNames, splitCurrentMonth } from '@/lib/timelineMonths';
+import { splitCurrentMonth } from '@/lib/timelineMonths';
 import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -228,7 +228,8 @@ export default function Timeline() {
   const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
-  const [showLater, setShowLater] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const [openMonths, setOpenMonths] = useState<string[]>([]);
 
   const groups = useMemo(() => {
     if (!data) return [];
@@ -245,10 +246,19 @@ export default function Timeline() {
   }, [data, filter]);
 
   const split = useMemo(() => splitCurrentMonth(groups, localKey(new Date())), [groups]);
-  const monthName = (key: string) => parseDay(`${key}-01`).toLocaleDateString(undefined, { month: 'long' });
+  const thisYear = new Date().getFullYear();
+  const monthTitle = (key: string) => {
+    const d = parseDay(`${key}-01`);
+    const name = d.toLocaleDateString(undefined, { month: 'long' });
+    return d.getFullYear() === thisYear ? name : `${name} ${d.getFullYear()}`;
+  };
   const laterDays = split.later.length;
-  const laterLabel = `${showLater ? 'Show less' : `Show ${joinNames(split.laterMonths.map(monthName))}`}${showLater ? '' : ` · ${laterDays} more ${laterDays === 1 ? 'day' : 'days'}`}`;
-  const visibleGroups = showLater ? groups : split.now;
+  const visibleGroups = split.now;
+  const toggleMonth = (key: string) => {
+    setOpenMonths((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+    setOpenId(null);
+  };
+
 
   const personalByDate = useMemo(() => {
     const m = new Map<string, number>();
@@ -256,13 +266,33 @@ export default function Timeline() {
     return m;
   }, [data]);
 
+  const renderDay = ([day, events]: [string, TimelineEvent[]]) => (
+              <View key={day} style={styles.day}>
+                <View style={styles.dayHead}>
+                  <View style={[styles.node, day === groups[0]?.[0] && styles.nodeFirst]} />
+                  <Text accessibilityRole="header" style={styles.dayTitle}>{longDate(day)}</Text>
+                  {personalByDate.get(day) ? (
+                    <Text style={styles.dayBadge}>Personal Day {numLabel(personalByDate.get(day)!)}</Text>
+                  ) : null}
+                </View>
+                {events.map((e) => (
+                  <EventRow
+                    key={e.id}
+                    e={e}
+                    open={openId === e.id}
+                    onToggle={() => setOpenId(openId === e.id ? null : e.id)}
+                  />
+                ))}
+              </View>
+  );
+
   return (
     <Screen refreshing={refreshing} onRefresh={refresh}>
       <FadeIn>
         <View style={styles.header}>
           <LensLabel lens="road">The road ahead</LensLabel>
           <Text accessibilityRole="header" style={styles.title}>Timeline</Text>
-          <Text style={styles.sub}>The rest of this month first, measured against your own chart. Later days are one tap away.</Text>
+          <Text style={styles.sub}>The rest of this month first, measured against your own chart. Later months are under Show more.</Text>
         </View>
       </FadeIn>
 
@@ -303,37 +333,42 @@ export default function Timeline() {
           ) : visibleGroups.length === 0 ? (
             <Text style={styles.sub}>Nothing in this filter for the rest of this month.</Text>
           ) : (
-            visibleGroups.map(([day, events]) => (
-              <View key={day} style={styles.day}>
-                <View style={styles.dayHead}>
-                  <View style={[styles.node, day === groups[0]?.[0] && styles.nodeFirst]} />
-                  <Text accessibilityRole="header" style={styles.dayTitle}>{longDate(day)}</Text>
-                  {personalByDate.get(day) ? (
-                    <Text style={styles.dayBadge}>Personal Day {numLabel(personalByDate.get(day)!)}</Text>
-                  ) : null}
-                </View>
-                {events.map((e) => (
-                  <EventRow
-                    key={e.id}
-                    e={e}
-                    open={openId === e.id}
-                    onToggle={() => setOpenId(openId === e.id ? null : e.id)}
-                  />
-                ))}
-              </View>
-            ))
+            visibleGroups.map((g) => renderDay(g))
           )}
 
           {laterDays > 0 ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityState={{ expanded: showLater }}
-              accessibilityLabel={laterLabel}
-              onPress={() => { setShowLater((v) => !v); setOpenId(null); }}
-              style={({ pressed }) => [styles.showMore, pressed && { opacity: 0.8 }]}
-            >
-              <Text style={styles.showMoreText}>{laterLabel}</Text>
-            </Pressable>
+            <View style={styles.moreWrap}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ expanded: showMore }}
+                onPress={() => { setShowMore((v) => !v); setOpenId(null); }}
+                style={({ pressed }) => [styles.showMore, pressed && { opacity: 0.8 }]}
+              >
+                <Text style={styles.showMoreText}>{showMore ? 'Show less' : 'Show more'}</Text>
+              </Pressable>
+              {showMore
+                ? split.laterMonths.map((key) => {
+                    const open = openMonths.includes(key);
+                    const days = split.later.filter(([d]) => d.startsWith(key));
+                    return (
+                      <View key={key} style={styles.monthBlock}>
+                        <Pressable
+                          accessibilityRole="button"
+                          accessibilityState={{ expanded: open }}
+                          accessibilityLabel={`${monthTitle(key)}, ${days.length} ${days.length === 1 ? 'day' : 'days'} with events. ${open ? 'Expanded.' : 'Double tap to open.'}`}
+                          onPress={() => toggleMonth(key)}
+                          style={({ pressed }) => [styles.monthBtn, pressed && { opacity: 0.8 }]}
+                        >
+                          <Text style={styles.monthName}>{monthTitle(key)}</Text>
+                          <Text style={styles.monthCount}>{days.length} {days.length === 1 ? 'day' : 'days'}</Text>
+                          <Text style={[styles.monthChevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+                        </Pressable>
+                        {open ? days.map((g) => renderDay(g)) : null}
+                      </View>
+                    );
+                  })
+                : null}
+            </View>
           ) : null}
 
           <Text style={styles.reminder}>{data.reminder}</Text>
@@ -344,6 +379,16 @@ export default function Timeline() {
 }
 
 const styles = StyleSheet.create({
+  moreWrap: { gap: space.md },
+  monthBlock: { gap: space.md },
+  monthBtn: {
+    minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: space.sm,
+    paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1,
+    borderColor: colors.hairline, backgroundColor: colors.charcoal,
+  },
+  monthName: { flex: 1, fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
+  monthCount: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted },
+  monthChevron: { fontFamily: fonts.bodyBold, fontSize: 24, lineHeight: 26, color: colors.gold },
   showMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
   showMoreText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.gold },
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },

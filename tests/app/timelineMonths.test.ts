@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { joinNames, monthOf, splitCurrentMonth } from '../../mobile/src/lib/timelineMonths';
+import { monthOf, splitCurrentMonth } from '../../mobile/src/lib/timelineMonths';
 
 const g = (day: string): [string, string[]] => [day, ['e']];
 
@@ -29,9 +29,6 @@ test('the year rolls over correctly', () => {
   assert.deepEqual(r.laterMonths, ['2027-01']);
 });
 
-test('names read as a sentence', () => {
-  assert.equal(joinNames(['November']), 'November');
-  assert.equal(joinNames(['November', 'December']), 'November and December');
-  assert.equal(joinNames(['November', 'December', 'January']), 'November, December and January');
+test('monthOf takes the year and month', () => {
   assert.equal(monthOf('2026-10-11'), '2026-10');
 });
