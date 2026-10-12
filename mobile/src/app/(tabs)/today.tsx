@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SkeletonCards } from '@/components/Skeleton';
-import { AppState, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, AppState, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -63,15 +63,20 @@ const TRANSITS_SHOWN = 3;
 
 const NATURE_KIND: Record<DailyTransitHit['nature'], SignalKind> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
 
-function TransitRow({ hit, number, onSelect }: { hit: DailyTransitHit; number?: number; onSelect: (hit: DailyTransitHit) => void }) {
+function TransitRow({
+  hit, number, focused, innerRef, onSelect,
+}: {
+  hit: DailyTransitHit; number?: number; focused?: boolean; innerRef?: (node: View | null) => void; onSelect: (hit: DailyTransitHit) => void;
+}) {
   const phrase = `${bodyName(hit.transiting)} ${aspectWord(hit.aspect)} your ${natalName(hit.natal)}`;
   const detail = `${hit.orb.toFixed(1)}° from exact · ${hit.applying ? 'applying' : 'separating'}${hit.peak ? ' · peak' : ''}`;
   return (
     <Pressable
+      ref={innerRef}
       accessibilityRole="button"
       accessibilityLabel={`${number ? `Number ${number}. ` : ''}${phrase}. ${SIGNAL_LABEL[NATURE_KIND[hit.nature]]}. ${detail}. Opens the full meaning.`}
       onPress={() => onSelect(hit)}
-      style={({ pressed }) => [styles.transitRow, hit.nature === 'friction' && styles.transitFriction, pressed && { opacity: 0.8 }]}
+      style={({ pressed }) => [styles.transitRow, hit.nature === 'friction' && styles.transitFriction, focused && styles.transitFocused, pressed && { opacity: 0.8 }]}
     >
       <View style={styles.transitHead}>
         {number ? <NumberBadge n={number} nature={hit.nature} /> : null}
@@ -216,10 +221,35 @@ export default function Today() {
     ? null
     : localDateString(shown) < liveDate ? 'A DAY GONE BY' : 'A DAY AHEAD';
   const dayWord = isToday ? 'today' : 'this day';
+  const scrollRef = useRef<ScrollView | null>(null);
+  const scrollOffset = useRef(0);
+  const rowRefs = useRef<Record<number, View | null>>({});
+  const [focusNum, setFocusNum] = useState<number | null>(null);
+  const focusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (focusTimer.current) clearTimeout(focusTimer.current); }, []);
+
+  /** A numbered badge on the wheel: scroll to its row in the list and mark it for a moment. */
+  const pickNumber = useCallback((n: number) => {
+    const row = rowRefs.current[n];
+    const scroller = scrollRef.current;
+    setFocusNum(n);
+    if (focusTimer.current) clearTimeout(focusTimer.current);
+    focusTimer.current = setTimeout(() => setFocusNum(null), 3000);
+    if (!row || !scroller) return;
+    const host = scroller as unknown as { measureInWindow?: (cb: (x: number, y: number, w: number, h: number) => void) => void };
+    if (typeof host.measureInWindow !== 'function') return;
+    host.measureInWindow((_sx, scrollerTop) => {
+      row.measureInWindow((_x, top) => {
+        scroller.scrollTo({ y: Math.max(0, scrollOffset.current + (top - scrollerTop) - 12), animated: true });
+      });
+    });
+    AccessibilityInfo.announceForAccessibility(`Showing number ${n} in the list.`);
+  }, []);
+
   const numbered = today ? hasWheelPositions(today.transits) : false;
 
   return (
-    <Screen refreshing={refreshing} onRefresh={onRefresh}>
+    <Screen refreshing={refreshing} onRefresh={onRefresh} scrollRef={scrollRef} scrollOffset={scrollOffset}>
       <FadeIn>
         <View style={styles.header}>
           <View style={styles.eyebrowRow}>
@@ -329,9 +359,9 @@ export default function Today() {
             </View>
             {today.transits.length ? (
               <View style={styles.transitList}>
-                <TransitMiniWheel hits={today.transits} />
+                <TransitMiniWheel hits={today.transits} onPickNumber={pickNumber} />
                 {(allTransits ? today.transits : today.transits.slice(0, TRANSITS_SHOWN)).map((hit, i) => (
-                  <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} number={numbered && i < MAX_WHEEL_CHORDS ? i + 1 : undefined} onSelect={setSelectedHit} />
+                  <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} number={numbered && i < MAX_WHEEL_CHORDS ? i + 1 : undefined} focused={numbered && i + 1 === focusNum} innerRef={(node) => { rowRefs.current[i + 1] = node; }} onSelect={setSelectedHit} />
                 ))}
                 {today.transits.length > TRANSITS_SHOWN ? (
                   <Pressable
@@ -417,6 +447,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.md, borderWidth: 1,
     borderColor: colors.hairline, padding: space.md, gap: 4,
   },
+  transitFocused: { borderColor: colors.gold, borderWidth: 2.5 },
   transitFriction: { borderColor: SIGNAL_COLOR.friction },
   transitNatureRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   transitHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },

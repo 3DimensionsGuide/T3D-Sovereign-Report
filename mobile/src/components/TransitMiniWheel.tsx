@@ -1,24 +1,27 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Rect, Text as SvgText } from 'react-native-svg';
 import { SIGNAL_COLOR, SignalMarker } from '@/components/Lens';
 import type { DailyTransitHit } from '@/lib/api';
+import { select } from '@/lib/haptics';
 import { buildTransitWheel, hasWheelPositions, MAX_WHEEL_CHORDS, type WheelChord } from '@/lib/transitWheel';
 import { colors, fonts, space } from '@/theme/tokens';
 
-const SIZE = 260;
+const SIZE = 320;
+const BADGE_R = 15;
+const TARGET = 48;
 
-function Mark({ chord }: { chord: WheelChord }) {
+function Badge({ chord }: { chord: WheelChord }) {
   const color = SIGNAL_COLOR[chord.nature];
-  const r = 11;
+  const r = BADGE_R;
   return (
     <>
       {chord.nature === 'friction' ? (
-        <Rect x={chord.mx - r} y={chord.my - r} width={r * 2} height={r * 2} rx={5} fill={colors.charcoal} stroke={color} strokeWidth={2.4} />
+        <Rect x={chord.bx - r} y={chord.by - r} width={r * 2} height={r * 2} rx={6} fill={colors.charcoal} stroke={color} strokeWidth={2.6} />
       ) : (
-        <Circle cx={chord.mx} cy={chord.my} r={r} fill={colors.charcoal} stroke={color} strokeWidth={2.4} />
+        <Circle cx={chord.bx} cy={chord.by} r={r} fill={colors.charcoal} stroke={color} strokeWidth={2.6} />
       )}
-      <SvgText x={chord.mx} y={chord.my + 4.5} fontSize={13} fontWeight="bold" fill={colors.parchment} textAnchor="middle">
+      <SvgText x={chord.bx} y={chord.by + 5} fontSize={15} fontWeight="bold" fill={colors.parchment} textAnchor="middle">
         {String(chord.number)}
       </SvgText>
     </>
@@ -28,9 +31,10 @@ function Mark({ chord }: { chord: WheelChord }) {
 /**
  * Today's three tightest contacts as numbered lines between two rings: the sky outside, your chart
  * inside. The numbers match the first rows of the list below. Flow is a solid line with a round
- * badge; friction is dashed with a square badge. Lines draw in tightest first and the closest pulses once.
+ * badge; friction is dashed with a square badge. Each badge sits outside the ring, spread apart, and is
+ * a 48-point button that jumps to its row in the list. Lines draw in tightest first and the closest pulses once.
  */
-export function TransitMiniWheel({ hits }: { hits: DailyTransitHit[] }) {
+export function TransitMiniWheel({ hits, onPickNumber }: { hits: DailyTransitHit[]; onPickNumber: (n: number) => void }) {
   const wheel = useMemo(() => buildTransitWheel(hits, SIZE), [hits]);
   const drawn = useRef<Animated.Value[]>([]);
   const pulse = useRef(new Animated.Value(1)).current;
@@ -72,7 +76,8 @@ export function TransitMiniWheel({ hits }: { hits: DailyTransitHit[] }) {
 
   return (
     <View style={styles.wrap}>
-      <View accessible accessibilityRole="image" accessibilityLabel={wheel.spoken} style={styles.figure}>
+      <View style={styles.figure}>
+        <View accessible accessibilityRole="image" accessibilityLabel={wheel.spoken}>
         <Svg width={SIZE} height={SIZE} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
           <Circle cx={wheel.cx} cy={wheel.cy} r={wheel.outerR} fill="none" stroke={colors.hairline} strokeWidth={1.5} />
           <Circle cx={wheel.cx} cy={wheel.cy} r={wheel.innerR} fill="none" stroke={colors.hairline} strokeWidth={1.5} />
@@ -90,12 +95,13 @@ export function TransitMiniWheel({ hits }: { hits: DailyTransitHit[] }) {
               strokeWidth={1.8}
             />
           ))}
-          {wheel.dots.map((d) => (
+          {wheel.dots.filter((d) => d.label).map((d) => (
             <SvgText key={`${d.key}-l`} x={d.lx} y={d.ly + 4} fontSize={11} fontWeight="bold" fill={colors.parchment} textAnchor="middle">
               {d.label}
             </SvgText>
           ))}
         </Svg>
+        </View>
         {wheel.chords.map((c, i) => (
           <Animated.View
             key={c.key}
@@ -103,6 +109,7 @@ export function TransitMiniWheel({ hits }: { hits: DailyTransitHit[] }) {
             style={[StyleSheet.absoluteFill, { opacity: i === 0 ? Animated.multiply(drawn.current[i], pulse) : drawn.current[i] }]}
           >
             <Svg width={SIZE} height={SIZE} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+              <Line x1={c.x1} y1={c.y1} x2={c.bx} y2={c.by} stroke={SIGNAL_COLOR[c.nature]} strokeWidth={1.6} opacity={0.7} />
               <Line
                 x1={c.x1}
                 y1={c.y1}
@@ -114,9 +121,21 @@ export function TransitMiniWheel({ hits }: { hits: DailyTransitHit[] }) {
                 strokeDasharray={c.dashed ? '7 5' : undefined}
                 opacity={c.opacity}
               />
-              <Mark chord={c} />
+              <Badge chord={c} />
             </Svg>
           </Animated.View>
+        ))}
+        {wheel.chords.map((c) => (
+          <Pressable
+            key={`hit-${c.key}`}
+            accessibilityRole="button"
+            accessibilityLabel={`Number ${c.number}: ${c.phrase}. Jumps to it in the list.`}
+            onPress={() => {
+              select();
+              onPickNumber(c.number);
+            }}
+            style={{ position: 'absolute', left: c.bx - TARGET / 2, top: c.by - TARGET / 2, width: TARGET, height: TARGET }}
+          />
         ))}
       </View>
 

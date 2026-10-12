@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildBodygraphChip } from '../../mobile/src/lib/bodygraphChip';
-import { buildTransitWheel, hasWheelPositions, wheelAngle, wheelPoint, type WheelHit } from '../../mobile/src/lib/transitWheel';
+import { BADGE_GAP, buildTransitWheel, hasWheelPositions, spreadAngles, wheelAngle, wheelPoint, type WheelHit } from '../../mobile/src/lib/transitWheel';
 
 test('chip draws all nine centers and fills only the defined ones', () => {
   const chip = buildBodygraphChip(['throat', 'sacral'], null);
@@ -76,14 +76,42 @@ test('wheel ignores hits without positions and reports a quiet sky', () => {
   assert.match(w.spoken, /No close contacts/);
 });
 
-test('wheel labels of close neighbours are pushed apart', () => {
+test('wheel labels of close neighbours on your ring are pushed apart', () => {
   const w = buildTransitWheel([
-    hit({ transiting: 'mercury', transitLongitude: 100, natalLongitude: 10 }),
-    hit({ transiting: 'moon', transitLongitude: 105, natalLongitude: 200, orb: 1 }),
+    hit({ natal: 'sun', transitLongitude: 100, natalLongitude: 10 }),
+    hit({ natal: 'moon', transitLongitude: 200, natalLongitude: 15, orb: 1 }),
   ]);
-  const outer = w.dots.filter((d) => d.ring === 'outer');
-  assert.equal(outer.length, 2);
-  assert.ok(Math.hypot(outer[0].lx - outer[1].lx, outer[0].ly - outer[1].ly) >= 15.5);
+  const inner = w.dots.filter((d) => d.ring === 'inner');
+  assert.equal(inner.length, 2);
+  assert.ok(Math.hypot(inner[0].lx - inner[1].lx, inner[0].ly - inner[1].ly) >= 15.5);
+  assert.ok(w.dots.filter((d) => d.ring === 'outer').every((d) => d.label === ''), 'sky planets are named in the list');
+});
+
+test('badges stay apart even when the sky planets are almost on top of each other', () => {
+  const w = buildTransitWheel([
+    hit({ transiting: 'jupiter', natal: 'midheaven', orb: 0, transitLongitude: 100, natalLongitude: 100 }),
+    hit({ transiting: 'mars', natal: 'sun', orb: 0.6, transitLongitude: 101, natalLongitude: 20 }),
+    hit({ transiting: 'venus', natal: 'moon', orb: 1.2, transitLongitude: 103, natalLongitude: 50 }),
+  ]);
+  for (let i = 0; i < w.chords.length; i++) {
+    for (let j = i + 1; j < w.chords.length; j++) {
+      const d = Math.hypot(w.chords[i].bx - w.chords[j].bx, w.chords[i].by - w.chords[j].by);
+      assert.ok(d >= BADGE_GAP - 1, `badges ${i + 1} and ${j + 1} are ${d.toFixed(1)} apart`);
+    }
+  }
+  // Every badge stays inside the picture so its whole touch target can be pressed.
+  for (const c of w.chords) {
+    assert.ok(c.bx - 24 >= 0 && c.bx + 24 <= w.size && c.by - 24 >= 0 && c.by + 24 <= w.size);
+  }
+  assert.equal(w.chords[0].phrase, 'Jupiter square your Midheaven');
+});
+
+test('spreadAngles leaves well-separated angles alone and handles the wrap past 360 degrees', () => {
+  const spread = spreadAngles([0, 2, 4], 100);
+  assert.deepEqual(spread.map((a) => Math.round(a * 1000) / 1000), [0, 2, 4]);
+  const tight = spreadAngles([6.2, 0.05], 100);
+  const gap = Math.min(Math.abs(tight[0] - tight[1]), Math.PI * 2 - Math.abs(tight[0] - tight[1]));
+  assert.ok(gap * 100 >= BADGE_GAP - 0.5);
 });
 
 test('chip keeps the Sun and Moon markers apart when their gates are neighbours', () => {

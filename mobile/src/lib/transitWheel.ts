@@ -34,6 +34,11 @@ export interface WheelChord {
   y2: number;
   mx: number;
   my: number;
+  /** Where the numbered badge sits: outside the ring, spread so each can be tapped on its own. */
+  bx: number;
+  by: number;
+  /** "Jupiter conjunct your Midheaven" */
+  phrase: string;
   nature: AspectNature;
   strokeWidth: number;
   opacity: number;
@@ -46,6 +51,7 @@ export interface TransitWheel {
   cy: number;
   outerR: number;
   innerR: number;
+  badgeR: number;
   dots: WheelDot[];
   /** Faint marks every 30 degrees, so the ring reads as a zodiac. */
   ticks: { x1: number; y1: number; x2: number; y2: number }[];
@@ -70,6 +76,35 @@ const NATURE_WORD: Record<AspectNature, string> = { flow: 'flow', friction: 'fri
 /** The wheel draws only the tightest few, numbered to match the list under it. */
 export const MAX_WHEEL_CHORDS = 3;
 export const MIN_LABEL_GAP = 16;
+/** Badges are at least this far apart (centre to centre): a comfortable 48-point touch target each. */
+export const BADGE_GAP = 52;
+
+/** Spreads angles (radians) so neighbours are at least `gap` apart on a circle of the given radius. */
+export function spreadAngles(angles: number[], radius: number): number[] {
+  const gap = BADGE_GAP / radius;
+  const TAU = Math.PI * 2;
+  const order = angles.map((a, i) => ({ i, a: ((a % TAU) + TAU) % TAU })).sort((p, q) => p.a - q.a);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let k = 0; k < order.length; k++) {
+      const cur = order[k];
+      const nxt = order[(k + 1) % order.length];
+      if (order.length < 2) break;
+      let d = nxt.a - cur.a;
+      if (k === order.length - 1) d += Math.PI * 2;
+      if (d < gap) {
+        const push = (gap - d) / 2 + 0.001;
+        cur.a -= push;
+        nxt.a += push;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const out = new Array<number>(angles.length);
+  for (const o of order) out[o.i] = o.a;
+  return out;
+}
 
 /** Pushes crowded labels apart (same ring) so neighbours such as Mercury and the Moon stay readable. */
 export function spreadLabels(dots: WheelDot[]): void {
@@ -117,8 +152,9 @@ export function hasWheelPositions(hits: readonly WheelHit[]): boolean {
 /** The tightest contacts drawn between two rings: today's sky outside, your chart inside. */
 export function buildTransitWheel(hits: readonly WheelHit[], size = 260): TransitWheel {
   const c = size / 2;
-  const outerR = c - 30;
+  const outerR = c - 54;
   const innerR = outerR - 52;
+  const badgeR = outerR + 28;
   const usable = hits
     .filter((h) => typeof h.transitLongitude === 'number' && typeof h.natalLongitude === 'number')
     .slice()
@@ -132,7 +168,8 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
     const r = ring === 'outer' ? outerR : innerR;
     const [x, y] = wheelPoint(lon, r, c);
     const [lx, ly] = wheelPoint(lon, ring === 'outer' ? r + 15 : r - 15, c);
-    dots.set(key, { key, ring, x, y, lx, ly, label: ABBR[name] ?? name });
+    // The sky's planets are named in the numbered list; only your own points are labelled on the ring.
+    dots.set(key, { key, ring, x, y, lx, ly, label: ring === 'outer' ? '' : ABBR[name] ?? name });
   };
 
   const chords: WheelChord[] = usable.map((h, rank) => {
@@ -147,6 +184,9 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
       x1, y1, x2, y2,
       mx: Math.round(((x1 + x2) / 2) * 100) / 100,
       my: Math.round(((y1 + y2) / 2) * 100) / 100,
+      bx: 0,
+      by: 0,
+      phrase: `${NAMES[h.transiting]} ${ASPECT_WORD[h.aspect]} your ${NAMES[h.natal]}`,
       nature: h.nature,
       // Tighter contacts are thicker and stronger.
       strokeWidth: h.orb <= 1 ? 3.2 : h.orb <= 2 ? 2.4 : 1.8,
@@ -162,6 +202,12 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
         .join('. ') + '.'
     : 'No close contacts to your chart today.';
 
+  // Badges ride outside the ring at the sky planet's angle, nudged apart so none hides another.
+  const spread = spreadAngles(usable.map((h) => wheelAngle(h.transitLongitude as number)), badgeR);
+  chords.forEach((ch, i) => {
+    ch.bx = Math.round((c + badgeR * Math.cos(spread[i])) * 100) / 100;
+    ch.by = Math.round((c - badgeR * Math.sin(spread[i])) * 100) / 100;
+  });
   const list = [...dots.values()];
   spreadLabels(list.filter((d) => d.ring === 'outer'));
   spreadLabels(list.filter((d) => d.ring === 'inner'));
@@ -170,5 +216,5 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
     const [x2, y2] = wheelPoint(i * 30, outerR + 6, c);
     return { x1, y1, x2, y2 };
   });
-  return { size, cx: c, cy: c, outerR, innerR, dots: list, ticks, chords, spoken };
+  return { size, cx: c, cy: c, outerR, innerR, badgeR, dots: list, ticks, chords, spoken };
 }
