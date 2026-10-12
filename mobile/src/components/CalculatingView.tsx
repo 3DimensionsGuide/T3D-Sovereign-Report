@@ -42,7 +42,7 @@ export function CalculatingView({ done }: { done: boolean }) {
 
   return (
     <View style={styles.wrap} accessibilityLiveRegion="polite">
-      <TriadSeal size={96} />
+      <TriadSeal size={96} animate />
       <Text accessibilityRole="header" style={styles.title}>{done ? 'Your chart is ready' : 'Calculating your chart'}</Text>
       <View style={styles.rows}>
         {STEPS.map((s, i) => (

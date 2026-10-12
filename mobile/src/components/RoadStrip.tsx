@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { LENS_COLOR, LENS_TEXT, LensIcon } from '@/components/Lens';
-import { tap } from '@/lib/haptics';
+import { MotionLensIcon } from '@/components/LensMotion';
+import { lensTap } from '@/lib/haptics';
 import { buildRoadStrip } from '@/lib/roadStrip';
 import { useNumerology } from '@/lib/useNumerology';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -37,13 +38,13 @@ export function RoadStrip({ date, personalYear }: Props) {
       accessibilityRole="button"
       accessibilityLabel={`The Road. ${model.spokenSummary} Opens your timeline.`}
       onPress={() => {
-        tap();
+        lensTap('road');
         router.push('/timeline' as Href);
       }}
       style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
     >
       <View style={styles.head}>
-        <LensIcon lens="road" size={13} />
+        <MotionLensIcon lens="road" size={13} />
         <Text accessibilityRole="header" style={[styles.lens, { color: LENS_TEXT.road }]}>Where you are on the Road</Text>
         <Text accessibilityElementsHidden style={styles.chevron}>›</Text>
       </View>

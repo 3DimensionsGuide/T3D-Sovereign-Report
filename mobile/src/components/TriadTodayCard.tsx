@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { TriadToday } from '@/lib/triadTypes';
 import { Disclosure } from '@/components/Disclosure';
-import { LensIcon, lensFromGlyph } from '@/components/Lens';
+import { lensFromGlyph } from '@/components/Lens';
+import { MotionLensIcon } from '@/components/LensMotion';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 function Lens({ glyph, accent, label, title, lines }: {
@@ -10,7 +11,7 @@ function Lens({ glyph, accent, label, title, lines }: {
   return (
     <View style={[styles.lens, { borderLeftColor: accent }]}>
       <View style={styles.lensHead}>
-        {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={12} color={accent} /> : null}
+        {lensFromGlyph(glyph) ? <MotionLensIcon lens={lensFromGlyph(glyph)!} size={12} color={accent} /> : null}
         <Text style={[styles.lensLabel, { color: accent }]}>{label}</Text>
       </View>
       <Text style={styles.lensTitle}>{title}</Text>

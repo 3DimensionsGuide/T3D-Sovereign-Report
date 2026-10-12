@@ -22,6 +22,7 @@ import { TriadTodayCard } from '@/components/TriadTodayCard';
 import { SkyTally, TodaySignal } from '@/components/TodaySignal';
 import { SignalLamp } from '@/components/SignalLamp';
 import { RoadStrip } from '@/components/RoadStrip';
+import { TriadSeal } from '@/components/TriadSeal';
 import { SkyTodayCard } from '@/components/SkyTodayCard';
 import { select } from '@/lib/haptics';
 import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
@@ -213,7 +214,17 @@ export default function Today() {
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
       <FadeIn>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>{isToday ? 'TODAY\u2019S SKY' : `THE SKY · ${relation}`}</Text>
+          <View style={styles.eyebrowRow}>
+            <Text style={[styles.eyebrow, styles.flexText]}>{isToday ? 'TODAY\u2019S SKY' : `THE SKY · ${relation}`}</Text>
+            {/* The person's own seal: a lens they have no data for is drawn hollow. */}
+            <TriadSeal
+              size={36}
+              animate
+              lenses={triad?.signal
+                ? { vehicle: !!triad.signal.vehicle, road: !!triad.signal.road, stoplight: !!triad.signal.stoplight }
+                : undefined}
+            />
+          </View>
           <Text accessibilityRole="header" style={styles.title}>{dateLabel}</Text>
           <Text style={styles.sub}>Read against your own chart. Pull down to refresh.</Text>
         </View>
@@ -361,6 +372,8 @@ export default function Today() {
 
 const styles = StyleSheet.create({
   header: { gap: 6, paddingTop: space.lg },
+  eyebrowRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
+  flexText: { flex: 1 },
   dateBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm, marginVertical: space.sm },
   stepBtn: {
     width: 52, height: 52, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,

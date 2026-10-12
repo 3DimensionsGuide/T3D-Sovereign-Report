@@ -49,7 +49,7 @@ export default function Welcome() {
     <Screen>
       <FadeIn>
         <View style={styles.hero}>
-          <TriadSeal size={92} />
+          <TriadSeal size={92} animate />
           <Text style={styles.eyebrow}>The 3 Dimensions</Text>
           <Text accessibilityRole="header" style={styles.title}>
             Your vehicle,{'\n'}your road,{'\n'}your timing.

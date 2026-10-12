@@ -59,16 +59,21 @@ interface LensIconProps {
   lens: LensName;
   size?: number;
   color?: string;
+  /** A hollow outline instead of a filled shape: "no data for this lens yet". */
+  outline?: boolean;
 }
 
 /** Decorative: the lens name is always written next to it. */
-export function LensIcon({ lens, size = 16, color }: LensIconProps) {
-  const fill = color ?? LENS_COLOR[lens];
+export function LensIcon({ lens, size = 16, color, outline = false }: LensIconProps) {
+  const c = color ?? LENS_COLOR[lens];
+  const paint = outline
+    ? { fill: 'none', stroke: c, strokeWidth: 2, strokeLinejoin: 'round' as const, opacity: 0.55 }
+    : { fill: c };
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {lens === 'vehicle' ? <Polygon points="12,2 22,12 12,22 2,12" fill={fill} /> : null}
-      {lens === 'road' ? <Polygon points="12,3 22,21 2,21" fill={fill} /> : null}
-      {lens === 'stoplight' ? <Circle cx="12" cy="12" r="8.5" fill={fill} /> : null}
+      {lens === 'vehicle' ? <Polygon points="12,2 22,12 12,22 2,12" {...paint} /> : null}
+      {lens === 'road' ? <Polygon points="12,3 22,21 2,21" {...paint} /> : null}
+      {lens === 'stoplight' ? <Circle cx="12" cy="12" r="8.5" {...paint} /> : null}
     </Svg>
   );
 }

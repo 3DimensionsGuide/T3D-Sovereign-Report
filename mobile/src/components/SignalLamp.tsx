@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LENS_LABEL, LENS_TEXT, LensIcon, SIGNAL_COLOR, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
-import { select } from '@/lib/haptics';
+import { LENS_LABEL, LENS_TEXT, SIGNAL_COLOR, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
+import { lensTap } from '@/lib/haptics';
+import { MotionLensIcon } from '@/components/LensMotion';
 import type { DailySignal, Lamp, LampState } from '@/lib/triadTypes';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -92,7 +93,7 @@ function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; m
   const body = (
     <>
       <View style={styles.rowHead}>
-        <LensIcon lens={lens} size={13} />
+        <MotionLensIcon lens={lens} size={13} replayKey={lamp?.state ?? null} />
         <Text style={[styles.lensName, { color: LENS_TEXT[lens] }]}>{LENS_LABEL[lens]}</Text>
         <View style={styles.rowWord}>
           {lamp ? <SignalMarker kind={SHAPE[lamp.state]} size={14} color={COLOR[lamp.state]} /> : null}
@@ -112,7 +113,7 @@ function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; m
       accessibilityState={{ expanded: open }}
       accessibilityLabel={`${LENS_LABEL[lens]}, ${word}. ${text} ${open ? 'Expanded.' : 'Double tap to read in full.'}`}
       onPress={() => {
-        select();
+        lensTap(lens);
         setOpen((o) => !o);
       }}
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.75 }]}
