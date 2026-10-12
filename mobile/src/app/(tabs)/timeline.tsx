@@ -290,6 +290,8 @@ export default function Timeline() {
     return d.getFullYear() === thisYear ? name : `${name} ${d.getFullYear()}`;
   };
   const nowMonthKey = localKey(new Date()).slice(0, 7);
+  // The first block is stored as 'now'; the month it shows is this month.
+  const pinMonthKey = pinMonth === 'now' || pinMonth === null ? nowMonthKey : pinMonth;
   const dayCount = (key: string) => groups.filter(([d]) => d.startsWith(key)).length;
   const laterDays = split.later.length;
   const visibleGroups = split.now;
@@ -334,8 +336,8 @@ export default function Timeline() {
       overlay={
         lens !== 'road' && data && (pinMonth || jumpVisible) ? (
           <TimelinePinBar
-            month={pinMonth ? monthTitle(pinMonth) : null}
-            detail={pinMonth ? `${dayCount(pinMonth)} ${dayCount(pinMonth) === 1 ? 'day' : 'days'} with events` : null}
+            month={pinMonth ? monthTitle(pinMonthKey) : null}
+            detail={pinMonth ? `${dayCount(pinMonthKey)} ${dayCount(pinMonthKey) === 1 ? 'day' : 'days'} with events` : null}
             onJumpToday={jumpVisible ? jumpToday : null}
           />
         ) : null
