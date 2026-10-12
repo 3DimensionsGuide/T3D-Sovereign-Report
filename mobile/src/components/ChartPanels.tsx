@@ -127,7 +127,7 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
         <KeyItem swatch={<><Dash color={chartColors.conjunction} /><SignalMarker kind="neutral" size={14} /></>} label="Conjunction · neutral" />
       </View>
       <Text style={styles.note}>
-        Whole-sign houses, counted from your rising sign. Thicker lines are within 1° of exact.
+        Whole-sign houses, counted from your rising sign. Thicker lines are within 1° of exact. Aspects are the same in both zodiacs, because the sidereal zodiac moves every point by the same amount. Only the signs and houses change.
       </Text>
 
       <Section title="Planets and points" lens="stoplight">
