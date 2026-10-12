@@ -7,9 +7,11 @@ export function pinnedLine(openCard: string | null, summary: string): string {
 
 /**
  * Remembers which card was opened last. Opening a card makes it the one shown;
- * closing it clears the bar only if it was the one being shown.
+ * closing it clears the bar only if it was the one being shown. A card that starts open only fills an empty bar.
  */
-export function nextOpenCard(current: string | null, title: string, open: boolean): string | null {
+export function nextOpenCard(current: string | null, title: string, open: boolean, initial = false): string | null {
+  // Cards that start open report in page order; the first one (highest on the page) keeps the bar.
+  if (initial) return current ?? title;
   if (open) return title;
   return current === title ? null : current;
 }

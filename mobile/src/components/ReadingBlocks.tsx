@@ -20,7 +20,7 @@ export const ReadingLensProvider = LensContext.Provider;
 export const useReadingLens = (): LensName => useContext(LensContext);
 
 /** Lets a pinned bar hear which card was opened or closed, without every card passing a handler. */
-const CardOpenContext = createContext<(title: string, open: boolean) => void>(() => undefined);
+const CardOpenContext = createContext<(title: string, open: boolean, initial?: boolean) => void>(() => undefined);
 export const ReadingCardOpenProvider = CardOpenContext.Provider;
 
 /** "YOUR MACHINERY" becomes "Your machinery". */
@@ -205,6 +205,8 @@ export function Accordion({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const reportOpen = useContext(CardOpenContext);
+  // A card that starts open counts as the one being read until another is opened (the first on the page wins).
+  useEffect(() => { if (defaultOpen) reportOpen(title, true, true); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <View style={[styles.card, now && { borderColor: accent, borderWidth: 2 }]}>
       <Pressable

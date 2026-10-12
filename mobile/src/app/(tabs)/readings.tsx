@@ -59,10 +59,14 @@ export default function Readings() {
   const [pinned, setPinned] = useState(false);
   const [focusCenter, setFocusCenter] = useState<string | null>(null);
   const onFocusCenter = useCallback((id: string, open: boolean) => setFocusCenter((cur) => nextFocus(cur, id, open)), []);
-  // The Road and Stoplight bars name the card opened last; it resets when the lens changes.
-  const [openCard, setOpenCard] = useState<string | null>(null);
-  const onCardOpen = useCallback((title: string, open: boolean) => setOpenCard((cur) => nextOpenCard(cur, title, open)), []);
-  useEffect(() => { setOpenCard(null); }, [lens]);
+  // The Road and Stoplight bars name the card opened last. It is remembered with its lens, so another lens never shows it.
+  const [openCardState, setOpenCardState] = useState<{ lens: Lens; title: string | null } | null>(null);
+  const openCard = openCardState && openCardState.lens === lens ? openCardState.title : null;
+  const onCardOpen = useCallback(
+    (title: string, open: boolean, initial = false) =>
+      setOpenCardState((cur) => ({ lens, title: nextOpenCard(cur && cur.lens === lens ? cur.title : null, title, open, initial) })),
+    [lens],
+  );
   const onScrollY = useCallback((y: number) => { const p = y > PIN_AT[lens]; setPinned((prev) => (prev === p ? prev : p)); }, [lens]);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffset = useRef(0);

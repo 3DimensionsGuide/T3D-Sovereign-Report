@@ -35,3 +35,11 @@ test('Stoplight bar names Sun and Moon, and says Rising needs a birth time when 
   assert.deepEqual(wheelPin('Leo', 'Pisces', 'Virgo'), { title: 'Sun Leo · Moon Pisces', summary: 'Rising Virgo' });
   assert.equal(wheelPin('Leo', 'Pisces', null).summary, 'Rising needs a birth time');
 });
+
+test('cards that start open only fill an empty bar, first one wins', () => {
+  let cur: string | null = null;
+  cur = nextOpenCard(cur, 'Life Path', true, true);
+  cur = nextOpenCard(cur, 'Third Pinnacle', true, true);
+  assert.equal(cur, 'Life Path');
+  assert.equal(nextOpenCard(cur, 'Soul Urge', true), 'Soul Urge');
+});
