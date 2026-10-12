@@ -1,5 +1,6 @@
 import { yearRangeLabel } from '@/lib/teaser';
 import { useMemo, useState } from 'react';
+import { joinNames, splitCurrentMonth } from '@/lib/timelineMonths';
 import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -227,6 +228,7 @@ export default function Timeline() {
   const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [showLater, setShowLater] = useState(false);
 
   const groups = useMemo(() => {
     if (!data) return [];
@@ -242,6 +244,12 @@ export default function Timeline() {
     return [...byDay.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [data, filter]);
 
+  const split = useMemo(() => splitCurrentMonth(groups, localKey(new Date())), [groups]);
+  const monthName = (key: string) => parseDay(`${key}-01`).toLocaleDateString(undefined, { month: 'long' });
+  const laterDays = split.later.length;
+  const laterLabel = `${showLater ? 'Show less' : `Show ${joinNames(split.laterMonths.map(monthName))}`}${showLater ? '' : ` · ${laterDays} more ${laterDays === 1 ? 'day' : 'days'}`}`;
+  const visibleGroups = showLater ? groups : split.now;
+
   const personalByDate = useMemo(() => {
     const m = new Map<string, number>();
     data?.personal.forEach((p) => m.set(p.date, p.day));
@@ -254,7 +262,7 @@ export default function Timeline() {
         <View style={styles.header}>
           <LensLabel lens="road">The road ahead</LensLabel>
           <Text accessibilityRole="header" style={styles.title}>Timeline</Text>
-          <Text style={styles.sub}>The next 60 days, measured against your own chart.</Text>
+          <Text style={styles.sub}>The rest of this month first, measured against your own chart. Later days are one tap away.</Text>
         </View>
       </FadeIn>
 
@@ -292,8 +300,10 @@ export default function Timeline() {
 
           {groups.length === 0 ? (
             <Text style={styles.sub}>Nothing in this filter over the next 60 days.</Text>
+          ) : visibleGroups.length === 0 ? (
+            <Text style={styles.sub}>Nothing in this filter for the rest of this month.</Text>
           ) : (
-            groups.map(([day, events]) => (
+            visibleGroups.map(([day, events]) => (
               <View key={day} style={styles.day}>
                 <View style={styles.dayHead}>
                   <View style={[styles.node, day === groups[0]?.[0] && styles.nodeFirst]} />
@@ -314,6 +324,18 @@ export default function Timeline() {
             ))
           )}
 
+          {laterDays > 0 ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ expanded: showLater }}
+              accessibilityLabel={laterLabel}
+              onPress={() => { setShowLater((v) => !v); setOpenId(null); }}
+              style={({ pressed }) => [styles.showMore, pressed && { opacity: 0.8 }]}
+            >
+              <Text style={styles.showMoreText}>{laterLabel}</Text>
+            </Pressable>
+          ) : null}
+
           <Text style={styles.reminder}>{data.reminder}</Text>
         </>
       ) : null}
@@ -322,6 +344,8 @@ export default function Timeline() {
 }
 
 const styles = StyleSheet.create({
+  showMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
+  showMoreText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.gold },
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
