@@ -108,10 +108,12 @@ export default function MeetYourTriad() {
   }, [load]);
 
   const began = startedOn ?? liveDate;
-  const now = currentStop(began, liveDate);
+  // In a developer build, the Premium preview also opens every stop, so Days 4 to 7 can be checked on day one.
+  const clockDate = __DEV__ && premium ? opensOn(began, TOTAL_DAYS) : liveDate;
+  const now = currentStop(began, clockDate);
   const statuses = useMemo(
-    () => STOPS.map((s) => stopStatus(s, began, liveDate, done, premium)),
-    [began, liveDate, done, premium],
+    () => STOPS.map((s) => stopStatus(s, began, clockDate, done, premium)),
+    [began, clockDate, done, premium],
   );
   const doneCount = statuses.filter((s) => s === 'done').length;
 
@@ -311,7 +313,7 @@ export default function MeetYourTriad() {
 
       {__DEV__ ? (
         <Pressable accessibilityRole="switch" accessibilityState={{ checked: premium }} onPress={() => setPremium(!premium)} style={styles.dev}>
-          <Text style={styles.devText}>Developer only: preview as Premium ({premium ? 'on' : 'off'})</Text>
+          <Text style={styles.devText}>Developer only: preview as Premium, all stops open ({premium ? 'on' : 'off'})</Text>
         </Pressable>
       ) : null}
     </Screen>
