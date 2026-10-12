@@ -20,8 +20,8 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
-/** About how tall the pinned bar is. A month takes the bar over once its header is about to slide under it. */
-const BAR_HEIGHT = 56;
+/** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
+const BAR_HEIGHT = 120;
 
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
 /** Timeline lenses. Human Design has no dated events here yet, so it is not offered. */
