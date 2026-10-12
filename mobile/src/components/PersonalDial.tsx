@@ -16,6 +16,8 @@ interface Props {
   number: number;
   /** The text shown in the middle: "6", or "11/2" for a master number. */
   text: string;
+  /** The number's name, such as "Foundations", shown under the label. */
+  word?: string;
 }
 
 /**
@@ -23,7 +25,7 @@ interface Props {
  * round to it from the top (once, and not at all with Reduce Motion). The number is written in the
  * middle and the tick count is spoken, so the dial never carries the meaning alone.
  */
-export function PersonalDial({ kind, number, text }: Props) {
+export function PersonalDial({ kind, number, text, word }: Props) {
   const angle = dialAngle(number);
   const spin = useRef(new Animated.Value(0)).current;
   const base = dialBase(number);
@@ -45,7 +47,7 @@ export function PersonalDial({ kind, number, text }: Props) {
 
   const rotate = spin.interpolate({ inputRange: [0, 360], outputRange: ['0deg', '360deg'] });
   return (
-    <View style={styles.wrap} accessible accessibilityRole="image" accessibilityLabel={dialSpoken(kind, number)}>
+    <View style={styles.wrap} accessible accessibilityRole="image" accessibilityLabel={word ? `${dialSpoken(kind, number)} ${word}.` : dialSpoken(kind, number)}>
       <View style={styles.dial}>
         <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
           <Circle cx={C} cy={C} r={R} fill="none" stroke={colors.hairline} strokeWidth={1.5} />
@@ -67,6 +69,7 @@ export function PersonalDial({ kind, number, text }: Props) {
       <Text style={styles.label}>
         <Term id={kind === 'Year' ? 'num:personalyear' : kind === 'Month' ? 'num:personalmonth' : 'num:personalday'}>{kind}</Term>
       </Text>
+      {word ? <Text style={styles.word}>{word}</Text> : null}
     </View>
   );
 }
@@ -78,4 +81,5 @@ const styles = StyleSheet.create({
   center: { position: 'absolute', top: 0, left: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' },
   number: { fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
   label: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
+  word: { fontFamily: fonts.bodyBold, fontSize: 13, lineHeight: 17, color: colors.parchment, textAlign: 'center' },
 });

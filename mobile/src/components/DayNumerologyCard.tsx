@@ -6,6 +6,7 @@ import { Term } from '@/components/Explain';
 import { PersonalDial } from '@/components/PersonalDial';
 import { RollingNumber } from '@/components/RollingNumber';
 import { numberId } from '@/lib/termIds';
+import { cycleLine, numberWord } from '@/lib/numberWords';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
@@ -91,12 +92,18 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
         <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
       </Pressable>
       <View style={styles.dials}>
-        <PersonalDial kind="Year" number={data.personalYear} text={String(data.personalYear)} />
-        <PersonalDial kind="Month" number={data.personalMonth} text={String(data.personalMonth)} />
-        <PersonalDial kind="Day" number={p.number} text={numberText(p)} />
+        <PersonalDial kind="Year" number={data.personalYear} text={String(data.personalYear)} word={numberWord(data.personalYear)} />
+        <PersonalDial kind="Month" number={data.personalMonth} text={String(data.personalMonth)} word={numberWord(data.personalMonth)} />
+        <PersonalDial kind="Day" number={p.number} text={numberText(p)} word={p.label} />
       </View>
       {open ? (
         <>
+          <View style={styles.stack} accessibilityLabel="How your cycles stack">
+            <Text style={styles.strong}>How your cycles stack</Text>
+            <Text style={styles.body}>{cycleLine('Year', data.personalYear)}</Text>
+            <Text style={styles.body}>{cycleLine('Month', data.personalMonth)}</Text>
+          </View>
+          <View style={styles.divider} />
           <DayBlock kind="YOURS" meaning={p} bare />
           <View style={styles.divider} />
           <DayBlock kind="GLOBAL" meaning={data.universal} />
@@ -136,5 +143,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6,
   },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchment },
+  stack: { gap: 6 },
   divider: { height: 1, backgroundColor: colors.hairline },
 });
