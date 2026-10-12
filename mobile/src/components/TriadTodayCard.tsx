@@ -67,7 +67,7 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
         lines={[
           data.stoplight.lead ? data.stoplight.lead.natureLine : data.stoplight.quiet,
           compact ? null : data.stoplight.moon,
-          data.stoplight.lead ? data.stoplight.lead.invitation : null,
+          compact ? null : data.stoplight.lead ? data.stoplight.lead.invitation : null,
         ]}
       />
 
@@ -75,6 +75,7 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
         <Disclosure label="How to use today">
           {restOfFrame ? <Text style={styles.body}>{restOfFrame}</Text> : null}
           {data.vehicle.cue ? <Text style={styles.body}>{data.vehicle.cue}</Text> : null}
+          {data.stoplight.lead?.invitation ? <Text style={styles.body}>{data.stoplight.lead.invitation}</Text> : null}
           {steps}
           <Text style={styles.closing}>{data.closing}</Text>
         </Disclosure>

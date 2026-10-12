@@ -76,9 +76,9 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
           <Text style={styles.badgeText}>{numberText(p)}</Text>
         </View>
         <View style={styles.flex}>
-          <Text style={styles.eyebrow}>THE ROAD · PERSONAL DAY</Text>
+          <Text style={styles.eyebrow}>PERSONAL DAY</Text>
           <Text style={styles.label}>{p.label}</Text>
-          <Text style={styles.caption}>{`Personal Year ${data.personalYear} · Personal Month ${data.personalMonth}`}</Text>
+          <Text style={styles.caption}>{`Year ${data.personalYear} · Month ${data.personalMonth}`}</Text>
         </View>
         <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
       </Pressable>
