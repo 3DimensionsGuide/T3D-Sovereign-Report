@@ -13,6 +13,7 @@ import { buildTransitCard, pickAuthorityContent, pickTypeContent } from '@/lib/a
 import type { DayNumerology } from '@/server/engines/dayNumerology';
 import type { DailySkyResult } from '@/server/engines/dailySky';
 import { buildDailySignal, type DailySignal, type VehicleGateData } from '@/lib/app/signal';
+import { withArticle } from './article';
 
 export interface TriadToday {
   vehicle: {
@@ -129,7 +130,7 @@ export function buildTriadToday(
     steps: [
       strategyStep,
       authorityStep,
-      `Road check: does what you are about to do fit a ${p.label} day? Lean in: ${p.leanIn}`,
+      `Road check: does what you are about to do fit ${withArticle(p.label)} day? Lean in: ${p.leanIn}`,
       card
         ? `Sky check: ${card.title}. ${card.invitation}`
         : `Sky check: ${moonLine}`,

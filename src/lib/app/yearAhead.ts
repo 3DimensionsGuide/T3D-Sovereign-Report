@@ -14,6 +14,7 @@ import { FIRDARIA_ANALYSIS } from '@/lib/report/section5/firdaria-content';
 import { HOUSE_NAMES, HOUSE_THEMES } from '@/lib/report/advanced/stoplight/transits-content';
 import type { TimelineResult } from '@/server/engines/timeline';
 import type { FirdariaPlanet } from '@/lib/report/tokens';
+import { withArticle } from './article';
 
 export interface YearChapterItem {
   name: string;
@@ -112,7 +113,7 @@ export function buildYearAhead(timeline: TimelineResult): YearAhead {
   const nowNames = chapter.filter((c) => c.when === 'now').map((c) => c.name.toLowerCase());
   const summaryParts: string[] = [];
   if (nowNames.length > 0) {
-    summaryParts.push(`This year sits inside a ${nowNames.join(' and ')} chapter, which sets a wider backdrop of growth.`);
+    summaryParts.push(`This year sits inside ${withArticle(nowNames.join(' and '))} chapter, which sets a wider backdrop of growth.`);
   }
   summaryParts.push(
     `The topic that tends to come forward is your ${p.house}${ordinalSuffix(p.house)} house, ${houseName.toLowerCase()}: ${theme.charAt(0).toLowerCase()}${theme.slice(1)}`,

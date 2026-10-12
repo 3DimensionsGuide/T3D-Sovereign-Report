@@ -35,6 +35,7 @@ import {
   KARMIC_LESSONS_MECHANISM,
 } from '@/lib/report/advanced/road/road-content';
 import { DAY_NUMBER_CONTENT } from '@/server/engines/dayNumerology';
+import { withArticle } from './article';
 
 export type GlossaryGroup = 'Human Design' | 'Astrology' | 'Numerology' | 'Timing';
 
@@ -358,7 +359,7 @@ function personalise(id: string, ctx: ChartContext): string | null {
     if (p?.longitude === undefined) return null;
     const house = typeof asc === 'number' ? ` in your ${houseOf(p.longitude, asc)}${suffix(houseOf(p.longitude, asc))} house` : '';
     const top = closestAspects(m[1]!, tr)[0];
-    const aspect = top ? ` Its closest aspect is a ${top.type} to ${PLANET_NAME[top.other] ?? top.other} (${top.orb.toFixed(1)}° from exact).` : '';
+    const aspect = top ? ` Its closest aspect is ${withArticle(top.type)} to ${PLANET_NAME[top.other] ?? top.other} (${top.orb.toFixed(1)}° from exact).` : '';
     return `Your ${PLANET_NAME[m[1]!] ?? m[1]} is in ${p.formatted ?? signOf(p.longitude)}${house}${p.retrograde ? ', retrograde' : ''}.${aspect}`;
   }
   if ((m = /^astro:sign:(.+)$/.exec(id)) && tr) {

@@ -23,7 +23,7 @@ export function roadPin(lifePath: string | null, model: RoadStripModel | null): 
   const title = lifePath ? `Life Path ${lifePath}` : 'Your Road';
   const current = model?.segments.find((s) => s.current);
   if (!model || !current) return { title, summary: `${model?.segments.length ?? 4} Pinnacles along your life` };
-  return { title, summary: `Pinnacle ${current.index + 1} of ${model.segments.length} is a ${current.number}` };
+  return { title, summary: `Pinnacle ${current.index + 1} of ${model.segments.length} is ${/^(8|11|18)$/.test(String(current.number)) ? 'an' : 'a'} ${current.number}` };
 }
 
 export interface WheelPin { title: string; summary: string }

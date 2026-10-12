@@ -27,8 +27,8 @@ function Row({ glyph, accent, label, main, sub }: { glyph: string; accent: strin
         {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={11} color={accent} /> : null}
         <Text style={[styles.rowLabel, { color: lensFromGlyph(glyph) ? LENS_TEXT[lensFromGlyph(glyph)!] : accent }]}>{label}</Text>
       </View>
-      <Text style={styles.rowMain}>{main}</Text>
-      {sub ? <Text style={styles.rowSub}>{sub}</Text> : null}
+      <Text style={styles.rowMain} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{main}</Text>
+      {sub ? <Text style={styles.rowSub} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{sub}</Text> : null}
     </View>
   );
 }
@@ -52,7 +52,7 @@ export const ProfileShareCard = forwardRef<View, Props>(function ProfileShareCar
         <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
       </View>
       <View style={styles.rule} />
-      <Text style={styles.title}>{firstName ? `${firstName}'s T3D Triad` : 'My T3D Triad'}</Text>
+      <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.65}>{firstName ? `${firstName}'s T3D Triad` : 'My T3D Triad'}</Text>
 
       <View style={styles.rows}>
         <Row glyph="◆" accent={colors.vehicle} label="THE VEHICLE · HUMAN DESIGN" main={hd.type} sub={`Profile ${profileLines} · ${hd.authority} Authority`} />
@@ -71,20 +71,20 @@ export const ProfileShareCard = forwardRef<View, Props>(function ProfileShareCar
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH, height: CARD_HEIGHT, backgroundColor: colors.obsidian, borderWidth: 1, borderColor: colors.gold,
-    borderRadius: 18, padding: 24, overflow: 'hidden', justifyContent: 'space-between',
+    borderRadius: 18, padding: 20, overflow: 'hidden', justifyContent: 'space-between',
   },
   glow: { height: 280 },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
   rule: { height: 1, backgroundColor: colors.gold, opacity: 0.6, marginTop: 8 },
-  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 35, color: colors.parchment, marginTop: 14 },
-  rows: { gap: 16, marginTop: 14 },
+  title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.parchment, marginTop: 12 },
+  rows: { gap: 12, marginTop: 12 },
   row: { borderLeftWidth: 4, paddingLeft: 12, gap: 3 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   rowLabel: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 1.6 },
   rowMain: { fontFamily: fonts.display, fontSize: 22, lineHeight: 28, color: colors.parchment },
   rowSub: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
-  footer: { gap: 3, marginTop: 18 },
+  footer: { gap: 3, marginTop: 10 },
   footerSmall: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 2, color: colors.parchmentMuted },
   footerUrl: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.gold },
 });

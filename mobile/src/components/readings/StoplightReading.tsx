@@ -33,7 +33,7 @@ function BigThree({ lens, prefix }: { lens: BigThreeLens; prefix: string }) {
         subtitle={`${lens.sun.formatted} · ${lens.sun.element}, ${lens.sun.modality}`}
         defaultOpen={prefix === 'Tropical'}
       >
-        <Block label="YOUR CORE ORIENTATION" text={lens.sun.orientation} />
+        <Block label="WHICH WAY YOU LEAN" text={lens.sun.orientation} />
         <Bullets label="YOU MAY RECOGNIZE THIS WHEN…" items={lens.sun.recognize} />
         <Block label="WATCH FOR" text={lens.sun.watchFor} />
         <Block label={`WHERE IT SHINES: ${lens.sun.arenaName.toUpperCase()} (HOUSE ${lens.sun.house})`} text={lens.sun.arena} />
@@ -157,7 +157,7 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
         <Block label="THE GIFT" text={data.elements.gift} />
         <Block label="THE FRICTION" text={data.elements.friction} />
       </Accordion>
-      <Accordion badge="◇" title={data.modality.label} subtitle="Modality blend of your Sun, Moon and Rising">
+      <Accordion badge={/^(Cardinal|Fixed|Mutable)/.exec(data.modality.label)?.[1]?.slice(0, 3).toUpperCase() ?? '◇'} title={data.modality.label} subtitle="Modality blend of your Sun, Moon and Rising">
         <Block label="WHAT IT MEANS" text={data.modality.description} />
       </Accordion>
 
@@ -211,7 +211,7 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
       >
         <Block label="YOUR YEAR'S ARENA" text={data.lordOfYear.houseTheme} />
         <Block label="THE SIGN ON THIS HOUSE" text={`${data.lordOfYear.sign}, ruled by ${data.lordOfYear.lord}.`} />
-        <Block label="ITS RULER" text={data.lordOfYear.lordQuote ? yearQuote(data.lordOfYear.lordQuote) : data.lordOfYear.lordQuote} />
+        <Block label="WHAT THIS YEAR ASKS OF YOU" text={data.lordOfYear.lordQuote ? yearQuote(data.lordOfYear.lordQuote) : data.lordOfYear.lordQuote} />
       </Accordion>
 
       <SectionTitle

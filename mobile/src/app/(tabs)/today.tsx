@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SkeletonCards } from '@/components/Skeleton';
 import { AccessibilityInfo, AppState, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -38,6 +39,8 @@ import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
+
+const PULLED_KEY = 't3d-today-pulled-v1';
 const MIN_DATE = new Date(1950, 0, 1);
 const MAX_DATE = new Date(2100, 11, 31);
 
@@ -109,6 +112,13 @@ export default function Today() {
   const [selectedHit, setSelectedHit] = useState<DailyTransitHit | null>(null);
   const [allTransits, setAllTransits] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  // The "pull down to refresh" hint shows until the person has pulled once. null = not read yet.
+  const [pulledBefore, setPulledBefore] = useState<boolean | null>(null);
+  useEffect(() => {
+    AsyncStorage.getItem(PULLED_KEY)
+      .then((v) => setPulledBefore(v === '1'))
+      .catch(() => setPulledBefore(true));
+  }, []);
   const [offline, setOffline] = useState(false);
   const [savedCopyAt, setSavedCopyAt] = useState<number | null>(null);
   /** Today's date on this phone; it changes at midnight so the screen loads the new day. */
@@ -209,6 +219,8 @@ export default function Today() {
   }, [viewDate, load]);
 
   const onRefresh = useCallback(async () => {
+    setPulledBefore(true);
+    AsyncStorage.setItem(PULLED_KEY, '1').catch(() => {});
     setRefreshing(true);
     await load();
     setRefreshing(false);
@@ -265,7 +277,7 @@ export default function Today() {
             />
           </View>
           <Text accessibilityRole="header" style={styles.title}>{dateLabel}</Text>
-          <Text style={styles.sub}>Read against your own chart. Pull down to refresh.</Text>
+          <Text style={styles.sub}>{pulledBefore === false ? 'Read against your own chart. Pull down to refresh.' : 'Read against your own chart.'}</Text>
         </View>
         <View style={styles.dateBar}>
           <Pressable

@@ -13,6 +13,7 @@
  */
 
 import { personalYearNumber } from '@/lib/numerology/personalYear';
+import { withArticle } from '../../lib/app/article';
 
 export interface DayNumberMeaning {
   number: number;
@@ -149,7 +150,7 @@ function blendSentence(universal: number, personal: number): string {
   if (universal === personal) {
     return `The world's ${u} theme and your own personal theme are the same today, so this energy is doubled for you. Lean into it deliberately and make your choices through your Strategy and Authority.`;
   }
-  return `The world is running a ${u} theme while your own day is about ${p}. Let the global tone set the backdrop, and let your personal day guide what you do within it.`;
+  return `The world is running ${withArticle(u)} theme while your own day is about ${p}. Let the global tone set the backdrop, and let your personal day guide what you do within it.`;
 }
 
 /** localDate is the person's calendar date, YYYY-MM-DD. birthDate likewise. */
