@@ -14,6 +14,8 @@ import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
+import { SceneView } from '@/components/SceneView';
+import { termDrawing } from '@/charts/termDrawings';
 export const GROUP_ACCENT: Record<GlossaryGroup, string> = {
   'Human Design': colors.vehicle,
   Astrology: colors.stoplight,
@@ -148,6 +150,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
                   </Text>
                   <Text accessibilityRole="header" style={styles.title}>{entry.title}</Text>
                   <Text style={styles.summary}>{entry.summary}</Text>
+                  <TermPicture id={entry.id} />
                   {entry.body.map((p) => (
                     <Text key={p} style={styles.body}>{p}</Text>
                   ))}
@@ -193,6 +196,17 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
         </View>
       </Modal>
     </ExplainContext.Provider>
+  );
+}
+
+/** The small drawing for a term, when it has one. */
+function TermPicture({ id }: { id: string }) {
+  const drawing = useMemo(() => termDrawing(id), [id]);
+  if (!drawing) return null;
+  return (
+    <View style={styles.picture}>
+      <SceneView scene={drawing.scene} label={drawing.label} />
+    </View>
   );
 }
 
@@ -265,6 +279,13 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 35, color: colors.parchment },
   summary: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 25, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 25, color: colors.parchment },
+  picture: {
+    borderRadius: radius.md,
+    backgroundColor: colors.obsidian,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    padding: space.sm,
+  },
   yours: {
     gap: 6,
     padding: space.md,

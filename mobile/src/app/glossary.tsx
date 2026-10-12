@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TermPressable } from '@/components/Explain';
 import { LENS_COLOR, LENS_LABEL, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
 import { GoldButton } from '@/components/GoldButton';
+import { LetterStrip } from '@/components/LetterStrip';
 import { ChartRequestError, requestGlossary } from '@/lib/api';
 import type { GlossaryGroup, GlossaryItem } from '@/lib/explainTypes';
 import { useChartData } from '@/lib/useChartData';
@@ -138,7 +139,7 @@ export default function Glossary() {
           onScrollToIndexFailed={() => undefined}
           keyExtractor={(r) => (r.kind === 'item' ? r.item.id : `fold-${r.key}`)}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, letters.length > 1 && styles.listWithStrip]}
           ListHeaderComponent={
             <View style={styles.header}>
               <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={styles.back}>
@@ -174,21 +175,6 @@ export default function Glossary() {
                   );
                 })}
               </View>
-              {letters.length > 1 ? (
-                <View style={styles.letters} accessibilityLabel="Jump to letter">
-                  {letters.map(([L, idx]) => (
-                    <Pressable
-                      key={L}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Jump to ${L}`}
-                      onPress={() => listRef.current?.scrollToLocation({ sectionIndex: 0, itemIndex: idx, viewOffset: 0, animated: true })}
-                      style={styles.letter}
-                    >
-                      <Text style={styles.letterText}>{L}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-              ) : null}
             </View>
           }
           ListEmptyComponent={
@@ -237,6 +223,15 @@ export default function Glossary() {
             )
           }
         />
+        {letters.length > 1 ? (
+          <LetterStrip
+            letters={letters.map(([L]) => L)}
+            onJump={(L) => {
+              const at = letters.find(([l]) => l === L);
+              if (at) listRef.current?.scrollToLocation({ sectionIndex: 0, itemIndex: at[1], viewOffset: 0, animated: false });
+            }}
+          />
+        ) : null}
       </SafeAreaView>
     </View>
   );
@@ -246,6 +241,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.obsidian },
   safe: { flex: 1 },
   list: { padding: space.lg, paddingBottom: space.xxl, gap: 10 },
+  listWithStrip: { paddingRight: space.lg + 26 },
   header: { gap: space.sm, paddingBottom: space.sm },
   back: { minHeight: TOUCH - 4, justifyContent: 'center', alignSelf: 'flex-start' },
   backText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchmentMuted },
@@ -253,9 +249,6 @@ const styles = StyleSheet.create({
   secHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingTop: space.lg, paddingBottom: 4 },
   secTitle: { fontFamily: fonts.bodyBold, fontSize: 14, flex: 1 },
   secCount: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
-  letters: { flexDirection: 'row', flexWrap: 'wrap', gap: 2 },
-  letter: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
-  letterText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
   fold: { minHeight: TOUCH, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.hairline },
   foldText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment },

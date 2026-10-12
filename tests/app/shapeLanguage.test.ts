@@ -102,7 +102,8 @@ test('step 7: practice checks follow Triad order and partner form has no fake de
 test('step 8: glossary is grouped by lens, folds gates and channels, and titles are not doubled', async () => {
   const g = read('mobile/src/app/glossary.tsx');
   assert.match(g, /SectionList/);
-  assert.match(g, /Jump to letter/);
+  assert.match(g, /<LetterStrip/);
+  assert.match(read('mobile/src/components/LetterStrip.tsx'), /Jump to letter/);
   assert.match(g, /fold/);
   const { listEntries } = await import('../../src/lib/app/glossary');
   const titles = listEntries().map((e) => e.title);
