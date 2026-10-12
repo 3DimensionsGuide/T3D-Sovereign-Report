@@ -81,7 +81,7 @@ export function LetterStrip({ letters, onJump }: { letters: string[]; onJump: (l
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: 'absolute', top: 0, bottom: 0, right: 2, justifyContent: 'center', alignItems: 'flex-end', flexDirection: 'row' },
+  wrap: { position: 'absolute', top: 0, bottom: 0, right: 2, flexDirection: 'row', alignItems: 'center' },
   strip: { width: 30, paddingVertical: STRIP_PAD, borderRadius: radius.md, backgroundColor: 'rgba(18,18,20,0.72)' },
   item: { height: ITEM, alignItems: 'center', justifyContent: 'center' },
   letter: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
@@ -90,7 +90,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     marginRight: 10,
-    alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.lg,
