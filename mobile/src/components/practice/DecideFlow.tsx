@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import { LENS_COLOR, LensLabel, SignalMarker } from '@/components/Lens';
+import { BreathRing } from '@/components/practice/BreathRing';
 import { CheckLamps } from '@/components/practice/CheckLamps';
 import { ResultLamp } from '@/components/practice/ResultLamp';
 import { COLOR, SHAPE, WORD } from '@/components/SignalLamp';
@@ -46,6 +47,7 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
           returnKeyType="done"
         />
         <GoldButton label="Start the checks" disabled={text.trim().length < 3} onPress={() => setStepIndex(0)} />
+        {text.trim().length < 3 ? <Text style={styles.hint}>Write your decision above to begin.</Text> : null}
       </View>
     );
   }
@@ -103,6 +105,7 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
       <Text style={styles.decisionText}>{text.trim()}</Text>
       <Text style={styles.prompt}>{step.prompt}</Text>
       <Text style={styles.body}>{step.instruction}</Text>
+      {step.key === 'vehicle' && /sacral/i.test(data.authority ?? '') ? <BreathRing /> : null}
       <Text style={styles.signal}>{step.signal}</Text>
       <View style={styles.choices}>
         {step.choices.map((c) => {
@@ -150,6 +153,7 @@ const styles = StyleSheet.create({
   pace: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 22, color: colors.parchmentMuted },
   decisionText: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 24, color: colors.parchment, padding: space.md, borderRadius: radius.md, backgroundColor: colors.amethyst },
   prompt: { fontFamily: fonts.display, fontSize: 19, lineHeight: 27, color: colors.parchment },
+  hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted, textAlign: 'center', marginTop: -6 },
   signal: { fontFamily: fonts.body, fontSize: 14, lineHeight: 22, color: colors.parchmentMuted },
   choices: { gap: 8 },
   choice: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },

@@ -39,10 +39,12 @@ export function TabIcon({ name, color, focused, size = 26 }: Props) {
         </>
       ) : null}
       {name === 'practice' ? (
-        <Path
-          d="M12 2.8 L14.2 9.8 L21.2 12 L14.2 14.2 L12 21.2 L9.8 14.2 L2.8 12 L9.8 9.8 Z"
-          fill={fill} stroke={color} strokeWidth={sw} strokeLinejoin="round"
-        />
+        <>
+          <Rect x="6.5" y="2.5" width="11" height="19" rx="3.5" fill={fill} stroke={color} strokeWidth={sw} />
+          <Circle cx="12" cy="7.6" r="1.7" fill={focused ? '#0B0B0C' : 'none'} stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} />
+          <Circle cx="12" cy="12" r="1.7" fill={focused ? '#0B0B0C' : 'none'} stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} />
+          <Circle cx="12" cy="16.4" r="1.7" fill={focused ? '#0B0B0C' : 'none'} stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} />
+        </>
       ) : null}
       {name === 'chart' ? (
         <>

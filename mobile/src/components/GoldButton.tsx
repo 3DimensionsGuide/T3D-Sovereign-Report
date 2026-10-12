@@ -16,6 +16,7 @@ export function GoldButton({ label, onPress, loading = false, disabled = false, 
   const scale = useRef(new Animated.Value(1)).current;
   const inactive = disabled || loading;
   const ghost = variant === 'ghost';
+  const resting = disabled && !loading && !ghost; // a clearly unavailable gold button, not a faded one
 
   const animateTo = (value: number) =>
     Animated.spring(scale, { toValue: value, speed: 40, bounciness: value < 1 ? 0 : 8, useNativeDriver: true }).start();
@@ -36,13 +37,13 @@ export function GoldButton({ label, onPress, loading = false, disabled = false, 
         style={[
           styles.base,
           ghost ? styles.ghost : styles.gold,
-          inactive && styles.inactive,
+          resting ? styles.resting : inactive && styles.inactive,
         ]}
       >
         {loading ? (
           <ActivityIndicator color={ghost ? colors.parchment : colors.obsidian} />
         ) : (
-          <Text style={[styles.label, ghost && styles.ghostLabel]}>{label}</Text>
+          <Text style={[styles.label, ghost && styles.ghostLabel, resting && styles.restingLabel]}>{label}</Text>
         )}
       </Pressable>
     </Animated.View>
@@ -59,6 +60,8 @@ const styles = StyleSheet.create({
   },
   gold: { backgroundColor: colors.gold },
   ghost: { borderWidth: 1, borderColor: colors.hairline, backgroundColor: 'transparent' },
+  resting: { backgroundColor: colors.amethyst, borderWidth: 1, borderColor: colors.hairline },
+  restingLabel: { color: colors.parchmentMuted },
   inactive: { opacity: 0.55 },
   label: { fontFamily: fonts.bodyBold, fontSize: 16, letterSpacing: 0.6, color: colors.obsidian },
   ghostLabel: { color: colors.parchment },
