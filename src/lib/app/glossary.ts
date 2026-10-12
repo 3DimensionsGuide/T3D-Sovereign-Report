@@ -357,7 +357,9 @@ function personalise(id: string, ctx: ChartContext): string | null {
     const p = tr[m[1]!] as { longitude?: number; retrograde?: boolean; formatted?: string } | undefined;
     if (p?.longitude === undefined) return null;
     const house = typeof asc === 'number' ? ` in your ${houseOf(p.longitude, asc)}${suffix(houseOf(p.longitude, asc))} house` : '';
-    return `Your ${PLANET_NAME[m[1]!] ?? m[1]} is in ${p.formatted ?? signOf(p.longitude)}${house}${p.retrograde ? ', retrograde' : ''}.`;
+    const top = closestAspects(m[1]!, tr)[0];
+    const aspect = top ? ` Its closest aspect is a ${top.type} to ${PLANET_NAME[top.other] ?? top.other} (${top.orb.toFixed(1)}° from exact).` : '';
+    return `Your ${PLANET_NAME[m[1]!] ?? m[1]} is in ${p.formatted ?? signOf(p.longitude)}${house}${p.retrograde ? ', retrograde' : ''}.${aspect}`;
   }
   if ((m = /^astro:sign:(.+)$/.exec(id)) && tr) {
     const here = Object.keys(PLANET_NAME)
@@ -411,10 +413,50 @@ function suffix(n: number): string {
   return ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';
 }
 
+const ASPECT_ANGLES: [string, number][] = [['conjunction', 0], ['sextile', 60], ['square', 90], ['trine', 120], ['opposition', 180]];
+
+/** The tightest natal aspect from one planet to the others, within a 5° orb. */
+function closestAspects(body: string, tr: NonNullable<ChartContext['tropical']>): { other: string; type: string; orb: number }[] {
+  const mine = (tr as Record<string, { longitude?: number } | undefined>)[body]?.longitude;
+  if (typeof mine !== 'number') return [];
+  const found: { other: string; type: string; orb: number }[] = [];
+  for (const other of Object.keys(PLANET_NAME)) {
+    if (other === body) continue;
+    if ((body === 'northNode' && other === 'southNode') || (body === 'southNode' && other === 'northNode')) continue;
+    const lon = (tr as Record<string, { longitude?: number } | undefined>)[other]?.longitude;
+    if (typeof lon !== 'number') continue;
+    let diff = Math.abs(mine - lon) % 360;
+    if (diff > 180) diff = 360 - diff;
+    for (const [type, angle] of ASPECT_ANGLES) {
+      const orb = Math.abs(diff - angle);
+      if (orb <= 5) found.push({ other, type, orb });
+    }
+  }
+  return found.sort((a, b) => a.orb - b.orb);
+}
+
+/** Related terms for a planet entry: its own house and its tightest aspect types. Null when the chart is missing. */
+function planetRelated(id: string, ctx: ChartContext): string[] | null {
+  const m = /^astro:planet:(.+)$/.exec(id);
+  const tr = ctx.tropical;
+  if (!m || !tr) return null;
+  const lon = (tr as Record<string, { longitude?: number } | undefined>)[m[1]!]?.longitude;
+  const asc = tr.houses?.ascendant;
+  if (typeof lon !== 'number' || typeof asc !== 'number') return null;
+  const types: string[] = [];
+  for (const a of closestAspects(m[1]!, tr)) {
+    const t = `astro:aspect:${a.type}`;
+    if (!types.includes(t)) types.push(t);
+    if (types.length === 2) break;
+  }
+  return [`astro:house:${houseOf(lon, asc)}`, ...types];
+}
+
 export function buildEntry(id: string, ctx: ChartContext): (GlossaryEntry & { yours: string | null; relatedEntries: { id: string; title: string }[] }) | null {
   const base = lookupStatic(id);
   if (!base) return null;
-  const relatedEntries = base.related.flatMap((r) => {
+  const relatedIds = planetRelated(id, ctx) ?? base.related;
+  const relatedEntries = relatedIds.flatMap((r) => {
     const e = lookupStatic(r);
     return e ? [{ id: r, title: e.title }] : [];
   });
