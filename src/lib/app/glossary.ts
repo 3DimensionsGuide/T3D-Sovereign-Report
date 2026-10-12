@@ -219,12 +219,49 @@ for (const [key, m] of Object.entries(CIRCUIT_GROUP_MEANING)) {
 
 // Numerology
 add('num:master', 'Numerology', 'Master numbers', '11, 22 and 33 keep their double digits.', ['When a calculation lands on 11, 22 or 33 it is not reduced further. It is written with its root (11/2, 22/4, 33/6) and read as a higher frequency working through a practical base.'], ['num:11', 'num:22', 'num:33']);
-add('num:lifepath', 'Numerology', 'Life Path', 'The direction your whole life leans toward.', ['Your Life Path comes from your full birth date and is the central number in your chart. It describes your lifelong curriculum.'], ['num:destiny']);
+add('num:lifepath', 'Numerology', 'Life Path', 'The direction your whole life leans toward.', ['Your Life Path comes from your full birth date and is the central number in your chart. It describes your lifelong curriculum.'], ['num:destiny', 'num:maturity']);
 add('num:destiny', 'Numerology', 'Destiny (Expression)', 'What you are here to do and develop.', [INNER_DRIVERS_MECHANISM], ['num:soulurge', 'num:personality']);
 add('num:soulurge', 'Numerology', 'Soul Urge', 'What you want at your core.', ['The Soul Urge comes from the vowels in your full birth name and describes your inner motivations.'], ['num:destiny']);
 add('num:personality', 'Numerology', 'Personality Number', 'How others first experience you.', ['The Personality number comes from the consonants in your full birth name and describes the face you present.'], ['num:destiny']);
 add('num:hiddenpassion', 'Numerology', 'Hidden Passion', 'The energy you use most.', [HIDDEN_PASSION_MECHANISM], ['num:karmic']);
 add('num:karmic', 'Numerology', 'Karmic Lessons', 'Numbers missing from your name.', [KARMIC_LESSONS_MECHANISM], ['num:hiddenpassion']);
+/** Reduce to one digit but keep 11, 22 and 33. */
+function reduceKeepMasters(n: number): number {
+  let v = n;
+  while (v > 9 && v !== 11 && v !== 22 && v !== 33) v = String(v).split('').reduce((a, d) => a + Number(d), 0);
+  return v;
+}
+
+/** Maturity Number: Life Path plus Destiny (Expression), reduced, keeping 11, 22 and 33. */
+export function maturityNumber(lifePath: number, destiny: number): number {
+  return reduceKeepMasters(lifePath + destiny);
+}
+
+/** What each number becomes as a Maturity Number (from the T3D PHILOSOPHER knowledge base). */
+export const MATURITY_MEANINGS: Record<number, string> = {
+  1: 'independent leadership, self-reliance and the courage to stand on your own feet.',
+  2: 'quiet diplomacy, patient cooperation and emotional attunement.',
+  3: 'creative self-expression, optimistic communication and lifting others through words or art.',
+  4: 'practical stability, steady organisation and building lasting foundations.',
+  5: 'freedom, adaptability and welcoming constructive change.',
+  6: 'family responsibility, nurturing service and accepting imperfection in yourself and others.',
+  7: 'inner wisdom, research and trust earned through solitude.',
+  8: 'executive authority and handling resources with ethics.',
+  9: 'compassion for everyone, service and letting go of ego attachments.',
+  11: 'intuitive illumination and visionary insight, held on a diplomatic 2 base.',
+  22: 'master building: turning large practical visions into lasting structures, held on a 4 base.',
+  33: 'master teaching and selfless care for others, held on a 6 base.',
+};
+
+add('num:maturity', 'Numerology', 'Maturity Number', 'Where your life is ripening toward.', [
+  'Your Maturity Number is your Life Path plus your Destiny (Expression), reduced to one digit. If the total is 11, 22 or 33 it stays as a master number.',
+  'It sits quietly in the background from birth, starts to show itself around ages 35 to 40, and flowers fully in your 50s and later. It does not cancel your earlier numbers. It is a blend of two of them that ripens with time.',
+  'Use it as a roadmap to experiment with, not as a verdict.',
+], ['num:lifepath', 'num:destiny']);
+add('num:subconscious', 'Numerology', 'Subconscious Self', 'How steady you feel when things go wrong.', [
+  'The Subconscious Self starts at 9 and loses one for every digit from 1 to 9 that is missing from your full birth name (your Karmic Lessons). The fewer gaps, the higher the number.',
+  'It describes your instinctive trust in your own abilities when a situation catches you off guard.',
+], ['num:karmic', 'num:hiddenpassion']);
 add('num:pinnacle', 'Numerology', 'Pinnacle', 'A long chapter of your life.', ['Your life has four Pinnacles, each a chapter of many years with its own theme. The one you are in now sets the main terrain.'], ['num:challenge']);
 add('num:challenge', 'Numerology', 'Challenge', 'The recurring lesson in each chapter.', ['Each Pinnacle has a matching Challenge, a skill that life keeps asking you to build during that chapter.'], ['num:pinnacle']);
 add('num:birthday', 'Numerology', 'Birthday Number', 'The day you were born.', ['The day of the month you were born adds a specific talent to your Life Path.'], ['num:lifepath']);
@@ -400,6 +437,17 @@ function personalise(id: string, ctx: ChartContext): string | null {
     'num:lifepath': 'lifePath', 'num:destiny': 'destiny', 'num:soulurge': 'soulUrge',
     'num:personality': 'personality', 'num:hiddenpassion': 'hiddenPassion',
   };
+  if (id === 'num:maturity' && typeof nm?.lifePath === 'number' && typeof nm.destiny === 'number') {
+    const v = maturityNumber(nm.lifePath, nm.destiny);
+    const root = v === 11 ? '/2' : v === 22 ? '/4' : v === 33 ? '/6' : '';
+    return `Yours is ${v}${root}: your Life Path ${nm.lifePath} plus your Destiny ${nm.destiny}. It ripens toward ${MATURITY_MEANINGS[v] ?? 'a fuller expression of both.'}`;
+  }
+  if (id === 'num:subconscious' && Array.isArray(nm?.karmicLessons)) {
+    const gaps = nm.karmicLessons.length;
+    return gaps === 0
+      ? 'Yours is 9: every digit from 1 to 9 appears in your name.'
+      : `Yours is ${9 - gaps}: ${gaps} ${gaps === 1 ? 'digit is' : 'digits are'} missing from your name.`;
+  }
   const field = direct[id];
   if (field && nm) {
     const v = nm[field];

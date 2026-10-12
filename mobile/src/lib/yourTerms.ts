@@ -57,7 +57,7 @@ export function yourTermIds(
   for (const n of [num.lifePath, num.destiny, num.soulUrge, num.personality, num.hiddenPassion, ...num.karmicLessons]) {
     ids.add(`num:${n}`);
   }
-  ['lifepath', 'destiny', 'soulurge', 'personality', 'hiddenpassion'].forEach((k) => ids.add(`num:${k}`));
+  ['lifepath', 'destiny', 'soulurge', 'personality', 'hiddenpassion', 'maturity', 'subconscious'].forEach((k) => ids.add(`num:${k}`));
   if (num.karmicLessons.length) ids.add('num:karmic');
   for (const p of numerology?.pinnacles ?? []) ids.add(`num:${p.number}`);
   for (const c of numerology?.challenges ?? []) ids.add(`num:${c.number}`);
