@@ -59,7 +59,7 @@ function BridgeBlock({ b }: { b: Bridge }) {
   );
 }
 
-function VehicleBody({ data }: { data: VehicleDetail }) {
+function VehicleBody({ data, onFocusCenter }: { data: VehicleDetail; onFocusCenter?: (id: string, open: boolean) => void }) {
   const conscious = data.gates.filter((g) => g.epoch === 'personality');
   const unconscious = data.gates.filter((g) => g.epoch === 'design');
   const gateRow = (g: VehicleDetail['gates'][number]) =>
@@ -128,7 +128,7 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
         <NoteCard text="No Center is defined in your design. Everything in you is open and responsive, which is the Reflector configuration." />
       ) : (
         data.centers.defined.map((c) => (
-          <Accordion key={c.id} badge={<CenterIcon id={c.id} defined />} title={`${c.name} (defined)`} subtitle={c.title}>
+          <Accordion key={c.id} badge={<CenterIcon id={c.id} defined />} title={`${c.name} (defined)`} subtitle={c.title} onOpenChange={(o) => onFocusCenter?.(c.id, o)}>
             <Block label={c.title.toUpperCase()} text={c.description} />
           </Accordion>
         ))
@@ -139,7 +139,7 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
         <NoteCard text="All nine Centers are defined in your design, so none of them is open." />
       ) : (
         data.centers.open.map((c) => (
-          <Accordion key={c.id} badge={<CenterIcon id={c.id} defined={false} />} title={`${c.name} (open)`} subtitle={c.title}>
+          <Accordion key={c.id} badge={<CenterIcon id={c.id} defined={false} />} title={`${c.name} (open)`} subtitle={c.title} onOpenChange={(o) => onFocusCenter?.(c.id, o)}>
             <Block label="WHAT GETS AMPLIFIED" text={c.sensitivity} />
             <Block label="THE WISDOM IT BUILDS" text={c.wisdom} />
             <Block label="A KINDER READ" text={c.notDefect} />
@@ -219,7 +219,7 @@ function VehicleBody({ data }: { data: VehicleDetail }) {
   );
 }
 
-export function VehicleReading({ onRefreshReady }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void }) {
+export function VehicleReading({ onRefreshReady, onFocusCenter }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void; onFocusCenter?: (id: string, open: boolean) => void }) {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
   const { data, error, loading, retry, offline, savedAt, refresh } = useVehicle(chart?.leadId, profile?.email.trim());
@@ -239,7 +239,7 @@ export function VehicleReading({ onRefreshReady }: { onRefreshReady?: (r: { run:
       offline={offline}
       savedAt={savedAt}
     >
-      {data ? <VehicleBody data={data} /> : null}
+      {data ? <VehicleBody data={data} onFocusCenter={onFocusCenter} /> : null}
     </ReadingStatus>
   );
 }

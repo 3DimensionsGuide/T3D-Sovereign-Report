@@ -62,3 +62,9 @@ export function focusSentence(f: CenterFocusInfo): string {
   }
   return parts.join(' ');
 }
+
+/** Which center the pinned mini bodygraph should light after an accordion opens or closes. The last one opened wins. */
+export function nextFocus(current: string | null, id: string, open: boolean): string | null {
+  if (open) return id;
+  return current === id ? null : current;
+}

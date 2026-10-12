@@ -8,7 +8,9 @@ import { LENS_COLOR, LensIcon, LensLabel } from '@/components/Lens';
 import { ReadingContents, ReadingJumpProvider, ReadingLensProvider } from '@/components/ReadingBlocks';
 import { NumerologyReading } from '@/components/readings/NumerologyReading';
 import { StoplightReading } from '@/components/readings/StoplightReading';
+import { StickyMiniBody } from '@/components/readings/StickyMiniBody';
 import { VehicleReading } from '@/components/readings/VehicleReading';
+import { nextFocus } from '@/lib/bodygraphFocus';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const OPTIONS = [
@@ -40,6 +42,9 @@ const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; acce
   },
 };
 
+/** How far the reading scrolls before the full bodygraph is out of view and the small one pins to the top. */
+const PIN_AT = 560;
+
 export default function Readings() {
   const [lens, setLens] = useState<Lens>('vehicle');
   // My Chart's portrait opens a lens straight away.
@@ -48,6 +53,10 @@ export default function Readings() {
     if (requestedLens === 'vehicle' || requestedLens === 'road' || requestedLens === 'stoplight') setLens(requestedLens);
   }, [requestedLens, requestedAt]);
   const head = HEADINGS[lens];
+  const [pinned, setPinned] = useState(false);
+  const [focusCenter, setFocusCenter] = useState<string | null>(null);
+  const onFocusCenter = useCallback((id: string, open: boolean) => setFocusCenter((cur) => nextFocus(cur, id, open)), []);
+  const onScrollY = useCallback((y: number) => { const p = y > PIN_AT; setPinned((prev) => (prev === p ? prev : p)); }, []);
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffset = useRef(0);
   const [refresher, setRefresher] = useState<{ run: () => Promise<void> } | null>(null);
@@ -58,7 +67,14 @@ export default function Readings() {
   }, [refresher]);
 
   return (
-    <Screen refreshing={refreshing} onRefresh={onRefresh} scrollRef={scrollRef} scrollOffset={scrollOffset}>
+    <Screen
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      scrollRef={scrollRef}
+      scrollOffset={scrollOffset}
+      onScrollY={onScrollY}
+      overlay={lens === 'vehicle' && pinned ? <StickyMiniBody focusId={focusCenter} /> : null}
+    >
       <ReadingLensProvider value={lens}>
         <ReadingJumpProvider scrollRef={scrollRef} scrollOffset={scrollOffset}>
           <FadeIn>
@@ -71,7 +87,7 @@ export default function Readings() {
           <Segmented options={OPTIONS} value={lens} onChange={setLens} />
           <ReadingContents />
           {lens === 'vehicle' ? (
-            <VehicleReading onRefreshReady={setRefresher} />
+            <VehicleReading onRefreshReady={setRefresher} onFocusCenter={onFocusCenter} />
           ) : lens === 'road' ? (
             <NumerologyReading onRefreshReady={setRefresher} />
           ) : (

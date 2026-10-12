@@ -14,9 +14,13 @@ interface ScreenProps {
   scrollRef?: RefObject<ScrollView | null>;
   /** Kept up to date with the current scroll position. */
   scrollOffset?: MutableRefObject<number>;
+  /** Called on every scroll with the new vertical position. */
+  onScrollY?: (y: number) => void;
+  /** Drawn over the top of the scrolling body, for things that stay pinned. */
+  overlay?: ReactNode;
 }
 
-export function Screen({ children, refreshing = false, onRefresh, scrollRef, scrollOffset }: ScreenProps) {
+export function Screen({ children, refreshing = false, onRefresh, scrollRef, scrollOffset, onScrollY, overlay }: ScreenProps) {
   return (
     <View style={styles.root}>
       <Glow color={colors.purple} opacity={0.7} style={styles.glow} />
@@ -24,7 +28,11 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
         <ScrollView
           ref={scrollRef}
           scrollEventThrottle={16}
-          onScroll={scrollOffset ? (e) => { scrollOffset.current = e.nativeEvent.contentOffset.y; } : undefined}
+          onScroll={scrollOffset || onScrollY ? (e) => {
+            const y = e.nativeEvent.contentOffset.y;
+            if (scrollOffset) scrollOffset.current = y;
+            onScrollY?.(y);
+          } : undefined}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"
@@ -37,6 +45,7 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
         >
           {children}
         </ScrollView>
+        {overlay}
       </SafeAreaView>
     </View>
   );

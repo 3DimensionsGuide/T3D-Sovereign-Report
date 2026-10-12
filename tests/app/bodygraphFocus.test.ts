@@ -51,3 +51,12 @@ test('with a focus, channels that do not touch the center fade and the center is
 test('the scene offers one tap target per center', () => {
   assert.equal(buildBodygraphScene(hd).hotspots?.length, 9);
 });
+
+import { nextFocus } from '../../mobile/src/lib/bodygraphFocus';
+
+test('the pinned mini bodygraph follows the last center opened and clears when it closes', () => {
+  assert.equal(nextFocus(null, 'sacral', true), 'sacral');
+  assert.equal(nextFocus('sacral', 'root', true), 'root');
+  assert.equal(nextFocus('root', 'root', false), null);
+  assert.equal(nextFocus('root', 'sacral', false), 'root');
+});

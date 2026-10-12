@@ -187,7 +187,7 @@ export function Footnote({ text }: { text: string }) {
 
 /** A card that opens to reveal the full interpretation. */
 export function Accordion({
-  accent, badge, title, subtitle, defaultOpen = false, now = false, children,
+  accent, badge, title, subtitle, defaultOpen = false, now = false, onOpenChange, children,
 }: {
   accent: string;
   badge: ReactNode;
@@ -195,13 +195,15 @@ export function Accordion({
   subtitle?: string | null;
   defaultOpen?: boolean;
   now?: boolean;
+  /** Called with the new state each time the card is opened or closed by a tap. */
+  onOpenChange?: (open: boolean) => void;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <View style={[styles.card, now && { borderColor: accent, borderWidth: 2 }]}>
       <Pressable
-        onPress={() => setOpen((o) => !o)}
+        onPress={() => { setOpen(!open); onOpenChange?.(!open); }}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${title}. ${subtitle ?? ''}${now ? ' Active now.' : ''} ${open ? 'Expanded.' : 'Double tap to read.'}`}
