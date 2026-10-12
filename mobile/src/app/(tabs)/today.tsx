@@ -26,6 +26,8 @@ import { TriadSeal } from '@/components/TriadSeal';
 import { SkyTodayCard } from '@/components/SkyTodayCard';
 import { BodygraphChip } from '@/components/BodygraphChip';
 import { TransitMiniWheel } from '@/components/TransitMiniWheel';
+import { NumberBadge } from '@/components/NumberBadge';
+import { hasWheelPositions, MAX_WHEEL_CHORDS } from '@/lib/transitWheel';
 import { select } from '@/lib/haptics';
 import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TriadToday } from '@/lib/triadTypes';
@@ -61,21 +63,24 @@ const TRANSITS_SHOWN = 3;
 
 const NATURE_KIND: Record<DailyTransitHit['nature'], SignalKind> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
 
-function TransitRow({ hit, onSelect }: { hit: DailyTransitHit; onSelect: (hit: DailyTransitHit) => void }) {
+function TransitRow({ hit, number, onSelect }: { hit: DailyTransitHit; number?: number; onSelect: (hit: DailyTransitHit) => void }) {
   const phrase = `${bodyName(hit.transiting)} ${aspectWord(hit.aspect)} your ${natalName(hit.natal)}`;
   const detail = `${hit.orb.toFixed(1)}° from exact · ${hit.applying ? 'applying' : 'separating'}${hit.peak ? ' · peak' : ''}`;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${phrase}. ${SIGNAL_LABEL[NATURE_KIND[hit.nature]]}. ${detail}. Opens the full meaning.`}
+      accessibilityLabel={`${number ? `Number ${number}. ` : ''}${phrase}. ${SIGNAL_LABEL[NATURE_KIND[hit.nature]]}. ${detail}. Opens the full meaning.`}
       onPress={() => onSelect(hit)}
       style={({ pressed }) => [styles.transitRow, hit.nature === 'friction' && styles.transitFriction, pressed && { opacity: 0.8 }]}
     >
-      <Text style={styles.transitPhrase}>
+      <View style={styles.transitHead}>
+        {number ? <NumberBadge n={number} nature={hit.nature} /> : null}
+        <Text style={[styles.transitPhrase, styles.flexText]}>
         <Term id={planetId(hit.transiting)}>{bodyName(hit.transiting)}</Term>{' '}
         <Term id={aspectId(hit.aspect)}>{aspectWord(hit.aspect)}</Term> your{' '}
         <Term id={natalId(hit.natal)}>{natalName(hit.natal)}</Term>
-      </Text>
+        </Text>
+      </View>
       <Text style={styles.transitDetail}>{detail}</Text>
       <View style={styles.transitNatureRow}>
         <SignalMarker kind={NATURE_KIND[hit.nature]} size={14} />
@@ -211,6 +216,7 @@ export default function Today() {
     ? null
     : localDateString(shown) < liveDate ? 'A DAY GONE BY' : 'A DAY AHEAD';
   const dayWord = isToday ? 'today' : 'this day';
+  const numbered = today ? hasWheelPositions(today.transits) : false;
 
   return (
     <Screen refreshing={refreshing} onRefresh={onRefresh}>
@@ -323,9 +329,9 @@ export default function Today() {
             </View>
             {today.transits.length ? (
               <View style={styles.transitList}>
-                <TransitMiniWheel hits={today.transits} onSelect={setSelectedHit} />
-                {(allTransits ? today.transits : today.transits.slice(0, TRANSITS_SHOWN)).map((hit) => (
-                  <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} onSelect={setSelectedHit} />
+                <TransitMiniWheel hits={today.transits} />
+                {(allTransits ? today.transits : today.transits.slice(0, TRANSITS_SHOWN)).map((hit, i) => (
+                  <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} number={numbered && i < MAX_WHEEL_CHORDS ? i + 1 : undefined} onSelect={setSelectedHit} />
                 ))}
                 {today.transits.length > TRANSITS_SHOWN ? (
                   <Pressable
@@ -413,6 +419,7 @@ const styles = StyleSheet.create({
   },
   transitFriction: { borderColor: SIGNAL_COLOR.friction },
   transitNatureRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  transitHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   transitPhrase: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   transitDetail: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   transitMore: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.6, color: colors.gold, marginTop: 2 },

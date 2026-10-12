@@ -1,31 +1,36 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Rect, Text as SvgText } from 'react-native-svg';
-import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker } from '@/components/Lens';
+import { SIGNAL_COLOR, SignalMarker } from '@/components/Lens';
 import type { DailyTransitHit } from '@/lib/api';
-import { aspectWord, bodyName, natalName } from '@/lib/skyText';
-import { select } from '@/lib/haptics';
-import { buildTransitWheel, hasWheelPositions, type WheelChord } from '@/lib/transitWheel';
+import { buildTransitWheel, hasWheelPositions, MAX_WHEEL_CHORDS, type WheelChord } from '@/lib/transitWheel';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const SIZE = 260;
 
 function Mark({ chord }: { chord: WheelChord }) {
   const color = SIGNAL_COLOR[chord.nature];
-  const r = 6;
-  return chord.nature === 'friction' ? (
-    <Rect x={chord.mx - r} y={chord.my - r} width={r * 2} height={r * 2} rx={2} fill={colors.charcoal} stroke={color} strokeWidth={2} />
-  ) : (
-    <Circle cx={chord.mx} cy={chord.my} r={r} fill={colors.charcoal} stroke={color} strokeWidth={2} />
+  const r = 11;
+  return (
+    <>
+      {chord.nature === 'friction' ? (
+        <Rect x={chord.mx - r} y={chord.my - r} width={r * 2} height={r * 2} rx={5} fill={colors.charcoal} stroke={color} strokeWidth={2.4} />
+      ) : (
+        <Circle cx={chord.mx} cy={chord.my} r={r} fill={colors.charcoal} stroke={color} strokeWidth={2.4} />
+      )}
+      <SvgText x={chord.mx} y={chord.my + 4.5} fontSize={13} fontWeight="bold" fill={colors.parchment} textAnchor="middle">
+        {String(chord.number)}
+      </SvgText>
+    </>
   );
 }
 
 /**
- * Today's tightest contacts as lines between two rings: the sky outside, your chart inside. Flow is a
- * solid line with a round mark; friction is dashed with a square mark. Lines draw in tightest first
- * and the closest pulses once. The same facts are in the caption and in the list below.
+ * Today's three tightest contacts as numbered lines between two rings: the sky outside, your chart
+ * inside. The numbers match the first rows of the list below. Flow is a solid line with a round
+ * badge; friction is dashed with a square badge. Lines draw in tightest first and the closest pulses once.
  */
-export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; onSelect: (hit: DailyTransitHit) => void }) {
+export function TransitMiniWheel({ hits }: { hits: DailyTransitHit[] }) {
   const wheel = useMemo(() => buildTransitWheel(hits, SIZE), [hits]);
   const drawn = useRef<Animated.Value[]>([]);
   const pulse = useRef(new Animated.Value(1)).current;
@@ -63,8 +68,7 @@ export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; 
   }, [signature, pulse]);
 
   if (!hasWheelPositions(hits) || !wheel.chords.length) return null;
-  const top = hits.slice().sort((a, b) => a.orb - b.orb)[0];
-  const topKind = top.nature;
+  const more = hits.length - wheel.chords.length;
 
   return (
     <View style={styles.wrap}>
@@ -72,6 +76,9 @@ export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; 
         <Svg width={SIZE} height={SIZE} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
           <Circle cx={wheel.cx} cy={wheel.cy} r={wheel.outerR} fill="none" stroke={colors.hairline} strokeWidth={1.5} />
           <Circle cx={wheel.cx} cy={wheel.cy} r={wheel.innerR} fill="none" stroke={colors.hairline} strokeWidth={1.5} />
+          {wheel.ticks.map((t, i) => (
+            <Line key={`t${i}`} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke={colors.hairline} strokeWidth={1.5} />
+          ))}
           {wheel.dots.map((d) => (
             <Circle
               key={d.key}
@@ -125,19 +132,9 @@ export function TransitMiniWheel({ hits, onSelect }: { hits: DailyTransitHit[]; 
         </View>
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`Closest: ${bodyName(top.transiting)} ${aspectWord(top.aspect)} your ${natalName(top.natal)}, ${top.orb.toFixed(1)} degrees from exact. ${SIGNAL_LABEL[topKind]}. Opens the full meaning.`}
-        onPress={() => {
-          select();
-          onSelect(top);
-        }}
-        style={({ pressed }) => [styles.caption, pressed && { opacity: 0.8 }]}
-      >
-        <Text style={styles.captionText}>
-          Closest: {bodyName(top.transiting)} {aspectWord(top.aspect)} your {natalName(top.natal)}, {top.orb.toFixed(1)}° from exact
-        </Text>
-      </Pressable>
+      <Text style={styles.rings}>
+        {more > 0 ? `The ${wheel.chords.length} closest, numbered to match the list. ${more} more below.` : 'Numbered to match the list below.'}
+      </Text>
     </View>
   );
 }
@@ -149,6 +146,4 @@ const styles = StyleSheet.create({
   legend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendText: { fontFamily: fonts.body, fontSize: 13, color: colors.parchment },
-  caption: { minHeight: 48, justifyContent: 'center', paddingHorizontal: space.sm },
-  captionText: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold, textAlign: 'center' },
 });

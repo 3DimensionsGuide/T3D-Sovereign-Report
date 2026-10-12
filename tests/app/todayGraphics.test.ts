@@ -56,14 +56,16 @@ test('wheel keeps the tightest contacts, tightest first, and draws friction dash
   assert.equal(w.chords[0].dashed, true);
   assert.equal(w.chords[1].dashed, false);
   assert.ok(w.chords[0].strokeWidth > w.chords[2].strokeWidth);
-  assert.match(w.spoken, /^Today's tightest contacts to your chart, closest first\. Saturn square your Sun, 0\.4 degrees from exact, friction\./);
+  assert.match(w.spoken, /^Today's tightest contacts to your chart, closest first\. 1\. Saturn square your Sun, 0\.4 degrees from exact, friction\./);
 });
 
-test('wheel caps chords at six and shares dots between chords', () => {
+test('wheel caps chords at three, numbers them, and shares dots between chords', () => {
   const many = Array.from({ length: 9 }, (_, i) => hit({ orb: i * 0.3 }));
   const w = buildTransitWheel(many);
-  assert.equal(w.chords.length, 6);
+  assert.equal(w.chords.length, 3);
+  assert.deepEqual(w.chords.map((c) => c.number), [1, 2, 3]);
   assert.equal(w.dots.length, 2);
+  assert.equal(w.ticks.length, 12);
 });
 
 test('wheel ignores hits without positions and reports a quiet sky', () => {

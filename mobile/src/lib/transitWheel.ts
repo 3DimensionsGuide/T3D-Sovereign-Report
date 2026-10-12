@@ -26,6 +26,8 @@ export interface WheelChord {
   key: string;
   /** 0 is the tightest. Drives draw-in order. */
   rank: number;
+  /** 1-based number shown on the line and on the matching list row. */
+  number: number;
   x1: number;
   y1: number;
   x2: number;
@@ -45,6 +47,8 @@ export interface TransitWheel {
   outerR: number;
   innerR: number;
   dots: WheelDot[];
+  /** Faint marks every 30 degrees, so the ring reads as a zodiac. */
+  ticks: { x1: number; y1: number; x2: number; y2: number }[];
   chords: WheelChord[];
   /** Plain-words summary of the drawn contacts, tightest first. */
   spoken: string;
@@ -63,7 +67,8 @@ const ASPECT_WORD: Record<DailyAspect, string> = {
 };
 const NATURE_WORD: Record<AspectNature, string> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
 
-export const MAX_WHEEL_CHORDS = 6;
+/** The wheel draws only the tightest few, numbered to match the list under it. */
+export const MAX_WHEEL_CHORDS = 3;
 export const MIN_LABEL_GAP = 16;
 
 /** Pushes crowded labels apart (same ring) so neighbours such as Mercury and the Moon stay readable. */
@@ -112,8 +117,8 @@ export function hasWheelPositions(hits: readonly WheelHit[]): boolean {
 /** The tightest contacts drawn between two rings: today's sky outside, your chart inside. */
 export function buildTransitWheel(hits: readonly WheelHit[], size = 260): TransitWheel {
   const c = size / 2;
-  const outerR = c - 26;
-  const innerR = outerR - 46;
+  const outerR = c - 30;
+  const innerR = outerR - 52;
   const usable = hits
     .filter((h) => typeof h.transitLongitude === 'number' && typeof h.natalLongitude === 'number')
     .slice()
@@ -138,6 +143,7 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
     return {
       key: `${h.transiting}-${h.natal}-${h.aspect}`,
       rank,
+      number: rank + 1,
       x1, y1, x2, y2,
       mx: Math.round(((x1 + x2) / 2) * 100) / 100,
       my: Math.round(((y1 + y2) / 2) * 100) / 100,
@@ -152,12 +158,17 @@ export function buildTransitWheel(hits: readonly WheelHit[], size = 260): Transi
   const spoken = usable.length
     ? `Today's tightest contacts to your chart, closest first. ` +
       usable
-        .map((h) => `${NAMES[h.transiting]} ${ASPECT_WORD[h.aspect]} your ${NAMES[h.natal]}, ${h.orb.toFixed(1)} degrees from exact, ${NATURE_WORD[h.nature]}`)
+        .map((h, i) => `${i + 1}. ${NAMES[h.transiting]} ${ASPECT_WORD[h.aspect]} your ${NAMES[h.natal]}, ${h.orb.toFixed(1)} degrees from exact, ${NATURE_WORD[h.nature]}`)
         .join('. ') + '.'
     : 'No close contacts to your chart today.';
 
   const list = [...dots.values()];
   spreadLabels(list.filter((d) => d.ring === 'outer'));
   spreadLabels(list.filter((d) => d.ring === 'inner'));
-  return { size, cx: c, cy: c, outerR, innerR, dots: list, chords, spoken };
+  const ticks = Array.from({ length: 12 }, (_, i) => {
+    const [x1, y1] = wheelPoint(i * 30, outerR - 6, c);
+    const [x2, y2] = wheelPoint(i * 30, outerR + 6, c);
+    return { x1, y1, x2, y2 };
+  });
+  return { size, cx: c, cy: c, outerR, innerR, dots: list, ticks, chords, spoken };
 }
