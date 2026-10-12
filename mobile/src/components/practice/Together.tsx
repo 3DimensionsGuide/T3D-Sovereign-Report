@@ -15,6 +15,8 @@ import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
+import { TypeShape } from '@/components/practice/TypeShape';
+import { spokenPair, typeShapeKind } from '@/lib/typeShapes';
 const sc = (t: string): string => t.charAt(0) + t.slice(1).toLowerCase().replace(/ · /g, ' · ');
 const pad = (n: number) => String(n).padStart(2, '0');
 const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -169,6 +171,28 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
       <GoldButton label="Continue" onPress={onCheck} loading={loading} />
       {onCancel ? <GoldButton label="Cancel" variant="ghost" onPress={onCancel} /> : null}
+    </View>
+  );
+}
+
+function TypePair({ a, b }: { a: TogetherPerson; b: TogetherPerson }) {
+  const cell = (p: TogetherPerson) => {
+    const sure = p.certainty === 'sure';
+    return (
+      <View key={p.label} style={styles.pairCell}>
+        <TypeShape kind={sure ? typeShapeKind(p.type) : null} size={84} />
+        <Text style={styles.pairName} numberOfLines={1}>{p.label}</Text>
+        <Text style={styles.pairType}>{sure ? (p.type ?? 'Type unknown') : 'Depends on birth time'}</Text>
+      </View>
+    );
+  };
+  return (
+    <View style={styles.pair} accessible accessibilityLabel={spokenPair(
+      { label: a.label, type: a.certainty === 'sure' ? a.type : null },
+      { label: b.label, type: b.certainty === 'sure' ? b.type : null },
+    )}>
+      {cell(a)}
+      {cell(b)}
     </View>
   );
 }
@@ -439,6 +463,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
 
       {view === 'decide' ? (
       <View style={{ gap: space.md }}>
+      <TypePair a={data.people[0]} b={data.people[1]} />
       {data.people.map((p) => <PersonCard key={p.label} p={p} />)}
       {data.note ? <View style={styles.noteBox}><Text style={styles.body}>{data.note}</Text></View> : null}
 
@@ -520,6 +545,10 @@ const styles = StyleSheet.create({
   mark: { fontSize: 20, color: colors.gold },
   placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   rowBox: { gap: 4, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline },
+  pair: { flexDirection: 'row', gap: space.md, backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg },
+  pairCell: { flex: 1, alignItems: 'center', gap: 4 },
+  pairName: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
+  pairType: { fontFamily: fonts.bodyMedium, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted, textAlign: 'center' },
   stepRow: { flexDirection: 'row', gap: 10 },
   stepNum: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 23, color: colors.gold, width: 16 },
 });
