@@ -20,7 +20,7 @@ function Row({ glyph, accent, label, main }: { glyph: string; accent: string; la
         {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={11} color={accent} /> : null}
         <Text style={[styles.rowLabel, { color: lensFromGlyph(glyph) ? LENS_TEXT[lensFromGlyph(glyph)!] : accent }]}>{label}</Text>
       </View>
-      <Text style={styles.rowMain}>{main}</Text>
+      <Text style={styles.rowMain} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{main}</Text>
     </View>
   );
 }
@@ -39,7 +39,7 @@ export const TodayShareCard = forwardRef<View, Props>(function TodayShareCard({ 
         <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
       </View>
       <View style={styles.rule} />
-      <Text style={styles.title}>{firstName ? `${firstName}'s frame for today` : 'My frame for today'}</Text>
+      <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{firstName ? `${firstName}'s frame for today` : 'My frame for today'}</Text>
       <Text style={styles.date}>{date}</Text>
 
       <View style={styles.rows}>
@@ -59,20 +59,20 @@ export const TodayShareCard = forwardRef<View, Props>(function TodayShareCard({ 
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH, height: CARD_HEIGHT, backgroundColor: colors.obsidian, borderWidth: 1, borderColor: colors.gold,
-    borderRadius: 18, padding: 24, overflow: 'hidden', justifyContent: 'space-between',
+    borderRadius: 18, padding: 20, overflow: 'hidden', justifyContent: 'space-between',
   },
   glow: { height: 280 },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
   rule: { height: 1, backgroundColor: colors.gold, opacity: 0.6, marginTop: 8 },
-  title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment, marginTop: 14 },
+  title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.parchment, marginTop: 10 },
   date: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
-  rows: { gap: 16, marginTop: 14 },
+  rows: { gap: 12, marginTop: 10 },
   row: { borderLeftWidth: 4, paddingLeft: 12, gap: 3 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   rowLabel: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 1.6 },
-  rowMain: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26, color: colors.parchment },
-  footer: { gap: 3, marginTop: 18 },
+  rowMain: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: colors.parchment },
+  footer: { gap: 3, marginTop: 10 },
   footerSmall: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 2, color: colors.parchmentMuted },
   footerUrl: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.gold },
 });
