@@ -24,6 +24,15 @@ export function SpineAxis({ from, to, fromLabel, toLabel }: { from: string; to: 
   );
 }
 
+/** One line under the axis that says what the marks on the bars mean. */
+export function SpineKey() {
+  return (
+    <View accessible accessibilityLabel="Key. A left arrow means the transit began earlier. A right arrow means it continues later. A dark mark is the exact day." style={styles.key}>
+      <Text style={styles.keyText}>{'‹ began earlier   › continues later   ▮ exact day'}</Text>
+    </View>
+  );
+}
+
 export interface SpineSeason {
   key: string;
   title: string;
@@ -106,6 +115,8 @@ const styles = StyleSheet.create({
   tick: { position: 'absolute', top: 4, width: 1, height: 9, backgroundColor: colors.parchmentMuted },
   tickLabel: { position: 'absolute', top: 11, left: -12, width: 26, textAlign: 'center', fontFamily: fonts.body, fontSize: 11, color: colors.parchmentMuted },
   endLabel: { position: 'absolute', top: 19, fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.parchment },
+  key: { paddingBottom: 4 },
+  keyText: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted },
   row: { gap: 6, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline },
   rowHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rowTitle: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 21, color: colors.parchment },

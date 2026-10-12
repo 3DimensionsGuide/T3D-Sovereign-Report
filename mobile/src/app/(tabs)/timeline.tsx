@@ -12,7 +12,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { Segmented } from '@/components/Segmented';
 import { aspectWord, bodyName, capFirst, houseTheme, natalName, ordinal } from '@/lib/skyText';
 import { LENS_TEXT, LensIcon, LensLabel, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
-import { CycleBar, SpineAxis, SpineRow, type SpineSeason } from '@/components/TimeSpine';
+import { CycleBar, SpineAxis, SpineKey, SpineRow, type SpineSeason } from '@/components/TimeSpine';
 import { SignalRibbon } from '@/components/SignalRibbon';
 import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineResult } from '@/lib/timelineTypes';
 import { useTimeline } from '@/lib/useTimeline';
@@ -393,11 +393,12 @@ export default function Timeline() {
             <FadeIn delay={100}>
               <Panel label="Slow transits in effect" lens="stoplight">
                 <SpineAxis from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} fromLabel="Today" toLabel={shortDate(localKey(new Date(data.to)))} />
+                <SpineKey />
                 {data.seasons.map((s, i) => (
                   <SpineRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={spineSeason(s, i)} from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} />
                 ))}
                 <Text style={styles.footnote}>
-                  Each bar runs from when the planet comes within 3° of your chart to when it leaves. Dark marks show the exact days. An arrow at the end of a bar means it began earlier or lasts beyond this stretch. ★ marks your Lord of the Year.
+                  Each bar runs from when the planet comes within 3° of your chart to when it leaves. ★ marks your Lord of the Year.
                 </Text>
               </Panel>
             </FadeIn>
