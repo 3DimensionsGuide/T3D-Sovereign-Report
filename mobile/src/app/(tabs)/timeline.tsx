@@ -250,7 +250,7 @@ export default function Timeline() {
   };
   const absSections = (): PinSection[] =>
     [...sectionBox.current.entries()]
-      .map(([key, b]) => ({ key, top: b.y + (b.more ? moreY.current : 0), headHeight: 56, bottom: b.y + (b.more ? moreY.current : 0) + b.h }))
+      .map(([key, b]) => ({ key, top: b.y + (b.more ? moreY.current : 0), headHeight: 0, bottom: b.y + (b.more ? moreY.current : 0) + b.h }))
       .sort((a, b) => a.top - b.top);
   const listTop = (): number | null => {
     const b = sectionBox.current.get('now');
