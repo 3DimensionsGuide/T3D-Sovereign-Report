@@ -1,3 +1,4 @@
+import { teaser } from '@/lib/teaser';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode, type RefObject } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LENS_COLOR, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
@@ -193,7 +194,7 @@ export function Accordion({
         <View style={styles.headText}>
           {now ? <Text style={styles.nowTag}>Active now</Text> : null}
           <Text style={styles.cardTitle}>{title}</Text>
-          {subtitle ? <Text style={styles.cardSub} numberOfLines={open ? undefined : 2}>{subtitle}</Text> : null}
+          {subtitle ? <Text style={styles.cardSub} numberOfLines={open ? undefined : 3}>{open ? subtitle : teaser(subtitle)}</Text> : null}
         </View>
         <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
       </Pressable>

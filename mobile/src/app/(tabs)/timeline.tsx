@@ -1,3 +1,4 @@
+import { yearRangeLabel } from '@/lib/teaser';
 import { useMemo, useState } from 'react';
 import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
@@ -116,8 +117,10 @@ function YearCard({ data }: { data: TimelineResult }) {
             Lord of the Year: {bodyName(p.lord)}
           </Text>
           <Text style={styles.blockBody}>
-            Your {ordinal(p.house)} house ({p.sign}) is activated from {shortDate(p.startsOn)} to{' '}
-            {shortDate(p.endsOn)}. {capFirst(houseTheme(p.house))}
+            Your {ordinal(p.house)} house ({p.sign}) is activated from{' '}
+            {yearRangeLabel(p.startsOn, p.endsOn, (d, withYear) =>
+              d.toLocaleDateString(undefined, withYear ? { month: 'short', day: 'numeric', year: 'numeric' } : { month: 'short', day: 'numeric' }))}
+            . {capFirst(houseTheme(p.house))}
           </Text>
         </View>
         {py ? (
