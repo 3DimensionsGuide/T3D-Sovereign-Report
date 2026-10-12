@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
+import { LensIcon, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TimelineEvent, TimelineResult } from '@/lib/timelineTypes';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -84,7 +84,7 @@ export function SignalRibbon({ data }: Props) {
               <Text style={styles.weekday}>{i === 0 ? 'Today' : dt.toLocaleDateString(undefined, { weekday: 'narrow' })}</Text>
               <Text style={styles.dayNum}>{dt.getDate()}</Text>
               <View style={styles.markerSlot}>
-                {sig ? <SignalMarker kind={sig} size={16} /> : <View style={styles.quiet} />}
+                {sig ? <SignalMarker kind={sig} size={16} /> : d.events.some((e) => e.kind === 'gate') ? <LensIcon lens="vehicle" size={13} /> : <View style={styles.quiet} />}
               </View>
               <Text style={styles.pd}>PD {d.personalDay}</Text>
             </Pressable>
@@ -103,7 +103,7 @@ export function SignalRibbon({ data }: Props) {
             const s = eventSignal(e);
             return (
               <View key={e.id} style={styles.eventLine}>
-                {s ? <SignalMarker kind={s} size={15} /> : <View style={styles.noMarker} />}
+                {s ? <SignalMarker kind={s} size={15} /> : e.kind === 'gate' ? <LensIcon lens="vehicle" size={13} /> : <View style={styles.noMarker} />}
                 <Text style={styles.eventText}>
                   {e.title}{s ? ` · ${SIGNAL_LABEL[s]}` : ''}
                 </Text>

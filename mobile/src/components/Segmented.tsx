@@ -6,8 +6,8 @@ import { select } from '@/lib/haptics';
 export interface SegmentOption<T extends string> {
   value: T;
   label: string;
-  /** Optional drawn icon shown before the label. */
-  icon?: ReactNode;
+  /** Optional drawn icon shown before the label. A function receives whether the option is selected, so the icon can stay readable on the gold pill. */
+  icon?: ReactNode | ((selected: boolean) => ReactNode);
 }
 
 /** A row of mutually exclusive choices (like iOS segmented control), 52pt tall. */
@@ -44,7 +44,7 @@ export function Segmented<T extends string>({
             ]}
           >
             <View style={styles.inner}>
-              {opt.icon}
+              {typeof opt.icon === 'function' ? opt.icon(selected) : opt.icon}
               <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.label, selected && styles.labelSelected]}>{opt.label}</Text>
             </View>
           </Pressable>

@@ -17,9 +17,9 @@ import { nextOpenCard } from '@/lib/pinnedBar';
 import { colors, fonts, space } from '@/theme/tokens';
 
 const OPTIONS = [
-  { value: 'vehicle', label: 'Vehicle', icon: <LensIcon lens="vehicle" size={13} /> },
-  { value: 'road', label: 'Road', icon: <LensIcon lens="road" size={13} /> },
-  { value: 'stoplight', label: 'Stoplight', icon: <LensIcon lens="stoplight" size={13} /> },
+  { value: 'vehicle', label: 'Vehicle', icon: (on: boolean) => <LensIcon lens="vehicle" size={13} color={on ? colors.obsidian : undefined} /> },
+  { value: 'road', label: 'Road', icon: (on: boolean) => <LensIcon lens="road" size={13} color={on ? colors.obsidian : undefined} /> },
+  { value: 'stoplight', label: 'Stoplight', icon: (on: boolean) => <LensIcon lens="stoplight" size={13} color={on ? colors.obsidian : undefined} /> },
 ] as const;
 
 type Lens = (typeof OPTIONS)[number]['value'];

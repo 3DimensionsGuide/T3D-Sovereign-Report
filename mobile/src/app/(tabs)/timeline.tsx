@@ -29,9 +29,9 @@ type TimelineLens = 'all' | 'vehicle' | 'road' | 'stoplight';
 
 const LENS_OPTIONS = [
   { value: 'all', label: 'All' },
-  { value: 'vehicle', label: 'Vehicle', icon: <LensIcon lens="vehicle" size={13} /> },
-  { value: 'road', label: 'Road', icon: <LensIcon lens="road" size={13} /> },
-  { value: 'stoplight', label: 'Stoplight', icon: <LensIcon lens="stoplight" size={13} /> },
+  { value: 'vehicle', label: 'Vehicle', icon: (on: boolean) => <LensIcon lens="vehicle" size={13} color={on ? colors.obsidian : undefined} /> },
+  { value: 'road', label: 'Road', icon: (on: boolean) => <LensIcon lens="road" size={13} color={on ? colors.obsidian : undefined} /> },
+  { value: 'stoplight', label: 'Stoplight', icon: (on: boolean) => <LensIcon lens="stoplight" size={13} color={on ? colors.obsidian : undefined} /> },
 ] as const;
 
 const FILTERS = [
@@ -115,6 +115,15 @@ function localKey(d: Date): string {
 
 function timeOf(at: string): string {
   return new Date(at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
+/** The Moon leaves a gate within hours, so it gets a clock time; the Sun gets a date. */
+function untilLabel(e: TimelineEvent): string {
+  if (!e.until) return '';
+  const end = new Date(e.until);
+  if (e.body !== 'moon') return shortDate(localKey(end));
+  const sameDay = localKey(end) === localKey(new Date(e.at));
+  return sameDay ? timeOf(e.until) : `${shortDate(localKey(end))}, ${timeOf(e.until)}`;
 }
 
 function Panel({ children, label, lens }: { children: React.ReactNode; label: string; lens: LensName }) {
@@ -234,7 +243,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
           <Text style={styles.blockBody}>{e.detail}</Text>
           {e.kind === 'gate' && e.until ? (
             <Text style={styles.blockBody}>
-              Line {e.line} on entering. The {e.body === 'moon' ? 'Moon' : 'Sun'} stays in Gate {e.gate} until {shortDate(localKey(new Date(e.until)))}.
+              Line {e.line} on entering. The {e.body === 'moon' ? 'Moon' : 'Sun'} stays in Gate {e.gate} until {untilLabel(e)}.
             </Text>
           ) : null}
           {e.house ? (
