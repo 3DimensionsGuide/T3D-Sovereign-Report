@@ -89,9 +89,9 @@ export interface VehicleGateData {
   gateCenter: Readonly<Record<number, string>>;
 }
 
-type Contact = 'electromagnetic' | 'companionship' | 'compromise' | 'amplified' | 'flavor';
+export type Contact = 'electromagnetic' | 'companionship' | 'compromise' | 'amplified' | 'flavor';
 
-interface GateContact {
+export interface GateContact {
   who: 'Sun' | 'Moon';
   gate: number;
   kind: Contact;
@@ -102,7 +102,7 @@ interface GateContact {
 const channelName = (a: number, b: number): string => `${Math.min(a, b)}-${Math.max(a, b)}`;
 
 /** How one transit gate meets the person's chart. */
-function contactFor(who: 'Sun' | 'Moon', gate: number, data: VehicleGateData, other: number): GateContact {
+export function contactFor(who: 'Sun' | 'Moon', gate: number, data: VehicleGateData, other: number): GateContact {
   const natal = new Set(data.natalGates);
   const mine = data.channels.filter((c) => c[0] === gate || c[1] === gate);
 

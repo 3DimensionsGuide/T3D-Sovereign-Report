@@ -39,10 +39,11 @@ import type {
 } from './dailySky';
 import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/road-content';
 import { personalYearNumber } from '../../lib/numerology/personalYear';
+import { buildGateEvents, type GateVehicle } from '../../lib/app/gateEvents';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
 
-export type TimelineKind = 'lunation' | 'eclipse' | 'station' | 'ingress' | 'transit' | 'return';
+export type TimelineKind = 'lunation' | 'eclipse' | 'station' | 'ingress' | 'transit' | 'return' | 'gate';
 
 export interface TimelineEvent {
   id: string;
@@ -70,6 +71,12 @@ export interface TimelineEvent {
   peakEnd?: string;
   /** Transit passes: whether the transiting planet is retrograde at the exact moment. */
   retrograde?: boolean;
+  /** Gate changes (kind 'gate'): the Human Design gate and line entered, how it meets the person's chart, and when the body leaves. */
+  gate?: number;
+  line?: number;
+  contact?: 'electromagnetic' | 'companionship' | 'compromise' | 'amplified' | 'flavor';
+  channel?: string;
+  until?: string;
 }
 
 export interface ActiveSeason {
@@ -141,6 +148,8 @@ export interface TimelineInput {
   challenges: NumerologyCycle[];
   /** The person's current calendar date, YYYY-MM-DD (from their phone). */
   localDate: string;
+  /** The person's Human Design gates, for the Vehicle lens. Without it no gate events are built. */
+  vehicle?: GateVehicle;
   /** Minutes behind UTC for their phone (JS getTimezoneOffset). */
   tzOffsetMinutes: number;
   days: number;
@@ -754,6 +763,10 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     }
   }
   seasons.sort((a, b) => a.orb - b.orb);
+
+  if (input.vehicle && input.vehicle.natalGates.length > 0) {
+    events.push(...buildGateEvents(startJd, endJd, input.vehicle, (b, jd) => posAt(b, jd).lon));
+  }
 
   events.sort((a, b) => a.at.localeCompare(b.at));
 

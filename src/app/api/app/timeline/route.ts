@@ -89,6 +89,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const results = lead.results as unknown as {
       astrology?: AstrologyResult;
       numerology?: { pinnacles?: unknown; challenges?: unknown };
+      humanDesign?: { type?: string; authority?: string; activeGates?: Array<{ gate?: number }>; undefinedCenters?: string[] };
     } | null;
     const birthDate = (lead.birthData as { date?: string } | null)?.date;
     const tropical = results?.astrology?.tropical;
@@ -126,8 +127,18 @@ export async function POST(request: Request): Promise<NextResponse> {
       midheaven: tropical.houses.mc,
     };
 
+    const hd = results?.humanDesign;
+    const natalGates = (hd?.activeGates ?? [])
+      .map((g) => g.gate)
+      .filter((g): g is number => typeof g === 'number');
+    // Without the person's gates there are no Vehicle events; everything else still builds.
+    const vehicle = natalGates.length && Array.isArray(hd?.undefinedCenters)
+      ? { type: hd?.type ?? null, authority: hd?.authority ?? null, natalGates, undefinedCenters: hd?.undefinedCenters ?? [] }
+      : undefined;
+
     const timeline = calculateTimeline({
       natal,
+      vehicle,
       birthDate,
       pinnacles: results.numerology.pinnacles,
       challenges: results.numerology.challenges,

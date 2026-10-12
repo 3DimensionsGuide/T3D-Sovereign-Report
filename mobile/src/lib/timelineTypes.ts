@@ -1,7 +1,7 @@
 /** Shapes returned by POST /api/app/timeline (mirrors the server's timeline.ts). */
 import type { AspectNature, DailyAspect, NatalPointName, SkyBody } from '@/lib/api';
 
-export type TimelineKind = 'lunation' | 'eclipse' | 'station' | 'ingress' | 'transit' | 'return';
+export type TimelineKind = 'lunation' | 'eclipse' | 'station' | 'ingress' | 'transit' | 'return' | 'gate';
 
 export interface TimelineEvent {
   id: string;
@@ -22,6 +22,12 @@ export interface TimelineEvent {
   peakStart?: string;
   peakEnd?: string;
   retrograde?: boolean;
+  /** Gate changes (kind 'gate'). */
+  gate?: number;
+  line?: number;
+  contact?: 'electromagnetic' | 'companionship' | 'compromise' | 'amplified' | 'flavor';
+  channel?: string;
+  until?: string;
 }
 
 export interface ActiveSeason {

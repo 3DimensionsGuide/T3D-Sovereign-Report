@@ -24,11 +24,12 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 const BAR_HEIGHT = 120;
 
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
-/** Timeline lenses. Human Design has no dated events here yet, so it is not offered. */
-type TimelineLens = 'all' | 'road' | 'stoplight';
+/** Timeline lenses. Vehicle shows the Sun's gate changes and the Moon's channel-completing days. */
+type TimelineLens = 'all' | 'vehicle' | 'road' | 'stoplight';
 
 const LENS_OPTIONS = [
   { value: 'all', label: 'All' },
+  { value: 'vehicle', label: 'Vehicle', icon: <LensIcon lens="vehicle" size={13} /> },
   { value: 'road', label: 'Road', icon: <LensIcon lens="road" size={13} /> },
   { value: 'stoplight', label: 'Stoplight', icon: <LensIcon lens="stoplight" size={13} /> },
 ] as const;
@@ -54,6 +55,7 @@ const KIND_LABEL: Record<TimelineKind, string> = {
   ingress: 'Sign change',
   transit: 'Transit',
   return: 'Return',
+  gate: 'Gate change',
 };
 
 const KIND_GLYPH: Record<TimelineKind, string> = {
@@ -63,6 +65,15 @@ const KIND_GLYPH: Record<TimelineKind, string> = {
   ingress: '→',
   transit: '✦',
   return: '↻',
+  gate: '◆',
+};
+
+const CONTACT_LABEL: Record<NonNullable<TimelineEvent['contact']>, string> = {
+  electromagnetic: 'Completes your channel',
+  companionship: 'A channel you hold',
+  compromise: 'Compromise',
+  amplified: 'Amplified',
+  flavor: 'Adds a flavor',
 };
 
 const NATURE_KIND: Record<ActiveSeason['nature'], SignalKind> = { flow: 'flow', friction: 'friction', neutral: 'neutral' };
@@ -211,10 +222,21 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
       {e.kind === 'transit' || e.kind === 'return' ? (
         <NatureTag nature={e.nature} />
       ) : null}
+      {e.kind === 'gate' && e.contact ? (
+        <View style={styles.natureTag}>
+          <Text style={styles.contactGlyph}>{e.contact === 'electromagnetic' ? '✦' : e.contact === 'amplified' ? '▲' : '●'}</Text>
+          <Text style={styles.natureWord}>{CONTACT_LABEL[e.contact]}</Text>
+        </View>
+      ) : null}
       {flags.length ? <Text style={styles.eventFlags}>{flags.join('   ')}</Text> : null}
       {open ? (
         <View style={styles.eventBody}>
           <Text style={styles.blockBody}>{e.detail}</Text>
+          {e.kind === 'gate' && e.until ? (
+            <Text style={styles.blockBody}>
+              Line {e.line} on entering. The {e.body === 'moon' ? 'Moon' : 'Sun'} stays in Gate {e.gate} until {shortDate(localKey(new Date(e.until)))}.
+            </Text>
+          ) : null}
           {e.house ? (
             <Text style={styles.blockBody}>
               Your {ordinal(e.house)} house: {houseTheme(e.house)}
@@ -277,13 +299,15 @@ export default function Timeline() {
     const byDay = new Map<string, TimelineEvent[]>();
     for (const e of data.events) {
       if (kinds && !kinds.includes(e.kind)) continue;
+      if (lens === 'stoplight' && e.kind === 'gate') continue;
+      if (lens === 'vehicle' && e.kind !== 'gate') continue;
       const key = localKey(new Date(e.at));
       const list = byDay.get(key) ?? [];
       list.push(e);
       byDay.set(key, list);
     }
     return [...byDay.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [data, filter]);
+  }, [data, filter, lens]);
 
   const split = useMemo(() => splitCurrentMonth(groups, localKey(new Date())), [groups]);
   const thisYear = new Date().getFullYear();
@@ -375,7 +399,7 @@ export default function Timeline() {
               compact
             />
           </FadeIn>
-          {lens !== 'stoplight' ? <YearCard data={data} /> : null}
+          {lens === 'all' || lens === 'road' ? <YearCard data={data} /> : null}
 
           {lens === 'road' ? (
             <Panel label="Your Personal Days" lens="road">
@@ -389,7 +413,7 @@ export default function Timeline() {
             </Panel>
           ) : null}
 
-          {lens !== 'road' && data.seasons.length > 0 ? (
+          {(lens === 'all' || lens === 'stoplight') && data.seasons.length > 0 ? (
             <FadeIn delay={100}>
               <Panel label="Slow transits in effect" lens="stoplight">
                 <SpineAxis from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} fromLabel="Today" toLabel={shortDate(localKey(new Date(data.to)))} />
@@ -406,12 +430,22 @@ export default function Timeline() {
 
           {lens === 'road' ? null : (
           <>
-          <FadeIn delay={160}>
-            <Segmented options={FILTERS} value={filter} onChange={(f) => { setFilter(f); setOpenId(null); }} compact />
-          </FadeIn>
+          {lens === 'vehicle' ? (
+            <Text style={styles.sub}>
+              The Sun in every new gate, and the days the Moon completes one of your channels. Conditions, not decisions: your Strategy and Authority decide.
+            </Text>
+          ) : (
+            <FadeIn delay={160}>
+              <Segmented options={FILTERS} value={filter} onChange={(f) => { setFilter(f); setOpenId(null); }} compact />
+            </FadeIn>
+          )}
 
           {groups.length === 0 ? (
-            <Text style={styles.sub}>Nothing in this filter over the next 60 days.</Text>
+            <Text style={styles.sub}>
+              {lens === 'vehicle'
+                ? 'No gate changes to show. Your Human Design gates may be missing, so recalculate your chart.'
+                : 'Nothing in this filter over the next 60 days.'}
+            </Text>
           ) : (
             <View onLayout={onSectionLayout('now', false)} style={styles.monthBlock}>
               <View style={styles.monthHead}>
@@ -502,6 +536,7 @@ const styles = StyleSheet.create({
   panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   panelLabel: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
   natureTag: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  contactGlyph: { fontSize: 13, color: colors.vehicle },
   natureWord: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchment },
   block: { gap: 4 },
   blockTitle: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchment },
