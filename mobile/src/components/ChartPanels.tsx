@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { TermPressable, useExplain } from '@/components/Explain';
 import { LENS_TEXT, LensIcon, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
 import { aspectId, centerId, channelId, gateId, natalId } from '@/lib/termIds';
 import { buildBodygraphScene } from '@/charts/bodygraph';
 import { chartColors } from '@/charts/palette';
 import type { BodygraphData, WheelAspect, WheelBody, WheelChart } from '@/charts/chartTypes';
-import { ASPECT_NAMES, BODY_GLYPHS, BODY_NAMES, buildWheelScene } from '@/charts/wheel';
+import { ASPECT_NAMES, ASPECT_SYMBOLS, BODY_GLYPHS, BODY_NAMES, buildWheelScene, sameFocus, type WheelFocus } from '@/charts/wheel';
 import { Segmented } from '@/components/Segmented';
 import { SceneView } from '@/components/SceneView';
 import { colors, fonts, radius, space } from '@/theme/tokens';
@@ -56,7 +56,9 @@ const ZODIAC_OPTIONS = [
 export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sidereal: WheelChart }) {
   const [zodiac, setZodiac] = useState<'tropical' | 'sidereal'>('tropical');
   const chart = zodiac === 'tropical' ? tropical : sidereal;
-  const scene = useMemo(() => buildWheelScene(chart), [chart]);
+  const [focus, setFocus] = useState<WheelFocus | null>(null);
+  const scene = useMemo(() => buildWheelScene(chart, focus), [chart, focus]);
+  const focused = focus ? chart.aspects.find((a) => sameFocus(focus, a)) ?? null : null;
   const { open } = useExplain();
   const [figureWidth, setFigureWidth] = useState(0);
   const scale = figureWidth / scene.w;
@@ -68,7 +70,7 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
 
   return (
     <View style={styles.panel}>
-      <Segmented options={ZODIAC_OPTIONS} value={zodiac} onChange={setZodiac} compact />
+      <Segmented options={ZODIAC_OPTIONS} value={zodiac} onChange={(z) => { setZodiac(z); setFocus(null); }} compact />
       <View style={styles.figure} onLayout={(e) => setFigureWidth(e.nativeEvent.layout.width)}>
         <SceneView scene={scene} label={label} />
         {scale > 0 ? scene.hotspots?.map((h) => (
@@ -81,7 +83,41 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
           />
         )) : null}
       </View>
-      <Text style={styles.note}>Tap any planet on the wheel to learn what it means in your chart.</Text>
+      {chart.aspects.length > 0 ? (
+        <>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+            {chart.aspects.map((a, i) => {
+              const on = sameFocus(focus, a);
+              return (
+                <Pressable
+                  key={`${a.a}-${a.b}-${i}`}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  accessibilityLabel={`${pointName(a.a)} ${ASPECT_NAMES[a.aspect]} ${pointName(a.b)}. ${SIGNAL_LABEL[ASPECT_SIGNAL[a.aspect]]}. ${on ? 'Showing on the wheel. Double tap to clear.' : 'Double tap to show on the wheel.'}`}
+                  onPress={() => setFocus(on ? null : { a: a.a, b: a.b })}
+                  style={[styles.aspectChip, on && styles.aspectChipOn]}
+                >
+                  <SignalMarker kind={ASPECT_SIGNAL[a.aspect]} size={14} />
+                  <Text style={styles.aspectChipText}>
+                    {pointGlyph(a.a)} {ASPECT_SYMBOLS[a.aspect]} {pointGlyph(a.b)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          <View accessibilityLiveRegion="polite">
+            {focused ? (
+              <Text style={styles.focusLine}>
+                {pointName(focused.a)} {ASPECT_NAMES[focused.aspect].toLowerCase()} {pointName(focused.b)} · {SIGNAL_LABEL[ASPECT_SIGNAL[focused.aspect]]} · {focused.orb.toFixed(1)}°{focused.peak ? ' · exact' : ''}
+              </Text>
+            ) : (
+              <Text style={styles.note}>Tap an aspect above to light its line. Tap a planet on the wheel to learn what it means in your chart.</Text>
+            )}
+          </View>
+        </>
+      ) : (
+        <Text style={styles.note}>Tap any planet on the wheel to learn what it means in your chart.</Text>
+      )}
 
       <View style={styles.keyRow}>
         <KeyItem swatch={<><Dash color={chartColors.flow} /><SignalMarker kind="flow" size={14} /></>} label="Trine · flow" />
@@ -125,6 +161,12 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
       </Section>
     </View>
   );
+}
+
+function pointGlyph(p: string): string {
+  if (p === 'ascendant') return 'AC';
+  if (p === 'midheaven') return 'MC';
+  return BODY_GLYPHS[p as WheelBody] ?? p;
 }
 
 function pointName(p: string): string {
@@ -252,6 +294,11 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline,
     backgroundColor: colors.obsidian,
   },
+  chipScroll: { gap: 8, paddingVertical: 2 },
+  aspectChip: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal },
+  aspectChipOn: { borderColor: colors.gold, backgroundColor: colors.amethyst },
+  aspectChipText: { fontSize: 17, color: colors.parchment },
+  focusLine: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 22, color: colors.parchment },
   keyRow: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space.md, rowGap: space.sm },
   keyItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   keyText: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },

@@ -93,7 +93,29 @@ function aspectStyle(aspect: WheelAspect, peak: boolean): { stroke: string; w: n
   }
 }
 
-export function buildWheelScene(chart: WheelChart): Scene {
+/** One aspect picked to be lit on the wheel. */
+export interface WheelFocus {
+  a: WheelPoint;
+  b: WheelPoint;
+}
+
+export const ASPECT_SYMBOLS: Record<WheelAspect, string> = {
+  conjunction: '☌', sextile: '⚹', square: '□', trine: '△', opposition: '☍',
+};
+
+export const sameFocus = (f: WheelFocus | null, asp: { a: WheelPoint; b: WheelPoint }): boolean =>
+  f !== null && f.a === asp.a && f.b === asp.b;
+
+/** Shortest angle between two longitudes, in degrees. */
+const angleBetween = (x: number, y: number): number => {
+  const d = Math.abs(norm(x) - norm(y));
+  return d > 180 ? 360 - d : d;
+};
+
+/** How far a glyph must be pushed from its true position before a thin line joins the two. */
+export const CONNECTOR_MIN_DEGREES = 1.5;
+
+export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = null): Scene {
   const prims: Prim[] = [];
   const hotspots: Hotspot[] = [];
   const asc = chart.ascendant;
@@ -142,7 +164,15 @@ export function buildWheelScene(chart: WheelChart): Scene {
     const [x1, y1] = polar(la, asc, R_ASPECT);
     const [x2, y2] = polar(lb, asc, R_ASPECT);
     const st = aspectStyle(asp.aspect, asp.peak);
-    prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w, dash: st.dash, op: asp.peak ? 0.95 : 0.65 });
+    if (focus && !sameFocus(focus, asp)) {
+      prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w, dash: st.dash, op: 0.12 });
+    } else if (focus) {
+      prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w + 1.6, dash: st.dash, op: 1 });
+      prims.push({ k: 'circle', cx: x1, cy: y1, r: 4, fill: st.stroke, stroke: c.obsidian, w: 1 });
+      prims.push({ k: 'circle', cx: x2, cy: y2, r: 4, fill: st.stroke, stroke: c.obsidian, w: 1 });
+    } else {
+      prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w, dash: st.dash, op: asp.peak ? 0.95 : 0.65 });
+    }
   }
 
   // Planets: tick at the true longitude, glyph at a spread-out position.
@@ -153,6 +183,14 @@ export function buildWheelScene(chart: WheelChart): Scene {
     const [t2x, t2y] = polar(pl.longitude, asc, R_HOUSE_IN - 7);
     prims.push({ k: 'line', x1: t1x, y1: t1y, x2: t2x, y2: t2y, stroke: c.gold, w: 1.4 });
     const [gx, gy] = polar(spread[i], asc, R_PLANET);
+    if (angleBetween(pl.longitude, spread[i]) > CONNECTOR_MIN_DEGREES) {
+      // The glyph was moved to make room: a thin line joins it back to its true position.
+      const [cx1, cy1] = polar(spread[i], asc, R_PLANET + 11);
+      prims.push({ k: 'line', x1: t2x, y1: t2y, x2: cx1, y2: cy1, stroke: c.gold, w: 0.9, op: 0.7 });
+    }
+    if (focus && (focus.a === pl.body || focus.b === pl.body)) {
+      prims.push({ k: 'circle', cx: gx, cy: gy, r: 15, stroke: c.gold, w: 1.8 });
+    }
     hotspots.push({ x: gx, y: gy, key: pl.body, label: `${BODY_NAMES[pl.body]} in ${pl.formatted}` });
     prims.push({ k: 'text', x: gx, y: gy, s: BODY_GLYPHS[pl.body] + TEXT_STYLE, size: 19, fill: c.parchment, font: 'symbol' });
     if (pl.retrograde) {
