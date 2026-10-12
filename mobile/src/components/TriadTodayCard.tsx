@@ -33,10 +33,16 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
   // and the Moon by its own card, so this card keeps only what is new: Strategy and the sky contact.
   const compact = !!data.signal;
   const [lead, restOfFrame] = compact ? firstSentence(data.frame) : [data.frame, ''];
+  // With the signal lamp, Strategy and Authority are already written out above, so the checks that
+  // are left are the two that are not: the Road and the sky.
+  const shownSteps = compact
+    ? data.steps.filter((t) => /^(Road|Sky) check/.test(t))
+    : data.steps;
+  const checks = shownSteps.length ? shownSteps : data.steps;
   const steps = (
     <View style={styles.steps}>
-      <Text style={styles.stepsLabel}>YOUR FOUR CHECKS</Text>
-      {data.steps.map((s, i) => (
+      <Text style={styles.stepsLabel}>{checks.length === 2 ? 'YOUR TWO CHECKS' : 'YOUR FOUR CHECKS'}</Text>
+      {checks.map((s, i) => (
         <View key={s} style={styles.stepRow}>
           <Text style={styles.stepNum}>{i + 1}</Text>
           <Text style={[styles.body, styles.stepText]}>{s}</Text>

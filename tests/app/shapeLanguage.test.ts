@@ -194,6 +194,7 @@ test('Today is condensed: frame before the Road strip, one sky card, collapsed d
   const card = read('mobile/src/components/TriadTodayCard.tsx');
   assert.match(card, /<Disclosure label="How to use today">/);
   assert.match(card, /firstSentence\(data\.frame\)/);
+  assert.match(card, /Road\|Sky\) check/, 'with the lamp, only the Road and sky checks are listed');
   const sky = read('mobile/src/components/SkyTodayCard.tsx');
   assert.match(sky, /<Disclosure label="More about the Moon">/);
   const day = read('mobile/src/components/DayNumerologyCard.tsx');
