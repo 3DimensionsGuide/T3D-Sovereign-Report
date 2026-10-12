@@ -7,6 +7,7 @@ import type {
   ChallengeCard, HiddenPassionContent, LifePathContent, NameNumberContent, NumerologyDetail, PinnacleCard,
 } from '@/lib/numerologyTypes';
 import { RoadPath } from '@/components/readings/RoadPath';
+import { NameColumns } from '@/components/readings/NameColumns';
 import { useNumerology } from '@/lib/useNumerology';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, space } from '@/theme/tokens';
@@ -170,6 +171,13 @@ function NumerologyBody({ data }: { data: NumerologyDetail }) {
           </Accordion>
         ) : null}
         <Footnote text={data.nameNote} />
+
+        {data.nameColumns && data.nameColumns.length === 9 ? (
+          <>
+            <SectionTitle eyebrow="WHERE THE NUMBERS COME FROM" title="Your name in nine columns" note="Every letter of your full birth name sits under its number, 1 to 9. The tallest column is your Hidden Passion and an empty column is a Karmic Lesson." />
+            <NameColumns columns={data.nameColumns} />
+          </>
+        ) : null}
 
         <SectionTitle eyebrow="UNDER THE SURFACE" title="Hidden Passion" note={data.hiddenPassion.mechanism} />
         {data.hiddenPassion.content ? (

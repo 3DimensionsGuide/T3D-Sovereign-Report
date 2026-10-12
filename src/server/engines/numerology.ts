@@ -262,6 +262,36 @@ function calculateKarmicLessons(
   return lessons;
 }
 
+/**
+ * The full birth name laid out in nine columns, one per Pythagorean number (1-9).
+ * Every letter goes under its number, in name order, repeats included. The column with the most
+ * letters is the Hidden Passion (the lowest number wins a tie); an empty column is a Karmic Lesson.
+ */
+export interface NameColumn {
+  number: number;
+  letters: string[];
+  count: number;
+}
+
+function calculateNameColumns(
+  firstName: string,
+  middleName: string | undefined,
+  lastName: string,
+): NameColumn[] {
+  const columns: NameColumn[] = Array.from({ length: 9 }, (_, i) => ({ number: i + 1, letters: [], count: 0 }));
+  for (const word of parseNameWords(firstName, middleName, lastName)) {
+    for (const char of word) {
+      const val = letterValue(char);
+      if (val >= 1 && val <= 9) {
+        const col = columns[val - 1]!;
+        col.letters.push(char.toUpperCase());
+        col.count += 1;
+      }
+    }
+  }
+  return columns;
+}
+
 // ─── PINNACLES & CHALLENGES ───────────────────────────────────────────────────
 
 /**
@@ -401,4 +431,5 @@ export {
   calculateSoulUrge,
   calculateHiddenPassion,
   calculateKarmicLessons,
+  calculateNameColumns,
 };

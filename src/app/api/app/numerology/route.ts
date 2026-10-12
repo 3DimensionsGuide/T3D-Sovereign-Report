@@ -18,6 +18,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import type { NumerologyCycle, NumerologyResult } from '@/server/engines/types';
+import { calculateNameColumns } from '@/server/engines/numerology';
 import { computeAttitude, computeBirthday, computeLifePath } from '@/lib/report/schema/normalize';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 import {
@@ -211,6 +212,8 @@ export async function POST(request: Request): Promise<NextResponse> {
         content: HIDDEN_PASSION_CONTENT[num.hiddenPassion] ?? null,
       },
       karmicLessons: { mechanism: KARMIC_LESSONS_MECHANISM, items: karmic },
+      // The same letters the numbers above are read from, laid out under 1 to 9.
+      nameColumns: calculateNameColumns(lead.firstName, lead.middleName ?? undefined, lead.lastName),
       pinnacles,
       challenges,
       interplay: getPinnacleChallengeInteraction(

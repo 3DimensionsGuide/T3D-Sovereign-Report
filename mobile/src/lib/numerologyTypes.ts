@@ -58,6 +58,12 @@ export interface ChallengeCard extends PhaseCard {
   key: string | null;
 }
 
+export interface NameColumn {
+  number: number;
+  letters: string[];
+  count: number;
+}
+
 export interface NumerologyDetail {
   locked: boolean;
   lifePath: { display: string; number: number; content: LifePathContent | null };
@@ -71,6 +77,8 @@ export interface NumerologyDetail {
   };
   hiddenPassion: { mechanism: string; number: number; content: HiddenPassionContent | null };
   karmicLessons: { mechanism: string; items: KarmicItem[] };
+  /** Optional: copies saved before this was added do not have it. */
+  nameColumns?: NameColumn[];
   pinnacles: PinnacleCard[];
   challenges: ChallengeCard[];
   interplay: string;
