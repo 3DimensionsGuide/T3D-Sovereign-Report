@@ -7,11 +7,11 @@ import { buildBodygraphScene } from '@/charts/bodygraph';
 import { CENTER_SHAPES } from '@/charts/bodygraphLayout';
 import { centerFocusInfo, centerLabel, focusSentence } from '@/lib/bodygraphFocus';
 import { chartColors } from '@/charts/palette';
-import type { BodygraphData, WheelAspect, WheelBody, WheelChart } from '@/charts/chartTypes';
-import { ASPECT_NAMES, ASPECT_SYMBOLS, BODY_GLYPHS, BODY_NAMES, buildWheelScene, sameFocus, type WheelFocus } from '@/charts/wheel';
+import type { BodygraphData, WheelAspect, WheelBody, WheelChart, WheelPoint } from '@/charts/chartTypes';
+import { ASPECT_NAMES, ASPECT_SYMBOLS, BODY_GLYPHS, BODY_NAMES, buildWheelScene, sameContact, sameFocus, type WheelFocus } from '@/charts/wheel';
 import { Segmented } from '@/components/Segmented';
 import type { SkyPosition } from '@/lib/api';
-import { nowPlanets, nowRows, zodiacShift } from '@/lib/wheelNow';
+import { nowContacts, nowPlanets, nowRows, zodiacShift } from '@/lib/wheelNow';
 import { SceneView } from '@/components/SceneView';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -74,7 +74,10 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
     [nowOn, sky, zodiac, tropical, sidereal],
   );
   const todayRows = useMemo(() => (today ? nowRows(chart, today) : []), [today, chart]);
-  const scene = useMemo(() => buildWheelScene(chart, focus, today), [chart, focus, today]);
+  const todayContacts = useMemo(() => (today ? nowContacts(chart, today) : []), [today, chart]);
+  const [nowFocus, setNowFocus] = useState<{ transit: WheelBody; natal: WheelPoint } | null>(null);
+  const scene = useMemo(() => buildWheelScene(chart, focus, today, todayContacts, nowFocus), [chart, focus, today, todayContacts, nowFocus]);
+  const litContact = nowFocus ? todayContacts.find((c) => sameContact(nowFocus, c)) ?? null : null;
   const focused = focus ? chart.aspects.find((a) => sameFocus(focus, a)) ?? null : null;
   const { open } = useExplain();
   const [figureWidth, setFigureWidth] = useState(0);
@@ -84,12 +87,12 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
   const label =
     `Natal wheel, ${zodiac} zodiac. ` +
     `Sun in ${sun?.formatted ?? 'unknown'}, Moon in ${moon?.formatted ?? 'unknown'}.` +
-    (today ? ' The outer ring shows where the planets are today.' : '');
+    (today ? ` The outer ring shows where the planets are today, with ${todayContacts.length} ${todayContacts.length === 1 ? 'line' : 'lines'} joining them to your chart.` : '');
 
   return (
     <View style={styles.panel}>
-      <Segmented options={ZODIAC_OPTIONS} value={zodiac} onChange={(z) => { setZodiac(z); setFocus(null); }} compact />
-      {sky ? <Segmented options={SKY_OPTIONS} value={skyMode} onChange={setSkyMode} compact /> : null}
+      <Segmented options={ZODIAC_OPTIONS} value={zodiac} onChange={(z) => { setZodiac(z); setFocus(null); setNowFocus(null); }} compact />
+      {sky ? <Segmented options={SKY_OPTIONS} value={skyMode} onChange={(m) => { setSkyMode(m); setNowFocus(null); }} compact /> : null}
       <View style={styles.figure} onLayout={(e) => setFigureWidth(e.nativeEvent.layout.width)}>
         <SceneView scene={scene} label={label} />
         {scale > 0 ? scene.hotspots?.map((h) => (
@@ -154,6 +157,39 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
           <Text style={styles.note}>
             The outer ring of crimson symbols is where the planets are right now. The inner wheel is your birth chart. The house is the part of your life each one is moving through today.
           </Text>
+          {todayContacts.length > 0 ? (
+            <>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroll}>
+                {todayContacts.map((ct) => {
+                  const on = sameContact(nowFocus, ct);
+                  return (
+                    <Pressable
+                      key={`${ct.transit}-${ct.natal}-${ct.aspect}`}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: on }}
+                      accessibilityLabel={`Today's ${BODY_NAMES[ct.transit]} ${ASPECT_NAMES[ct.aspect].toLowerCase()} your ${pointName(ct.natal)}. ${SIGNAL_LABEL[ASPECT_SIGNAL[ct.aspect]]}. ${on ? 'Showing on the wheel. Double tap to clear.' : 'Double tap to show on the wheel.'}`}
+                      onPress={() => setNowFocus(on ? null : { transit: ct.transit, natal: ct.natal })}
+                      style={[styles.aspectChip, on && styles.aspectChipOn]}
+                    >
+                      <SignalMarker kind={ASPECT_SIGNAL[ct.aspect]} size={14} />
+                      <Text style={styles.aspectChipText}>
+                        {BODY_GLYPHS[ct.transit]} {ASPECT_SYMBOLS[ct.aspect]} {pointGlyph(ct.natal)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+              <View accessibilityLiveRegion="polite">
+                <Text style={litContact ? styles.focusLine : styles.note}>
+                  {litContact
+                    ? `Today's ${BODY_NAMES[litContact.transit]} ${ASPECT_NAMES[litContact.aspect].toLowerCase()} your ${pointName(litContact.natal)} · ${SIGNAL_LABEL[ASPECT_SIGNAL[litContact.aspect]]} · ${litContact.orb.toFixed(1)}°${litContact.peak ? ' · exact' : ''}`
+                    : 'Tap a contact to light its line. Each line joins a planet in today\'s sky to the part of your chart it touches. Closest first.'}
+                </Text>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.note}>No planet is in a close aspect to your chart today.</Text>
+          )}
           {todayRows.map((p) => (
             <View key={p.body} style={styles.row} accessible accessibilityLabel={`${BODY_NAMES[p.body]} today in ${p.formatted}${p.retrograde ? ', retrograde' : ''}, in your house ${p.house}`}>
               <Text style={styles.glyph}>{BODY_GLYPHS[p.body]}</Text>

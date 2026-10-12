@@ -118,10 +118,28 @@ export const CONNECTOR_MIN_DEGREES = 1.5;
 /** With today's sky on the outer ring, the birth wheel shrinks to this share of its size to make room. */
 export const NOW_SCALE = 0.84;
 
+/** One aspect between a planet in today's sky and a point of your birth chart. */
+export interface WheelNowContact {
+  transit: WheelBody;
+  natal: WheelPoint;
+  aspect: WheelAspect;
+  orb: number;
+  peak: boolean;
+}
+
+export const sameContact = (f: { transit: WheelBody; natal: WheelPoint } | null, c: { transit: WheelBody; natal: WheelPoint }): boolean =>
+  f !== null && f.transit === c.transit && f.natal === c.natal;
+
 /** One planet of today's sky, drawn in the outer ring. */
 export interface WheelNowPlanet { body: WheelBody; longitude: number; retrograde: boolean }
 
-export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = null, now: readonly WheelNowPlanet[] | null = null): Scene {
+export function buildWheelScene(
+  chart: WheelChart,
+  focus: WheelFocus | null = null,
+  now: readonly WheelNowPlanet[] | null = null,
+  contacts: readonly WheelNowContact[] = [],
+  nowFocus: { transit: WheelBody; natal: WheelPoint } | null = null,
+): Scene {
   const k = now ? NOW_SCALE : 1;
   const rOut = R_OUT * k;
   const rSignIn = R_SIGN_IN * k;
@@ -183,7 +201,7 @@ export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = nu
       prims.push({ k: 'circle', cx: x1, cy: y1, r: 4, fill: st.stroke, stroke: c.obsidian, w: 1 });
       prims.push({ k: 'circle', cx: x2, cy: y2, r: 4, fill: st.stroke, stroke: c.obsidian, w: 1 });
     } else {
-      prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w, dash: st.dash, op: asp.peak ? 0.95 : 0.65 });
+      prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w, dash: st.dash, op: (asp.peak ? 0.95 : 0.65) * (now ? 0.5 : 1) });
     }
   }
 
@@ -220,6 +238,24 @@ export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = nu
   label(asc + 180, 'DC');
   label(chart.midheaven, 'MC');
   label(chart.midheaven + 180, 'IC');
+
+  // Today's contacts: a line from each planet in today's sky, through the wheel, to the point of your chart it touches.
+  if (now && contacts.length) {
+    const nowLon = (b: WheelBody): number | null => now.find((p) => p.body === b)?.longitude ?? null;
+    for (const ct of [...contacts].sort((x, y) => Number(x.peak) - Number(y.peak))) {
+      const tl = nowLon(ct.transit);
+      const nl = positionOf(ct.natal);
+      if (tl == null || nl == null) continue;
+      const [x1, y1] = polar(tl, asc, rOut);
+      const [x2, y2] = polar(nl, asc, rAspect);
+      const st = aspectStyle(ct.aspect, ct.peak);
+      const dim = nowFocus !== null && !sameContact(nowFocus, ct);
+      const lit = nowFocus !== null && sameContact(nowFocus, ct);
+      prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: lit ? st.w + 1.8 : st.w + 0.4, dash: st.dash, op: dim ? 0.12 : 1 });
+      // A crimson dot where the line meets your chart; the line's own style says which aspect it is.
+      prims.push({ k: 'circle', cx: x2, cy: y2, r: lit ? 4.5 : 3, fill: c.stoplight, stroke: c.obsidian, w: 1, op: dim ? 0.25 : 1 });
+    }
+  }
 
   // Today's sky: an outer ring of glyphs in the Stoplight's crimson, ticked onto the sign ring.
   if (now && now.length) {
