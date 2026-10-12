@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { select } from '@/lib/haptics';
 import type { DayNumberMeaning, DayNumerology } from '@/lib/dayNumerologyTypes';
 import { Term } from '@/components/Explain';
+import { PersonalDial } from '@/components/PersonalDial';
+import { RollingNumber } from '@/components/RollingNumber';
 import { numberId } from '@/lib/termIds';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -80,15 +82,19 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
         style={({ pressed }) => [styles.summary, pressed && { opacity: 0.8 }]}
       >
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>{numberText(p)}</Text>
+          <RollingNumber value={numberText(p)} style={styles.badgeText} />
         </View>
         <View style={styles.flex}>
           <Text style={styles.eyebrow}>PERSONAL DAY</Text>
           <Text style={styles.label}>{p.label}</Text>
-          <Text style={styles.caption}>{`Year ${data.personalYear} · Month ${data.personalMonth}`}</Text>
         </View>
         <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
       </Pressable>
+      <View style={styles.dials}>
+        <PersonalDial kind="Year" number={data.personalYear} text={String(data.personalYear)} />
+        <PersonalDial kind="Month" number={data.personalMonth} text={String(data.personalMonth)} />
+        <PersonalDial kind="Day" number={p.number} text={numberText(p)} />
+      </View>
       {open ? (
         <>
           <DayBlock kind="YOURS" meaning={p} bare />
@@ -113,6 +119,7 @@ const styles = StyleSheet.create({
     padding: space.lg, gap: 14,
   },
   summary: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 56 },
+  dials: { flexDirection: 'row', justifyContent: 'space-between', gap: space.sm },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 24, lineHeight: 26, color: colors.gold },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   block: { gap: 10 },
