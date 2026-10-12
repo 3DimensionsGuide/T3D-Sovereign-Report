@@ -1,10 +1,12 @@
 import { yearRangeLabel } from '@/lib/teaser';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { splitCurrentMonth } from '@/lib/timelineMonths';
 import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { Screen } from '@/components/Screen';
+import { TimelinePinBar } from '@/components/TimelinePinBar';
+import { pinnedMonthAt, showJumpToday, type PinSection } from '@/lib/timelinePin';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { Segmented } from '@/components/Segmented';
@@ -237,6 +239,35 @@ export default function Timeline() {
   const [showMore, setShowMore] = useState(false);
   const [openMonths, setOpenMonths] = useState<string[]>([]);
 
+  // Where each month's block sits on the page, so a pinned bar can name the month being read.
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionBox = useRef(new Map<string, { y: number; h: number; more: boolean }>());
+  const moreY = useRef(0);
+  const [pinMonth, setPinMonth] = useState<string | null>(null);
+  const [jumpVisible, setJumpVisible] = useState(false);
+  const onSectionLayout = (key: string, more: boolean) => (e: LayoutChangeEvent) => {
+    sectionBox.current.set(key, { y: e.nativeEvent.layout.y, h: e.nativeEvent.layout.height, more });
+  };
+  const absSections = (): PinSection[] =>
+    [...sectionBox.current.entries()]
+      .map(([key, b]) => ({ key, top: b.y + (b.more ? moreY.current : 0), headHeight: 56, bottom: b.y + (b.more ? moreY.current : 0) + b.h }))
+      .sort((a, b) => a.top - b.top);
+  const listTop = (): number | null => {
+    const b = sectionBox.current.get('now');
+    return b ? b.y : null;
+  };
+  const onScrollY = useCallback((y: number) => {
+    const key = pinnedMonthAt(absSections(), y);
+    setPinMonth((prev) => (prev === key ? prev : key));
+    const jump = showJumpToday(y, listTop());
+    setJumpVisible((prev) => (prev === jump ? prev : jump));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const jumpToday = () => {
+    const top = listTop();
+    if (top !== null) scrollRef.current?.scrollTo({ y: Math.max(0, top - space.md), animated: true });
+  };
+
   const groups = useMemo(() => {
     if (!data) return [];
     const kinds = FILTER_KINDS[filter];
@@ -258,6 +289,8 @@ export default function Timeline() {
     const name = d.toLocaleDateString(undefined, { month: 'long' });
     return d.getFullYear() === thisYear ? name : `${name} ${d.getFullYear()}`;
   };
+  const nowMonthKey = localKey(new Date()).slice(0, 7);
+  const dayCount = (key: string) => groups.filter(([d]) => d.startsWith(key)).length;
   const laterDays = split.later.length;
   const visibleGroups = split.now;
   const toggleMonth = (key: string) => {
@@ -293,7 +326,21 @@ export default function Timeline() {
   );
 
   return (
-    <Screen refreshing={refreshing} onRefresh={refresh}>
+    <Screen
+      refreshing={refreshing}
+      onRefresh={refresh}
+      scrollRef={scrollRef}
+      onScrollY={onScrollY}
+      overlay={
+        lens !== 'road' && data && (pinMonth || jumpVisible) ? (
+          <TimelinePinBar
+            month={pinMonth ? monthTitle(pinMonth) : null}
+            detail={pinMonth ? `${dayCount(pinMonth)} ${dayCount(pinMonth) === 1 ? 'day' : 'days'} with events` : null}
+            onJumpToday={jumpVisible ? jumpToday : null}
+          />
+        ) : null
+      }
+    >
       <FadeIn>
         <View style={styles.header}>
           <LensLabel lens="road">The road ahead</LensLabel>
@@ -359,14 +406,22 @@ export default function Timeline() {
 
           {groups.length === 0 ? (
             <Text style={styles.sub}>Nothing in this filter over the next 60 days.</Text>
-          ) : visibleGroups.length === 0 ? (
-            <Text style={styles.sub}>Nothing in this filter for the rest of this month.</Text>
           ) : (
-            visibleGroups.map((g) => renderDay(g))
+            <View onLayout={onSectionLayout('now', false)} style={styles.monthBlock}>
+              <View style={styles.monthHead}>
+                <Text accessibilityRole="header" style={styles.monthName}>{monthTitle(nowMonthKey)}</Text>
+                <Text style={styles.monthCount}>From today</Text>
+              </View>
+              {visibleGroups.length === 0 ? (
+                <Text style={styles.sub}>Nothing in this filter for the rest of this month.</Text>
+              ) : (
+                visibleGroups.map((g) => renderDay(g))
+              )}
+            </View>
           )}
 
           {laterDays > 0 ? (
-            <View style={styles.moreWrap}>
+            <View style={styles.moreWrap} onLayout={(e) => { moreY.current = e.nativeEvent.layout.y; }}>
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ expanded: showMore }}
@@ -380,7 +435,7 @@ export default function Timeline() {
                     const open = openMonths.includes(key);
                     const days = split.later.filter(([d]) => d.startsWith(key));
                     return (
-                      <View key={key} style={styles.monthBlock}>
+                      <View key={key} style={styles.monthBlock} onLayout={onSectionLayout(key, true)}>
                         <Pressable
                           accessibilityRole="button"
                           accessibilityState={{ expanded: open }}
@@ -413,6 +468,7 @@ export default function Timeline() {
 const styles = StyleSheet.create({
   moreWrap: { gap: space.md },
   monthBlock: { gap: space.md },
+  monthHead: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md },
   monthBtn: {
     minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: space.sm,
     paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1,
