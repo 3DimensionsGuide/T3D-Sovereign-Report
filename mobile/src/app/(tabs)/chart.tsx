@@ -16,6 +16,7 @@ import { ReminderCard } from '@/components/ReminderCard';
 import { TriadCard } from '@/components/TriadCard';
 import { TriadPortrait } from '@/components/TriadPortrait';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
+import { useSkyNow } from '@/lib/useSkyNow';
 import { OfflineNote } from '@/components/OfflineNote';
 import { Segmented } from '@/components/Segmented';
 import { useChartData } from '@/lib/useChartData';
@@ -39,6 +40,7 @@ export default function Chart() {
     if (requestedView === 'bodygraph' || requestedView === 'wheel') setView(requestedView);
   }, [requestedView, requestedAt]);
   const drawing = useChartData(chart?.leadId, profile?.email.trim());
+  const skyNow = useSkyNow(chart?.leadId, profile?.email.trim());
 
   const openLens = (lens: LensName) => {
     router.push({ pathname: '/readings', params: { lens, t: String(Date.now()) } } as unknown as Href);
@@ -163,7 +165,7 @@ export default function Chart() {
           {drawing.offline && drawing.data ? <OfflineNote savedAt={drawing.savedAt} /> : null}
           {drawing.data ? (
             view === 'wheel' ? (
-              <WheelPanel tropical={drawing.data.tropical} sidereal={drawing.data.sidereal} />
+              <WheelPanel tropical={drawing.data.tropical} sidereal={drawing.data.sidereal} sky={skyNow.positions} />
             ) : (
               <BodygraphPanel hd={drawing.data.humanDesign} />
             )

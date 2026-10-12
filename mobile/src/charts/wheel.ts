@@ -115,36 +115,48 @@ const angleBetween = (x: number, y: number): number => {
 /** How far a glyph must be pushed from its true position before a thin line joins the two. */
 export const CONNECTOR_MIN_DEGREES = 1.5;
 
-export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = null): Scene {
+/** With today's sky on the outer ring, the birth wheel shrinks to this share of its size to make room. */
+export const NOW_SCALE = 0.84;
+
+/** One planet of today's sky, drawn in the outer ring. */
+export interface WheelNowPlanet { body: WheelBody; longitude: number; retrograde: boolean }
+
+export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = null, now: readonly WheelNowPlanet[] | null = null): Scene {
+  const k = now ? NOW_SCALE : 1;
+  const rOut = R_OUT * k;
+  const rSignIn = R_SIGN_IN * k;
+  const rHouseIn = R_HOUSE_IN * k;
+  const rPlanet = R_PLANET * k;
+  const rAspect = R_ASPECT * k;
   const prims: Prim[] = [];
   const hotspots: Hotspot[] = [];
   const asc = chart.ascendant;
 
   // Background disc
-  prims.push({ k: 'circle', cx: CX, cy: CY, r: R_OUT + 2, fill: c.charcoal });
+  prims.push({ k: 'circle', cx: CX, cy: CY, r: rOut + 2, fill: c.charcoal });
 
   // Sign ring (aligned to real longitudes) + whole-sign house ring.
   for (let s = 0; s < 12; s++) {
-    prims.push({ k: 'path', d: wedge(s * 30, (s + 1) * 30, asc, R_OUT, R_SIGN_IN), fill: ELEMENT_TINT[s % 4], op: 0.1, stroke: c.parchment, w: 0.8 });
-    const [gx, gy] = polar(s * 30 + 15, asc, (R_OUT + R_SIGN_IN) / 2);
+    prims.push({ k: 'path', d: wedge(s * 30, (s + 1) * 30, asc, rOut, rSignIn), fill: ELEMENT_TINT[s % 4], op: 0.1, stroke: c.parchment, w: 0.8 });
+    const [gx, gy] = polar(s * 30 + 15, asc, (rOut + rSignIn) / 2);
     prims.push({ k: 'text', x: gx, y: gy, s: SIGN_GLYPHS[s], size: 15, fill: c.parchment, font: 'symbol' });
-    prims.push({ k: 'path', d: wedge(s * 30, (s + 1) * 30, asc, R_SIGN_IN, R_HOUSE_IN), fill: c.amethyst, op: s % 2 ? 0.55 : 0.85, stroke: c.parchment, w: 0.6 });
+    prims.push({ k: 'path', d: wedge(s * 30, (s + 1) * 30, asc, rSignIn, rHouseIn), fill: c.amethyst, op: s % 2 ? 0.55 : 0.85, stroke: c.parchment, w: 0.6 });
   }
   // House numbers: house 1 is the sign containing the Ascendant.
   const ascSign = Math.floor(norm(asc) / 30);
   for (let h = 1; h <= 12; h++) {
     const s = (ascSign + h - 1) % 12;
-    const [hx, hy] = polar(s * 30 + 15, asc, (R_SIGN_IN + R_HOUSE_IN) / 2);
+    const [hx, hy] = polar(s * 30 + 15, asc, (rSignIn + rHouseIn) / 2);
     prims.push({ k: 'text', x: hx, y: hy, s: String(h), size: 9.5, fill: c.muted, font: 'body' });
   }
 
   // Inner aspect circle
-  prims.push({ k: 'circle', cx: CX, cy: CY, r: R_ASPECT, fill: c.obsidian, stroke: c.parchment, w: 0.8, op: 1 });
+  prims.push({ k: 'circle', cx: CX, cy: CY, r: rAspect, fill: c.obsidian, stroke: c.parchment, w: 0.8, op: 1 });
 
   // Axis lines (Ascendant–Descendant and MC–IC) just inside the ring.
   const axis = (lon: number, col: string) => {
-    const [x1, y1] = polar(lon, asc, R_HOUSE_IN);
-    const [x2, y2] = polar(lon + 180, asc, R_HOUSE_IN);
+    const [x1, y1] = polar(lon, asc, rHouseIn);
+    const [x2, y2] = polar(lon + 180, asc, rHouseIn);
     prims.push({ k: 'line', x1, y1, x2, y2, stroke: col, w: 0.9, op: 0.35, dash: '4 4' });
   };
   axis(asc, c.gold);
@@ -161,8 +173,8 @@ export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = nu
     const la = positionOf(asp.a);
     const lb = positionOf(asp.b);
     if (la == null || lb == null) continue;
-    const [x1, y1] = polar(la, asc, R_ASPECT);
-    const [x2, y2] = polar(lb, asc, R_ASPECT);
+    const [x1, y1] = polar(la, asc, rAspect);
+    const [x2, y2] = polar(lb, asc, rAspect);
     const st = aspectStyle(asp.aspect, asp.peak);
     if (focus && !sameFocus(focus, asp)) {
       prims.push({ k: 'line', x1, y1, x2, y2, stroke: st.stroke, w: st.w, dash: st.dash, op: 0.12 });
@@ -177,15 +189,15 @@ export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = nu
 
   // Planets: tick at the true longitude, glyph at a spread-out position.
   const lons = chart.planets.map((p) => p.longitude);
-  const spread = spreadAngles(lons, 12);
+  const spread = spreadAngles(lons, now ? 15 : 12);
   chart.planets.forEach((pl, i) => {
-    const [t1x, t1y] = polar(pl.longitude, asc, R_HOUSE_IN);
-    const [t2x, t2y] = polar(pl.longitude, asc, R_HOUSE_IN - 7);
+    const [t1x, t1y] = polar(pl.longitude, asc, rHouseIn);
+    const [t2x, t2y] = polar(pl.longitude, asc, rHouseIn - 7);
     prims.push({ k: 'line', x1: t1x, y1: t1y, x2: t2x, y2: t2y, stroke: c.gold, w: 1.4 });
-    const [gx, gy] = polar(spread[i], asc, R_PLANET);
+    const [gx, gy] = polar(spread[i], asc, rPlanet);
     if (angleBetween(pl.longitude, spread[i]) > CONNECTOR_MIN_DEGREES) {
       // The glyph was moved to make room: a thin line joins it back to its true position.
-      const [cx1, cy1] = polar(spread[i], asc, R_PLANET + 11);
+      const [cx1, cy1] = polar(spread[i], asc, rPlanet + 11);
       prims.push({ k: 'line', x1: t2x, y1: t2y, x2: cx1, y2: cy1, stroke: c.gold, w: 0.9, op: 0.7 });
     }
     if (focus && (focus.a === pl.body || focus.b === pl.body)) {
@@ -194,20 +206,42 @@ export function buildWheelScene(chart: WheelChart, focus: WheelFocus | null = nu
     hotspots.push({ x: gx, y: gy, key: pl.body, label: `${BODY_NAMES[pl.body]} in ${pl.formatted}` });
     prims.push({ k: 'text', x: gx, y: gy, s: BODY_GLYPHS[pl.body] + TEXT_STYLE, size: 19, fill: c.parchment, font: 'symbol' });
     if (pl.retrograde) {
-      const [rx, ry] = polar(spread[i], asc, R_PLANET - 13);
+      const [rx, ry] = polar(spread[i], asc, rPlanet - 13);
       prims.push({ k: 'text', x: rx, y: ry, s: 'R', size: 7, fill: c.friction, font: 'bold' });
     }
   });
 
   // Ascendant / Midheaven labels outside the ring.
   const label = (lon: number, s: string) => {
-    const [x, y] = polar(lon, asc, R_OUT + 12);
+    const [x, y] = polar(lon, asc, rOut + (now ? 8 : 12));
     prims.push({ k: 'text', x, y, s, size: 9, fill: c.gold, font: 'bold' });
   };
   label(asc, 'AC');
   label(asc + 180, 'DC');
   label(chart.midheaven, 'MC');
   label(chart.midheaven + 180, 'IC');
+
+  // Today's sky: an outer ring of glyphs in the Stoplight's crimson, ticked onto the sign ring.
+  if (now && now.length) {
+    const rNow = rOut + 26;
+    prims.push({ k: 'circle', cx: CX, cy: CY, r: rOut + 12, stroke: c.stoplight, w: 0.8, op: 0.5 });
+    const nowSpread = spreadAngles(now.map((p) => p.longitude), 14);
+    now.forEach((pl, i) => {
+      const [t1x, t1y] = polar(pl.longitude, asc, rOut);
+      const [t2x, t2y] = polar(pl.longitude, asc, rOut + 12);
+      prims.push({ k: 'line', x1: t1x, y1: t1y, x2: t2x, y2: t2y, stroke: c.stoplight, w: 1.4 });
+      const [gx, gy] = polar(nowSpread[i], asc, rNow);
+      if (angleBetween(pl.longitude, nowSpread[i]) > CONNECTOR_MIN_DEGREES) {
+        const [cx1, cy1] = polar(nowSpread[i], asc, rNow - 10);
+        prims.push({ k: 'line', x1: t2x, y1: t2y, x2: cx1, y2: cy1, stroke: c.stoplight, w: 0.9, op: 0.7 });
+      }
+      prims.push({ k: 'text', x: gx, y: gy, s: BODY_GLYPHS[pl.body] + TEXT_STYLE, size: 17, fill: c.stoplight, font: 'symbol' });
+      if (pl.retrograde) {
+        const [rx, ry] = polar(nowSpread[i], asc, rNow + 12);
+        prims.push({ k: 'text', x: rx, y: ry, s: 'R', size: 7, fill: c.friction, font: 'bold' });
+      }
+    });
+  }
 
   return { w: WHEEL_SIZE, h: WHEEL_SIZE, prims, hotspots };
 }

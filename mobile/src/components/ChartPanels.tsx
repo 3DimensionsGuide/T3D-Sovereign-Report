@@ -10,6 +10,8 @@ import { chartColors } from '@/charts/palette';
 import type { BodygraphData, WheelAspect, WheelBody, WheelChart } from '@/charts/chartTypes';
 import { ASPECT_NAMES, ASPECT_SYMBOLS, BODY_GLYPHS, BODY_NAMES, buildWheelScene, sameFocus, type WheelFocus } from '@/charts/wheel';
 import { Segmented } from '@/components/Segmented';
+import type { SkyPosition } from '@/lib/api';
+import { nowPlanets, nowRows, zodiacShift } from '@/lib/wheelNow';
 import { SceneView } from '@/components/SceneView';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -55,11 +57,24 @@ const ZODIAC_OPTIONS = [
   { value: 'sidereal', label: 'Sidereal' },
 ] as const;
 
-export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sidereal: WheelChart }) {
+const SKY_OPTIONS = [
+  { value: 'birth', label: 'Birth sky' },
+  { value: 'now', label: 'Birth + today' },
+] as const;
+
+export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: WheelChart; sidereal: WheelChart; sky?: SkyPosition[] | null }) {
   const [zodiac, setZodiac] = useState<'tropical' | 'sidereal'>('tropical');
   const chart = zodiac === 'tropical' ? tropical : sidereal;
   const [focus, setFocus] = useState<WheelFocus | null>(null);
-  const scene = useMemo(() => buildWheelScene(chart, focus), [chart, focus]);
+  const [skyMode, setSkyMode] = useState<'birth' | 'now'>('birth');
+  const nowOn = sky !== null && skyMode === 'now';
+  // Today's planets, shifted into the zodiac being shown.
+  const today = useMemo(
+    () => (nowOn && sky ? nowPlanets(sky, zodiac === 'sidereal' ? zodiacShift(tropical, sidereal) : 0) : null),
+    [nowOn, sky, zodiac, tropical, sidereal],
+  );
+  const todayRows = useMemo(() => (today ? nowRows(chart, today) : []), [today, chart]);
+  const scene = useMemo(() => buildWheelScene(chart, focus, today), [chart, focus, today]);
   const focused = focus ? chart.aspects.find((a) => sameFocus(focus, a)) ?? null : null;
   const { open } = useExplain();
   const [figureWidth, setFigureWidth] = useState(0);
@@ -68,11 +83,13 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
   const moon = chart.planets.find((p) => p.body === 'moon');
   const label =
     `Natal wheel, ${zodiac} zodiac. ` +
-    `Sun in ${sun?.formatted ?? 'unknown'}, Moon in ${moon?.formatted ?? 'unknown'}.`;
+    `Sun in ${sun?.formatted ?? 'unknown'}, Moon in ${moon?.formatted ?? 'unknown'}.` +
+    (today ? ' The outer ring shows where the planets are today.' : '');
 
   return (
     <View style={styles.panel}>
       <Segmented options={ZODIAC_OPTIONS} value={zodiac} onChange={(z) => { setZodiac(z); setFocus(null); }} compact />
+      {sky ? <Segmented options={SKY_OPTIONS} value={skyMode} onChange={setSkyMode} compact /> : null}
       <View style={styles.figure} onLayout={(e) => setFigureWidth(e.nativeEvent.layout.width)}>
         <SceneView scene={scene} label={label} />
         {scale > 0 ? scene.hotspots?.map((h) => (
@@ -131,6 +148,21 @@ export function WheelPanel({ tropical, sidereal }: { tropical: WheelChart; sider
       <Text style={styles.note}>
         Whole-sign houses, counted from your rising sign. Thicker lines are within 1° of exact. Aspects are the same in both zodiacs, because the sidereal zodiac moves every point by the same amount. Only the signs and houses change.
       </Text>
+
+      {today ? (
+        <Section title="The sky today" lens="stoplight">
+          <Text style={styles.note}>
+            The outer ring of crimson symbols is where the planets are right now. The inner wheel is your birth chart. The house is the part of your life each one is moving through today.
+          </Text>
+          {todayRows.map((p) => (
+            <View key={p.body} style={styles.row} accessible accessibilityLabel={`${BODY_NAMES[p.body]} today in ${p.formatted}${p.retrograde ? ', retrograde' : ''}, in your house ${p.house}`}>
+              <Text style={styles.glyph}>{BODY_GLYPHS[p.body]}</Text>
+              <Text style={styles.rowName}>{BODY_NAMES[p.body]}</Text>
+              <Text style={styles.rowValue}>{p.formatted}{p.retrograde ? ' ℞' : ''} · House {p.house}</Text>
+            </View>
+          ))}
+        </Section>
+      ) : null}
 
       <Section title="Planets and points" lens="stoplight">
         {chart.planets.map((p) => (

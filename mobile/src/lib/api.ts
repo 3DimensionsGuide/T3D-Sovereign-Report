@@ -191,6 +191,13 @@ export interface DailyTransitHit {
   natalLongitude?: number;
 }
 
+/** Where one body is in the sky today (tropical, 0–360). Missing from older servers. */
+export interface SkyPosition {
+  body: SkyBody;
+  longitude: number;
+  retrograde: boolean;
+}
+
 export interface TodayResult {
   asOf: string;
   moon: {
@@ -206,6 +213,8 @@ export interface TodayResult {
   sun: { sign: string; formatted: string; house: number };
   retrograde: SkyBody[];
   transits: DailyTransitHit[];
+  /** Every body's place in the sky, for drawing today's sky on the wheel. Missing when the server is older than the app. */
+  positions?: SkyPosition[];
   /** The gate and line the Sun and Moon are in. Missing when the server is older than the app. */
   gates?: { sun: { gate: number; line: number }; moon: { gate: number; line: number } };
   vehicle: { type: string | null; strategy: string | null; authority: string | null };

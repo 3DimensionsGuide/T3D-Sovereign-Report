@@ -99,6 +99,13 @@ export interface MoonReading {
   lastSeparating: MoonAspectContact | null;
 }
 
+/** Where one body is in the sky (tropical, 0–360). Drawing only: the app puts today's planets on the wheel. */
+export interface SkyPosition {
+  body: SkyBody;
+  longitude: number;
+  retrograde: boolean;
+}
+
 export interface DailySkyResult {
   /** ISO timestamp the sky was calculated for. */
   asOf: string;
@@ -108,6 +115,8 @@ export interface DailySkyResult {
   retrograde: SkyBody[];
   /** Tightest-orb first. */
   transits: DailyTransitHit[];
+  /** Every body's place in the sky right now, for drawing the sky on the wheel. */
+  positions: SkyPosition[];
   /**
    * The Sun's and Moon's tropical longitudes right now. SERVER ONLY: used to find their Human Design
    * gates for the Signal, and removed before any result leaves the server.
@@ -183,6 +192,10 @@ const BODY_IDS: Record<SkyBody, number> = {
 const DAILY_DRIVERS: readonly SkyBody[] = ['moon', 'sun', 'mercury', 'venus', 'mars'];
 /** Outer planets count only on an exact (peak) alignment. */
 const OUTER_BODIES: readonly SkyBody[] = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+/** The order bodies are listed in when drawn: the luminaries, the personal planets, then the slow ones. */
+const SKY_ORDER: readonly SkyBody[] = [
+  'sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto',
+];
 const RETROGRADE_CHECKED: readonly SkyBody[] = [
   'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto',
 ];
@@ -394,6 +407,12 @@ export function calculateDailySky(natal: NatalSkyPoints, at: Date = new Date()):
     },
     retrograde: RETROGRADE_CHECKED.filter((body) => sky[body].retrograde),
     transits: hits.slice(0, MAX_TRANSITS_RETURNED),
+    positions: SKY_ORDER.map((body) => ({
+      body,
+      // Two decimals is far finer than a wheel can show.
+      longitude: Math.round(sky[body].longitude * 100) / 100,
+      retrograde: sky[body].retrograde,
+    })),
     skyLongitudes: { sun: sky.sun.longitude, moon: sky.moon.longitude },
   };
 }
