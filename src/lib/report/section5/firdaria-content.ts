@@ -26,7 +26,7 @@ export const FIRDARIA_ANALYSIS: Record<FirdariaPlanet, FirdariaAnalysis> = {
   Venus: {
     quote: 'A decade ruled by Venus — the planet of relationship, beauty, and aesthetic intelligence.',
     paragraphs: [
-      'Venus governs a decade oriented around harmony, attraction, and the quality of your close relationships. Partnerships — romantic, creative, and professional — carry unusual weight, and what you build during this period tends to be judged by how well it holds together, not just how well it performs.',
+      'Venus governs a period oriented around harmony, attraction, and the quality of your close relationships. Partnerships — romantic, creative, and professional — carry unusual weight, and what you build during this period tends to be judged by how well it holds together, not just how well it performs.',
       'This is fertile ground for anything that depends on taste, collaboration, or genuine rapport. The corresponding risk is conflict avoidance — smoothing over real disagreement to preserve harmony costs more here than it would in another period.',
     ],
     watchFor: 'Watch for accommodating past the point of honesty — Venus periods can make peace feel more urgent than truth.',
@@ -34,39 +34,39 @@ export const FIRDARIA_ANALYSIS: Record<FirdariaPlanet, FirdariaAnalysis> = {
   Mercury: {
     quote: 'A decade ruled by Mercury — the planet of analysis, exchange, and information.',
     paragraphs: [
-      'Mercury governs a decade built around analysis, exchange, and the gathering of information. Ideas move faster here, and the ability to synthesize, write, teach, or negotiate becomes unusually load-bearing.',
-      'Whatever your Vehicle already does well with communication, this decade asks you to do more of it, more visibly. The corresponding risk is staying in analysis past the point of usefulness.',
+      'Mercury governs a period built around analysis, exchange, and the gathering of information. Ideas move faster here, and the ability to synthesize, write, teach, or negotiate becomes unusually load-bearing.',
+      'Whatever your Vehicle already does well with communication, this period asks you to do more of it, more visibly. The corresponding risk is staying in analysis past the point of usefulness.',
     ],
     watchFor: 'Watch for research replacing action — Mercury periods reward synthesis, not permanent deliberation.',
   },
   Moon: {
     quote: 'A decade ruled by the Moon — the planet of memory, rhythm, and emotional response.',
     paragraphs: [
-      'The Moon governs a decade built around receptivity, rhythm, and emotional memory rather than initiation. This period rewards presence — noticing what recurs, what nourishes, and what depletes — over forcing new ground.',
-      'Home, daily routine, and the people you’re closest to tend to move to the foreground. What gets built here is rarely dramatic; it’s cumulative — the decade’s real output shows up as consistency, not as a single visible milestone.',
+      'The Moon governs a period built around receptivity, rhythm, and emotional memory rather than initiation. This period rewards presence — noticing what recurs, what nourishes, and what depletes — over forcing new ground.',
+      'Home, daily routine, and the people you’re closest to tend to move to the foreground. What gets built here is rarely dramatic; it’s cumulative — the period’s real output shows up as consistency, not as a single visible milestone.',
     ],
     watchFor: 'Watch for mood mistaken for signal — a Moon period generates more raw emotional material than usual, so the gap between a genuine response and a passing feeling matters more than ever.',
   },
   Saturn: {
     quote: 'A decade ruled by Saturn — the planet of structure, mastery, and long consolidation.',
     paragraphs: [
-      'Saturn governs a decade built around discipline, patience, and the slow accumulation of real competence. Progress here is rarely fast and rarely glamorous — but what gets built during a Saturn period tends to be the most durable output of your entire life.',
-      'This is not a decade to force quick wins. Saturn periods reward showing up consistently for something that won’t pay off for years, and they’re unusually good at revealing which commitments were real and which were convenient.',
+      'Saturn governs a period built around discipline, patience, and the slow accumulation of real competence. Progress here is rarely fast and rarely glamorous — but what gets built during a Saturn period tends to be the most durable output of your entire life.',
+      'This is not a period to force quick wins. Saturn periods reward showing up consistently for something that won’t pay off for years, and they’re unusually good at revealing which commitments were real and which were convenient.',
     ],
     watchFor: 'Watch for mistaking restriction for failure — a Saturn period’s slowness is structural, not a sign that something is wrong.',
   },
   Jupiter: {
     quote: 'A decade ruled by Jupiter — the planet of expansion, opportunity, and growth.',
     paragraphs: [
-      'Jupiter governs a decade built around genuine expansion — more opportunity, more reach, and more room to grow than the periods around it. Doors that were closed tend to open, often through people, travel, or education.',
-      'The risk that comes with Jupiter is overextension — saying yes to every opportunity simply because it appeared. The decade rewards growth with direction, not growth for its own sake.',
+      'Jupiter governs a period built around genuine expansion — more opportunity, more reach, and more room to grow than the periods around it. Doors that were closed tend to open, often through people, travel, or education.',
+      'The risk that comes with Jupiter is overextension — saying yes to every opportunity simply because it appeared. The period rewards growth with direction, not growth for its own sake.',
     ],
     watchFor: 'Watch for scope creep — Jupiter periods make everything look like an opportunity worth pursuing.',
   },
   Mars: {
     quote: 'A decade ruled by Mars — the planet of initiative, drive, and direct action.',
     paragraphs: [
-      'Mars governs a decade built around momentum and direct action. Energy runs higher, patience runs shorter, and the capacity to simply start — before every condition is perfect — becomes the decade’s defining skill.',
+      'Mars governs a period built around momentum and direct action. Energy runs higher, patience runs shorter, and the capacity to simply start — before every condition is perfect — becomes this period’s defining skill.',
       'Used well, this is one of the most productive periods in the whole cycle. Used poorly, it produces conflict for its own sake, or burnout from sustained intensity with no recovery built in.',
     ],
     watchFor: 'Watch for urgency mistaken for necessity — not everything that feels like it must happen now actually does.',

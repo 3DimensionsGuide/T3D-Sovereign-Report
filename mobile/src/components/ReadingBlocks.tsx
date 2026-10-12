@@ -1,4 +1,5 @@
 import { teaser } from '@/lib/teaser';
+import { readMoreSplit } from '@/lib/readMore';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode, type RefObject } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LENS_COLOR, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
@@ -144,7 +145,27 @@ export function SectionTitle({ eyebrow, title, note }: { eyebrow: string; title:
         <Text style={[styles.eyebrow, { color: LENS_TEXT[lens] }]}>{sentence(eyebrow)}</Text>
       </View>
       <Text accessibilityRole="header" style={styles.sectionTitle}>{title}</Text>
-      {note ? <Text style={styles.sub}>{note}</Text> : null}
+      {note ? <ReadMoreNote text={note} /> : null}
+    </View>
+  );
+}
+
+/** A section intro: the opening sentences, with "Read more" for the rest of a long one. */
+function ReadMoreNote({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const { short, rest } = readMoreSplit(text);
+  if (!rest) return <Text style={styles.sub}>{text}</Text>;
+  return (
+    <View>
+      <Text style={styles.sub}>{open ? text : short}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: open }}
+        onPress={() => setOpen((o) => !o)}
+        style={({ pressed }) => [styles.readMore, pressed && styles.pressed]}
+      >
+        <Text style={styles.readMoreText}>{open ? 'Show less' : 'Read more'}</Text>
+      </Pressable>
     </View>
   );
 }
@@ -169,7 +190,7 @@ export function Accordion({
   accent, badge, title, subtitle, defaultOpen = false, now = false, children,
 }: {
   accent: string;
-  badge: string;
+  badge: ReactNode;
   title: string;
   subtitle?: string | null;
   defaultOpen?: boolean;
@@ -187,9 +208,13 @@ export function Accordion({
         style={({ pressed }) => [styles.cardHead, pressed && styles.pressed]}
       >
         <View style={[styles.badge, { borderColor: accent }]}>
-          <Text style={styles.badgeText} numberOfLines={1} adjustsFontSizeToFit>
-            {badge}
-          </Text>
+          {typeof badge === 'string' ? (
+            <Text style={styles.badgeText} numberOfLines={1} adjustsFontSizeToFit>
+              {badge}
+            </Text>
+          ) : (
+            badge
+          )}
         </View>
         <View style={styles.headText}>
           {now ? <Text style={styles.nowTag}>Active now</Text> : null}
@@ -250,6 +275,8 @@ const styles = StyleSheet.create({
   contentsChip: { minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: colors.charcoal },
   contentsChipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
+  readMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
+  readMoreText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
   sectionHead: { gap: 6, marginTop: space.lg },

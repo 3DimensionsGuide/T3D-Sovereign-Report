@@ -142,7 +142,7 @@ export default function Page31cActivatedYear({ data }: Props) {
   const pyTheme = PERSONAL_YEAR_THEMES[data.personalYear] ?? PERSONAL_YEAR_THEMES[1]!;
 
   const convergeBody = converges
-    ? `Your Firdaria Time Lord and this year's Profection Lord are the same planet. This convergence happens roughly once every seven years — when it lands, the ruling planet's themes carry double weight for the year, not just the decade. Read your Time Lord page (previous) as the terrain; read this page as the current weather inside it.`
+    ? `Your Firdaria Time Lord and this year's Profection Lord are the same planet. This convergence happens roughly once every seven years — when it lands, the ruling planet's themes carry double weight for the year, not just the period. Read your Time Lord page (previous) as the terrain; read this page as the current weather inside it.`
     : `${firdaria.current.planet} sets the multi-year terrain (ages ${firdaria.current.startAge}–${firdaria.current.endAge}), while ${profection.lord} rules this specific year via Annual Profection — House ${profection.house}, ${profection.sign}. When the two differ, treat the Major Time Lord as the long chapter and the Lord of the Year as this year's specific weather inside it — not a contradiction, just two resolutions of the same clock.`;
 
   const crossBody = pinnacleTheme

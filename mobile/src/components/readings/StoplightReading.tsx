@@ -8,6 +8,8 @@ import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, Stoplig
 import { ElementBalance, StoplightCompare } from '@/components/readings/StoplightCompare';
 import { TimeLordBar } from '@/components/readings/TimeLordBar';
 import { periodQuote } from '@/lib/timeLordBar';
+import { AspectIcon } from '@/components/AspectIcon';
+import { houseLabel, HOUSE_NAMES } from '@/lib/houseNames';
 import { useStoplight } from '@/lib/useStoplight';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -68,7 +70,7 @@ function NodesSection({ nodes }: { nodes: NodesReading }) {
       <Accordion
         badge="☊"
         title={`North Node in ${nodes.north.sign}`}
-        subtitle={`${nodes.north.formatted}${nodes.north.house ? ` · house ${nodes.north.house}` : ''}`}
+        subtitle={[nodes.north.formatted, houseLabel(nodes.north.house)].filter(Boolean).join(' · ')}
       >
         <Block label="THE DIRECTION OF GROWTH" text={nodes.growth} />
         {nodes.houseGrowth ? <Block label={`WHERE IT SHOWS UP (HOUSE ${nodes.north.house})`} text={nodes.houseGrowth} /> : null}
@@ -76,7 +78,7 @@ function NodesSection({ nodes }: { nodes: NodesReading }) {
       <Accordion
         badge="☋"
         title={`South Node in ${nodes.south.sign}`}
-        subtitle={`${nodes.south.formatted}${nodes.south.house ? ` · house ${nodes.south.house}` : ''}`}
+        subtitle={[nodes.south.formatted, houseLabel(nodes.south.house)].filter(Boolean).join(' · ')}
       >
         <Block label="WHAT FEELS FAMILIAR" text={nodes.familiar} />
         {nodes.houseFamiliar ? <Block label={`WHERE IT SHOWS UP (HOUSE ${nodes.south.house})`} text={nodes.houseFamiliar} /> : null}
@@ -95,7 +97,7 @@ function AspectsSection({ aspects }: { aspects: NatalAspects }) {
       {aspects.items.map((a) => (
         <Accordion
           key={a.line}
-          badge={a.tight ? '◎' : '○'}
+          badge={<AspectIcon feel={a.feel} />}
           title={a.line}
           subtitle={`${FEEL_WORD[a.feel] ?? a.feel} · ${a.orb.toFixed(1)}° from exact${a.tight ? ' · very tight' : ''}`}
         >
@@ -113,7 +115,7 @@ function PlanetCard({ p }: { p: StoplightPlanet }) {
     <Accordion
       badge={PLANET_GLYPH[p.key] ?? '●'}
       title={`${p.placement}${p.retrograde ? ' ℞' : ''}`}
-      subtitle={p.houseName && p.group !== 'outer' ? `${p.houseName} (house ${p.house})` : p.houseName}
+      subtitle={p.group !== 'outer' ? houseLabel(p.house) ?? p.houseName : p.houseName ?? (p.house ? HOUSE_NAMES[p.house] : null)}
     >
       <Block label="WHAT IT IS BUILT TO DO" text={p.theme} />
       <Block label="THE GIFT" text={p.gift} />
@@ -159,7 +161,7 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
         <Block label="WHAT IT MEANS" text={data.modality.description} />
       </Accordion>
 
-      <SectionTitle eyebrow="YOUR CHART RULER" title={data.ruler.ruler} note={data.ruler.arena} />
+      <SectionTitle eyebrow="YOUR CHART RULER" title={data.ruler.ruler} />
       <Accordion badge="♛" title={`Ruled by ${data.ruler.ruler}`} subtitle={data.ruler.arena}>
         <Block label="WHAT IT MEANS" text={data.ruler.description} />
       </Accordion>
@@ -192,7 +194,6 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
         badge={data.timeLord.planet.slice(0, 2)}
         title={`Time Lord: ${data.timeLord.planet}`}
         subtitle={`${data.timeLord.startYear} to ${data.timeLord.endYear} · about ${data.timeLord.yearsRemaining} years left`}
-        defaultOpen
         now
       >
         <Block label="THE THEME OF THIS PERIOD" text={data.timeLord.tagline} />
@@ -201,13 +202,11 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
           <Block key={t} label={i === 0 ? 'WHAT THIS LOOKS LIKE' : 'HOW IT PLAYS OUT'} text={t} />
         ))}
         <Block label="WATCH FOR" text={data.timeLord.watchFor} />
-        {data.timeLord.next ? <Block label="NEXT" text={`After ${data.timeLord.planet} comes ${data.timeLord.next}.`} /> : null}
       </Accordion>
       <Accordion
-        badge={String(data.lordOfYear.house)}
+        badge={data.lordOfYear.lord.slice(0, 2)}
         title={`Lord of the Year: ${data.lordOfYear.lord}`}
         subtitle={`Age ${data.lordOfYear.age} · ${data.lordOfYear.houseName} (house ${data.lordOfYear.house})`}
-        defaultOpen
         now
       >
         <Block label="YOUR YEAR'S ARENA" text={data.lordOfYear.houseTheme} />

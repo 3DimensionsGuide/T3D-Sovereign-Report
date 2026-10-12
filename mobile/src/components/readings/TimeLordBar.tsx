@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   marker: { position: 'absolute', left: -7, top: 0, flexDirection: 'row', alignItems: 'center', gap: 6 },
   here: { fontFamily: fonts.bodyBold, fontSize: 13, color: LENS_TEXT.stoplight },
   track: { height: 14, borderRadius: 7, borderWidth: 1.5, borderColor: colors.stoplight, overflow: 'hidden' },
-  fill: { height: '100%', backgroundColor: 'rgba(200,62,62,0.55)' },
+  fill: { height: '100%', backgroundColor: colors.stoplight },
   ends: { flexDirection: 'row', justifyContent: 'space-between' },
   endText: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
 });
