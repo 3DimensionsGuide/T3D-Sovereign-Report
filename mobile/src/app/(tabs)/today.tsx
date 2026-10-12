@@ -24,6 +24,8 @@ import { SignalLamp } from '@/components/SignalLamp';
 import { RoadStrip } from '@/components/RoadStrip';
 import { TriadSeal } from '@/components/TriadSeal';
 import { SkyTodayCard } from '@/components/SkyTodayCard';
+import { BodygraphChip } from '@/components/BodygraphChip';
+import { TransitMiniWheel } from '@/components/TransitMiniWheel';
 import { select } from '@/lib/haptics';
 import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TriadToday } from '@/lib/triadTypes';
@@ -301,6 +303,10 @@ export default function Today() {
             <SkyTodayCard today={today} />
           </FadeIn>
 
+          <FadeIn delay={120}>
+            <BodygraphChip today={today} />
+          </FadeIn>
+
           {dayNum ? (
             <FadeIn delay={200}>
               <DayNumerologyCard data={dayNum} />
@@ -317,6 +323,7 @@ export default function Today() {
             </View>
             {today.transits.length ? (
               <View style={styles.transitList}>
+                <TransitMiniWheel hits={today.transits} onSelect={setSelectedHit} />
                 {(allTransits ? today.transits : today.transits.slice(0, TRANSITS_SHOWN)).map((hit) => (
                   <TransitRow key={`${hit.transiting}-${hit.natal}-${hit.aspect}`} hit={hit} onSelect={setSelectedHit} />
                 ))}

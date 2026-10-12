@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SkeletonCards } from '@/components/Skeleton';
 import { StyleSheet, Text, View } from 'react-native';
-import { Redirect, router, type Href } from 'expo-router';
+import { Redirect, router, useLocalSearchParams, type Href } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
@@ -28,6 +28,11 @@ export default function Chart() {
   const chart = useT3DStore((state) => state.chart);
   const profile = useT3DStore((state) => state.profile);
   const [view, setView] = useState<'overview' | 'wheel' | 'bodygraph'>('overview');
+  const { view: requestedView, t: requestedAt } = useLocalSearchParams<{ view?: string; t?: string }>();
+  // Today's bodygraph chip opens this tab straight on the bodygraph.
+  useEffect(() => {
+    if (requestedView === 'bodygraph' || requestedView === 'wheel') setView(requestedView);
+  }, [requestedView, requestedAt]);
   const drawing = useChartData(chart?.leadId, profile?.email.trim());
 
   if (!chart || !profile) return <Redirect href="/onboarding" />;

@@ -71,6 +71,10 @@ export interface DailyTransitHit {
   peak: boolean;
   applying: boolean;
   nature: AspectNature;
+  /** Where the transiting body is (tropical, 0–360). Drawing position only. */
+  transitLongitude: number;
+  /** Where the natal point is (tropical, 0–360). Drawing position only. */
+  natalLongitude: number;
 }
 
 export interface MoonAspectContact {
@@ -360,6 +364,8 @@ export function calculateDailySky(natal: NatalSkyPoints, at: Date = new Date()):
           peak: orb <= PEAK_ORB_DEGREES,
           applying: orbSoon < orb,
           nature: classify(body, aspect),
+          transitLongitude: position.longitude,
+          natalLongitude: natal[target],
         });
       }
     }

@@ -16,6 +16,7 @@ import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
+import { longitudeToGate } from '@/server/engines/human_design';
 import { calculateDailySky, type NatalSkyPoints } from '@/server/engines/dailySky';
 import type { AstrologyResult } from '@/server/engines/types';
 import { parseSkyInstant } from '@/lib/app/skyDate';
@@ -104,14 +105,16 @@ export async function POST(request: Request): Promise<NextResponse> {
       midheaven: tropical.houses.mc,
     };
 
-    // The luminaries' longitudes stay on the server; only the curated sky leaves.
-    const { skyLongitudes: _serverOnly, ...sky } = calculateDailySky(natal, at);
+    // The luminaries' raw longitudes stay on the server; only their gates leave.
+    const { skyLongitudes, ...sky } = calculateDailySky(natal, at);
 
     return NextResponse.json(
       {
         success: true,
         data: {
           ...sky,
+          // The gate and line the Sun and Moon are in: the app lights them on the bodygraph.
+          gates: { sun: longitudeToGate(skyLongitudes.sun), moon: longitudeToGate(skyLongitudes.moon) },
           vehicle: {
             type: results?.humanDesign?.type ?? null,
             strategy: results?.humanDesign?.strategy ?? null,

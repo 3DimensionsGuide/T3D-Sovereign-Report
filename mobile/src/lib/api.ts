@@ -1,3 +1,4 @@
+import type { AspectNature, DailyAspect, NatalPointName, SkyBody } from '@/lib/apiTypes';
 import type { BirthPreview } from '@/lib/previewTypes';
 import type { ChartDrawingData } from '@/charts/chartTypes';
 import type { StoplightDetail } from '@/lib/stoplightTypes';
@@ -168,14 +169,7 @@ export function formatLongitude(longitude: number): string {
 
 // ─── TODAY (daily sky) ───────────────────────────────────────────────────────
 
-export type SkyBody =
-  | 'moon' | 'sun' | 'mercury' | 'venus' | 'mars'
-  | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'pluto';
-export type NatalPointName =
-  | 'sun' | 'moon' | 'mercury' | 'venus' | 'mars'
-  | 'jupiter' | 'saturn' | 'ascendant' | 'midheaven';
-export type DailyAspect = 'conjunction' | 'sextile' | 'square' | 'trine' | 'opposition';
-export type AspectNature = 'flow' | 'friction' | 'neutral';
+export type { AspectNature, DailyAspect, NatalPointName, SkyBody };
 
 export interface MoonAspectContact {
   natal: NatalPointName;
@@ -192,6 +186,9 @@ export interface DailyTransitHit {
   peak: boolean;
   applying: boolean;
   nature: AspectNature;
+  /** Drawing positions. Missing when the server is older than the app. */
+  transitLongitude?: number;
+  natalLongitude?: number;
 }
 
 export interface TodayResult {
@@ -209,6 +206,8 @@ export interface TodayResult {
   sun: { sign: string; formatted: string; house: number };
   retrograde: SkyBody[];
   transits: DailyTransitHit[];
+  /** The gate and line the Sun and Moon are in. Missing when the server is older than the app. */
+  gates?: { sun: { gate: number; line: number }; moon: { gate: number; line: number } };
   vehicle: { type: string | null; strategy: string | null; authority: string | null };
   reminder: string;
 }
