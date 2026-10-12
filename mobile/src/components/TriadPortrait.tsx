@@ -10,7 +10,7 @@ import { colors, fonts } from '@/theme/tokens';
  * Drawn in a 100 x 95 box that scales to any width. Each corner carries its lens shape,
  * its name and one headline fact, written out so nothing depends on colour alone.
  */
-const V = { x: 50, y: 22 };
+const V = { x: 50, y: 26 };
 const R = { x: 17, y: 69 };
 const S = { x: 83, y: 69 };
 const HEIGHT_UNITS = 95;

@@ -19,6 +19,14 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
+/** Timeline lenses. Human Design has no dated events here yet, so it is not offered. */
+type TimelineLens = 'all' | 'road' | 'stoplight';
+
+const LENS_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'road', label: 'Road', icon: <LensIcon lens="road" size={13} /> },
+  { value: 'stoplight', label: 'Stoplight', icon: <LensIcon lens="stoplight" size={13} /> },
+] as const;
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -227,6 +235,7 @@ export default function Timeline() {
   const chart = useT3DStore((s) => s.chart);
   const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
   const [filter, setFilter] = useState<Filter>('all');
+  const [lens, setLens] = useState<TimelineLens>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const [showMore, setShowMore] = useState(false);
   const [openMonths, setOpenMonths] = useState<string[]>([]);
@@ -271,7 +280,7 @@ export default function Timeline() {
                 <View style={styles.dayHead}>
                   <View style={[styles.node, day === groups[0]?.[0] && styles.nodeFirst]} />
                   <Text accessibilityRole="header" style={styles.dayTitle}>{longDate(day)}</Text>
-                  {personalByDate.get(day) ? (
+                  {lens === 'all' && personalByDate.get(day) ? (
                     <Text style={styles.dayBadge}>Personal Day {numLabel(personalByDate.get(day)!)}</Text>
                   ) : null}
                 </View>
@@ -309,9 +318,29 @@ export default function Timeline() {
           <FadeIn delay={40}>
             <SignalRibbon data={data} />
           </FadeIn>
-          <YearCard data={data} />
+          <FadeIn delay={60}>
+            <Segmented
+              options={LENS_OPTIONS}
+              value={lens}
+              onChange={(l) => { setLens(l); setOpenId(null); }}
+              compact
+            />
+          </FadeIn>
+          {lens !== 'stoplight' ? <YearCard data={data} /> : null}
 
-          {data.seasons.length > 0 ? (
+          {lens === 'road' ? (
+            <Panel label="Your Personal Days" lens="road">
+              {data.personal.slice(0, 14).map((d) => (
+                <View key={d.date} style={styles.personalRow}>
+                  <Text style={styles.personalDate}>{shortDate(d.date)}</Text>
+                  <Text style={styles.dayBadge}>Personal Day {numLabel(d.day)}</Text>
+                </View>
+              ))}
+              <Text style={styles.footnote}>The next two weeks. Pick Stoplight to see the sky events.</Text>
+            </Panel>
+          ) : null}
+
+          {lens !== 'road' && data.seasons.length > 0 ? (
             <FadeIn delay={100}>
               <Panel label="Seasons in effect" lens="stoplight">
                 {data.seasons.map((s, i) => (
@@ -324,6 +353,8 @@ export default function Timeline() {
             </FadeIn>
           ) : null}
 
+          {lens === 'road' ? null : (
+          <>
           <FadeIn delay={160}>
             <Segmented options={FILTERS} value={filter} onChange={(f) => { setFilter(f); setOpenId(null); }} compact />
           </FadeIn>
@@ -370,6 +401,9 @@ export default function Timeline() {
                 : null}
             </View>
           ) : null}
+
+          </>
+          )}
 
           <Text style={styles.reminder}>{data.reminder}</Text>
         </>
@@ -430,6 +464,8 @@ const styles = StyleSheet.create({
   node: { position: 'absolute', left: -28, top: 7, width: 14, height: 14, borderRadius: 7, backgroundColor: colors.obsidian, borderWidth: 3, borderColor: '#1F8A4D' },
   nodeFirst: { backgroundColor: colors.gold, borderColor: colors.gold },
   dayTitle: { fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
+  personalRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  personalDate: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   dayBadge: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.6, color: colors.gold },
   event: {
     gap: 6,

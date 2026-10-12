@@ -7,6 +7,9 @@ import { LENS_COLOR, LENS_LABEL, LENS_TEXT, LensIcon, type LensName } from '@/co
 import { GoldButton } from '@/components/GoldButton';
 import { ChartRequestError, requestGlossary } from '@/lib/api';
 import type { GlossaryGroup, GlossaryItem } from '@/lib/explainTypes';
+import { useChartData } from '@/lib/useChartData';
+import { useNumerology } from '@/lib/useNumerology';
+import { yourTermIds } from '@/lib/yourTerms';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
@@ -54,7 +57,13 @@ export default function Glossary() {
   const [loading, setLoading] = useState(items.length === 0);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<LensName | 'all'>('all');
+  const [filter, setFilter] = useState<LensName | 'all' | 'yours'>('all');
+  const drawing = useChartData(chart?.leadId, profile?.email.trim());
+  const numerology = useNumerology(chart?.leadId, profile?.email.trim());
+  const yours = useMemo(
+    () => (chart ? yourTermIds(chart, drawing.data, numerology.data) : new Set<string>()),
+    [chart, drawing.data, numerology.data],
+  );
   const [folds, setFolds] = useState<Record<string, boolean>>({});
   const listRef = useRef<SectionList<Row, Sec>>(null);
 
@@ -84,8 +93,9 @@ export default function Glossary() {
     const byTitle = (a: { title: string }, b: { title: string }) => a.title.localeCompare(b.title, undefined, { numeric: true });
     const clean = items
       .map((item) => ({ item, title: cleanTitle(item.title) }))
+      .filter((r) => filter !== 'yours' || yours.has(r.item.id))
       .filter((r) => !q || r.title.toLowerCase().includes(q) || r.item.summary.toLowerCase().includes(q));
-    return ORDER.filter((l) => filter === 'all' || filter === l).map((lens) => {
+    return ORDER.filter((l) => filter === 'all' || filter === 'yours' || filter === l).map((lens) => {
       const mine = clean.filter((r) => LENS_OF[r.item.group] === lens);
       const plain = mine.filter((r) => !foldOf(r.item.id)).sort(byTitle);
       const data: Row[] = plain.map((r) => ({ kind: 'item', item: r.item, title: r.title }));
@@ -94,16 +104,16 @@ export default function Glossary() {
         if (group.length === 0) continue;
         const sortKey = (r: { item: GlossaryItem }) => r.item.id.replace(/\D+/g, ' ').trim().split(' ').map((n) => n.padStart(3, '0')).join('-');
         group.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
-        const open = searching || !!folds[key];
+        const open = searching || filter === 'yours' || !!folds[key];
         data.push({ kind: 'fold', key, label: key === 'gates' ? 'Gates' : 'Channels', count: group.length, open });
         if (open) group.forEach((r) => data.push({ kind: 'item', item: r.item, title: r.title }));
       }
       return { lens, count: mine.length, data } as Sec;
     }).filter((sec) => sec.data.length > 0);
-  }, [items, query, filter, folds, searching]);
+  }, [items, query, filter, folds, searching, yours]);
 
   const letters = useMemo(() => {
-    if (filter === 'all' || searching) return [];
+    if (filter === 'all' || filter === 'yours' || searching) return [];
     const sec = sections[0];
     if (!sec) return [];
     const seen: Record<string, number> = {};
@@ -145,7 +155,7 @@ export default function Glossary() {
                 style={styles.search}
               />
               <View style={styles.filters}>
-                {(['all', ...ORDER] as const).map((f) => {
+                {(['all', 'yours', ...ORDER] as const).map((f) => {
                   const selected = f === filter;
                   return (
                     <Pressable
@@ -155,8 +165,8 @@ export default function Glossary() {
                       onPress={() => setFilter(f)}
                       style={[styles.filter, selected && styles.filterOn]}
                     >
-                      {f !== 'all' ? <LensIcon lens={f} size={13} color={selected ? colors.obsidian : LENS_COLOR[f]} /> : null}
-                      <Text style={[styles.filterText, selected && styles.filterTextOn]}>{f === 'all' ? 'All' : LENS_LABEL[f]}</Text>
+                      {f !== 'all' && f !== 'yours' ? <LensIcon lens={f} size={13} color={selected ? colors.obsidian : LENS_COLOR[f]} /> : null}
+                      <Text style={[styles.filterText, selected && styles.filterTextOn]}>{f === 'all' ? 'All' : f === 'yours' ? `In your chart${items.length ? ` · ${items.filter((i) => yours.has(i.id)).length}` : ''}` : LENS_LABEL[f]}</Text>
                     </Pressable>
                   );
                 })}
@@ -189,7 +199,7 @@ export default function Glossary() {
                 <GoldButton label="Try again" variant="ghost" onPress={load} />
               </View>
             ) : (
-              <Text style={styles.empty}>No terms match that search.</Text>
+              <Text style={styles.empty}>{filter === 'yours' && !searching ? 'Nothing from your chart yet. Pull to refresh on My Chart, then come back.' : 'No terms match that search.'}</Text>
             )
           }
           renderSectionHeader={({ section }) => (
