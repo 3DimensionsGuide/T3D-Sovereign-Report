@@ -191,10 +191,12 @@ export function Footnote({ text }: { text: string }) {
 
 /** A card that opens to reveal the full interpretation. */
 export function Accordion({
-  accent, badge, title, subtitle, defaultOpen = false, now = false, onOpenChange, children,
+  accent, badge, badgeShape = 'circle', title, subtitle, defaultOpen = false, now = false, onOpenChange, children,
 }: {
   accent: string;
   badge: ReactNode;
+  /** Circle by default. A rounded square marks a Challenge, matching its drawing in the glossary. */
+  badgeShape?: 'circle' | 'square';
   title: string;
   subtitle?: string | null;
   defaultOpen?: boolean;
@@ -216,7 +218,7 @@ export function Accordion({
         accessibilityLabel={`${title}. ${subtitle ?? ''}${now ? ' Active now.' : ''} ${open ? 'Expanded.' : 'Double tap to read.'}`}
         style={({ pressed }) => [styles.cardHead, pressed && styles.pressed]}
       >
-        <View style={[styles.badge, { borderColor: accent }]}>
+        <View style={[styles.badge, badgeShape === 'square' && styles.badgeSquare, { borderColor: accent }]}>
           {typeof badge === 'string' ? (
             <Text style={[styles.badgeText, [...badge].length >= 3 && styles.badgeTextLong]} numberOfLines={1} adjustsFontSizeToFit>
               {badge}
@@ -310,6 +312,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  badgeSquare: { borderRadius: 10 },
   badgeText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchment },
   /** Three-letter badges (CAR, IND) are set smaller so the circle stays a circle. */
   badgeTextLong: { fontSize: 13, letterSpacing: 0.4 },

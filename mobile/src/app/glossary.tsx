@@ -6,6 +6,7 @@ import { TermPressable } from '@/components/Explain';
 import { LENS_COLOR, LENS_LABEL, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
 import { GoldButton } from '@/components/GoldButton';
 import { LetterStrip } from '@/components/LetterStrip';
+import { letterTargets } from '@/lib/letterStrip';
 import { ChartRequestError, requestGlossary } from '@/lib/api';
 import type { GlossaryGroup, GlossaryItem } from '@/lib/explainTypes';
 import { useChartData } from '@/lib/useChartData';
@@ -116,17 +117,12 @@ export default function Glossary() {
     }).filter((sec) => sec.data.length > 0);
   }, [items, query, filter, folds, searching, yours]);
 
+  // One entry per letter: where its first term sits. Under "All" the lists run Vehicle, Road, Stoplight,
+  // so a letter jumps to the first lens that has it.
   const letters = useMemo(() => {
-    if (filter === 'all' || filter === 'yours' || searching) return [];
-    const sec = sections[0];
-    if (!sec) return [];
-    const seen: Record<string, number> = {};
-    sec.data.forEach((r, i) => {
-      if (r.kind !== 'item' || foldOf(r.item.id)) return;
-      const L = r.title.charAt(0).toUpperCase();
-      if (/[A-Z]/.test(L) && seen[L] === undefined) seen[L] = i;
-    });
-    return Object.entries(seen).sort(([a], [b]) => a.localeCompare(b));
+    if (filter === 'yours' || searching) return [];
+    const shown = filter === 'all' ? sections : sections.slice(0, 1);
+    return letterTargets(shown.map((sec) => sec.data.map((r) => (r.kind === 'item' && !foldOf(r.item.id) ? r.title : null))));
   }, [sections, filter, searching]);
 
   return (
@@ -228,7 +224,7 @@ export default function Glossary() {
             letters={letters.map(([L]) => L)}
             onJump={(L) => {
               const at = letters.find(([l]) => l === L);
-              if (at) listRef.current?.scrollToLocation({ sectionIndex: 0, itemIndex: at[1], viewOffset: 0, animated: false });
+              if (at) listRef.current?.scrollToLocation({ sectionIndex: at[1], itemIndex: at[2], viewOffset: 0, animated: false });
             }}
           />
         ) : null}

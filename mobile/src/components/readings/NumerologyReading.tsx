@@ -86,6 +86,7 @@ function ChallengeBlock({ c }: { c: ChallengeCard }) {
   return (
     <Accordion
       badge={String(c.number)}
+      badgeShape="square"
       title={c.label}
       subtitle={datesLine(c)}
       now={c.current}

@@ -206,3 +206,12 @@ test('Today is condensed: frame before the Road strip, one sky card, collapsed d
   assert.match(lamp, /numberOfLines=\{open \? undefined : 1\}/, 'lens rows are one line until tapped');
   assert.match(lamp, /Conditions, not a decision\./);
 });
+
+test('Challenge cards use a square badge, matching the Challenge drawing; Pinnacles stay round', () => {
+  const reading = read('mobile/src/components/readings/NumerologyReading.tsx');
+  const challenge = reading.slice(reading.indexOf('function ChallengeBlock'));
+  assert.match(challenge, /badgeShape="square"/);
+  const pinnacle = reading.slice(reading.indexOf('function PinnacleBlock'), reading.indexOf('function ChallengeBlock'));
+  assert.doesNotMatch(pinnacle, /badgeShape/);
+  assert.match(read('mobile/src/components/ReadingBlocks.tsx'), /badgeShape === 'square' && styles\.badgeSquare/);
+});
