@@ -101,10 +101,6 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
           <View style={styles.divider} />
           <DayBlock kind="GLOBAL" meaning={data.universal} />
           <Text style={styles.body}>{data.blend}</Text>
-          <Text style={styles.caption}>
-            <Term id="num:personalyear">Personal Year</Term> {data.personalYear} ·{' '}
-            <Term id="num:personalmonth">Personal Month</Term> {data.personalMonth}
-          </Text>
         </>
       ) : null}
     </AccentView>

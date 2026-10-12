@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { Term } from '@/components/Explain';
 import { RollingNumber } from '@/components/RollingNumber';
 import { LENS_TEXT } from '@/components/Lens';
 import { DIAL_TICKS, dialAngle, dialBase, dialSpoken, tickPoint } from '@/lib/dials';
@@ -63,7 +64,9 @@ export function PersonalDial({ kind, number, text }: Props) {
           <RollingNumber value={text} style={styles.number} />
         </View>
       </View>
-      <Text style={styles.label}>{kind}</Text>
+      <Text style={styles.label}>
+        <Term id={kind === 'Year' ? 'num:personalyear' : kind === 'Month' ? 'num:personalmonth' : 'num:personalday'}>{kind}</Term>
+      </Text>
     </View>
   );
 }

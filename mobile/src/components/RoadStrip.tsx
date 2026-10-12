@@ -69,6 +69,22 @@ export function RoadStrip({ date, personalYear }: Props) {
       </View>
 
       <View style={styles.stripWrap} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <View style={styles.markerTrack} onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}>
+          <Animated.View
+            style={[
+              styles.marker,
+              {
+                left: 0,
+                opacity: slide.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 1, 1] }),
+                transform: [{ translateX: slide.interpolate({ inputRange: [0, 1], outputRange: [0, (model.markerPct / 100) * trackWidth] }) }],
+              },
+            ]}
+          >
+            <View style={{ transform: [{ rotate: '180deg' }] }}>
+              <LensIcon lens="road" size={16} color={LENS_TEXT.road} />
+            </View>
+          </Animated.View>
+        </View>
         <View style={styles.strip}>
           {model.segments.map((s) => (
             <View
@@ -93,20 +109,6 @@ export function RoadStrip({ date, personalYear }: Props) {
               )}
             </View>
           ))}
-        </View>
-        <View style={styles.markerTrack} onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}>
-          <Animated.View
-            style={[
-              styles.marker,
-              {
-                left: 0,
-                opacity: slide.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 1, 1] }),
-                transform: [{ translateX: slide.interpolate({ inputRange: [0, 1], outputRange: [0, (model.markerPct / 100) * trackWidth] }) }],
-              },
-            ]}
-          >
-            <LensIcon lens="road" size={16} color={LENS_TEXT.road} />
-          </Animated.View>
         </View>
       </View>
 

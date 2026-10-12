@@ -1,3 +1,4 @@
+import { teaser } from '@/lib/teaser';
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LENS_LABEL, LENS_TEXT, SIGNAL_COLOR, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
@@ -101,7 +102,7 @@ function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; m
           {text ? <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text> : null}
         </View>
       </View>
-      {text ? <Text style={styles.rowText} numberOfLines={open ? undefined : 1}>{text}</Text> : null}
+      {text ? <Text style={styles.rowText} numberOfLines={open ? undefined : 1}>{open ? text : teaser(text, 40)}</Text> : null}
     </>
   );
   if (!text) {
