@@ -25,13 +25,13 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
   const setPartner = usePartnerStore((s) => s.setPartner);
   const [today] = useState(() => new Date());
   const [label, setLabel] = useState(saved?.label ?? '');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
+  const [place, setPlace] = useState('');
   const [birthDate, setBirthDate] = useState<Date | null>(saved ? new Date(`${saved.birthDate}T12:00:00`) : null);
   const [pickingDate, setPickingDate] = useState(false);
   const [pickingTime, setPickingTime] = useState(false);
   const [birthTime, setBirthTime] = useState<Date | null>(saved?.birthTime ? new Date(`2000-01-01T${saved.birthTime}:00`) : null);
   const [timeKnown, setTimeKnown] = useState(saved ? saved.birthTime !== null : true);
+  const timeUnknown = !timeKnown;
   const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
   const [chosen, setChosen] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -41,11 +41,14 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
     setError(null);
     if (label.trim().length < 1) return setError('Please enter a name or nickname.');
     if (!birthDate) return setError('Please choose their birth date.');
-    if (timeKnown && !birthTime) return setError('Please choose their birth time, or switch off "I know their birth time".');
-    if (!city.trim() || !country.trim()) return setError('Please enter their birth city and country.');
+    if (timeKnown && !birthTime) return setError('Please choose their birth time, or switch on "Birth time unknown".');
+    const cut = place.lastIndexOf(',');
+    const city = cut > 0 ? place.slice(0, cut).trim() : '';
+    const country = cut > 0 ? place.slice(cut + 1).trim() : '';
+    if (!city || !country) return setError('Please enter their birth place as city, then country. For example: Austin, United States.');
     setLoading(true);
     try {
-      setCandidates(await requestPlaceCheck(city.trim(), country.trim(), dateString(birthDate as Date)));
+      setCandidates(await requestPlaceCheck(city, country, dateString(birthDate as Date)));
       setChosen(0);
     } catch (e) {
       setError(e instanceof ChartRequestError ? e.message : 'Something went wrong. Please try again.');
@@ -130,9 +133,9 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
           <GoldButton label="Use this date" onPress={() => setPickingDate(false)} />
         </View>
       ) : null}
+      {timeKnown ? (
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>Their birth time</Text>
-        {timeKnown ? (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={birthTime ? `Their birth time, ${timeString(birthTime)}. Change` : 'Choose their birth time'}
@@ -143,10 +146,8 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
               {birthTime ? birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : 'Choose time'}
             </Text>
           </Pressable>
-        ) : (
-          <Text style={styles.small}>Not known</Text>
-        )}
       </View>
+      ) : null}
       {timeKnown && pickingTime && birthTime ? (
         <View style={{ gap: space.sm }}>
           <DateTimePicker value={birthTime} mode="time" display="spinner" themeVariant="dark"
@@ -155,19 +156,18 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
         </View>
       ) : null}
       <View style={styles.pickerRow}>
-        <Text style={styles.pickerLabel}>I know their birth time</Text>
-        <Switch value={timeKnown} onValueChange={setTimeKnown} trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
-          accessibilityLabel="I know their birth time" />
+        <Text style={styles.pickerLabel}>Birth time unknown</Text>
+        <Switch value={timeUnknown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
+          accessibilityLabel="Birth time unknown" />
       </View>
       {!timeKnown ? (
         <Text style={styles.small}>
           We check every hour of that day. If their Type or Authority is the same all day, the reading is exact. If not, we tell you.
         </Text>
       ) : null}
-      <Field label="Birth city" value={city} onChangeText={setCity} autoCapitalize="words" placeholder="e.g. Austin, Texas" />
-      <Field label="Birth country" value={country} onChangeText={setCountry} autoCapitalize="words" placeholder="e.g. United States" />
+      <Field label="Birth place (city, country)" value={place} onChangeText={setPlace} autoCapitalize="words" placeholder="e.g. Austin, United States" />
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-      <GoldButton label="Check their birth place" onPress={onCheck} loading={loading} />
+      <GoldButton label="Continue" onPress={onCheck} loading={loading} />
       {onCancel ? <GoldButton label="Cancel" variant="ghost" onPress={onCancel} /> : null}
     </View>
   );
