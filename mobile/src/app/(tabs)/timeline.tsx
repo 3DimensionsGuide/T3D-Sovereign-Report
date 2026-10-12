@@ -20,6 +20,9 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
+/** About how tall the pinned bar is. A month takes the bar over once its header is about to slide under it. */
+const BAR_HEIGHT = 56;
+
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
 /** Timeline lenses. Human Design has no dated events here yet, so it is not offered. */
 type TimelineLens = 'all' | 'road' | 'stoplight';
@@ -250,7 +253,7 @@ export default function Timeline() {
   };
   const absSections = (): PinSection[] =>
     [...sectionBox.current.entries()]
-      .map(([key, b]) => ({ key, top: b.y + (b.more ? moreY.current : 0), headHeight: 0, bottom: b.y + (b.more ? moreY.current : 0) + b.h }))
+      .map(([key, b]) => ({ key, top: b.y + (b.more ? moreY.current : 0), headHeight: -BAR_HEIGHT, bottom: b.y + (b.more ? moreY.current : 0) + b.h }))
       .sort((a, b) => a.top - b.top);
   const listTop = (): number | null => {
     const b = sectionBox.current.get('now');
