@@ -6,6 +6,9 @@ import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/termIds';
+import { Disclosure } from '@/components/Disclosure';
+import { MiniBody } from '@/components/MiniBody';
+import type { LensName } from '@/components/Lens';
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
 import { TriadCard } from '@/components/TriadCard';
@@ -34,6 +37,10 @@ export default function Chart() {
     if (requestedView === 'bodygraph' || requestedView === 'wheel') setView(requestedView);
   }, [requestedView, requestedAt]);
   const drawing = useChartData(chart?.leadId, profile?.email.trim());
+
+  const openLens = (lens: LensName) => {
+    router.push({ pathname: '/readings', params: { lens, t: String(Date.now()) } } as unknown as Href);
+  };
 
   if (!chart || !profile) return <Redirect href="/onboarding" />;
 
@@ -64,7 +71,7 @@ export default function Chart() {
       {view === 'overview' ? (
         <>
       <FadeIn delay={80}>
-        <TriadPortrait chart={chart} />
+        <TriadPortrait chart={chart} onOpenLens={openLens} />
       </FadeIn>
 
       <FadeIn delay={100}>
@@ -73,12 +80,15 @@ export default function Chart() {
           glyph="◆"
           metaphor="THE VEHICLE"
           system="Human Design"
+          drawing={drawing.data ? <MiniBody definedCenters={drawing.data.humanDesign.definedCenters} /> : undefined}
           rows={[
             { label: 'Type', value: hd.type, valueId: typeId(hd.type) },
             { label: 'Strategy', value: hd.strategy, labelId: STRATEGY_ID },
             { label: 'Authority', value: hd.authority, valueId: authorityId(hd.authority), labelId: 'hd:authority' },
             { label: 'Profile', value: hd.profile, valueId: profileId(hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile), labelId: 'hd:profile' },
           ]}
+          onOpen={() => openLens('vehicle')}
+          openLabel="Read your Vehicle reading"
         />
       </FadeIn>
 
@@ -92,6 +102,8 @@ export default function Chart() {
             { label: 'Life Path', value: String(num.lifePath), labelId: 'num:lifepath', valueId: `num:${num.lifePath}` },
             { label: 'Destiny', value: String(num.destiny), labelId: 'num:destiny', valueId: `num:${num.destiny}` },
             { label: 'Soul Urge', value: String(num.soulUrge), labelId: 'num:soulurge', valueId: `num:${num.soulUrge}` },
+          ]}
+          moreRows={[
             { label: 'Personality', value: String(num.personality), labelId: 'num:personality', valueId: `num:${num.personality}` },
             { label: 'Hidden Passion', value: String(num.hiddenPassion), labelId: 'num:hiddenpassion', valueId: `num:${num.hiddenPassion}` },
             {
@@ -100,6 +112,9 @@ export default function Chart() {
               value: num.karmicLessons.length ? num.karmicLessons.join(', ') : 'None',
             },
           ]}
+          moreLabel="More numbers"
+          onOpen={() => openLens('road')}
+          openLabel="Read your Road reading"
         />
       </FadeIn>
 
@@ -110,22 +125,32 @@ export default function Chart() {
           metaphor="THE STOPLIGHT"
           system="Astrology"
           rows={[
-            { label: 'Tropical Sun', value: astro.tropicalSun.formatted, labelId: planetId('sun') },
-            { label: 'Tropical Moon', value: astro.tropicalMoon.formatted, labelId: planetId('moon') },
-            { label: 'Tropical Rising', value: formatLongitude(astro.tropicalAscendant), labelId: 'astro:ascendant' },
+            { label: 'Sun', value: astro.tropicalSun.formatted, labelId: planetId('sun') },
+            { label: 'Moon', value: astro.tropicalMoon.formatted, labelId: planetId('moon') },
+            { label: 'Rising', value: formatLongitude(astro.tropicalAscendant), labelId: 'astro:ascendant' },
+          ]}
+          moreRows={[
             { label: 'Sidereal Sun', value: astro.siderealSun.formatted, labelId: 'astro:sidereal' },
             { label: 'Sidereal Rising', value: formatLongitude(astro.siderealAscendant), labelId: 'astro:ascendant' },
           ]}
+          moreLabel="Sidereal lens"
+          onOpen={() => openLens('stoplight')}
+          openLabel="Read your Stoplight reading"
         />
+        <Text style={styles.note}>
+          Tropical leads here: it follows the seasons and is the Western standard. Sidereal is a second lens.
+        </Text>
         {risingNote ? <Text style={styles.note}>{risingNote}</Text> : null}
       </FadeIn>
 
       <FadeIn delay={360}>
-        <BirthDataCard profile={profile} />
-      </FadeIn>
-
-      <FadeIn delay={400}>
-        <ReminderCard />
+        <Disclosure label="Birth details, reminder and settings">
+          <View style={styles.moreStack}>
+            <BirthDataCard profile={profile} />
+            <ReminderCard />
+            <GoldButton label="Edit birth details" variant="ghost" onPress={() => router.push('/onboarding')} />
+          </View>
+        </Disclosure>
       </FadeIn>
 
         </>
@@ -153,7 +178,6 @@ export default function Chart() {
         <View style={styles.actions}>
           <GoldButton label="Share your T3D card" onPress={() => router.push('/share-card' as Href)} />
           <GoldButton label="Glossary · tap any term" variant="ghost" onPress={() => router.push('/glossary')} />
-          <GoldButton label="Edit birth details" variant="ghost" onPress={() => router.push('/onboarding')} />
         </View>
       </FadeIn>
     </Screen>
@@ -166,6 +190,7 @@ const styles = StyleSheet.create({
   name: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
   meta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, marginTop: space.sm },
+  moreStack: { gap: space.md },
   actions: { marginTop: space.md, gap: 12 },
   chartArea: { marginTop: space.md },
   centerBox: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },

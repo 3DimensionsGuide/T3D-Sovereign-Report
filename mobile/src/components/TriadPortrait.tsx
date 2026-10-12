@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Line, Polygon, Stop } from 'react-native-svg';
 import type { ChartResult } from '@/lib/api';
-import { LENS_COLOR, LENS_LABEL, LENS_TEXT } from '@/components/Lens';
+import { LENS_COLOR, LENS_LABEL, LENS_TEXT, type LensName } from '@/components/Lens';
+import { lensTap } from '@/lib/haptics';
 import { colors, fonts } from '@/theme/tokens';
 
 /**
@@ -17,22 +18,29 @@ const pct = (y: number) => `${(y / HEIGHT_UNITS) * 100}%` as const;
 
 interface Props {
   chart: ChartResult;
+  /** Each corner opens that lens's reading. */
+  onOpenLens?: (lens: LensName) => void;
 }
 
-export function TriadPortrait({ chart }: Props) {
+export function TriadPortrait({ chart, onOpenLens }: Props) {
   const { humanDesign: hd, numerology: num, astrology: astro } = chart;
   const profileLines = hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile;
   const vehicle = { head: hd.type, sub: `Profile ${profileLines}` };
   const road = { head: `Life Path ${num.lifePath}`, sub: `Destiny ${num.destiny}` };
   const stoplight = { head: `Sun in ${astro.tropicalSun.sign}`, sub: `Moon in ${astro.tropicalMoon.sign}` };
 
+  const open = (lens: LensName, name: string, fact: { head: string; sub: string }) => ({
+    accessibilityRole: 'button' as const,
+    accessibilityLabel: `${name}: ${fact.head}, ${fact.sub}. Opens your ${LENS_LABEL[lens]} reading.`,
+    disabled: !onOpenLens,
+    onPress: () => {
+      lensTap(lens);
+      onOpenLens?.(lens);
+    },
+  });
+
   return (
-    <View
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={`Your Triad. The Vehicle: ${vehicle.head}, ${vehicle.sub}. The Road: ${road.head}, ${road.sub}. The Stoplight: ${stoplight.head}, ${stoplight.sub}.`}
-      style={styles.wrap}
-    >
+    <View style={styles.wrap}>
       <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 100 ${HEIGHT_UNITS}`} preserveAspectRatio="xMidYMid meet">
         <Defs>
           <LinearGradient id="vr" gradientUnits="userSpaceOnUse" x1={V.x} y1={V.y} x2={R.x} y2={R.y}>
@@ -64,21 +72,21 @@ export function TriadPortrait({ chart }: Props) {
         <Circle cx={S.x} cy={S.y} r={4.2} fill={LENS_COLOR.stoplight} />
       </Svg>
 
-      <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[styles.corner, styles.top, { top: 0 }]}>
+      <Pressable {...open('vehicle', 'The Vehicle', vehicle)} style={[styles.corner, styles.top, { top: 0 }]}>
         <Text style={[styles.lens, { color: LENS_TEXT.vehicle }]}>{LENS_LABEL.vehicle}</Text>
         <Text style={styles.head}>{vehicle.head}</Text>
         <Text style={styles.sub}>{vehicle.sub}</Text>
-      </View>
-      <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[styles.corner, styles.left, { top: pct(S.y + 10) }]}>
+      </Pressable>
+      <Pressable {...open('road', 'The Road', road)} style={[styles.corner, styles.left, { top: pct(S.y + 10) }]}>
         <Text style={[styles.lens, { color: LENS_TEXT.road }]}>{LENS_LABEL.road}</Text>
         <Text style={styles.head}>{road.head}</Text>
         <Text style={styles.sub}>{road.sub}</Text>
-      </View>
-      <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden style={[styles.corner, styles.right, { top: pct(S.y + 10) }]}>
+      </Pressable>
+      <Pressable {...open('stoplight', 'The Stoplight', stoplight)} style={[styles.corner, styles.right, { top: pct(S.y + 10) }]}>
         <Text style={[styles.lens, { color: LENS_TEXT.stoplight }]}>{LENS_LABEL.stoplight}</Text>
         <Text style={[styles.head, styles.alignRight]}>{stoplight.head}</Text>
         <Text style={[styles.sub, styles.alignRight]}>{stoplight.sub}</Text>
-      </View>
+      </Pressable>
       <Text importantForAccessibility="no" accessibilityElementsHidden style={[styles.centre, { top: pct(54) }]}>T3D</Text>
     </View>
   );
@@ -86,7 +94,7 @@ export function TriadPortrait({ chart }: Props) {
 
 const styles = StyleSheet.create({
   wrap: { width: '100%', aspectRatio: 100 / HEIGHT_UNITS },
-  corner: { position: 'absolute', gap: 2 },
+  corner: { position: 'absolute', gap: 2, minHeight: 48 },
   top: { left: 0, right: 0, alignItems: 'center' },
   left: { left: 0, width: '46%' },
   right: { right: 0, width: '46%', alignItems: 'flex-end' },

@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
@@ -41,6 +42,11 @@ const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; acce
 
 export default function Readings() {
   const [lens, setLens] = useState<Lens>('vehicle');
+  // My Chart's portrait opens a lens straight away.
+  const { lens: requestedLens, t: requestedAt } = useLocalSearchParams<{ lens?: string; t?: string }>();
+  useEffect(() => {
+    if (requestedLens === 'vehicle' || requestedLens === 'road' || requestedLens === 'stoplight') setLens(requestedLens);
+  }, [requestedLens, requestedAt]);
   const head = HEADINGS[lens];
   const scrollRef = useRef<ScrollView>(null);
   const scrollOffset = useRef(0);

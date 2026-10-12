@@ -1,4 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { select } from '@/lib/haptics';
 import { Term } from '@/components/Explain';
 import { LensIcon, lensFromGlyph } from '@/components/Lens';
 import { colors, fonts, radius, space } from '@/theme/tokens';
@@ -21,22 +23,33 @@ interface Props {
   metaphor: 'THE VEHICLE' | 'THE ROAD' | 'THE STOPLIGHT';
   system: string;
   rows: TriadRow[];
+  /** Further rows kept behind a tap, so the card stays short. */
+  moreRows?: TriadRow[];
+  moreLabel?: string;
+  /** A small drawing at the right of the header. */
+  drawing?: ReactNode;
+  /** Opens the full reading for this lens. */
+  onOpen?: () => void;
+  openLabel?: string;
 }
 
-export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
+export function TriadCard({ accent, glyph, metaphor, system, rows, moreRows, moreLabel = 'More', drawing, onOpen, openLabel }: Props) {
+  const [more, setMore] = useState(false);
+  const shown = more && moreRows ? [...rows, ...moreRows] : rows;
   return (
     <AccentView
       style={[styles.card, { borderLeftColor: accent }]}
     >
       <View style={styles.header}>
         {lensFromGlyph(glyph) ? <LensIcon lens={lensFromGlyph(glyph)!} size={26} color={accent} /> : <Text style={[styles.glyph, { color: accent }]}>{glyph}</Text>}
-        <View>
+        <View style={styles.flex}>
           <Text style={styles.metaphor}>{metaphor}</Text>
           <Text style={styles.system}>{system}</Text>
         </View>
+        {drawing}
       </View>
       <View style={styles.rows}>
-        {rows.map((row) => (
+        {shown.map((row) => (
           <View key={row.label} style={styles.row}>
             <Text style={styles.rowLabel}>
               {row.labelId ? <Term id={row.labelId}>{row.label}</Term> : row.label}
@@ -47,6 +60,25 @@ export function TriadCard({ accent, glyph, metaphor, system, rows }: Props) {
           </View>
         ))}
       </View>
+      {moreRows?.length ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded: more }}
+          accessibilityLabel={`${moreLabel}. ${more ? 'Expanded.' : 'Double tap to show.'}`}
+          onPress={() => {
+            select();
+            setMore((v) => !v);
+          }}
+          style={({ pressed }) => [styles.link, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.linkText}>{more ? 'Show fewer' : moreLabel}</Text>
+        </Pressable>
+      ) : null}
+      {onOpen ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={openLabel} onPress={onOpen} style={({ pressed }) => [styles.link, pressed && { opacity: 0.7 }]}>
+          <Text style={styles.linkText}>{openLabel} ›</Text>
+        </Pressable>
+      ) : null}
     </AccentView>
   );
 }
@@ -61,6 +93,9 @@ const styles = StyleSheet.create({
     padding: space.lg,
     gap: space.md,
   },
+  flex: { flex: 1 },
+  link: { minHeight: 48, justifyContent: 'center' },
+  linkText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   glyph: { fontSize: 26 },
   metaphor: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
