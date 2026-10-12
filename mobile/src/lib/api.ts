@@ -470,8 +470,8 @@ export function confirmOptInCode(leadId: number, email: string, code: string): P
 }
 
 /** One glossary entry ("tap any term"), with an "In your chart" line. */
-export function requestExplain(leadId: number, email: string, id: string): Promise<ExplainEntry> {
-  return postApp<ExplainEntry>('/api/app/explain', { leadId, email, id }, 'Could not load that explanation.');
+export function requestExplain(leadId: number, email: string, id: string, premium = false): Promise<ExplainEntry> {
+  return postApp<ExplainEntry>('/api/app/explain', { leadId, email, id, premium }, 'Could not load that explanation.');
 }
 
 /** Every glossary term, for the searchable Glossary screen. */

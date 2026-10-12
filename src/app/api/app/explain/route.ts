@@ -2,7 +2,7 @@
  * POST /api/app/explain
  * One glossary entry ("tap any term"), with a personal "In your chart" line.
  *
- * Body: { leadId: number, email: string, id: string }
+ * Body: { leadId: number, email: string, id: string, premium?: boolean }
  *   id examples: "astro:planet:saturn", "hd:gate:41", "num:7"
  *
  * Same access rule as the other app routes.
@@ -12,13 +12,15 @@ import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
-import { buildEntry, type ChartContext } from '@/lib/app/glossary';
+import { buildEntry, gateEntry, type ChartContext } from '@/lib/app/glossary';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 interface ExplainRequest {
   leadId?: unknown;
   email?: unknown;
   id?: unknown;
+  /** Whether the person has Premium. Without it the long explanation is not sent. */
+  premium?: unknown;
 }
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
@@ -66,7 +68,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     return NextResponse.json(
-      { success: true, data: entry },
+      { success: true, data: gateEntry(entry, body.premium === true) },
       { status: 200, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error: unknown) {

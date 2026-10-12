@@ -39,6 +39,15 @@ import { withArticle } from './article';
 
 export type GlossaryGroup = 'Human Design' | 'Astrology' | 'Numerology' | 'Timing';
 
+/**
+ * The free view of an entry: its one-line summary and its "In your chart" line stay, the long
+ * explanation is withheld and the entry says so. Premium gets everything.
+ * (Until purchases exist the app states whether it is Premium; the route will check a real entitlement later.)
+ */
+export function gateEntry<T extends { body: string[] }>(entry: T, premium: boolean): T & { locked: boolean } {
+  return premium ? { ...entry, locked: false } : { ...entry, body: [], locked: true };
+}
+
 export interface GlossaryEntry {
   id: string;
   group: GlossaryGroup;

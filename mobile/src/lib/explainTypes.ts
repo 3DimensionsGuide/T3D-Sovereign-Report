@@ -8,6 +8,8 @@ export interface ExplainEntry {
   body: string[];
   yours: string | null;
   relatedEntries: { id: string; title: string }[];
+  /** True when the long explanation was withheld because the person does not have Premium. */
+  locked?: boolean;
 }
 
 export interface GlossaryItem {

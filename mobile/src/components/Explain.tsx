@@ -11,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChartRequestError, requestExplain } from '@/lib/api';
 import type { ExplainEntry, GlossaryGroup } from '@/lib/explainTypes';
 import { useT3DStore } from '@/store/useT3DStore';
+import { usePremium } from '@/lib/usePremium';
+import { LockIcon } from '@/components/LockIcon';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
@@ -46,6 +48,7 @@ const cache = new Map<string, ExplainEntry>();
 export function ExplainProvider({ children }: { children: ReactNode }) {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
+  const premium = usePremium();
   const insets = useSafeAreaInsets();
 
   const [trail, setTrail] = useState<string[]>([]);
@@ -68,7 +71,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
       setEntry(null);
       return;
     }
-    const key = `${leadId}|${currentId}`;
+    const key = `${leadId}|${currentId}|${premium ? 'p' : 'f'}`;
     const hit = cache.get(key);
     if (hit) {
       setEntry(hit);
@@ -81,7 +84,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
     setEntry(null);
-    requestExplain(leadId, email, currentId)
+    requestExplain(leadId, email, currentId, premium)
       .then((e) => {
         cache.set(key, e);
         if (active) setEntry(e);
@@ -93,7 +96,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [currentId, leadId, email]);
+  }, [currentId, leadId, email, premium]);
 
   const value = useMemo(() => ({ open }), [open]);
   const accent = entry ? GROUP_ACCENT[entry.group] : colors.gold;
@@ -154,6 +157,12 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
                   {entry.body.map((p) => (
                     <Text key={p} style={styles.body}>{p}</Text>
                   ))}
+                  {entry.locked ? (
+                    <View style={styles.locked} accessible accessibilityLabel="The full explanation is part of Premium. Subscriptions are not open yet.">
+                      <LockIcon size={18} />
+                      <Text style={styles.lockedText}>The full explanation is part of Premium. Subscriptions are not open yet.</Text>
+                    </View>
+                  ) : null}
                   {entry.yours ? (
                     <AccentView style={[styles.yours, { borderLeftColor: accent }]}>
                       <Text style={styles.yoursLabel}>IN YOUR CHART</Text>
@@ -293,6 +302,11 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     backgroundColor: colors.amethyst,
   },
+  locked: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, padding: space.md, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.gold, borderStyle: 'dashed',
+  },
+  lockedText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold },
   yoursLabel: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
   related: { gap: 8 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
