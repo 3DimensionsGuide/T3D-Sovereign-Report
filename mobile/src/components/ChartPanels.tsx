@@ -186,7 +186,7 @@ export function WheelPanel({ tropical, sidereal, sky = null }: { tropical: Wheel
         <KeyItem swatch={<><Dash color={chartColors.friction} /><SignalMarker kind="friction" size={14} /></>} label="Square · friction" />
         <KeyItem swatch={<><Dash color={chartColors.friction} dashed /><SignalMarker kind="friction" size={14} /></>} label="Opposition · friction" />
         <KeyItem swatch={<><Dash color={chartColors.conjunction} /><SignalMarker kind="neutral" size={14} /></>} label="Conjunction · neutral" />
-        {today ? <KeyItem swatch={<Dot fill={chartColors.stoplight} />} label="Crimson dot · where today's line meets your chart" /> : null}
+        {today ? <KeyItem swatch={<Dot fill={chartColors.stoplight} />} label="Crimson dot · today's line meets your chart" /> : null}
       </View>
       <Text style={styles.note}>
         Whole-sign houses, counted from your rising sign. Thicker lines are within 1° of exact. Aspects are the same in both zodiacs, because the sidereal zodiac moves every point by the same amount. Only the signs and houses change.
