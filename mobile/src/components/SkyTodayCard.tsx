@@ -2,8 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AccentView } from '@/components/AccentView';
 import { Disclosure } from '@/components/Disclosure';
 import { Term } from '@/components/Explain';
+import { MoonIcon } from '@/components/MoonIcon';
 import type { TodayResult } from '@/lib/api';
-import { bodyName, contactSentence, houseTheme, moonGlyph, ordinal, phaseMeaning } from '@/lib/skyText';
+import { bodyName, contactSentence, houseTheme, ordinal, phaseMeaning } from '@/lib/skyText';
 import { houseId, planetId } from '@/lib/termIds';
 import { colors, fonts, space } from '@/theme/tokens';
 
@@ -18,7 +19,7 @@ export function SkyTodayCard({ today }: { today: TodayResult }) {
   return (
     <AccentView style={styles.card} accent={colors.stoplight}>
       <View style={styles.moonHead}>
-        <Text accessibilityElementsHidden style={styles.moonGlyph}>{moonGlyph(moon.phase)}</Text>
+        <MoonIcon illuminationPercent={moon.illuminationPercent} waxing={moon.waxing} size={44} />
         <View style={styles.flex}>
           <Text accessibilityRole="header" style={styles.cardTitle}>The sky today</Text>
           <Text style={styles.moonLine}>
@@ -80,7 +81,6 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, borderLeftWidth: 4, padding: space.lg, gap: 10,
   },
   moonHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  moonGlyph: { fontSize: 40 },
   cardTitle: { fontFamily: fonts.display, fontSize: 24, color: colors.parchment },
   moonLine: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
