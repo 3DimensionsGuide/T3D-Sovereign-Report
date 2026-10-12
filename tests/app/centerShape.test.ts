@@ -28,3 +28,26 @@ test('every point stays inside the box', () => {
 test('an unknown id gives nothing', () => {
   assert.equal(centerPoints('nope'), null);
 });
+
+import { bodyMap } from '../../mobile/src/lib/centerShape';
+
+test('the body map has all nine Centers with exactly one active, drawn last', () => {
+  const map = bodyMap('throat');
+  assert.equal(map.length, 9);
+  assert.equal(map.filter((s) => s.active).length, 1);
+  assert.equal(map[8]?.id, 'throat');
+});
+
+test('Throat, Sacral and Root look different on the body map because they sit in different places', () => {
+  const pts = (id: string) => bodyMap(id).find((s) => s.id === id)?.points;
+  assert.equal(new Set([pts('throat'), pts('sacral'), pts('root')]).size, 3);
+});
+
+test('every body map point stays inside the box', () => {
+  for (const s of bodyMap('head', 30, 46, 1.5)) {
+    for (const pair of s.points.split(' ')) {
+      const [x, y] = pair.split(',').map(Number) as [number, number];
+      assert.ok(x >= 1.5 - 0.01 && x <= 28.5 + 0.01 && y >= 1.5 - 0.01 && y <= 44.5 + 0.01, `${s.id} ${pair}`);
+    }
+  }
+});
