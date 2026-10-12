@@ -17,7 +17,7 @@ export function MoonIcon({ illuminationPercent, waxing, size = 44 }: Props) {
   const shape = moonShape(illuminationPercent, waxing);
   return (
     <Svg width={size} height={size} viewBox="0 0 48 48" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Circle cx={24} cy={24} r={20} fill="#1F1235" stroke={colors.parchmentMuted} strokeWidth={1.5} />
+      <Circle cx={24} cy={24} r={20} fill={colors.amethyst} stroke={colors.parchmentMuted} strokeWidth={1.5} />
       {shape.kind === 'full' ? <Circle cx={24} cy={24} r={20} fill={colors.parchment} /> : null}
       {shape.kind === 'path' ? <Path d={shape.d} fill={colors.parchment} /> : null}
     </Svg>

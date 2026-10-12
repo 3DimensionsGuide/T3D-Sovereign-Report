@@ -14,7 +14,7 @@ import {
   ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
 } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, radius, space } from '@/theme/tokens';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 /** Local-time formatting (avoids the off-by-one-day bug of toISOString). */
@@ -333,7 +333,7 @@ export default function Onboarding() {
             <View style={styles.pickerRow}>
               <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
               <Switch value={emailOptIn} onValueChange={setEmailOptIn}
-                trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
+                trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
                 accessibilityLabel="Email me occasional T3D insights" />
             </View>
             {emailOptIn ? <Text style={styles.hint}>We will email a 6-digit code at the end to confirm it is really you.</Text> : null}
@@ -362,7 +362,7 @@ export default function Onboarding() {
             <View style={styles.pickerRow}>
               <Text style={styles.pickerLabel}>I know my birth time</Text>
               <Switch value={timeKnown} onValueChange={setTimeKnown}
-                trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
+                trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
                 accessibilityLabel="I know my birth time" />
             </View>
             <Text style={styles.hint}>
@@ -449,13 +449,13 @@ const styles = StyleSheet.create({
   actions: { gap: space.md, marginTop: space.md },
   submitError: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   confirmCard: {
-    gap: 4, padding: space.md, borderRadius: 12, borderWidth: 1, borderColor: colors.hairline,
+    gap: 4, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,
     backgroundColor: colors.charcoal,
   },
   confirmLine: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
   placeRow: {
     minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md,
-    borderRadius: 12, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
+    borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
   },
   placeRowOn: { borderColor: colors.gold },
   placeText: { flex: 1, gap: 2 },

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: radius.md, borderBottomRightRadius: radius.md,
     borderWidth: 1, borderTopWidth: 0, borderColor: colors.hairline,
     // Fully solid, so reading text never shows through.
-    backgroundColor: '#121214',
+    backgroundColor: colors.charcoal,
   },
   text: { flex: 1, gap: 2 },
   type: { fontFamily: fonts.display, fontSize: 16, color: colors.parchment },

@@ -84,7 +84,7 @@ export function ReminderCard() {
           value={enabled}
           disabled={busy}
           onValueChange={(v) => void toggle(v)}
-          trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
+          trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
           accessibilityLabel="Daily reminder"
         />
       </View>

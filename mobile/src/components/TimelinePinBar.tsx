@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6, paddingHorizontal: space.md, minHeight: TOUCH,
     borderBottomLeftRadius: radius.md, borderBottomRightRadius: radius.md,
     borderWidth: 1, borderTopWidth: 0, borderColor: colors.hairline,
-    backgroundColor: '#121214',
+    backgroundColor: colors.charcoal,
   },
   text: { flex: 1, gap: 1 },
   month: { fontFamily: fonts.display, fontSize: 18, color: colors.parchment },

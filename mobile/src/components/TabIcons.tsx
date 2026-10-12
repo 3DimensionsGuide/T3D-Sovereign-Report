@@ -1,4 +1,5 @@
 import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
+import { colors } from '@/theme/tokens';
 
 export type TabName = 'today' | 'timeline' | 'readings' | 'practice' | 'chart';
 
@@ -41,15 +42,15 @@ export function TabIcon({ name, color, focused, size = 26 }: Props) {
       {name === 'practice' ? (
         <>
           <Rect x="6.5" y="2.5" width="11" height="19" rx="3.5" fill={fill} stroke={color} strokeWidth={sw} />
-          <Circle cx="12" cy="7.6" r="1.7" fill={focused ? '#0B0B0C' : 'none'} stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} />
-          <Circle cx="12" cy="12" r="1.7" fill={focused ? '#0B0B0C' : 'none'} stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} />
-          <Circle cx="12" cy="16.4" r="1.7" fill={focused ? '#0B0B0C' : 'none'} stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} />
+          <Circle cx="12" cy="7.6" r="1.7" fill={focused ? colors.obsidian : 'none'} stroke={focused ? colors.obsidian : color} strokeWidth={1.4} />
+          <Circle cx="12" cy="12" r="1.7" fill={focused ? colors.obsidian : 'none'} stroke={focused ? colors.obsidian : color} strokeWidth={1.4} />
+          <Circle cx="12" cy="16.4" r="1.7" fill={focused ? colors.obsidian : 'none'} stroke={focused ? colors.obsidian : color} strokeWidth={1.4} />
         </>
       ) : null}
       {name === 'chart' ? (
         <>
           <Polygon points="12,2.5 21.5,12 12,21.5 2.5,12" fill={fill} stroke={color} strokeWidth={sw} strokeLinejoin="round" />
-          <Line x1="12" y1="8" x2="12" y2="16" stroke={focused ? '#0B0B0C' : color} strokeWidth={1.4} strokeLinecap="round" />
+          <Line x1="12" y1="8" x2="12" y2="16" stroke={focused ? colors.obsidian : color} strokeWidth={1.4} strokeLinecap="round" />
           <Rect x="0" y="0" width="0" height="0" />
         </>
       ) : null}

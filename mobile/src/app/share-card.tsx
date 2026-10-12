@@ -121,7 +121,7 @@ export default function ShareCard() {
         <Switch
           value={withName}
           onValueChange={setWithName}
-          trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
+          trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
           accessibilityLabel="Add my first name"
         />
       </View>

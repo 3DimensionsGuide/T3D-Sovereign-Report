@@ -160,7 +160,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
       ) : null}
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>Birth time unknown</Text>
-        <Switch value={timeUnknown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: '#6B6B73', true: colors.gold }} ios_backgroundColor="#6B6B73"
+        <Switch value={timeUnknown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
           accessibilityLabel="Birth time unknown" />
       </View>
       {!timeKnown ? (

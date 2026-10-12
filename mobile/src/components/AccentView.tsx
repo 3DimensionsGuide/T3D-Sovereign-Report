@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { colors } from '@/theme/tokens';
 import { StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
 
 interface Props extends Omit<ViewProps, 'style'> {
@@ -21,7 +22,7 @@ const BAR = 4;
 export function AccentView({ style, accent, children, ...rest }: Props) {
   const flat = StyleSheet.flatten(style) ?? {};
   const { borderLeftColor, borderLeftWidth: _w, padding, paddingLeft, paddingHorizontal, ...others } = flat;
-  const color = accent ?? (borderLeftColor as string | undefined) ?? '#D4AF37';
+  const color = accent ?? (borderLeftColor as string | undefined) ?? colors.gold;
   const baseLeft = paddingLeft ?? paddingHorizontal ?? padding ?? 0;
   const left = (typeof baseLeft === 'number' ? baseLeft : 0) + BAR;
   return (

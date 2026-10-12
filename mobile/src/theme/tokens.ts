@@ -32,6 +32,8 @@ export const colors = {
   parchmentMuted: 'rgba(245,245,243,0.72)',
   hairline: 'rgba(245,245,243,0.14)',
   danger: '#FF8A8A',
+  /** Off position of every switch. */
+  switchOff: '#6B6B73',
 } as const;
 
 export const fonts = {
