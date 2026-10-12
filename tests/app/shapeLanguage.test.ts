@@ -157,7 +157,9 @@ test('the signal lamp pairs every lamp with a shape and a word, and honours Redu
 
 test('the Sun and Moon longitudes stay on the server and feed the Vehicle lamp', () => {
   const route = read('src/app/api/app/today/route.ts');
-  assert.match(route, /skyLongitudes: _serverOnly/, 'stripped before the sky leaves the server');
+  assert.match(route, /const \{ skyLongitudes, \.\.\.sky \}/, 'taken out of the sky before it leaves the server');
+  assert.doesNotMatch(route, /skyLongitudes\.(sun|moon)\s*[,}]/, 'only gates are returned, never the raw longitudes');
+  assert.match(route, /gates: \{ sun: longitudeToGate\(skyLongitudes\.sun\)/);
   const triad = read('src/app/api/app/triad-today/route.ts');
   assert.match(triad, /longitudeToGate\(sky\.skyLongitudes\.sun\)/);
   assert.match(triad, /buildTriadToday\(/);
