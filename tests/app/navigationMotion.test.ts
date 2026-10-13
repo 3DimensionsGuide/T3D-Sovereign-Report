@@ -42,3 +42,13 @@ test('the guidance voice is loaded and used under page titles; changing digits u
   }
   assert.match(read('mobile/src/components/SignalRibbon.tsx'), /\.\.\.tabular/);
 });
+
+test('the first-time tour shows once, can be skipped, and can be replayed from About', () => {
+  const tour = read('mobile/src/components/CoachTour.tsx');
+  assert.match(tour, /label="Skip"/);
+  assert.match(tour, /useReduceMotion/);
+  assert.match(tour, /accessibilityViewIsModal/);
+  assert.match(read('mobile/src/store/useCoachStore.ts'), /t3d-coach-v1/);
+  assert.match(read('mobile/src/app/(tabs)/_layout.tsx'), /<CoachTour \/>/);
+  assert.match(read('mobile/src/app/your-data.tsx'), /Replay the welcome tour/);
+});

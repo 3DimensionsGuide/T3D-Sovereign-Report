@@ -9,6 +9,7 @@ import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
 import { clearReminder } from '@/lib/reminder';
 import { clearAllCached } from '@/lib/persistentCache';
 import { crashReportingOn, sendTestCrashReport } from '@/lib/sentry';
+import { useCoachStore } from '@/store/useCoachStore';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -105,6 +106,15 @@ export default function YourData() {
             label="READ THE PRIVACY POLICY"
             variant="ghost"
             onPress={() => { void WebBrowser.openBrowserAsync('https://www.3dimensions.guide/privacy'); }}
+          />
+
+          <GoldButton
+            label="Replay the welcome tour"
+            variant="ghost"
+            onPress={() => {
+              router.navigate('/today' as Href);
+              useCoachStore.getState().replay();
+            }}
           />
 
           {__DEV__ && crashReportingOn ? (
