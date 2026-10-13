@@ -107,6 +107,7 @@ export interface GateToday {
   channel: string | null;
   meets: string;
   advice: string;
+  reading: { theme: string; shadow: string; guidance: string };
 }
 
 export interface GateTodayResult {

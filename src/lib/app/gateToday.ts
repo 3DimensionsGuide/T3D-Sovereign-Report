@@ -13,6 +13,7 @@ import { GATE_CENTER_MAP, UNIQUE_CHANNELS, longitudeToGate } from '@/server/engi
 import { GATE_KEYNOTES } from '@/lib/report/section3/gate-content';
 import { pickAuthorityContent, pickTypeContent } from '@/lib/app/transitCard';
 import { contactFor, type Contact, type VehicleGateData } from '@/lib/app/signal';
+import { GATE_READINGS } from '@/lib/app/gateReadings';
 import { centerName, ingresses, jdToIso, sentence, type GateVehicle } from '@/lib/app/gateEvents';
 
 export interface GateToday {
@@ -30,8 +31,10 @@ export interface GateToday {
   channel: string | null;
   /** How the gate meets this chart, in one sentence. */
   meets: string;
-  /** What to do with it, in one or two sentences. */
+  /** What to do with it for this kind of contact, in one or two sentences. */
   advice: string;
+  /** This gate's own reading: what the Sun brings through it, where it tips over, and a piece of guidance. */
+  reading: { theme: string; shadow: string; guidance: string };
 }
 
 export interface GateTodayResult {
@@ -74,7 +77,8 @@ export function buildGateToday(
   };
   const make = (gate: number, line: number, from: number | null, until: number): GateToday | null => {
     const k = GATE_KEYNOTES[gate];
-    if (!k) return null;
+    const r = GATE_READINGS[gate];
+    if (!k || !r) return null;
     const c = contactFor('Sun', gate, data, 0);
     const channel = c.channel ?? null;
     return {
@@ -89,6 +93,7 @@ export function buildGateToday(
       channel,
       meets: sentence('Sun', gate, c.kind, channel ?? undefined, GATE_CENTER_MAP[gate]),
       advice: ADVICE[c.kind](channel),
+      reading: { theme: r.theme, shadow: r.shadow, guidance: r.guidance },
     };
   };
 

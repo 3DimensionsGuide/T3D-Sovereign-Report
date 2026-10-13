@@ -21,10 +21,14 @@ function GateBlock({ g, index, total }: { g: GateToday; index: number; total: nu
       </Text>
       <Text accessibilityRole="header" style={styles.gateTitle}>Gate {g.gate}: {g.name}</Text>
       <Text style={styles.body}>{g.meaning} It sits in the {g.center} Center, and the Sun is in line {g.line}.</Text>
-      <Text style={styles.label}>How it meets your chart</Text>
-      <Text style={styles.body}>{g.meets}</Text>
+      <Text style={styles.label}>What the Sun brings</Text>
+      <Text style={styles.body}>{g.reading.theme}</Text>
+      <Text style={styles.label}>Where it tips over</Text>
+      <Text style={styles.body}>{g.reading.shadow}</Text>
       <Text style={styles.label}>What to do with it</Text>
-      <Text style={styles.body}>{g.advice}</Text>
+      <Text style={styles.body}>{g.reading.guidance}</Text>
+      <Text style={styles.label}>How it meets your chart</Text>
+      <Text style={styles.body}>{g.meets} {g.advice}</Text>
     </AccentView>
   );
 }
