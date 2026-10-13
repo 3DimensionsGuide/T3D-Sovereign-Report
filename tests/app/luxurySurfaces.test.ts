@@ -17,5 +17,5 @@ test('luxury surface tokens exist and the gate card uses them', () => {
   const t = read('mobile/src/theme/tokens.ts');
   for (const k of ['surface', 'surfaceRaised', 'goldWash', 'goldEdge']) assert.match(t, new RegExp(`\\b${k}:`));
   assert.match(read('mobile/src/components/VehicleToday.tsx'), /backgroundColor: colors\.surface/);
-  assert.match(read('mobile/src/components/ChartPanels.tsx'), /aspectChipOn: \{[^}]*goldWash/);
+  assert.match(read('mobile/src/components/ChartPanels.tsx'), /aspectChipOn: \{[^}]*gold/);
 });

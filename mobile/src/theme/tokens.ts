@@ -22,9 +22,13 @@ export const colors = {
   /** Smoked graphite: the luxury surface for cards, tabs and sheets. Neutral, so gold and the Triad colors carry the color. */
   surface: '#17161A',
   /** One step lighter, for a card sitting on a card. */
-  surfaceRaised: '#201E24',
+  surfaceRaised: '#27242B',
   /** A faint gold wash for the selected state of a tab or chip. */
   goldWash: 'rgba(212,175,55,0.12)',
+  /** A clearly visible neutral outline for chips and buttons on a dark surface. */
+  line: 'rgba(245,245,243,0.30)',
+  /** A gold divider between table rows. */
+  goldLine: 'rgba(212,175,55,0.22)',
   /** A fine gold edge for a card that is worth a second look. */
   goldEdge: 'rgba(212,175,55,0.30)',
 
