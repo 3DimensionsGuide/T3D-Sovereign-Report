@@ -42,7 +42,7 @@ export function Fold({ id, lens, title, hint, children }: Props) {
   };
 
   return (
-    <View style={styles.card}>
+    <View style={open ? styles.openWrap : styles.card}>
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
@@ -67,10 +67,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
     backgroundColor: colors.charcoal, paddingHorizontal: space.lg, paddingVertical: space.sm,
   },
+  // Open: no outer box, so the cards inside keep their full width and are not boxed twice.
+  openWrap: { gap: space.sm },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 56 },
   headText: { flex: 1, gap: 2 },
   title: { fontFamily: fonts.bodyBold, fontSize: 16 },
   hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.parchmentMuted },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 24, lineHeight: 26, color: colors.parchmentMuted },
-  body: { gap: space.md, paddingTop: space.sm, paddingBottom: space.md },
+  body: { gap: space.md },
 });
