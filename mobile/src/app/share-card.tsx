@@ -6,20 +6,29 @@ import { captureRef } from 'react-native-view-shot';
 import { Screen } from '@/components/Screen';
 import { GoldButton } from '@/components/GoldButton';
 import { ProfileShareCard } from '@/components/ProfileShareCard';
+import { CarouselShareCard } from '@/components/CarouselShareCard';
 import { SigilShareCard } from '@/components/SigilShareCard';
 import { StoryShareCard } from '@/components/StoryShareCard';
 import { TodayShareCard } from '@/components/TodayShareCard';
 import { Segmented } from '@/components/Segmented';
+import { LENSES, type Lens } from '@/lib/carouselSlides';
 import { useTriadToday } from '@/lib/useTriadToday';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
 
-type Kind = 'profile' | 'sigil' | 'today';
+type Kind = 'profile' | 'sigil' | 'carousel' | 'today';
 
 const KINDS = [
   { value: 'profile', label: 'My Triad' },
   { value: 'sigil', label: 'Sigil' },
+  { value: 'carousel', label: 'Carousel' },
   { value: 'today', label: 'Today' },
+] as const;
+
+const SLIDES = [
+  { value: 'vehicle', label: '1 Vehicle' },
+  { value: 'road', label: '2 Road' },
+  { value: 'stoplight', label: '3 Stoplight' },
 ] as const;
 
 type Shape = 'post' | 'story';
@@ -32,6 +41,7 @@ const SHAPES = [
 const LINKS: Record<Kind, string> = {
   profile: 'https://3dimensions.guide/?ref=card-profile',
   sigil: 'https://3dimensions.guide/?ref=card-sigil',
+  carousel: 'https://3dimensions.guide/?ref=card-carousel',
   today: 'https://3dimensions.guide/?ref=card-today',
 };
 
@@ -43,6 +53,7 @@ export default function ShareCard() {
   const { kind: startKind } = useLocalSearchParams<{ kind?: string }>();
   const [kind, setKind] = useState<Kind>(startKind === 'sigil' ? 'sigil' : 'profile');
   const [shape, setShape] = useState<Shape>('post');
+  const [lens, setLens] = useState<Lens>('vehicle');
   const tall = (kind === 'profile' || kind === 'sigil') && shape === 'story';
   const triad = useTriadToday(chart?.leadId, profile?.email.trim());
   const [withName, setWithName] = useState(false);
@@ -56,7 +67,7 @@ export default function ShareCard() {
     setBusy(true);
     try {
       const uri = await captureRef(cardRef, { format: 'png', quality: 1, width: 1080, height: tall ? 1920 : 1350, result: 'tmpfile' });
-      const message = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : 'My T3D Triad'} · ${LINKS[kind]}`;
+      const message = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad'} · ${LINKS[kind]}`;
       const result = await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
       if (result.action === Share.sharedAction) success();
     } catch {
@@ -84,6 +95,8 @@ export default function ShareCard() {
         <Text style={styles.small}>
           {kind === 'today'
             ? 'The card shows today’s date, your Type and Authority, your Personal Day and the main sky contact. It never shows your birth date, time, place or last name.'
+            : kind === 'carousel'
+            ? 'Three slides, one for each lens, made for an Instagram carousel. Pick a slide, save it, then post all three together. It never shows your birth date, time, place or last name.'
             : kind === 'sigil'
             ? 'Your Sigil is a drawing made from your chart, so no two are the same. The card shows it with your Type, Life Path and Sun sign. It never shows your birth date, time, place or last name.'
             : 'The card shows your Type, Life Path and Sun sign. Choose Story for the tall Instagram Stories shape. It never shows your birth date, time, place or last name.'}
@@ -91,7 +104,8 @@ export default function ShareCard() {
       </View>
 
       <Segmented options={KINDS} value={kind} onChange={setKind} compact />
-      {kind !== 'today' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
+      {kind === 'carousel' ? <Segmented options={SLIDES} value={lens} onChange={setLens} compact /> : null}
+      {kind !== 'today' && kind !== 'carousel' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
 
       <View style={styles.preview}>
         {kind === 'today' ? (
@@ -102,6 +116,14 @@ export default function ShareCard() {
               {triad.error ?? 'Getting today’s frame…'}
             </Text>
           )
+        ) : kind === 'carousel' ? (
+          <CarouselShareCard
+            ref={cardRef}
+            lens={lens}
+            chart={chart}
+            birthTimeKnown={profile.birthTimeKnown}
+            firstName={withName && first ? first : null}
+          />
         ) : kind === 'sigil' ? (
           <SigilShareCard
             ref={cardRef}
@@ -142,7 +164,7 @@ export default function ShareCard() {
       </View>
 
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-      <GoldButton label="Share or save image" onPress={onShare} loading={busy} disabled={kind === 'today' && !triad.data} />
+      <GoldButton label={kind === 'carousel' ? `Share or save slide ${LENSES.indexOf(lens) + 1} of 3` : 'Share or save image'} onPress={onShare} loading={busy} disabled={kind === 'today' && !triad.data} />
       <Text style={styles.small}>In the share sheet, choose “Save Image” to keep it in Photos.</Text>
       <GoldButton label="Share the link only" variant="ghost" onPress={onShareLink} />
       <Text style={styles.small}>
