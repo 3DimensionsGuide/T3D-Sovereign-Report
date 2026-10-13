@@ -15,7 +15,9 @@ test('a day with no gate change has one gate, already under way, with when the S
   const g = r.gates[0]!;
   assert.equal(g.gate, GATE_SEQUENCE[10]);
   assert.equal(g.from, null);
-  assert.ok(Date.parse(g.until) > Date.parse('2026-01-01'));
+  const startMs = Date.UTC(2000, 0, 1, 12) + (START - 2451545.0) * 86_400_000;
+  const stays = (Date.parse(g.until) - startMs) / 86_400_000;
+  assert.ok(stays > 2.7 && stays < 2.9, `leaves after ${stays} days`);
   assert.ok(g.name.length > 0 && g.meaning.length > 0 && g.center.length > 0);
 });
 
