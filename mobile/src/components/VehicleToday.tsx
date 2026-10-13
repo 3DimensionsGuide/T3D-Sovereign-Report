@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Disclosure } from '@/components/Disclosure';
 import { LensIcon } from '@/components/Lens';
-import type { GateToday, GateTodayResult } from '@/lib/timelineTypes';
+import type { GateToday, GateTodayResult, MoonChannel } from '@/lib/timelineTypes';
 import { colors, fonts, radius, space, themes } from '@/theme/tokens';
 
 const T = themes.timeline;
@@ -38,6 +38,27 @@ function GateBlock({ g, index, total, dayLabel }: { g: GateToday; index: number;
   );
 }
 
+/** One stretch when the Moon sits in the missing half of one of your channels. */
+function MoonBlock({ m, dayWord }: { m: MoonChannel; dayWord: string }) {
+  return (
+    <View style={styles.gate}>
+      <Text style={styles.when}>{gateWindow(m, dayWord)}</Text>
+      <Text accessibilityRole="header" style={styles.gateTitle}>
+        Moon in Gate {m.gate}: Channel {m.channel}{m.channelName ? `, ${m.channelName}` : ''}
+      </Text>
+      <Text style={styles.body}>Gate {m.gate} ({m.name}) is the missing half of a channel you hold one gate of. While the Moon is here that channel is lit for you: a spark, not a decision.</Text>
+      <Text style={styles.label}>What the channel brings</Text>
+      <Text style={styles.body}>{m.reading.theme}</Text>
+      <Disclosure label="Show more">
+        <Text style={styles.label}>Where it tips over</Text>
+        <Text style={styles.body}>{m.reading.shadow}</Text>
+        <Text style={styles.label}>What to do with it</Text>
+        <Text style={styles.body}>{m.reading.guidance}</Text>
+      </Disclosure>
+    </View>
+  );
+}
+
 /**
  * Top of the Vehicle lens: the Sun's gate(s) today, in one panel like "Your year". What the Sun brings is
  * in view; the shadow, what to do and how it meets this chart open under Show more. The person's own Strategy
@@ -55,6 +76,18 @@ export function VehicleToday({ data, dayLabel = null }: { data: GateTodayResult;
         <Text accessibilityRole="header" style={styles.headText}>{title}</Text>
       </View>
       {data.gates.map((g, i) => <GateBlock key={g.gate} g={g} index={i} total={data.gates.length} dayLabel={dayLabel} />)}
+      {(data.moon ?? []).length > 0 ? (
+        <View style={styles.moonWrap}>
+          <Text accessibilityRole="header" style={styles.moonHead}>
+            {dayLabel ? 'The Moon completes your channel that day' : 'The Moon completes your channel today'}
+          </Text>
+          {(data.moon ?? []).map((m, i) => (
+            <View key={`${m.gate}-${m.until}`} style={i > 0 ? styles.gateDivider : undefined}>
+              <MoonBlock m={m} dayWord={dayLabel ? 'that day' : 'today'} />
+            </View>
+          ))}
+        </View>
+      ) : null}
       {data.strategy || data.authority ? (
         <View style={[styles.anchor, styles.gateDivider]}>
           <Text style={styles.label}>Your anchor</Text>
@@ -79,6 +112,8 @@ const styles = StyleSheet.create({
   gateTitle: { fontFamily: fonts.bodyBold, fontSize: 18, lineHeight: 25, color: colors.parchment },
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
+  moonWrap: { gap: space.md, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.rule, paddingTop: space.md },
+  moonHead: { fontFamily: fonts.display, fontSize: 18, lineHeight: 25, color: colors.parchment },
   anchor: { gap: 6 },
   foot: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
 });

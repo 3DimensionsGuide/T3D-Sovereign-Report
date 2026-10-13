@@ -784,7 +784,8 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     gateToday = buildGateToday(startJd, input.vehicle, sunAt);
     gateDays = [];
     for (let i = 1; i <= Math.min(GATE_DAYS_AHEAD, days - 1); i++) {
-      gateDays.push({ dayIndex: i, gates: buildGateToday(startJd + i, input.vehicle, sunAt).gates });
+      const g = buildGateToday(startJd + i, input.vehicle, sunAt);
+      gateDays.push({ dayIndex: i, gates: g.gates, moon: g.moon });
     }
   }
 

@@ -14,6 +14,7 @@ import { GATE_KEYNOTES } from '@/lib/report/section3/gate-content';
 import { pickAuthorityContent, pickTypeContent } from '@/lib/app/transitCard';
 import { contactFor, type Contact, type VehicleGateData } from '@/lib/app/signal';
 import { GATE_READINGS } from '@/lib/app/gateReadings';
+import { CHANNEL_READINGS, channelKey } from '@/lib/app/channelReadings';
 import { centerName, ingresses, jdToIso, sentence, type GateVehicle } from '@/lib/app/gateEvents';
 
 export interface GateToday {
@@ -44,10 +45,34 @@ export const GATE_DAYS_AHEAD = 14;
 export interface GateDay {
   dayIndex: number;
   gates: GateToday[];
+  moon: MoonChannel[];
+}
+
+/**
+ * A stretch of the day when the Moon sits in the missing half of one of the person's channels (it changes gate
+ * about every ten hours, so only those stretches are listed). The channel is lit for that while: a spark, not a decision.
+ */
+export interface MoonChannel {
+  gate: number;
+  /** The gate's I Ching name. */
+  name: string;
+  center: string;
+  /** "30-41": the channel the Moon completes. */
+  channel: string;
+  /** The channel's name, e.g. Recognition. */
+  channelName: string;
+  /** When the Moon enters the gate today (ISO, UTC); null when it was already there at the start of the day. */
+  from: string | null;
+  /** When the Moon leaves the gate (ISO, UTC). */
+  until: string;
+  /** What the lit channel brings, where it tips over, and a piece of guidance. */
+  reading: { theme: string; shadow: string; guidance: string };
 }
 
 export interface GateTodayResult {
   gates: GateToday[];
+  /** The stretches today when the Moon completes one of the person's channels; empty on most days. */
+  moon: MoonChannel[];
   /** The person's own Strategy and Authority practice, which decide. Null when their Type or Authority is not known. */
   strategy: string | null;
   authority: string | null;
@@ -106,6 +131,7 @@ export function buildGateToday(
     };
   };
 
+  const moon = buildMoonChannels(startJd, data, lonAt);
   const now = longitudeToGate(lonAt('sun', startJd));
   // The Sun's next gate changes after the start of the day: the first is when it leaves this gate.
   const changes = ingresses('sun', startJd, startJd + 14, lonAt);
@@ -122,7 +148,55 @@ export function buildGateToday(
   const auth = pickAuthorityContent(vehicle.authority);
   return {
     gates,
+    moon,
     strategy: type ? `Strategy (${type.type}): ${type.strategyPractice}` : null,
     authority: auth ? `Authority (${auth.authority}): ${auth.doList[0]}.` : null,
   };
+}
+
+const CHANNEL_NAMES: Record<string, string> = Object.fromEntries(
+  UNIQUE_CHANNELS.map((c) => [channelKey(c.gates[0], c.gates[1]), c.name]),
+);
+
+/**
+ * The stretches of one day (from `startJd`) when the Moon is in a gate that completes a channel the person
+ * holds half of. The Moon spends about ten hours in a gate, so a day has two or three gates and, for most people,
+ * a few days in a month carry one of these.
+ */
+export function buildMoonChannels(
+  startJd: number,
+  data: VehicleGateData,
+  lonAt: (b: 'sun' | 'moon', jd: number) => number,
+): MoonChannel[] {
+  const endJd = startJd + 1;
+  const first = longitudeToGate(lonAt('moon', startJd));
+  const changes = ingresses('moon', startJd, endJd + 1, lonAt);
+  const segments: { gate: number; from: number | null; until: number }[] = [];
+  let cur = { gate: first.gate, from: null as number | null };
+  for (const ing of changes) {
+    segments.push({ gate: cur.gate, from: cur.from, until: ing.jd });
+    cur = { gate: ing.gate, from: ing.jd };
+    if (ing.jd >= endJd) break;
+  }
+  const out: MoonChannel[] = [];
+  for (const seg of segments) {
+    // Only the stretches that overlap this day.
+    if (seg.until <= startJd || (seg.from !== null && seg.from >= endJd)) continue;
+    const c = contactFor('Moon', seg.gate, data, 0);
+    if (c.kind !== 'electromagnetic' || !c.channel) continue;
+    const k = GATE_KEYNOTES[seg.gate];
+    const r = CHANNEL_READINGS[c.channel];
+    if (!k || !r) continue;
+    out.push({
+      gate: seg.gate,
+      name: k.ichingName,
+      center: centerName(k.center),
+      channel: c.channel,
+      channelName: CHANNEL_NAMES[c.channel] ?? '',
+      from: seg.from === null ? null : jdToIso(seg.from),
+      until: jdToIso(seg.until),
+      reading: { theme: r.theme, shadow: r.shadow, guidance: r.guidance },
+    });
+  }
+  return out;
 }

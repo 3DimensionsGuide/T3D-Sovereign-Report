@@ -10,7 +10,7 @@ export { localDateString };
  * Bump when the server adds something to the timeline, so a copy saved before that is not reused for the rest of the day.
  * v2: the Sun's gate(s) today for the Vehicle lens.
  */
-const CACHE_VERSION = 5;
+const CACHE_VERSION = 6;
 
 /** The next stretch of days. One copy per chart per day, kept on the phone, and it moves to the new day by itself. */
 export function useTimeline(leadId: number | undefined, email: string | undefined, days = 60) {

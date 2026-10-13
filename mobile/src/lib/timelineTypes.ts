@@ -111,8 +111,21 @@ export interface GateToday {
   reading: { theme: string; shadow: string; guidance: string };
 }
 
+export interface MoonChannel {
+  gate: number;
+  name: string;
+  center: string;
+  channel: string;
+  channelName: string;
+  from: string | null;
+  until: string;
+  reading: { theme: string; shadow: string; guidance: string };
+}
+
 export interface GateTodayResult {
   gates: GateToday[];
+  /** The stretches today when the Moon completes one of the person's channels. Optional: older saved copies lack it. */
+  moon?: MoonChannel[];
   strategy: string | null;
   authority: string | null;
 }
@@ -120,6 +133,7 @@ export interface GateTodayResult {
 export interface GateDay {
   dayIndex: number;
   gates: GateToday[];
+  moon?: MoonChannel[];
 }
 
 export interface TimelineResult {
