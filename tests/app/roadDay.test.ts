@@ -25,9 +25,11 @@ test('roadDayFor returns null for a missing day or missing meanings', () => {
 
 test('Timeline Road lens shows RoadToday, future days gated', () => {
   const src = readFileSync('mobile/src/app/(tabs)/timeline.tsx', 'utf8');
-  assert.match(src, /selectedDay > 0 && !premium/);
-  assert.match(src, /roadDayFor\(data, selectedDay\)/);
-  assert.match(src, /<RoadToday day=\{rd\}/);
+  assert.match(src, /<RoadDayBlock data=\{data\} selectedDay=\{selectedDay\} premium=\{premium\}/);
+  const b = readFileSync('mobile/src/components/DayLenses.tsx', 'utf8');
+  assert.match(b, /selectedDay > 0 && !premium/);
+  assert.match(b, /roadDayFor\(data, selectedDay\)/);
+  assert.match(b, /<RoadToday day=\{rd\}/);
 });
 
 test('server returns a reading for every Personal Day number', () => {

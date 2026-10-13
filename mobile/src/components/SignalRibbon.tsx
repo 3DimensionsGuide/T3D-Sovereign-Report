@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import { LensIcon, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
+import { DayDetail } from '@/components/DayDetail';
 import type { TimelineEvent, TimelineResult } from '@/lib/timelineTypes';
 import { colors, fonts, radius, space, tabular, themes } from '@/theme/tokens';
 
@@ -43,13 +44,15 @@ interface Props {
   data: TimelineResult;
   /** Told which day (0 is today) the person has tapped, so the rest of the screen can follow it. */
   onSelectDay?: (index: number) => void;
+  /** Premium unlocks the meaning of future days and transits. */
+  premium?: boolean;
 }
 
 /**
  * A scrolling ribbon of the next 60 days. Each day shows its date, its Personal Day number and the
  * strongest signal of the day as a shape plus a word in the detail below. Tap a day to read its events.
  */
-export function SignalRibbon({ data, onSelectDay }: Props) {
+export function SignalRibbon({ data, onSelectDay, premium = false }: Props) {
   const days = useMemo(() => {
     const byDay = new Map<string, TimelineEvent[]>();
     for (const e of data.events) {
@@ -97,26 +100,17 @@ export function SignalRibbon({ data, onSelectDay }: Props) {
         })}
       </ScrollView>
 
-      <View style={styles.detail} accessibilityLiveRegion="polite">
-        <Text maxFontSizeMultiplier={1.15} style={styles.detailTitle}>
-          {date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} · Personal Day {current.personalDay}
-        </Text>
-        {current.events.length === 0 ? (
-          <Text maxFontSizeMultiplier={1.15} style={styles.sub}>A quiet day. Nothing close to your chart.</Text>
-        ) : (
-          current.events.map((e) => {
-            const s = eventSignal(e);
-            return (
-              <View key={e.id} style={styles.eventLine}>
-                {s ? <SignalMarker kind={s} size={15} /> : e.kind === 'gate' ? <LensIcon lens="vehicle" size={13} /> : <View style={styles.noMarker} />}
-                <Text maxFontSizeMultiplier={1.15} style={styles.eventText}>
-                  {e.title}{s ? ` · ${SIGNAL_LABEL[s]}` : ''}
-                </Text>
-              </View>
-            );
-          })
-        )}
-      </View>
+      <DayDetail
+        data={data}
+        index={selected}
+        dayKey={current.key}
+        todayKey={days[0]?.key ?? current.key}
+        premium={premium}
+        events={current.events}
+        signalOf={eventSignal}
+        title={date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+        personalDay={current.personalDay}
+      />
     </View>
   );
 }

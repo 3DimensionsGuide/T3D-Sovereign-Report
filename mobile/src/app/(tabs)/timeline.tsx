@@ -31,8 +31,7 @@ import { gateReadingForDay } from '@/lib/gateDay';
 import { usePremium } from '@/lib/usePremium';
 import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
-import { RoadToday } from '@/components/RoadToday';
-import { roadDayFor } from '@/lib/roadDay';
+import { RoadDayBlock, VehicleDayBlock } from '@/components/DayLenses';
 
 const T = themes.timeline;
 
@@ -439,7 +438,7 @@ export default function Timeline() {
         <>
           {offline ? <OfflineNote savedAt={savedAt} /> : null}
           <FadeIn delay={40}>
-            <SignalRibbon data={data} onSelectDay={setSelectedDay} />
+            <SignalRibbon data={data} onSelectDay={setSelectedDay} premium={premium} />
           </FadeIn>
           <FadeIn delay={60}>
             <Segmented
@@ -449,21 +448,15 @@ export default function Timeline() {
               compact
             />
           </FadeIn>
-          {lens === 'all' || lens === 'road' ? <YearCard data={data} /> : null}
-
-          {lens === 'road' ? (
-            selectedDay > 0 && !premium ? (
-              <PremiumGate
-                title={`Your Personal Day on ${dayTitle(data.personal[selectedDay]?.date)}`}
-                detail="Today's Personal Day reading is free. Look ahead with Premium: the theme, where to lean in and what to watch, for each day."
-              />
-            ) : (() => {
-              const rd = roadDayFor(data, selectedDay);
-              return rd ? (
-                <RoadToday day={rd} dayLabel={selectedDay > 0 ? dayTitle(rd.date) : null} />
-              ) : null;
-            })()
+          {lens === 'all' || lens === 'road' ? (
+            <FadeIn><RoadDayBlock data={data} selectedDay={selectedDay} premium={premium} /></FadeIn>
           ) : null}
+
+          {lens === 'all' ? (
+            <FadeIn><VehicleDayBlock data={data} selectedDay={selectedDay} premium={premium} /></FadeIn>
+          ) : null}
+
+          {lens === 'all' || lens === 'road' ? <YearCard data={data} /> : null}
 
           {lens === 'road' ? (
             <Panel label="Your Personal Days" lens="road">
@@ -506,19 +499,7 @@ export default function Timeline() {
           {lens === 'road' ? null : (
           <>
           {lens === 'vehicle' && selectedDay > 0 ? (
-            !premium ? (
-              <PremiumGate
-                title={`The gates on ${dayTitle(data.personal[selectedDay]?.date)}`}
-                detail="Today's gate reading is free. Look ahead with Premium: what the Sun brings, where it tips over, and what to do, for each day."
-              />
-            ) : (() => {
-              const reading = gateReadingForDay(data, selectedDay);
-              return reading ? (
-                <VehicleToday data={reading} dayLabel={dayTitle(data.personal[selectedDay]?.date)} />
-              ) : (
-                <Text style={styles.sub}>Gate readings reach {data.gateDays?.length ?? 14} days ahead. Pick a nearer day to read it.</Text>
-              );
-            })()
+            <VehicleDayBlock data={data} selectedDay={selectedDay} premium={premium} />
           ) : lens === 'vehicle' ? (
             data.gateToday && data.gateToday.gates.length > 0 ? (
               <>

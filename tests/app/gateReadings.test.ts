@@ -50,5 +50,7 @@ test('the Timeline locks future gate readings and follows the ribbon', () => {
   const s = readFileSync('mobile/src/app/(tabs)/timeline.tsx', 'utf8');
   assert.match(s, /onSelectDay=\{setSelectedDay\}/);
   assert.match(s, /selectedDay > 0/);
-  assert.match(s, /!premium \? \(\s*<PremiumGate\s+title=\{`The gates on/);
+  assert.match(s, /<VehicleDayBlock data=\{data\} selectedDay=\{selectedDay\} premium=\{premium\}/);
+  const b = readFileSync('mobile/src/components/DayLenses.tsx', 'utf8');
+  assert.match(b, /if \(!premium\) \{\s*return \(\s*<PremiumGate\s+title=\{`The gates on/);
 });
