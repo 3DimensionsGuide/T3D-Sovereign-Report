@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   hero: { gap: space.md, paddingTop: space.lg },
   // The logo is 694 by 506, so the box keeps that shape and the lettering is never squashed.
   logo: { width: 208, aspectRatio: 694 / 506, alignSelf: 'flex-start' },
-  eyebrow: { fontFamily: fonts.bodyMedium, fontSize: 15, letterSpacing: 0.5, color: colors.gold },
+  eyebrow: { fontFamily: fonts.displayRegular, fontSize: 15, letterSpacing: 5.5, textTransform: 'uppercase', color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
   lede: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
   pickerRow: {
