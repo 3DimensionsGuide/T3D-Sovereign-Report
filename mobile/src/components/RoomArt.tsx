@@ -156,8 +156,9 @@ function SunPath({ color, width }: { color: string; width: number }) {
   const x0 = width * 0.06;
   const x1 = width * 0.94;
   const xc = width / 2;
-  const horizon = 250;
-  const peak = -110; // control point height, which puts the top of the arc near y = 70
+  // A shallow arc kept above the page title, so no marker ever sits behind a line of text.
+  const horizon = 92;
+  const peak = 14; // control point height, which puts the top of the arc near y = 53
   const at = (t: number) => ({
     x: (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * xc + t * t * x1,
     y: (1 - t) * (1 - t) * horizon + 2 * (1 - t) * t * peak + t * t * horizon,
