@@ -22,10 +22,12 @@ const STARS = (() => {
  * One piece of faint line art behind a room's content. Decorative only: hidden from screen readers,
  * ignores touches, and never moves.
  */
-export function RoomArtLayer({ kind, color, width }: { kind: ArtKind; color: string; width: number }) {
+export function RoomArtLayer({
+  kind, color, width, opacity = 1,
+}: { kind: ArtKind; color: string; width: number; opacity?: number }) {
   const fade = `fade${useId().replace(/\W/g, '')}`;
   const reduce = useReduceMotion();
-  if (kind === 'none') return null;
+  if (kind === 'none' || opacity < 0.01) return null;
   return (
     <Animated.View
       key={kind}
@@ -33,7 +35,7 @@ export function RoomArtLayer({ kind, color, width }: { kind: ArtKind; color: str
       pointerEvents="none"
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      style={styles.fill}
+      style={[styles.fill, { opacity }]}
     >
       <Svg width="100%" height={HEIGHT}>
         <Defs>

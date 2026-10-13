@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Glow } from '@/components/Glow';
 import { RoomArtLayer } from '@/components/RoomArt';
+import { useSkyLook } from '@/lib/useSkyLook';
 import { ROOMS, type RoomName } from '@/theme/rooms';
 import { colors, space } from '@/theme/tokens';
 
@@ -26,13 +27,18 @@ interface ScreenProps {
 
 export function Screen({ children, refreshing = false, onRefresh, scrollRef, scrollOffset, onScrollY, overlay, room = 'sky' }: ScreenProps) {
   const { width } = useWindowDimensions();
-  const look = ROOMS[room];
+  const base = ROOMS[room];
+  // Today's sky follows the time of day; every other room keeps its own fixed light.
+  const sky = useSkyLook(room === 'sky');
+  const isSky = room === 'sky';
+  const glows = isSky && sky.glow.opacity > 0.005 ? [base.glows[0], sky.glow] : base.glows;
+  const artOpacity = isSky ? sky.starOpacity : 1;
   return (
     <View style={styles.root}>
-      {look.glows.map((g, i) => (
+      {glows.map((g, i) => (
         <Glow key={i} color={g.color} opacity={g.opacity} cx={g.cx} style={styles.glow} />
       ))}
-      <RoomArtLayer kind={look.art} color={look.artColor} width={width} />
+      <RoomArtLayer kind={base.art} color={base.artColor} width={width} opacity={artOpacity} />
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView
           ref={scrollRef}
