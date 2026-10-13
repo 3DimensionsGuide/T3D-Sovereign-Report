@@ -51,7 +51,7 @@ export interface GateVehicle {
 
 const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
 const MS_PER_DAY = 86_400_000;
-const jdToIso = (jd: number): string => new Date(J2000_MS + (jd - 2451545.0) * MS_PER_DAY).toISOString();
+export const jdToIso = (jd: number): string => new Date(J2000_MS + (jd - 2451545.0) * MS_PER_DAY).toISOString();
 
 const normalize = (deg: number): number => ((deg % 360) + 360) % 360;
 const signedDiff = (a: number, b: number): number => ((a - b + 540) % 360) - 180;
@@ -59,7 +59,7 @@ const signedDiff = (a: number, b: number): number => ((a - b + 540) % 360) - 180
 const STEP: Record<GateBody, number> = { sun: 0.25, moon: 0.05 };
 const WHO: Record<GateBody, string> = { sun: 'Sun', moon: 'Moon' };
 
-function centerName(id: string): string {
+export function centerName(id: string): string {
   const words = id.replace(/_/g, ' ');
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
@@ -75,10 +75,10 @@ function bisect(f: (jd: number) => number, a: number, b: number): number {
   return (lo + hi) / 2;
 }
 
-interface Ingress { jd: number; gate: number; line: number }
+export interface Ingress { jd: number; gate: number; line: number }
 
 /** Every moment `body` enters a new gate between startJd and stopJd (the first entry is the first change after startJd). */
-function ingresses(body: GateBody, startJd: number, stopJd: number, lonAt: (b: GateBody, jd: number) => number): Ingress[] {
+export function ingresses(body: GateBody, startJd: number, stopJd: number, lonAt: (b: GateBody, jd: number) => number): Ingress[] {
   const out: Ingress[] = [];
   const step = STEP[body];
   let jd = startJd;
@@ -98,7 +98,7 @@ function ingresses(body: GateBody, startJd: number, stopJd: number, lonAt: (b: G
   return out;
 }
 
-function sentence(who: string, gate: number, contact: Contact, channel: string | undefined, centerId: string | undefined): string {
+export function sentence(who: string, gate: number, contact: Contact, channel: string | undefined, centerId: string | undefined): string {
   switch (contact) {
     case 'electromagnetic':
       return `Gate ${gate} is the missing half of your Channel ${channel}. While the ${who} is here that channel is lit for you: a spark, not a decision.`;

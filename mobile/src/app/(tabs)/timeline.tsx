@@ -26,6 +26,7 @@ import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 import { LockIcon } from '@/components/LockIcon';
+import { VehicleToday } from '@/components/VehicleToday';
 import { usePremium } from '@/lib/usePremium';
 import { isTransitLocked } from '@/lib/timelineLock';
 
@@ -480,9 +481,18 @@ export default function Timeline() {
           {lens === 'road' ? null : (
           <>
           {lens === 'vehicle' ? (
-            <Text style={styles.sub}>
-              The Sun in every new gate, and the days the Moon completes one of your channels. Conditions, not decisions: your Strategy and Authority decide.
-            </Text>
+            data.gateToday && data.gateToday.gates.length > 0 ? (
+              <>
+                <VehicleToday data={data.gateToday} />
+                <Text style={styles.sub}>
+                  Coming up: the Sun in every new gate, and the days the Moon completes one of your channels.
+                </Text>
+              </>
+            ) : (
+              <Text style={styles.sub}>
+                The Sun in every new gate, and the days the Moon completes one of your channels. Conditions, not decisions: your Strategy and Authority decide.
+              </Text>
+            )
           ) : (
             <FadeIn delay={160}>
               <Segmented options={FILTERS} value={filter} onChange={(f) => { setFilter(f); setOpenId(null); }} compact />

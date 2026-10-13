@@ -93,6 +93,28 @@ export interface YearAhead {
   closing: string;
 }
 
+/** One gate the Sun is in today, read against the person's chart (built on the server). */
+export interface GateToday {
+  gate: number;
+  line: number;
+  name: string;
+  meaning: string;
+  center: string;
+  /** When the Sun enters this gate today; null when it was already here at the start of the day. */
+  from: string | null;
+  until: string;
+  contact: 'electromagnetic' | 'companionship' | 'compromise' | 'amplified' | 'flavor';
+  channel: string | null;
+  meets: string;
+  advice: string;
+}
+
+export interface GateTodayResult {
+  gates: GateToday[];
+  strategy: string | null;
+  authority: string | null;
+}
+
 export interface TimelineResult {
   from: string;
   to: string;
@@ -107,4 +129,6 @@ export interface TimelineResult {
   reminder: string;
   /** Optional: copies saved before this was added do not have it. */
   yearAhead?: YearAhead;
+  /** Optional: absent on older saved copies and on charts with no Human Design gates. */
+  gateToday?: GateTodayResult;
 }

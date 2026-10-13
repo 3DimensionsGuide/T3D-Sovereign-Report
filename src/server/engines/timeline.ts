@@ -40,6 +40,7 @@ import type {
 import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/road-content';
 import { personalYearNumber } from '../../lib/numerology/personalYear';
 import { buildGateEvents, type GateVehicle } from '../../lib/app/gateEvents';
+import { buildGateToday, type GateTodayResult } from '../../lib/app/gateToday';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
 
@@ -138,6 +139,8 @@ export interface TimelineResult {
   pinnacle: { current: CycleWindow; next: CycleWindow | null };
   challenge: { current: CycleWindow; next: CycleWindow | null };
   numberMeanings: Record<number, { word: string; line: string }>;
+  /** The Sun's gate(s) today, read against the person's chart. Absent when the chart has no Human Design gates. */
+  gateToday?: GateTodayResult;
 }
 
 export interface TimelineInput {
@@ -764,8 +767,10 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
   }
   seasons.sort((a, b) => a.orb - b.orb);
 
+  let gateToday: GateTodayResult | undefined;
   if (input.vehicle && input.vehicle.natalGates.length > 0) {
     events.push(...buildGateEvents(startJd, endJd, input.vehicle, (b, jd) => posAt(b, jd).lon));
+    gateToday = buildGateToday(startJd, input.vehicle, (b, jd) => posAt(b, jd).lon);
   }
 
   events.sort((a, b) => a.at.localeCompare(b.at));
@@ -793,6 +798,7 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     pinnacle: pickCycles(input.pinnacles, age, input.birthDate, 'pinnacle'),
     challenge: pickCycles(input.challenges, age, input.birthDate, 'challenge'),
     numberMeanings: NUMBER_MEANINGS,
+    gateToday,
   };
 }
 
