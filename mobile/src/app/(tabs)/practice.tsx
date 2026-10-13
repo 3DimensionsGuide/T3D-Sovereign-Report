@@ -35,7 +35,7 @@ export default function Practice() {
   const [mode, setMode] = useState<Mode>('week');
 
   return (
-    <Screen refreshing={refreshing} onRefresh={refresh}>
+    <Screen room="ritual" refreshing={refreshing} onRefresh={refresh}>
       <View style={styles.head}>
         <Text accessibilityRole="header" style={styles.title}>Practice</Text>
         <Text style={styles.sub}>Decide through your design. Everything you write stays on this phone.</Text>

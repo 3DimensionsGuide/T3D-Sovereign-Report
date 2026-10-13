@@ -376,7 +376,7 @@ export default function Timeline() {
   );
 
   return (
-    <Screen
+    <Screen room="road"
       refreshing={refreshing}
       onRefresh={refresh}
       scrollRef={scrollRef}

@@ -265,7 +265,7 @@ export default function Today() {
   const numbered = today ? hasWheelPositions(today.transits) : false;
 
   return (
-    <Screen refreshing={refreshing} onRefresh={onRefresh} scrollRef={scrollRef} scrollOffset={scrollOffset}>
+    <Screen room="sky" refreshing={refreshing} onRefresh={onRefresh} scrollRef={scrollRef} scrollOffset={scrollOffset}>
       <FadeIn>
         <View style={styles.header}>
           <View style={styles.eyebrowRow}>

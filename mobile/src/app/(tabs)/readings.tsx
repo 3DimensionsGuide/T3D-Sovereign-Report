@@ -81,7 +81,7 @@ export default function Readings() {
   }, [refresher]);
 
   return (
-    <Screen
+    <Screen room="study"
       refreshing={refreshing}
       onRefresh={onRefresh}
       scrollRef={scrollRef}

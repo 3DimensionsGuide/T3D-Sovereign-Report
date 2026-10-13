@@ -55,7 +55,7 @@ export default function Chart() {
     : 'Rising sign uses 12:00 noon because no birth time was entered.';
 
   return (
-    <Screen refreshing={drawing.refreshing} onRefresh={drawing.refresh}>
+    <Screen room="observatory" refreshing={drawing.refreshing} onRefresh={drawing.refresh}>
       <FadeIn>
         <View style={styles.header}>
           <Text style={styles.eyebrow}>YOUR T3D CHART</Text>

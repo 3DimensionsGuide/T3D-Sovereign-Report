@@ -6,6 +6,8 @@ interface Props {
   color: string;
   /** Strength at the brightest point, 0 to 1. */
   opacity?: number;
+  /** Where the light is centred across the width, in percent. */
+  cx?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -14,13 +16,13 @@ interface Props {
  * Replaces the old hard-edged purple circle, which cut across text when the page scrolled.
  * Purely decorative, so it is hidden from screen readers and ignores touches.
  */
-export function Glow({ color, opacity = 0.6, style }: Props) {
+export function Glow({ color, opacity = 0.6, cx = 50, style }: Props) {
   const id = `glow${useId().replace(/\W/g, '')}`;
   return (
     <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={[styles.fill, style]}>
       <Svg width="100%" height="100%">
         <Defs>
-          <RadialGradient id={id} cx="50%" cy="0%" rx="75%" ry="100%" fx="50%" fy="0%">
+          <RadialGradient id={id} cx={`${cx}%`} cy="0%" rx="75%" ry="100%" fx={`${cx}%`} fy="0%">
             <Stop offset="0" stopColor={color} stopOpacity={opacity} />
             <Stop offset="0.45" stopColor={color} stopOpacity={opacity * 0.45} />
             <Stop offset="1" stopColor={color} stopOpacity={0} />
