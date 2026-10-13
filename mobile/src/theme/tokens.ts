@@ -57,9 +57,9 @@ export const TOUCH = 52;
  * and a soft purple glow underneath. Ordinary cards stay flat so the hero cards stand out.
  */
 export const heroCard = {
-  borderTopColor: 'rgba(245,245,243,0.24)',
-  shadowColor: colors.purple,
-  shadowOpacity: 0.9,
-  shadowRadius: 22,
-  shadowOffset: { width: 0, height: 8 },
+  borderTopColor: 'rgba(245,245,243,0.42)',
+  shadowColor: '#7A4CC2',
+  shadowOpacity: 0.55,
+  shadowRadius: 32,
+  shadowOffset: { width: 0, height: 10 },
 } as const;
