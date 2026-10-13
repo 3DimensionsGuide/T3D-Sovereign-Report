@@ -19,3 +19,10 @@ test('luxury surface tokens exist and the gate card uses them', () => {
   assert.match(read('mobile/src/components/VehicleToday.tsx'), /backgroundColor: colors\.surface/);
   assert.match(read('mobile/src/components/ChartPanels.tsx'), /aspectChipOn: \{[^}]*gold/);
 });
+
+test('no purple left in the app palette', () => {
+  for (const f of ['mobile/src/theme/tokens.ts', 'mobile/src/charts/palette.ts']) {
+    const s = read(f);
+    assert.doesNotMatch(s, /2E1A47|1F1235|7A4CC2/i, f);
+  }
+});

@@ -2,8 +2,8 @@
 export const chartColors = {
   obsidian: '#0B0B0C',
   charcoal: '#121214',
-  purple: '#2E1A47',
-  amethyst: '#1F1235',
+  purple: '#2A2315',
+  amethyst: '#17161A',
   gold: '#D4AF37',
   vehicle: '#E5A93C',
   road: '#1F8A4D',
