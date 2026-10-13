@@ -195,10 +195,13 @@ export default function Today() {
 
   const premium = usePremium();
   const [timingLocked, setTimingLocked] = useState(false);
+  /** Bumped when a locked date is refused, so the date picker snaps back to the day being shown. */
+  const [pickerKey, setPickerKey] = useState(0);
   const goTo = useCallback((date: Date) => {
     if (date < MIN_DATE || date > MAX_DATE) return;
     if (isTimingLocked(date, premium)) {
       setTimingLocked(true);
+      setPickerKey((k) => k + 1);
       return;
     }
     setTimingLocked(false);
@@ -303,6 +306,7 @@ export default function Today() {
           </Pressable>
           <View style={styles.pickerWrap}>
             <DateTimePicker
+              key={pickerKey}
               value={shown}
               mode="date"
               display="compact"
@@ -325,8 +329,11 @@ export default function Today() {
         {timingLocked ? (
           <PremiumGate title="Past and future days" detail="Look back and look ahead in Today’s Sky, not only today. Today stays free." />
         ) : null}
+        {timingLocked && isToday ? (
+          <GoldButton label="Back to today" variant="ghost" onPress={() => { setTimingLocked(false); setPickerKey((k) => k + 1); }} />
+        ) : null}
         {!isToday ? (
-          <GoldButton label="Back to today" variant="ghost" onPress={() => setViewDate(null)} />
+          <GoldButton label="Back to today" variant="ghost" onPress={() => { setTimingLocked(false); setViewDate(null); }} />
         ) : null}
       </FadeIn>
 
