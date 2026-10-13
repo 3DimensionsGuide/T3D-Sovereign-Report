@@ -10,6 +10,8 @@ import { TimeLordBar } from '@/components/readings/TimeLordBar';
 import { periodQuote } from '@/lib/timeLordBar';
 import { AspectIcon } from '@/components/AspectIcon';
 import { houseLabel, HOUSE_NAMES } from '@/lib/houseNames';
+import { PremiumGate } from '@/components/PremiumGate';
+import { usePremium } from '@/lib/usePremium';
 import { useStoplight } from '@/lib/useStoplight';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -129,6 +131,7 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
   const social = data.planets.filter((p) => p.group === 'social');
   const outer = data.planets.filter((p) => p.group === 'outer');
 
+  const premium = usePremium();
   return (
     <View style={{ gap: space.md }}>
       {data.timeNote ? <NoteCard text={data.timeNote} /> : null}
@@ -175,8 +178,16 @@ function StoplightBody({ data }: { data: StoplightDetail }) {
       <SectionTitle eyebrow="YOUR PLANETS" title="Uranus, Neptune, Pluto" note={data.mechanisms.outer} />
       {outer.map((p) => <PlanetCard key={p.key} p={p} />)}
 
-      {data.nodes ? <NodesSection nodes={data.nodes} /> : null}
-      {data.aspects && data.aspects.items.length > 0 ? <AspectsSection aspects={data.aspects} /> : null}
+      {data.nodes ? (
+        premium ? <NodesSection nodes={data.nodes} /> : (
+          <PremiumGate title="Your Lunar Nodes" detail="Where you grow and where you rest, by sign and house." />
+        )
+      ) : null}
+      {data.aspects && data.aspects.items.length > 0 ? (
+        premium ? <AspectsSection aspects={data.aspects} /> : (
+          <PremiumGate title="Your natal aspects" detail="How your own planets talk to each other, in plain words." />
+        )
+      ) : null}
 
       <SectionTitle
         eyebrow="YOUR TIMING"

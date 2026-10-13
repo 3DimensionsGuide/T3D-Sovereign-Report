@@ -26,3 +26,10 @@ test('Practice, Year ahead and Today use the gate with the Premium flag', () => 
   assert.match(read('app/(tabs)/today.tsx'), /isTimingLocked\(date, premium\)/);
   assert.match(read('app/(tabs)/practice.tsx'), /premium && mode !== 'together'/);
 });
+
+test('Lunar Nodes and natal aspects sit behind the Premium flag', () => {
+  const s = readFileSync('mobile/src/components/readings/StoplightReading.tsx', 'utf8');
+  assert.match(s, /premium \? <NodesSection/);
+  assert.match(s, /premium \? <AspectsSection/);
+  assert.match(s, /<PremiumGate title="Your Lunar Nodes"/);
+});
