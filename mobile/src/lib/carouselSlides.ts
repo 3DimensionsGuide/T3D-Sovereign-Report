@@ -21,6 +21,8 @@ export interface SlideContent {
   name: string;
   question: string;
   facts: SlideFact[];
+  /** One short line of meaning under the facts, when there is one. */
+  note: string | null;
 }
 
 /** The sign a longitude from 0 to 360 falls in. */
@@ -29,7 +31,7 @@ export function signAt(degrees: number): string {
   return SIGNS[Math.floor(d / 30)];
 }
 
-export function slideContent(lens: Lens, chart: CarouselChart, birthTimeKnown: boolean): SlideContent {
+export function slideContent(lens: Lens, chart: CarouselChart, birthTimeKnown: boolean, lifePathMeaning: string | null = null): SlideContent {
   const { humanDesign: hd, numerology: num, astrology: astro } = chart;
   if (lens === 'vehicle') {
     return {
@@ -39,6 +41,7 @@ export function slideContent(lens: Lens, chart: CarouselChart, birthTimeKnown: b
         { label: 'Authority', value: hd.authority },
         { label: 'Profile', value: hd.profile.split(' ')[0] },
       ],
+      note: null,
     };
   }
   if (lens === 'road') {
@@ -48,6 +51,8 @@ export function slideContent(lens: Lens, chart: CarouselChart, birthTimeKnown: b
         { label: 'Life Path', value: String(num.lifePath) },
         { label: 'Destiny', value: String(num.destiny) },
       ],
+      // The meaning of the Life Path number, from the same glossary that powers the explanations.
+      note: lifePathMeaning && lifePathMeaning.trim() ? lifePathMeaning.trim() : null,
     };
   }
   const facts: SlideFact[] = [{ label: 'Sun', value: astro.tropicalSun.sign }];
@@ -55,5 +60,5 @@ export function slideContent(lens: Lens, chart: CarouselChart, birthTimeKnown: b
     facts.push({ label: 'Moon', value: astro.tropicalMoon.sign });
     facts.push({ label: 'Rising', value: signAt(astro.tropicalAscendant) });
   }
-  return { lens, name: 'The Stoplight', question: 'When do I go, wait or slow down?', facts };
+  return { lens, name: 'The Stoplight', question: 'When do I go, wait or slow down?', facts, note: null };
 }

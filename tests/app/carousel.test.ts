@@ -39,3 +39,18 @@ test('the carousel uses no private details and is offered in the share studio', 
   assert.match(share, /<CarouselShareCard/);
   assert.match(share, /card-carousel/);
 });
+
+test('the Road slide carries the Life Path meaning when there is one, and the others carry none', () => {
+  assert.equal(slideContent('road', chart, true).note, null);
+  assert.equal(slideContent('road', chart, true, '  A line of meaning.  ').note, 'A line of meaning.');
+  assert.equal(slideContent('road', chart, true, '   ').note, null);
+  assert.equal(slideContent('vehicle', chart, true, 'ignored').note, null);
+  assert.equal(slideContent('stoplight', chart, true, 'ignored').note, null);
+});
+
+test('the share studio loads the Life Path meaning and waits for it before saving the Road slide', () => {
+  const share = readFileSync('mobile/src/app/share-card.tsx', 'utf8');
+  assert.match(share, /useTermSummary/);
+  assert.match(share, /lifePathMeaning=\{meaning\.summary\}/);
+  assert.match(share, /lens === 'road' && meaning\.loading/);
+});
