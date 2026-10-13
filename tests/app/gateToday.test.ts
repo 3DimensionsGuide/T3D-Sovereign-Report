@@ -57,3 +57,9 @@ test('the Timeline builds it, and the Vehicle lens shows it above the upcoming l
   assert.match(screen, /<VehicleToday data=\{data\.gateToday\}/);
   assert.match(screen, /The Sun in every new gate/, 'older saved copies still get the plain line');
 });
+
+test('the saved Timeline copy is versioned, so a copy from before the gate card is not reused', () => {
+  const hook = readFileSync('mobile/src/lib/useTimeline.ts', 'utf8');
+  assert.match(hook, /CACHE_VERSION = \d+/);
+  assert.match(hook, /timeline\|v\$\{CACHE_VERSION\}\|/);
+});
