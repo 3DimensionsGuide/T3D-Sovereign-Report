@@ -5,6 +5,7 @@ import { Pressable } from '@/components/Pressable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
+import { Fold } from '@/components/Fold';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { ErrorState, LoadingState } from '@/components/StatusViews';
@@ -346,21 +347,21 @@ export default function Today() {
               <TriadTodayCard data={triad} isToday={isToday} />
             </FadeIn>
           ) : null}
+          <Fold id="today-road" lens="road" title="The road today" hint="Your personal day and where you are on the road">
           <RoadStrip date={localDateString(shown)} personalYear={dayNum?.personalYear ?? null} />
-
-          <FadeIn delay={80}>
-            <SkyTodayCard today={today} />
-          </FadeIn>
-
-          <FadeIn delay={120}>
-            <BodygraphChip today={today} />
-          </FadeIn>
 
           {dayNum ? (
             <FadeIn delay={200}>
               <DayNumerologyCard data={dayNum} />
             </FadeIn>
           ) : null}
+
+          </Fold>
+
+          <Fold id="today-sky" lens="stoplight" title="The sky today" hint="The Moon, the planets and the transits to your chart">
+          <FadeIn delay={80}>
+            <SkyTodayCard today={today} />
+          </FadeIn>
 
           <FadeIn delay={240}>
             <View style={styles.sectionHead}>
@@ -399,6 +400,15 @@ export default function Today() {
               </Text>
             )}
           </FadeIn>
+
+          </Fold>
+
+          <Fold id="today-vehicle" lens="vehicle" title="The vehicle today" hint="The gates the Sun and Moon are in today">
+          <FadeIn delay={120}>
+            <BodygraphChip today={today} />
+          </FadeIn>
+
+          </Fold>
 
           {!triad ? (
           <FadeIn delay={320}>
