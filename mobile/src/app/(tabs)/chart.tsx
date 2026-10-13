@@ -15,6 +15,7 @@ import type { LensName } from '@/components/Lens';
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
 import { Sigil } from '@/components/Sigil';
+import { TriadMap } from '@/components/TriadMap';
 import { TriadCard } from '@/components/TriadCard';
 import { TriadPortrait } from '@/components/TriadPortrait';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
@@ -159,6 +160,16 @@ export default function Chart() {
             Drawn only from your chart, so no two are alike: your Vehicle in the centre, your Road around it, and your Sun, Moon and Rising on the outer ring.
           </Text>
           <GoldButton label="Share your Sigil" variant="ghost" onPress={() => router.push({ pathname: '/share-card', params: { kind: 'sigil' } } as unknown as Href)} />
+        </View>
+      </FadeIn>
+
+      <FadeIn delay={350}>
+        <View style={styles.sigilCard}>
+          <Text accessibilityRole="header" style={styles.sigilTitle}>Your Triad Map</Text>
+          <Text style={[guidance, styles.sigilNote]}>
+            Your whole chart, grouped by lens. Tap a circle to open its reading, or any fact to learn what it means.
+          </Text>
+          <TriadMap chart={chart} birthTimeKnown={profile.birthTimeKnown} onOpenLens={openLens} />
         </View>
       </FadeIn>
 
