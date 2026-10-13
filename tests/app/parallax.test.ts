@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PARALLAX, parallaxShift } from '../../mobile/src/lib/parallax';
+import { PARALLAX, PARALLAX_LIMIT, parallaxShift } from '../../mobile/src/lib/parallax';
 
 test('background layers do not move at the top or when pulled down', () => {
   assert.equal(parallaxShift(0, PARALLAX.art), 0);
@@ -12,7 +12,7 @@ test('background layers do not move at the top or when pulled down', () => {
 test('background layers rise slowly as the page scrolls, and stop at the limit', () => {
   assert.equal(parallaxShift(100, 0.25), -25);
   assert.ok(Math.abs(parallaxShift(100, PARALLAX.glow)) < Math.abs(parallaxShift(100, PARALLAX.art)));
-  assert.equal(parallaxShift(5000, 0.25), parallaxShift(220, 0.25));
+  assert.equal(parallaxShift(5000, 0.25), parallaxShift(PARALLAX_LIMIT, 0.25));
 });
 
 test('every screen drifts its background, and Reduce Motion turns it off', () => {
