@@ -12,6 +12,7 @@ import { FadeIn } from '@/components/FadeIn';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import { CalculatingView } from '@/components/CalculatingView';
+import { IntroReveal } from '@/components/IntroReveal';
 import { TriadSeal } from '@/components/TriadSeal';
 import {
   ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
@@ -54,6 +55,9 @@ export default function Onboarding() {
   const [step, setStep] = useState(0);
   const [calculating, setCalculating] = useState(false);
   const [calcDone, setCalcDone] = useState(false);
+  /** After the calculation: the brand opening, then the email code step if one is needed. */
+  const [intro, setIntro] = useState(false);
+  const [pendingCode, setPendingCode] = useState<{ leadId: number; email: string; notice: string | null } | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -152,15 +156,16 @@ export default function Onboarding() {
       setChart(profile, chart);
       setCalcDone(true);
       await new Promise((resolve) => setTimeout(resolve, 900));
-      if (profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')) {
-        setCodeStep({
-          leadId: chart.leadId,
-          email: profile.email,
-          notice: optInCode === 'failed' ? 'We could not send the code just now. Tap "Send a new code" to try again.' : null,
-        });
-      } else {
-        router.replace('/today');
-      }
+      setPendingCode(
+        profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')
+          ? {
+              leadId: chart.leadId,
+              email: profile.email,
+              notice: optInCode === 'failed' ? 'We could not send the code just now. Tap "Send a new code" to try again.' : null,
+            }
+          : null,
+      );
+      setIntro(true);
     } catch (error) {
       flagError();
       setCalculating(false);
@@ -202,6 +207,23 @@ export default function Onboarding() {
     } finally {
       setCodeBusy(false);
     }
+  }
+
+  if (intro) {
+    return (
+      <Screen>
+        <IntroReveal
+          onContinue={() => {
+            if (pendingCode) {
+              setIntro(false);
+              setCodeStep(pendingCode);
+            } else {
+              router.replace('/today');
+            }
+          }}
+        />
+      </Screen>
+    );
   }
 
   if (calculating && !codeStep) {
@@ -391,7 +413,7 @@ export default function Onboarding() {
         {step === 3 ? (
           <>
             <Field shakeSignal={shake} label="Birth city" value={city} onChangeText={setCity} error={errors.city}
-              autoCapitalize="words" placeholder="e.g. Harbor City, California" />
+              autoCapitalize="words" placeholder="e.g. Los Angeles, California" />
             <Field shakeSignal={shake} label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
               autoCapitalize="words" placeholder="e.g. United States"
               why="Time zones and daylight saving rules differ by country and by year." />
@@ -435,7 +457,10 @@ export default function Onboarding() {
 
 const styles = StyleSheet.create({
   hero: { gap: space.md, paddingTop: space.lg },
-  stepNote: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchmentMuted },
+  stepNote: {
+    fontFamily: fonts.displayRegular, fontVariant: ['lining-nums'], fontSize: 13, letterSpacing: 4,
+    textTransform: 'uppercase', color: colors.parchmentMuted,
+  },
   progress: { flexDirection: 'row', gap: 6 },
   progressBar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: colors.hairline },
   progressBarOn: { backgroundColor: colors.gold },
@@ -449,7 +474,7 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
   linkRow: { minHeight: 48, justifyContent: 'center' },
   link: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold, textDecorationLine: 'underline' },
-  lede: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
+  lede: { fontFamily: fonts.displayItalic, fontSize: 18, lineHeight: 29, letterSpacing: 0.2, color: colors.parchmentMuted },
   form: { gap: space.md, marginTop: space.md },
   pickerRow: {
     minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
