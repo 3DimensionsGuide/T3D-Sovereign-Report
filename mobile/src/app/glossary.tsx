@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TermPressable } from '@/components/Explain';
 import { LENS_COLOR, LENS_LABEL, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { LetterStrip } from '@/components/LetterStrip';
 import { letterTargets } from '@/lib/letterStrip';
 import { ChartRequestError, requestGlossary } from '@/lib/api';
@@ -180,10 +181,7 @@ export default function Glossary() {
                 <ActivityIndicator color={colors.gold} />
               </View>
             ) : error ? (
-              <View style={styles.center}>
-                <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
-                <GoldButton label="Try again" variant="ghost" onPress={load} />
-              </View>
+              <ErrorState message={error} onRetry={load} />
             ) : (
               <Text style={styles.empty}>{filter === 'yours' && !searching ? 'Nothing from your chart yet. Pull to refresh on My Chart, then come back.' : 'No terms match that search.'}</Text>
             )

@@ -4,6 +4,7 @@ import { Pressable } from '@/components/Pressable';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { OfflineNote } from '@/components/OfflineNote';
 import { useTimeline } from '@/lib/useTimeline';
 import { yearQuote } from '@/lib/skyText';
@@ -42,23 +43,15 @@ export default function YearAheadScreen() {
           <Text style={styles.eyebrow}>YOUR YEAR AHEAD</Text>
           <Text accessibilityRole="header" style={styles.title}>The year in one view</Text>
 
-          {loading && !data ? <ActivityIndicator color={colors.gold} /> : null}
+          {loading && !data ? <LoadingState label="Reading your year…" /> : null}
           {error && !data ? (
-            <>
-              <Text style={styles.body}>{error}</Text>
-              <GoldButton label="Try again" variant="ghost" onPress={retry} />
-            </>
+            <ErrorState message={error} onRetry={retry} />
           ) : null}
           {offline && data ? <OfflineNote savedAt={savedAt} /> : null}
 
           {data && !y && (refreshing || !triedRefresh.current) ? <ActivityIndicator color={colors.gold} /> : null}
           {data && !y && !refreshing && triedRefresh.current ? (
-            <>
-              <Text style={styles.body}>
-                We could not load your year ahead just now. Check your connection and try again.
-              </Text>
-              <GoldButton label="Try again" variant="ghost" onPress={() => refresh()} />
-            </>
+            <ErrorState message="We could not load your year ahead just now. Check your connection and try again." onRetry={() => refresh()} />
           ) : null}
 
           {y ? (

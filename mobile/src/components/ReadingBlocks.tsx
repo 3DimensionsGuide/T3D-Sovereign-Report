@@ -6,6 +6,7 @@ import { Pressable } from '@/components/Pressable';
 import { LENS_COLOR, LENS_TEXT, LensIcon, type LensName } from '@/components/Lens';
 import { capFirst } from '@/lib/skyText';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { OfflineNote } from '@/components/OfflineNote';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -256,18 +257,12 @@ export function ReadingStatus({
 }) {
   if (loading && !hasData) {
     return (
-      <View style={styles.center} accessibilityLiveRegion="polite">
-        <ActivityIndicator color={colors.gold} />
-        <Text style={styles.sub}>{loadingText}</Text>
-      </View>
+      <LoadingState label={loadingText} />
     );
   }
   if (error && !hasData) {
     return (
-      <View style={styles.center}>
-        <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
-        <GoldButton label="Try again" variant="ghost" onPress={onRetry} />
-      </View>
+      <ErrorState message={error} onRetry={onRetry} />
     );
   }
   return hasData ? (

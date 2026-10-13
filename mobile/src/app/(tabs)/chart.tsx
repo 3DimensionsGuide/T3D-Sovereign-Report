@@ -5,6 +5,7 @@ import { Redirect, router, useLocalSearchParams, type Href } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { authorityId, planetId, STRATEGY_ID, typeId, profileId } from '@/lib/termIds';
 import { Disclosure } from '@/components/Disclosure';
 import { MiniBody } from '@/components/MiniBody';
@@ -170,10 +171,7 @@ export default function Chart() {
               <BodygraphPanel hd={drawing.data.humanDesign} />
             )
           ) : drawing.error ? (
-            <View style={styles.centerBox}>
-              <Text accessibilityRole="alert" style={styles.errorText}>{drawing.error}</Text>
-              <GoldButton label="Try again" variant="ghost" onPress={drawing.retry} />
-            </View>
+            <ErrorState message={drawing.error} onRetry={drawing.retry} />
           ) : (
             <SkeletonCards count={2} label="Drawing your chart…" />
           )}

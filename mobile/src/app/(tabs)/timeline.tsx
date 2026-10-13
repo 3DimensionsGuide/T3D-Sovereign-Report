@@ -10,6 +10,7 @@ import { TimelinePinBar } from '@/components/TimelinePinBar';
 import { pinnedMonthAt, showJumpToday, type PinSection } from '@/lib/timelinePin';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { Segmented } from '@/components/Segmented';
 import { aspectWord, bodyName, capFirst, houseTheme, natalName, ordinal } from '@/lib/skyText';
 import { LENS_TEXT, LensIcon, LensLabel, SIGNAL_LABEL, SignalMarker, type LensName, type SignalKind } from '@/components/Lens';
@@ -391,10 +392,7 @@ export default function Timeline() {
       {loading && !data ? (
         <SkeletonCards label="Reading the sky…" />
       ) : error && !data ? (
-        <View style={styles.center}>
-          <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
-          <GoldButton label="Try again" variant="ghost" onPress={retry} />
-        </View>
+        <ErrorState message={error} onRetry={retry} />
       ) : data ? (
         <>
           {offline ? <OfflineNote savedAt={savedAt} /> : null}

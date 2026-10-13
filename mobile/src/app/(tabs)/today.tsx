@@ -7,6 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Screen } from '@/components/Screen';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { DayNumerologyCard } from '@/components/DayNumerologyCard';
 import {
   ChartRequestError, requestDayNumerology, requestToday, requestTriadToday, type DailyTransitHit, type TodayResult,
@@ -324,10 +325,7 @@ export default function Today() {
       {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 
       {error ? (
-        <View style={styles.errorBox}>
-          <Text accessibilityLiveRegion="polite" style={styles.errorText}>{'⚠  '}{error}</Text>
-          <GoldButton label="Try again" variant="ghost" onPress={onRefresh} loading={refreshing} />
-        </View>
+        <ErrorState message={error} onRetry={onRefresh} retrying={refreshing} />
       ) : null}
 
       {today ? (

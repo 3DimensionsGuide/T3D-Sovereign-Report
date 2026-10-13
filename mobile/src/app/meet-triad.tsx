@@ -8,6 +8,7 @@ import { BodygraphChip } from '@/components/BodygraphChip';
 import { DayNumerologyCard } from '@/components/DayNumerologyCard';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { LENS_LABEL, LENS_TEXT, LensIcon, SIGNAL_COLOR, SignalMarker } from '@/components/Lens';
 import { LockIcon } from '@/components/LockIcon';
 import { RoadStrip } from '@/components/RoadStrip';
@@ -259,10 +260,7 @@ export default function MeetYourTriad() {
       </FadeIn>
 
       {failed ? (
-        <View style={styles.errorBox}>
-          <Text accessibilityRole="alert" style={styles.body}>We could not load today’s reading. Check your connection and try again.</Text>
-          <GoldButton label="Try again" variant="ghost" onPress={() => void load()} />
-        </View>
+        <ErrorState message="We could not load today’s reading. Check your connection and try again." onRetry={() => void load()} />
       ) : null}
 
       {STOPS.map((stop, i) => {

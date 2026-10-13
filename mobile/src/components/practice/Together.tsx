@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Field } from '@/components/Field';
 import { Segmented } from '@/components/Segmented';
 import { GoldButton } from '@/components/GoldButton';
+import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { LensLabel } from '@/components/Lens';
 import {
   ChartRequestError, requestDecideTogether, requestPlaceCheck, type PlaceCandidate,
@@ -439,10 +440,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
   }
   if (error || !data) {
     return (
-      <View style={styles.card}>
-        <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error ?? 'Something went wrong.'}</Text>
-        <GoldButton label="Try again" variant="ghost" onPress={load} />
-      </View>
+      <ErrorState message={error ?? 'Something went wrong. Try again in a moment.'} onRetry={load} />
     );
   }
 
