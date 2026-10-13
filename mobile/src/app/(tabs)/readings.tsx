@@ -48,6 +48,9 @@ const HEADINGS: Record<Lens, { eyebrow: string; title: string; sub: string; acce
 /** How far each reading scrolls before its big drawing is out of view and the small one pins to the top. */
 const PIN_AT: Record<Lens, number> = { vehicle: 560, road: 520, stoplight: 520 };
 
+/** Each lens is its own room: its colour of light and its own geometry behind the reading. */
+const READING_ROOM = { vehicle: 'readingVehicle', road: 'readingRoad', stoplight: 'readingStoplight' } as const;
+
 export default function Readings() {
   const [lens, setLens] = useState<Lens>('vehicle');
   // My Chart's portrait opens a lens straight away.
@@ -81,7 +84,7 @@ export default function Readings() {
   }, [refresher]);
 
   return (
-    <Screen room="study"
+    <Screen room={READING_ROOM[lens]}
       refreshing={refreshing}
       onRefresh={onRefresh}
       scrollRef={scrollRef}

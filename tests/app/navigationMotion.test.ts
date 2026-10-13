@@ -26,10 +26,11 @@ test('waiting states use the T3D triad loader instead of the stock spinner (only
 
 test('each tab is its own room, with its own light', () => {
   const rooms: [string, string][] = [
-    ['today', 'sky'], ['timeline', 'road'], ['readings', 'study'], ['practice', 'ritual'], ['chart', 'observatory'],
+    ['today', 'sky'], ['timeline', 'road'], ['practice', 'ritual'], ['chart', 'observatory'],
   ];
   for (const [file, room] of rooms) {
     assert.match(read(`mobile/src/app/(tabs)/${file}.tsx`), new RegExp(`<Screen room="${room}"`), `${file} is the ${room} room`);
   }
+  assert.match(read('mobile/src/app/(tabs)/readings.tsx'), /<Screen room=\{READING_ROOM\[lens\]\}/);
   assert.match(read('mobile/src/components/RoomArt.tsx'), /accessibilityElementsHidden/);
 });

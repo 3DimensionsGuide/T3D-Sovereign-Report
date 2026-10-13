@@ -5,9 +5,11 @@ import { colors } from '@/theme/tokens';
  * and one quiet piece of line art, so you can tell where you are before you read a word.
  * Colours stay inside the palette; the art is faint enough to sit behind any text.
  */
-export type RoomName = 'sky' | 'road' | 'study' | 'ritual' | 'observatory';
+export type RoomName =
+  | 'sky' | 'road' | 'ritual' | 'observatory'
+  | 'readingVehicle' | 'readingRoad' | 'readingStoplight';
 
-export type RoomArt = 'stars' | 'road' | 'rings' | 'none';
+export type RoomArt = 'stars' | 'road' | 'rings' | 'diamonds' | 'triangles' | 'orbits' | 'sunpath' | 'none';
 
 export interface Room {
   /** Soft pools of light, drawn from the top edge. Later layers sit on top of earlier ones. */
@@ -26,17 +28,30 @@ export const ROOMS: Record<RoomName, Room> = {
     art: 'road',
     artColor: colors.road,
   },
-  // Readings: a warm study, amber lamplight over the purple.
-  study: {
-    glows: [{ color: colors.purple, opacity: 0.6, cx: 40 }, { color: colors.vehicle, opacity: 0.14, cx: 75 }],
-    art: 'none',
+  // Readings: the room follows the lens you are reading. Each lens has its own light and its own geometry.
+  // Vehicle: amber lamplight and nested diamonds, like the centers of a bodygraph.
+  readingVehicle: {
+    glows: [{ color: colors.purple, opacity: 0.6, cx: 35 }, { color: colors.vehicle, opacity: 0.2, cx: 80 }],
+    art: 'diamonds',
     artColor: colors.vehicle,
   },
-  // Practice: dusk, a low red-violet glow for the daily ritual.
-  ritual: {
-    glows: [{ color: colors.purple, opacity: 0.65, cx: 60 }, { color: colors.stoplight, opacity: 0.14, cx: 25 }],
-    art: 'none',
+  // Road: emerald light and rising triangles, a climb in steps.
+  readingRoad: {
+    glows: [{ color: colors.purple, opacity: 0.6, cx: 35 }, { color: colors.road, opacity: 0.2, cx: 80 }],
+    art: 'triangles',
+    artColor: colors.road,
+  },
+  // Stoplight: crimson light and planets on their orbits.
+  readingStoplight: {
+    glows: [{ color: colors.purple, opacity: 0.6, cx: 35 }, { color: colors.stoplight, opacity: 0.18, cx: 80 }],
+    art: 'orbits',
     artColor: colors.stoplight,
+  },
+  // Practice: dusk, and the path of the sun over one day with a marker for each of the three daily check-ins.
+  ritual: {
+    glows: [{ color: colors.purple, opacity: 0.65, cx: 60 }, { color: colors.stoplight, opacity: 0.2, cx: 20 }, { color: colors.vehicle, opacity: 0.1, cx: 85 }],
+    art: 'sunpath',
+    artColor: colors.parchment,
   },
   // My Chart: an observatory, with astrolabe rings in the corner.
   observatory: { glows: [{ color: colors.purple, opacity: 0.75, cx: 50 }], art: 'rings', artColor: colors.gold },
