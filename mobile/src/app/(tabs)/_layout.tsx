@@ -4,7 +4,6 @@ import { useStoreHydrated, useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts } from '@/theme/tokens';
 import { TabIcon, type TabName } from '@/components/TabIcons';
 import { select } from '@/lib/haptics';
-import { useReduceMotion } from '@/lib/motion';
 
 const icon = (name: TabName) => ({ color, focused }: { color: ColorValue; focused: boolean }) => (
   <TabIcon name={name} color={color as string} focused={focused} />
@@ -14,7 +13,6 @@ const icon = (name: TabName) => ({ color, focused }: { color: ColorValue; focuse
 export default function TabsLayout() {
   const hydrated = useStoreHydrated();
   const hasChart = useT3DStore((state) => state.chart !== null);
-  const reduceMotion = useReduceMotion();
 
   if (!hydrated) return <View style={{ flex: 1, backgroundColor: colors.obsidian }} />;
   if (!hasChart) return <Redirect href="/onboarding" />;
@@ -24,8 +22,6 @@ export default function TabsLayout() {
       screenListeners={{ tabPress: () => select() }}
       screenOptions={{
         headerShown: false,
-        // Switching tabs cross-fades instead of cutting, so the change reads as one continuous space.
-        animation: reduceMotion ? 'none' : 'fade',
         sceneStyle: { backgroundColor: colors.obsidian },
         tabBarActiveTintColor: colors.gold,
         tabBarInactiveTintColor: colors.parchmentMuted,

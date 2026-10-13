@@ -11,6 +11,6 @@ test('opened screens slide in from the right and can be swiped back, with a fade
   assert.match(layout, /<Stack\.Screen name="\(tabs\)" options=\{\{ animation: 'fade', gestureEnabled: false \}\} \/>/);
 });
 
-test('switching tabs cross-fades, and not at all with Reduce Motion', () => {
-  assert.match(read('mobile/src/app/(tabs)/_layout.tsx'), /animation: reduceMotion \? 'none' : 'fade'/);
+test('the tab navigator does not animate its own screens (its fade left some tabs black)', () => {
+  assert.doesNotMatch(read('mobile/src/app/(tabs)/_layout.tsx'), /animation:/);
 });
