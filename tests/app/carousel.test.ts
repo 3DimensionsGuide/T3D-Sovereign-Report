@@ -40,17 +40,20 @@ test('the carousel uses no private details and is offered in the share studio', 
   assert.match(share, /card-carousel/);
 });
 
-test('the Road slide carries the Life Path meaning when there is one, and the others carry none', () => {
-  assert.equal(slideContent('road', chart, true).note, null);
-  assert.equal(slideContent('road', chart, true, '  A line of meaning.  ').note, 'A line of meaning.');
-  assert.equal(slideContent('road', chart, true, '   ').note, null);
-  assert.equal(slideContent('vehicle', chart, true, 'ignored').note, null);
-  assert.equal(slideContent('stoplight', chart, true, 'ignored').note, null);
+test('the Road slide shows a third fact, the Birth Number, once it is known', () => {
+  assert.deepEqual(slideContent('road', chart, true, 4).facts.map((f) => f.label), ['Life Path', 'Destiny', 'Birth Number']);
+  assert.deepEqual(slideContent('road', chart, true, 4).facts.map((f) => f.value), ['7', '9', '4']);
+  assert.equal(slideContent('road', chart, true).facts.length, 2, 'left off until it arrives, never guessed');
+  assert.equal(slideContent('vehicle', chart, true, 4).facts.length, 3);
+  assert.equal(slideContent('stoplight', chart, true, 4).facts.length, 3);
 });
 
-test('the share studio loads the Life Path meaning and waits for it before saving the Road slide', () => {
+test('the share studio takes the Birth Number from the server and waits for it before saving the Road slide', () => {
   const share = readFileSync('mobile/src/app/share-card.tsx', 'utf8');
-  assert.match(share, /useTermSummary/);
-  assert.match(share, /lifePathMeaning=\{meaning\.summary\}/);
-  assert.match(share, /lens === 'road' && meaning\.loading/);
+  const card = readFileSync('mobile/src/components/CarouselShareCard.tsx', 'utf8');
+  assert.match(share, /useNumerology/);
+  assert.match(share, /birthNumber=\{birthNumber\}/);
+  assert.match(share, /lens === 'road' && numerology\.loading/);
+  assert.match(card, /birthNumber/);
+  assert.doesNotMatch(card, /slide\.note/, 'every slide is three facts, with no extra line');
 });

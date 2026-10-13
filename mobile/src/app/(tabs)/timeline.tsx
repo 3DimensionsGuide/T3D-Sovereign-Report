@@ -25,6 +25,9 @@ import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
+import { LockIcon } from '@/components/LockIcon';
+import { usePremium } from '@/lib/usePremium';
+import { isTransitLocked } from '@/lib/timelineLock';
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
 const BAR_HEIGHT = 120;
@@ -218,7 +221,7 @@ function spineSeason(s: ActiveSeason, i: number): SpineSeason {
   };
 }
 
-function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onToggle: () => void }) {
+function EventRow({ e, open, onToggle, locked }: { e: TimelineEvent; open: boolean; onToggle: () => void; locked: boolean }) {
   const flags: string[] = [];
   if (e.lord) flags.push('★ Lord of the Year');
   if (e.profectedHouse) flags.push('⌂ Your profected house');
@@ -227,7 +230,11 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
       onPress={onToggle}
       accessibilityRole="button"
       accessibilityState={{ expanded: open }}
-      accessibilityLabel={`${timeOf(e.at)}. ${e.title}. ${open ? e.detail : 'Double tap for details.'}`}
+      accessibilityLabel={
+        locked
+          ? `${timeOf(e.at)}. ${e.title}. ${open ? 'The explanation is part of Premium. Subscriptions are not open yet.' : 'Part of Premium. Double tap to learn more.'}`
+          : `${timeOf(e.at)}. ${e.title}. ${open ? e.detail : 'Double tap for details.'}`
+      }
       style={({ pressed }) => [styles.event, pressed && styles.eventPressed]}
     >
       <View style={styles.eventHead}>
@@ -236,7 +243,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
           <Text style={styles.eventKind}>{KIND_LABEL[e.kind]} · {timeOf(e.at)}</Text>
           <Text style={styles.eventTitle}>{e.title}</Text>
         </View>
-        <Chevron open={open} style={styles.chevron} />
+        {locked ? <View style={styles.lockWrap}><LockIcon size={18} /></View> : <Chevron open={open} style={styles.chevron} />}
       </View>
       {e.kind === 'transit' || e.kind === 'return' ? (
         <NatureTag nature={e.nature} />
@@ -248,7 +255,16 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
         </View>
       ) : null}
       {flags.length ? <Text style={styles.eventFlags}>{flags.join('   ')}</Text> : null}
-      {open ? (
+      {open && locked ? (
+        <View style={styles.eventBody}>
+          <View style={styles.lockedBox}>
+            <LockIcon size={18} />
+            <Text style={styles.lockedText}>The explanation of this transit is part of Premium. Subscriptions are not open yet.</Text>
+          </View>
+          <GoldButton label="See what Premium includes" variant="ghost" onPress={() => router.push('/premium' as Href)} />
+        </View>
+      ) : null}
+      {open && !locked ? (
         <View style={styles.eventBody}>
           <Text style={styles.blockBody}>{e.detail}</Text>
           {e.kind === 'gate' && e.until ? (
@@ -276,6 +292,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
 export default function Timeline() {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
+  const premium = usePremium();
   const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
   const [filter, setFilter] = useState<Filter>('all');
   const [lens, setLens] = useState<TimelineLens>('all');
@@ -369,6 +386,7 @@ export default function Timeline() {
                     key={e.id}
                     e={e}
                     open={openId === e.id}
+                    locked={isTransitLocked(e.kind, premium)}
                     onToggle={() => { animateLayout(); setOpenId(openId === e.id ? null : e.id); }}
                   />
                 ))}
@@ -594,6 +612,12 @@ const styles = StyleSheet.create({
   eventTitleWrap: { flex: 1, gap: 2 },
   eventKind: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   eventTitle: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 22, color: colors.parchment },
+  lockWrap: { width: 24, alignItems: 'center', justifyContent: 'center' },
+  lockedBox: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, padding: space.md, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.gold, borderStyle: 'dashed',
+  },
+  lockedText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 20, color: colors.parchmentMuted, width: 24, textAlign: 'center' },
   eventNature: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.5, color: colors.parchmentMuted },
   eventFlags: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.gold },

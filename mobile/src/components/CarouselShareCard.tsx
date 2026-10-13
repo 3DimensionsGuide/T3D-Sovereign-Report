@@ -26,12 +26,12 @@ interface Props {
   chart: CarouselChart;
   birthTimeKnown: boolean;
   firstName?: string | null;
-  /** The short meaning of the Life Path number, shown on the Road slide. */
-  lifePathMeaning?: string | null;
+  /** The Birth Number, shown on the Road slide once it has loaded. */
+  birthNumber?: number | null;
 }
 
-export const CarouselShareCard = forwardRef<View, Props>(function CarouselShareCard({ lens, chart, birthTimeKnown, firstName, lifePathMeaning }, ref) {
-  const slide = slideContent(lens, chart, birthTimeKnown, lifePathMeaning ?? null);
+export const CarouselShareCard = forwardRef<View, Props>(function CarouselShareCard({ lens, chart, birthTimeKnown, firstName, birthNumber }, ref) {
+  const slide = slideContent(lens, chart, birthTimeKnown, birthNumber ?? null);
   const position = LENSES.indexOf(lens);
   const accent = LENS_COLOR[lens];
   return (
@@ -51,7 +51,6 @@ export const CarouselShareCard = forwardRef<View, Props>(function CarouselShareC
             </View>
           ))}
         </View>
-        {slide.note ? <Text style={styles.note} numberOfLines={3}>{slide.note}</Text> : null}
       </View>
       <View style={styles.footer}>
         <View style={styles.dots} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -80,7 +79,6 @@ const styles = StyleSheet.create({
   fact: { alignItems: 'center' },
   factLabel: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 2, color: colors.parchmentMuted, textTransform: 'uppercase' },
   factValue: { fontFamily: fonts.display, fontSize: 22, lineHeight: 28, color: colors.parchment, textAlign: 'center', alignSelf: 'stretch' },
-  note: { fontFamily: fonts.voice, fontSize: 17, lineHeight: 23, color: colors.parchmentMuted, textAlign: 'center', marginTop: 10, paddingHorizontal: 8 },
   footer: { alignItems: 'center', gap: 6, paddingTop: 8 },
   dots: { flexDirection: 'row', gap: 6 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.parchmentMuted, opacity: 0.9 },

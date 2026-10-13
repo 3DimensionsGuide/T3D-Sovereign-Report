@@ -86,6 +86,47 @@ export function RoomArtLayer({
   );
 }
 
+/**
+ * The daytime counterpart of the stars: a sun with rings and short rays, riding the same arc as the warm light
+ * (rising in the east, high at noon, setting in the west). Faint enough to sit behind any text, hidden at night.
+ */
+export function SkySun({ color, width, sun }: { color: string; width: number; sun: { opacity: number; cx: number; y: number } }) {
+  const reduce = useReduceMotion();
+  if (sun.opacity < 0.02) return null;
+  const x = (sun.cx / 100) * width;
+  const rays = Array.from({ length: 12 }, (_, i) => (i * Math.PI) / 6);
+  return (
+    <Animated.View
+      entering={reduce ? undefined : FadeIn.duration(700)}
+      pointerEvents="none"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[styles.fill, { opacity: sun.opacity }]}
+    >
+      <Svg width="100%" height={HEIGHT}>
+        {[64, 98, 140].map((r, i) => (
+          <Circle key={r} cx={x} cy={sun.y} r={r} fill="none" stroke={color} strokeWidth={0.9} opacity={0.3 - i * 0.08} />
+        ))}
+        {rays.map((a) => (
+          <Line
+            key={a}
+            x1={x + Math.cos(a) * 36}
+            y1={sun.y + Math.sin(a) * 36}
+            x2={x + Math.cos(a) * 54}
+            y2={sun.y + Math.sin(a) * 54}
+            stroke={color}
+            strokeWidth={1.4}
+            strokeLinecap="round"
+            opacity={0.55}
+          />
+        ))}
+        <Circle cx={x} cy={sun.y} r={26} fill={color} opacity={0.5} />
+        <Circle cx={x} cy={sun.y} r={18} fill={color} opacity={0.75} />
+      </Svg>
+    </Animated.View>
+  );
+}
+
 /** Readings, Vehicle: nested diamonds like the centers of a bodygraph, with a channel of light running through them. */
 function Diamonds({ color, width }: { color: string; width: number }) {
   const cx = width * 0.84;

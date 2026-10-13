@@ -3,7 +3,7 @@ import { RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions } fro
 import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Glow } from '@/components/Glow';
-import { RoomArtLayer } from '@/components/RoomArt';
+import { RoomArtLayer, SkySun } from '@/components/RoomArt';
 import { ParallaxLayer } from '@/components/ParallaxLayer';
 import { useReduceMotion } from '@/lib/motion';
 import { PARALLAX } from '@/lib/parallax';
@@ -37,7 +37,10 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
   // Today's sky follows the time of day; every other room keeps its own fixed light.
   const sky = useSkyLook(room === 'sky');
   const isSky = room === 'sky';
-  const glows = isSky && sky.glow.opacity > 0.005 ? [base.glows[0], sky.glow] : base.glows;
+  // By day the purple pool fades back so the warm light shows; at night it is the full purple.
+  const glows = isSky
+    ? [{ ...base.glows[0], opacity: base.glows[0].opacity * sky.purple }, ...(sky.glow.opacity > 0.005 ? [sky.glow] : [])]
+    : base.glows;
   const artOpacity = isSky ? sky.starOpacity : 1;
   return (
     <View style={styles.root}>
@@ -48,6 +51,7 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
       </ParallaxLayer>
       <ParallaxLayer scrollY={scrollY} factor={reduce ? 0 : PARALLAX.art}>
         <RoomArtLayer kind={base.art} color={base.artColor} width={width} opacity={artOpacity} />
+        {isSky ? <SkySun color={sky.glow.color} width={width} sun={sky.sun} /> : null}
       </ParallaxLayer>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView

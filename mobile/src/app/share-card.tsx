@@ -12,8 +12,7 @@ import { StoryShareCard } from '@/components/StoryShareCard';
 import { TodayShareCard } from '@/components/TodayShareCard';
 import { Segmented } from '@/components/Segmented';
 import { LENSES, type Lens } from '@/lib/carouselSlides';
-import { numberId } from '@/lib/termIds';
-import { useTermSummary } from '@/lib/useTermSummary';
+import { useNumerology } from '@/lib/useNumerology';
 import { useTriadToday } from '@/lib/useTriadToday';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
@@ -58,12 +57,9 @@ export default function ShareCard() {
   const [lens, setLens] = useState<Lens>('vehicle');
   const tall = (kind === 'profile' || kind === 'sigil') && shape === 'story';
   const triad = useTriadToday(chart?.leadId, profile?.email.trim());
-  const meaning = useTermSummary(
-    chart?.leadId,
-    profile?.email.trim(),
-    chart ? numberId(chart.numerology.lifePath) : null,
-    kind === 'carousel' && lens === 'road',
-  );
+  // The Birth Number comes from the server's numerology reading, so the day of birth never leaves it.
+  const numerology = useNumerology(chart?.leadId, profile?.email.trim());
+  const birthNumber = numerology.data?.birthday?.number ?? null;
   const [withName, setWithName] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +127,7 @@ export default function ShareCard() {
             chart={chart}
             birthTimeKnown={profile.birthTimeKnown}
             firstName={withName && first ? first : null}
-            lifePathMeaning={meaning.summary}
+            birthNumber={birthNumber}
           />
         ) : kind === 'sigil' ? (
           <SigilShareCard
@@ -173,7 +169,7 @@ export default function ShareCard() {
       </View>
 
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-      <GoldButton label={kind === 'carousel' ? `Share or save slide ${LENSES.indexOf(lens) + 1} of 3` : 'Share or save image'} onPress={onShare} loading={busy} disabled={(kind === 'today' && !triad.data) || (kind === 'carousel' && lens === 'road' && meaning.loading)} />
+      <GoldButton label={kind === 'carousel' ? `Share or save slide ${LENSES.indexOf(lens) + 1} of 3` : 'Share or save image'} onPress={onShare} loading={busy} disabled={(kind === 'today' && !triad.data) || (kind === 'carousel' && lens === 'road' && numerology.loading && birthNumber === null)} />
       <Text style={styles.small}>In the share sheet, choose “Save Image” to keep it in Photos.</Text>
       <GoldButton label="Share the link only" variant="ghost" onPress={onShareLink} />
       <Text style={styles.small}>

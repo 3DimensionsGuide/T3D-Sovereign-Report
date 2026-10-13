@@ -36,3 +36,18 @@ test('every hour of the day gives a valid colour and opacity', () => {
 test('only the Today room follows the clock', () => {
   assert.match(readFileSync('mobile/src/components/Screen.tsx', 'utf8'), /useSkyLook\(room === 'sky'\)/);
 });
+
+test('by day the sun is drawn and the purple eases back; at night it is gone', () => {
+  assert.equal(skyLook(0).sun.opacity, 0);
+  assert.equal(skyLook(23).sun.opacity, 0);
+  assert.equal(skyLook(10).sun.opacity, 1);
+  assert.equal(skyLook(0).purple, 1);
+  assert.ok(skyLook(12).purple < 0.6, 'the purple pool gives way to the warm light at midday');
+  assert.ok(skyLook(12).glow.opacity > 0.2, 'the warm light is strong enough to see at 10 am-noon');
+  assert.ok(skyLook(7).sun.y > skyLook(12).sun.y, 'the sun sits lower at dawn than at noon');
+  assert.ok(skyLook(8).sun.cx > skyLook(16).sun.cx, 'the sun travels from east to west');
+});
+
+test('the Today screen draws the sun only in the sky room', () => {
+  assert.match(readFileSync('mobile/src/components/Screen.tsx', 'utf8'), /isSky \? <SkySun/);
+});
