@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
 import { success } from '@/lib/haptics';
 import { Platform, Share, StyleSheet, Switch, Text, View } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { captureRef } from 'react-native-view-shot';
 import { Screen } from '@/components/Screen';
 import { GoldButton } from '@/components/GoldButton';
 import { ProfileShareCard } from '@/components/ProfileShareCard';
+import { SigilShareCard } from '@/components/SigilShareCard';
 import { StoryShareCard } from '@/components/StoryShareCard';
 import { TodayShareCard } from '@/components/TodayShareCard';
 import { Segmented } from '@/components/Segmented';
@@ -13,10 +14,11 @@ import { useTriadToday } from '@/lib/useTriadToday';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
 
-type Kind = 'profile' | 'today';
+type Kind = 'profile' | 'sigil' | 'today';
 
 const KINDS = [
   { value: 'profile', label: 'My Triad' },
+  { value: 'sigil', label: 'Sigil' },
   { value: 'today', label: 'Today' },
 ] as const;
 
@@ -29,6 +31,7 @@ const SHAPES = [
 /** Each card type carries its own tag, so we can count visits that come from it. */
 const LINKS: Record<Kind, string> = {
   profile: 'https://3dimensions.guide/?ref=card-profile',
+  sigil: 'https://3dimensions.guide/?ref=card-sigil',
   today: 'https://3dimensions.guide/?ref=card-today',
 };
 
@@ -36,9 +39,11 @@ export default function ShareCard() {
   const chart = useT3DStore((s) => s.chart);
   const profile = useT3DStore((s) => s.profile);
   const cardRef = useRef<View>(null);
-  const [kind, setKind] = useState<Kind>('profile');
+  // My Chart's Sigil button opens this screen on the Sigil card.
+  const { kind: startKind } = useLocalSearchParams<{ kind?: string }>();
+  const [kind, setKind] = useState<Kind>(startKind === 'sigil' ? 'sigil' : 'profile');
   const [shape, setShape] = useState<Shape>('post');
-  const tall = kind === 'profile' && shape === 'story';
+  const tall = (kind === 'profile' || kind === 'sigil') && shape === 'story';
   const triad = useTriadToday(chart?.leadId, profile?.email.trim());
   const [withName, setWithName] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -51,7 +56,7 @@ export default function ShareCard() {
     setBusy(true);
     try {
       const uri = await captureRef(cardRef, { format: 'png', quality: 1, width: 1080, height: tall ? 1920 : 1350, result: 'tmpfile' });
-      const message = `${kind === 'today' ? 'My frame for today' : 'My T3D Triad'} · ${LINKS[kind]}`;
+      const message = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : 'My T3D Triad'} · ${LINKS[kind]}`;
       const result = await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
       if (result.action === Share.sharedAction) success();
     } catch {
@@ -79,12 +84,14 @@ export default function ShareCard() {
         <Text style={styles.small}>
           {kind === 'today'
             ? 'The card shows today’s date, your Type and Authority, your Personal Day and the main sky contact. It never shows your birth date, time, place or last name.'
+            : kind === 'sigil'
+            ? 'Your Sigil is a drawing made from your chart, so no two are the same. The card shows it with your Type, Life Path and Sun sign. It never shows your birth date, time, place or last name.'
             : 'The card shows your Type, Life Path and Sun sign. Choose Story for the tall Instagram Stories shape. It never shows your birth date, time, place or last name.'}
         </Text>
       </View>
 
       <Segmented options={KINDS} value={kind} onChange={setKind} compact />
-      {kind === 'profile' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
+      {kind !== 'today' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
 
       <View style={styles.preview}>
         {kind === 'today' ? (
@@ -95,6 +102,14 @@ export default function ShareCard() {
               {triad.error ?? 'Getting today’s frame…'}
             </Text>
           )
+        ) : kind === 'sigil' ? (
+          <SigilShareCard
+            ref={cardRef}
+            chart={chart}
+            tall={tall}
+            firstName={withName && first ? first : null}
+            birthTimeKnown={profile.birthTimeKnown}
+          />
         ) : tall ? (
           <StoryShareCard
             ref={cardRef}
@@ -112,7 +127,7 @@ export default function ShareCard() {
         )}
       </View>
 
-      {kind === 'profile' && !profile.birthTimeKnown ? (
+      {kind !== 'today' && !profile.birthTimeKnown ? (
         <Text style={styles.small}>Moon and Rising are left off because your birth time is not known.</Text>
       ) : null}
 

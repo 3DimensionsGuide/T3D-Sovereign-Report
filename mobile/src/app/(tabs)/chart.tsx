@@ -14,6 +14,7 @@ import { MiniWheel } from '@/components/MiniWheel';
 import type { LensName } from '@/components/Lens';
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
+import { Sigil } from '@/components/Sigil';
 import { TriadCard } from '@/components/TriadCard';
 import { TriadPortrait } from '@/components/TriadPortrait';
 import { BodygraphPanel, WheelPanel } from '@/components/ChartPanels';
@@ -23,7 +24,7 @@ import { Segmented } from '@/components/Segmented';
 import { useChartData } from '@/lib/useChartData';
 import { formatLongitude } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, guidance, radius, space } from '@/theme/tokens';
 
 const VIEW_OPTIONS = [
   { value: 'overview', label: 'Overview' },
@@ -150,6 +151,17 @@ export default function Chart() {
         {risingNote ? <Text style={styles.note}>{risingNote}</Text> : null}
       </FadeIn>
 
+      <FadeIn delay={340}>
+        <View style={styles.sigilCard}>
+          <Text accessibilityRole="header" style={styles.sigilTitle}>Your Sigil</Text>
+          <Sigil chart={chart} birthTimeKnown={profile.birthTimeKnown} size={240} />
+          <Text style={[guidance, styles.sigilNote]}>
+            Drawn only from your chart, so no two are alike: your Vehicle in the centre, your Road around it, and your Sun, Moon and Rising on the outer ring.
+          </Text>
+          <GoldButton label="Share your Sigil" variant="ghost" onPress={() => router.push({ pathname: '/share-card', params: { kind: 'sigil' } } as unknown as Href)} />
+        </View>
+      </FadeIn>
+
       <FadeIn delay={360}>
         <Disclosure label="Birth details, reminder and settings">
           <View style={styles.moreStack}>
@@ -195,6 +207,12 @@ const styles = StyleSheet.create({
   meta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, marginTop: space.sm },
   moreStack: { gap: space.md },
+  sigilCard: {
+    alignItems: 'center', gap: space.md, padding: space.lg, marginTop: space.md,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
+  },
+  sigilTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.parchment, alignSelf: 'flex-start' },
+  sigilNote: { alignSelf: 'stretch' },
   actions: { marginTop: space.md, gap: 12 },
   chartArea: { marginTop: space.md },
   centerBox: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
