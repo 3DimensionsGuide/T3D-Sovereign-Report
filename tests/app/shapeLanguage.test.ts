@@ -56,13 +56,13 @@ test('small lens-coloured text uses the lighter AAA tints', () => {
   assert.match(read('mobile/src/components/TodaySignal.tsx'), /LENS_TEXT\[lens\]/);
 });
 
-test('onboarding asks one question at a time, shows the calculation, and the welcome screen has the seal', () => {
+test('onboarding asks one question at a time, shows the calculation, and the welcome screen has the T3D logo', () => {
   const onboarding = read('mobile/src/app/onboarding.tsx');
   assert.match(onboarding, /Step \$\{step \+ 1\} of 4/);
   assert.match(onboarding, /validateStep/);
   assert.match(onboarding, /<CalculatingView /);
   assert.match(onboarding, /Calculate my chart/);
-  assert.match(read('mobile/src/app/welcome.tsx'), /<TriadSeal /);
+  assert.match(read('mobile/src/app/welcome.tsx'), /logo-t3d\.png/);
   assert.match(read('mobile/src/components/CalculatingView.tsx'), /isReduceMotionEnabled/);
 });
 
