@@ -5,7 +5,7 @@ import { Pressable } from '@/components/Pressable';
 import { TermPressable } from '@/components/Explain';
 import { useReduceMotion } from '@/lib/motion';
 import { triadMapGroups, type MapChart, type MapLens } from '@/lib/triadMap';
-import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
+import { colors, fonts, radius } from '@/theme/tokens';
 
 const LENS_COLOR: Record<MapLens, string> = { vehicle: colors.vehicle, road: colors.road, stoplight: colors.stoplight };
 
@@ -27,9 +27,11 @@ interface Props {
   onOpenLens: (lens: MapLens) => void;
 }
 
-const HUB = 52;
-const FACT_H = TOUCH;
-const GAP = 8;
+const HUB = 44;
+const FACT_H = 48;
+const GAP = 6;
+/** Space between one lens and the next. */
+const BAND_GAP = 14;
 
 /**
  * A map of the whole chart: T3D at the top, the three lenses below it, and each lens's headline facts branching off.
@@ -53,7 +55,7 @@ export function TriadMap({ chart, birthTimeKnown, onOpenLens }: Props) {
         const busH = bandH - FACT_H;
         // The line up to the circle above: the gap, plus the empty space either side of each circle.
         const prevBandH = gi === 0 ? HUB : groups[gi - 1].facts.length * FACT_H + (groups[gi - 1].facts.length - 1) * GAP;
-        const above = 22 + (prevBandH - HUB) / 2;
+        const above = BAND_GAP + (prevBandH - HUB) / 2;
         return (
           <Animated.View
             key={g.lens}
@@ -66,16 +68,17 @@ export function TriadMap({ chart, birthTimeKnown, onOpenLens }: Props) {
                 accessibilityRole="button"
                 accessibilityLabel={`${g.name}, ${g.system}. Opens your reading`}
                 onPress={() => onOpenLens(g.lens)}
+                hitSlop={6}
                 style={[styles.hub, { borderColor: accent }]}
               >
-                <Mark lens={g.lens} size={22} />
+                <Mark lens={g.lens} size={18} />
               </Pressable>
             </View>
-            <View style={{ width: 34, height: bandH }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-              <View style={[styles.hline, { backgroundColor: accent, top: centreY - 1, left: 0, width: 17 }]} />
-              {n > 1 ? <View style={[styles.vline, { backgroundColor: accent, left: 16, top: busTop, height: busH }]} /> : null}
+            <View style={{ width: 30, height: bandH }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+              <View style={[styles.hline, { backgroundColor: accent, top: centreY - 1, left: 0, width: 15 }]} />
+              {n > 1 ? <View style={[styles.vline, { backgroundColor: accent, left: 14, top: busTop, height: busH }]} /> : null}
               {g.facts.map((_, i) => (
-                <View key={i} style={[styles.hline, { backgroundColor: accent, top: i * (FACT_H + GAP) + FACT_H / 2 - 1, left: 16, width: 18 }]} />
+                <View key={i} style={[styles.hline, { backgroundColor: accent, top: i * (FACT_H + GAP) + FACT_H / 2 - 1, left: 14, width: 16 }]} />
               ))}
             </View>
             <View style={{ flex: 1, gap: GAP }}>
@@ -99,12 +102,12 @@ export function TriadMap({ chart, birthTimeKnown, onOpenLens }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { alignSelf: 'stretch', gap: 22 },
+  wrap: { alignSelf: 'stretch', gap: BAND_GAP },
   centre: {
     width: HUB, height: HUB, borderRadius: HUB / 2, borderWidth: 1.5, borderColor: colors.gold,
     backgroundColor: colors.amethyst, alignItems: 'center', justifyContent: 'center',
   },
-  centreText: { fontFamily: fonts.display, fontSize: 15, color: colors.gold },
+  centreText: { fontFamily: fonts.display, fontSize: 13, color: colors.gold },
   band: { flexDirection: 'row', alignItems: 'center' },
   spine: { position: 'absolute', left: HUB / 2 - 1, width: 2, opacity: 0.8 },
   hub: {
@@ -114,9 +117,9 @@ const styles = StyleSheet.create({
   hline: { position: 'absolute', height: 2, opacity: 0.85 },
   vline: { position: 'absolute', width: 2, opacity: 0.85 },
   fact: {
-    minHeight: FACT_H, justifyContent: 'center', paddingVertical: 4, paddingHorizontal: 12,
+    minHeight: FACT_H, justifyContent: 'center', paddingVertical: 3, paddingHorizontal: 12,
     backgroundColor: colors.charcoal, borderRadius: radius.md, borderLeftWidth: 4,
   },
-  factLabel: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 1.6, color: colors.parchmentMuted, textTransform: 'uppercase' },
-  factValue: { fontFamily: fonts.display, fontSize: 18, lineHeight: 24, color: colors.parchment },
+  factLabel: { fontFamily: fonts.bodyBold, fontSize: 9, letterSpacing: 1.6, color: colors.parchmentMuted, textTransform: 'uppercase' },
+  factValue: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: colors.parchment },
 });

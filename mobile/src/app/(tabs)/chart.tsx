@@ -166,7 +166,7 @@ export default function Chart() {
       <FadeIn delay={350}>
         <View style={styles.sigilCard}>
           <Text accessibilityRole="header" style={styles.sigilTitle}>Your Triad Map</Text>
-          <Text style={[guidance, styles.sigilNote]}>
+          <Text style={[guidance, styles.sigilNote, styles.mapNote]}>
             Your whole chart, grouped by lens. Tap a circle to open its reading, or any fact to learn what it means.
           </Text>
           <TriadMap chart={chart} birthTimeKnown={profile.birthTimeKnown} onOpenLens={openLens} />
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
   },
   sigilTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.parchment, alignSelf: 'flex-start' },
   sigilNote: { alignSelf: 'stretch' },
+  mapNote: { fontSize: 17, lineHeight: 24 },
   actions: { marginTop: space.md, gap: 12 },
   chartArea: { marginTop: space.md },
   centerBox: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
