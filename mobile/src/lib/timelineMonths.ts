@@ -21,3 +21,26 @@ export function splitCurrentMonth<T>(groups: DayGroup<T>[], todayKey: string): M
   return { now, later, laterMonths };
 }
 
+
+/** The day key `n` days after `dayKey` ("2026-10-13" + 7 = "2026-10-20"). */
+export function addDaysKey(dayKey: string, n: number): string {
+  const [y, m, d] = dayKey.split('-').map(Number) as [number, number, number];
+  const t = new Date(y, m - 1, d + n);
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+}
+
+export interface WeekSplit<T> {
+  /** Today and the next six days. */
+  week: DayGroup<T>[];
+  /** The rest of this month, after the week. */
+  rest: DayGroup<T>[];
+}
+
+/** Splits the days of this month into the week ahead and the rest of the month. */
+export function splitWeek<T>(nowGroups: DayGroup<T>[], todayKey: string, days = 7): WeekSplit<T> {
+  const end = addDaysKey(todayKey, days);
+  return {
+    week: nowGroups.filter(([day]) => day < end),
+    rest: nowGroups.filter(([day]) => day >= end),
+  };
+}

@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { monthOf, splitCurrentMonth } from '../../mobile/src/lib/timelineMonths';
 
 const g = (day: string): [string, string[]] => [day, ['e']];
@@ -31,4 +32,32 @@ test('the year rolls over correctly', () => {
 
 test('monthOf takes the year and month', () => {
   assert.equal(monthOf('2026-10-11'), '2026-10');
+});
+
+import { addDaysKey, splitWeek } from '../../mobile/src/lib/timelineMonths';
+
+test('addDaysKey crosses month and year ends', () => {
+  assert.equal(addDaysKey('2026-10-13', 7), '2026-10-20');
+  assert.equal(addDaysKey('2026-10-28', 7), '2026-11-04');
+  assert.equal(addDaysKey('2026-12-29', 7), '2027-01-05');
+});
+
+test('the week is today and the next six days, the rest of the month follows', () => {
+  const days = ['2026-10-13', '2026-10-15', '2026-10-19', '2026-10-20', '2026-10-31'].map(g);
+  const r = splitWeek(days, '2026-10-13');
+  assert.deepEqual(r.week.map(([d]) => d), ['2026-10-13', '2026-10-15', '2026-10-19']);
+  assert.deepEqual(r.rest.map(([d]) => d), ['2026-10-20', '2026-10-31']);
+});
+
+test('an empty week leaves everything in the rest', () => {
+  const r = splitWeek([g('2026-10-25')], '2026-10-13');
+  assert.equal(r.week.length, 0);
+  assert.equal(r.rest.length, 1);
+});
+
+test('Timeline shows the week first and the rest of the month behind Show more', () => {
+  const src = readFileSync('mobile/src/app/(tabs)/timeline.tsx', 'utf8');
+  assert.match(src, /const visibleGroups = weekSplit\.week;/);
+  assert.match(src, /showMore && restDays > 0/);
+  assert.match(src, /Rest of \{monthTitle\(nowMonthKey\)\}/);
 });

@@ -1,6 +1,6 @@
 import { yearRangeLabel } from '@/lib/teaser';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { splitCurrentMonth } from '@/lib/timelineMonths';
+import { splitCurrentMonth, splitWeek } from '@/lib/timelineMonths';
 import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
@@ -367,8 +367,10 @@ export default function Timeline() {
   // The first block is stored as 'now'; the month it shows is this month.
   const pinMonthKey = pinMonth === 'now' || pinMonth === null ? nowMonthKey : pinMonth;
   const dayCount = (key: string) => groups.filter(([d]) => d.startsWith(key)).length;
-  const laterDays = split.later.length;
-  const visibleGroups = split.now;
+  const weekSplit = useMemo(() => splitWeek(split.now, localKey(new Date())), [split]);
+  const visibleGroups = weekSplit.week;
+  const restDays = weekSplit.rest.length;
+  const laterDays = split.later.length + restDays;
   const toggleMonth = (key: string) => {
     animateLayout();
     setOpenMonths((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
@@ -426,7 +428,7 @@ export default function Timeline() {
         <View style={styles.header}>
           <LensLabel lens="road">The road ahead</LensLabel>
           <Text accessibilityRole="header" style={styles.title}>Timeline</Text>
-          <Text style={guidance}>The rest of this month first, measured against your own chart. Later months are under Show more.</Text>
+          <Text style={guidance}>This week first, measured against your own chart. The rest of the month and later months are under Show more.</Text>
         </View>
       </FadeIn>
 
@@ -529,10 +531,10 @@ export default function Timeline() {
             <View onLayout={onSectionLayout('now', false)} style={styles.monthBlock}>
               <View style={styles.monthHead}>
                 <Text accessibilityRole="header" style={styles.monthName}>{monthTitle(nowMonthKey)}</Text>
-                <Text style={styles.monthCount}>From today</Text>
+                <Text style={styles.monthCount}>This week</Text>
               </View>
               {visibleGroups.length === 0 ? (
-                <Text style={styles.sub}>Nothing in this filter for the rest of this month.</Text>
+                <Text style={styles.sub}>Nothing in this filter this week.</Text>
               ) : (
                 visibleGroups.map((g) => renderDay(g))
               )}
@@ -549,6 +551,22 @@ export default function Timeline() {
               >
                 <Text style={styles.showMoreText}>{showMore ? 'Show less' : 'Show more'}</Text>
               </Pressable>
+              {showMore && restDays > 0 ? (
+                <View style={styles.monthBlock} onLayout={onSectionLayout(nowMonthKey, true)}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ expanded: openMonths.includes(nowMonthKey) }}
+                    accessibilityLabel={`Rest of ${monthTitle(nowMonthKey)}, ${restDays} ${restDays === 1 ? 'day' : 'days'} with events. ${openMonths.includes(nowMonthKey) ? 'Expanded.' : 'Double tap to open.'}`}
+                    onPress={() => toggleMonth(nowMonthKey)}
+                    style={({ pressed }) => [styles.monthBtn, pressed && { opacity: 0.8 }]}
+                  >
+                    <Text style={styles.monthName}>Rest of {monthTitle(nowMonthKey)}</Text>
+                    <Text style={styles.monthCount}>{restDays} {restDays === 1 ? 'day' : 'days'}</Text>
+                    <Chevron open={openMonths.includes(nowMonthKey)} style={styles.monthChevron} />
+                  </Pressable>
+                  {openMonths.includes(nowMonthKey) ? weekSplit.rest.map((g) => renderDay(g)) : null}
+                </View>
+              ) : null}
               {showMore
                 ? split.laterMonths.map((key) => {
                     const open = openMonths.includes(key);
