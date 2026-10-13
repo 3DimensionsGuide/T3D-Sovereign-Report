@@ -1,7 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
+import { Chevron } from '@/components/Chevron';
 import { select } from '@/lib/haptics';
+import { animateLayout } from '@/lib/motion';
 import { colors, fonts, space } from '@/theme/tokens';
 
 interface Props {
@@ -25,12 +27,13 @@ export function Disclosure({ label, children, defaultOpen = false }: Props) {
         accessibilityLabel={`${label}. ${open ? 'Expanded.' : 'Double tap to read.'}`}
         onPress={() => {
           select();
+          animateLayout();
           setOpen((o) => !o);
         }}
         style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}
       >
         <Text style={styles.label}>{label}</Text>
-        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+        <Chevron open={open} style={styles.chevron} />
       </Pressable>
       {open ? <View style={styles.body}>{children}</View> : null}
     </View>

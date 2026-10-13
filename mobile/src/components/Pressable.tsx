@@ -3,10 +3,10 @@ import { Pressable as RNPressable, type PressableProps, type View } from 'react-
 
 /**
  * Drop-in replacement for React Native's Pressable. Anything tappable dims a little
- * while a finger is on it, so every control answers the touch. A screen's own pressed
+ * and dips a hair smaller while a finger is on it, so every control answers the touch. A screen's own pressed
  * style still wins because it is applied after this one.
  */
-const PRESSED = { opacity: 0.8 } as const;
+const PRESSED = { opacity: 0.8, transform: [{ scale: 0.985 }] } as const;
 
 export const Pressable = forwardRef<View, PressableProps>(function Pressable({ style, ...rest }, ref) {
   return (

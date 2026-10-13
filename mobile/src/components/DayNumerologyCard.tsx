@@ -11,6 +11,8 @@ import { cycleLine, numberWord } from '@/lib/numberWords';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
+import { animateLayout } from '@/lib/motion';
+import { Chevron } from '@/components/Chevron';
 function numberText(m: DayNumberMeaning): string {
   return m.root ? `${m.number}/${m.root}` : String(m.number);
 }
@@ -79,6 +81,7 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
         accessibilityLabel={`The Road, number of the day. Personal Day ${numberText(p)}, ${p.label}. Personal Year ${data.personalYear}, Personal Month ${data.personalMonth}. ${open ? 'Expanded.' : 'Double tap to read more.'}`}
         onPress={() => {
           select();
+          animateLayout();
           setOpen((o) => !o);
         }}
         style={({ pressed }) => [styles.summary, pressed && { opacity: 0.8 }]}
@@ -90,7 +93,7 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
           <Text style={styles.eyebrow}>PERSONAL DAY</Text>
           <Text style={styles.label}>{p.label}</Text>
         </View>
-        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+        <Chevron open={open} style={styles.chevron} />
       </Pressable>
       <View style={styles.dials}>
         <PersonalDial kind="Year" number={data.personalYear} text={String(data.personalYear)} word={numberWord(data.personalYear)} />

@@ -7,6 +7,8 @@ import { lensTap } from '@/lib/haptics';
 import { MotionLensIcon } from '@/components/LensMotion';
 import type { DailySignal, Lamp, LampState } from '@/lib/triadTypes';
 import { colors, fonts, heroCard, radius, space } from '@/theme/tokens';
+import { animateLayout } from '@/lib/motion';
+import { Chevron } from '@/components/Chevron';
 
 /**
  * The T3D signal lamp. A real three-lamp housing, top to bottom: Pause, Slow, Go.
@@ -100,7 +102,7 @@ function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; m
         <View style={styles.rowWord}>
           {lamp ? <SignalMarker kind={SHAPE[lamp.state]} size={14} color={COLOR[lamp.state]} /> : null}
           <Text maxFontSizeMultiplier={1.3} style={styles.rowWordText}>{word}</Text>
-          {text ? <Text maxFontSizeMultiplier={1.3} style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text> : null}
+          {text ? <Chevron open={open} style={styles.chevron} /> : null}
         </View>
       </View>
       {text ? <Text maxFontSizeMultiplier={1.3} style={styles.rowText} numberOfLines={open ? undefined : 1}>{open ? text : teaser(text, 40)}</Text> : null}
@@ -116,6 +118,7 @@ function LensRow({ lens, lamp, missing }: { lens: LensName; lamp: Lamp | null; m
       accessibilityLabel={`${LENS_LABEL[lens]}, ${word}. ${text} ${open ? 'Expanded.' : 'Double tap to read in full.'}`}
       onPress={() => {
         lensTap(lens);
+        animateLayout();
         setOpen((o) => !o);
       }}
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.75 }]}

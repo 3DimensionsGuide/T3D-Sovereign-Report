@@ -9,6 +9,8 @@ import { GoldButton } from '@/components/GoldButton';
 import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { OfflineNote } from '@/components/OfflineNote';
 import { colors, fonts, radius, space } from '@/theme/tokens';
+import { animateLayout } from '@/lib/motion';
+import { Chevron } from '@/components/Chevron';
 
 /**
  * Shared building blocks for the long-form readings (Vehicle, Road, Stoplight).
@@ -167,7 +169,7 @@ function ReadMoreNote({ text }: { text: string }) {
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        onPress={() => setOpen((o) => !o)}
+        onPress={() => { animateLayout(); setOpen((o) => !o); }}
         style={({ pressed }) => [styles.readMore, pressed && styles.pressed]}
       >
         <Text style={styles.readMoreText}>{open ? 'Show less' : 'Read more'}</Text>
@@ -214,7 +216,7 @@ export function Accordion({
   return (
     <View style={[styles.card, now && { borderColor: accent, borderWidth: 2 }]}>
       <Pressable
-        onPress={() => { setOpen(!open); reportOpen(title, !open); onOpenChange?.(!open); }}
+        onPress={() => { animateLayout(); setOpen(!open); reportOpen(title, !open); onOpenChange?.(!open); }}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         accessibilityLabel={`${title}. ${subtitle ?? ''}${now ? ' Active now.' : ''} ${open ? 'Expanded.' : 'Double tap to read.'}`}
@@ -234,7 +236,7 @@ export function Accordion({
           <Text style={styles.cardTitle}>{title}</Text>
           {subtitle ? <Text style={styles.cardSub} numberOfLines={open ? undefined : 3}>{open ? subtitle : teaser(subtitle)}</Text> : null}
         </View>
-        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+        <Chevron open={open} style={styles.chevron} />
       </Pressable>
       {open ? <View style={styles.cardBody}>{children}</View> : null}
     </View>

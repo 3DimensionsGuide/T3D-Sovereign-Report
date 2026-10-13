@@ -23,6 +23,8 @@ import { useTimeline } from '@/lib/useTimeline';
 import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
+import { animateLayout } from '@/lib/motion';
+import { Chevron } from '@/components/Chevron';
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
 const BAR_HEIGHT = 120;
@@ -234,7 +236,7 @@ function EventRow({ e, open, onToggle }: { e: TimelineEvent; open: boolean; onTo
           <Text style={styles.eventKind}>{KIND_LABEL[e.kind]} · {timeOf(e.at)}</Text>
           <Text style={styles.eventTitle}>{e.title}</Text>
         </View>
-        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+        <Chevron open={open} style={styles.chevron} />
       </View>
       {e.kind === 'transit' || e.kind === 'return' ? (
         <NatureTag nature={e.nature} />
@@ -341,6 +343,7 @@ export default function Timeline() {
   const laterDays = split.later.length;
   const visibleGroups = split.now;
   const toggleMonth = (key: string) => {
+    animateLayout();
     setOpenMonths((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
     setOpenId(null);
   };
@@ -366,7 +369,7 @@ export default function Timeline() {
                     key={e.id}
                     e={e}
                     open={openId === e.id}
-                    onToggle={() => setOpenId(openId === e.id ? null : e.id)}
+                    onToggle={() => { animateLayout(); setOpenId(openId === e.id ? null : e.id); }}
                   />
                 ))}
               </View>
@@ -441,7 +444,7 @@ export default function Timeline() {
                     accessibilityRole="button"
                     accessibilityState={{ expanded: showAllSeasons }}
                     accessibilityLabel={showAllSeasons ? 'Show fewer slow transits' : `Show all ${data.seasons.length} slow transits`}
-                    onPress={() => { select(); setShowAllSeasons((v) => !v); }}
+                    onPress={() => { select(); animateLayout(); setShowAllSeasons((v) => !v); }}
                     style={styles.showMore}
                   >
                     <Text style={styles.showMoreText}>{showAllSeasons ? 'Show fewer' : `Show all ${data.seasons.length}`}</Text>
@@ -491,7 +494,7 @@ export default function Timeline() {
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ expanded: showMore }}
-                onPress={() => { setShowMore((v) => !v); setOpenId(null); }}
+                onPress={() => { animateLayout(); setShowMore((v) => !v); setOpenId(null); }}
                 style={({ pressed }) => [styles.showMore, pressed && { opacity: 0.8 }]}
               >
                 <Text style={styles.showMoreText}>{showMore ? 'Show less' : 'Show more'}</Text>
@@ -511,7 +514,7 @@ export default function Timeline() {
                         >
                           <Text style={styles.monthName}>{monthTitle(key)}</Text>
                           <Text style={styles.monthCount}>{days.length} {days.length === 1 ? 'day' : 'days'}</Text>
-                          <Text style={[styles.monthChevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+                          <Chevron open={open} style={styles.monthChevron} />
                         </Pressable>
                         {open ? days.map((g) => renderDay(g)) : null}
                       </View>

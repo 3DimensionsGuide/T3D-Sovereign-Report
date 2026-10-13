@@ -3,7 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LensIcon, LENS_TEXT, type LensName } from '@/components/Lens';
 import { Pressable } from '@/components/Pressable';
+import { Chevron } from '@/components/Chevron';
 import { select } from '@/lib/haptics';
+import { animateLayout } from '@/lib/motion';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 const KEY = 't3d-fold-v1:';
@@ -37,6 +39,7 @@ export function Fold({ id, lens, title, hint, children }: Props) {
   const toggle = () => {
     select();
     const next = !open;
+    animateLayout();
     setOpen(next);
     AsyncStorage.setItem(KEY + id, next ? '1' : '0').catch(() => undefined);
   };
@@ -55,7 +58,7 @@ export function Fold({ id, lens, title, hint, children }: Props) {
           <Text style={[styles.title, { color: LENS_TEXT[lens] }]}>{title}</Text>
           {!open ? <Text style={styles.hint}>{hint}</Text> : null}
         </View>
-        <Text style={[styles.chevron, open && { transform: [{ rotate: '90deg' }] }]}>›</Text>
+        <Chevron open={open} style={styles.chevron} />
       </Pressable>
       {open ? <View style={styles.body}>{children}</View> : null}
     </View>
