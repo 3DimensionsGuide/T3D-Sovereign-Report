@@ -116,6 +116,11 @@ export interface GateTodayResult {
   authority: string | null;
 }
 
+export interface GateDay {
+  dayIndex: number;
+  gates: GateToday[];
+}
+
 export interface TimelineResult {
   from: string;
   to: string;
@@ -132,4 +137,6 @@ export interface TimelineResult {
   yearAhead?: YearAhead;
   /** Optional: absent on older saved copies and on charts with no Human Design gates. */
   gateToday?: GateTodayResult;
+  /** Gate readings for the days after today. Absent on older saved copies. */
+  gateDays?: GateDay[];
 }

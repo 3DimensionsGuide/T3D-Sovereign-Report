@@ -40,7 +40,7 @@ import type {
 import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/road-content';
 import { personalYearNumber } from '../../lib/numerology/personalYear';
 import { buildGateEvents, type GateVehicle } from '../../lib/app/gateEvents';
-import { buildGateToday, type GateTodayResult } from '../../lib/app/gateToday';
+import { buildGateToday, GATE_DAYS_AHEAD, type GateDay, type GateTodayResult } from '../../lib/app/gateToday';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
 
@@ -141,6 +141,8 @@ export interface TimelineResult {
   numberMeanings: Record<number, { word: string; line: string }>;
   /** The Sun's gate(s) today, read against the person's chart. Absent when the chart has no Human Design gates. */
   gateToday?: GateTodayResult;
+  /** The Sun's gate(s) for each of the next days after today (index 0 is tomorrow), so a chosen future day has its own reading. */
+  gateDays?: GateDay[];
 }
 
 export interface TimelineInput {
@@ -768,9 +770,15 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
   seasons.sort((a, b) => a.orb - b.orb);
 
   let gateToday: GateTodayResult | undefined;
+  let gateDays: GateDay[] | undefined;
   if (input.vehicle && input.vehicle.natalGates.length > 0) {
     events.push(...buildGateEvents(startJd, endJd, input.vehicle, (b, jd) => posAt(b, jd).lon));
-    gateToday = buildGateToday(startJd, input.vehicle, (b, jd) => posAt(b, jd).lon);
+    const sunAt = (b: 'sun' | 'moon', jd: number) => posAt(b, jd).lon;
+    gateToday = buildGateToday(startJd, input.vehicle, sunAt);
+    gateDays = [];
+    for (let i = 1; i <= Math.min(GATE_DAYS_AHEAD, days - 1); i++) {
+      gateDays.push({ dayIndex: i, gates: buildGateToday(startJd + i, input.vehicle, sunAt).gates });
+    }
   }
 
   events.sort((a, b) => a.at.localeCompare(b.at));
@@ -799,6 +807,7 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     challenge: pickCycles(input.challenges, age, input.birthDate, 'challenge'),
     numberMeanings: NUMBER_MEANINGS,
     gateToday,
+    gateDays,
   };
 }
 

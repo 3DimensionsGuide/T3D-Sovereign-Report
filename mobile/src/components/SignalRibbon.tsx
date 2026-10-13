@@ -39,13 +39,15 @@ function localKey(d: Date): string {
 
 interface Props {
   data: TimelineResult;
+  /** Told which day (0 is today) the person has tapped, so the rest of the screen can follow it. */
+  onSelectDay?: (index: number) => void;
 }
 
 /**
  * A scrolling ribbon of the next 60 days. Each day shows its date, its Personal Day number and the
  * strongest signal of the day as a shape plus a word in the detail below. Tap a day to read its events.
  */
-export function SignalRibbon({ data }: Props) {
+export function SignalRibbon({ data, onSelectDay }: Props) {
   const days = useMemo(() => {
     const byDay = new Map<string, TimelineEvent[]>();
     for (const e of data.events) {
@@ -79,7 +81,7 @@ export function SignalRibbon({ data }: Props) {
               accessibilityRole="button"
               accessibilityState={{ selected: isSel }}
               accessibilityLabel={`${dt.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}${i === 0 ? ', today' : ''}. ${sig ? SIGNAL_LABEL[sig] : 'Quiet'}. Personal Day ${d.personalDay}.`}
-              onPress={() => setSelected(i)}
+              onPress={() => { setSelected(i); onSelectDay?.(i); }}
               style={[styles.cell, isSel && styles.cellOn]}
             >
               <Text maxFontSizeMultiplier={1.15} style={styles.weekday}>{i === 0 ? 'Today' : dt.toLocaleDateString(undefined, { weekday: 'narrow' })}</Text>

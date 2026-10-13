@@ -27,5 +27,28 @@ test('the Vehicle card shows the gate reading and the cache was bumped for the n
   assert.match(ui, /g\.reading\.theme/);
   assert.match(ui, /g\.reading\.shadow/);
   assert.match(ui, /g\.reading\.guidance/);
-  assert.match(readFileSync('mobile/src/lib/useTimeline.ts', 'utf8'), /CACHE_VERSION = 3/);
+  assert.match(readFileSync('mobile/src/lib/useTimeline.ts', 'utf8'), /CACHE_VERSION = 4/);
+});
+
+import { gateReadingForDay } from '../../mobile/src/lib/gateDay';
+
+test('a chosen day gets its own gate reading, today keeps the anchor, a missing day has none', () => {
+  const g = (gate: number) => ({ gate });
+  const data = {
+    gateToday: { gates: [g(32)], strategy: 'S', authority: 'A' },
+    gateDays: [{ dayIndex: 2, gates: [g(50)] }],
+  };
+  assert.equal(gateReadingForDay(data, 0)!.gates[0]!.gate, 32);
+  const d2 = gateReadingForDay(data, 2)!;
+  assert.equal(d2.gates[0]!.gate, 50);
+  assert.equal(d2.strategy, 'S');
+  assert.equal(gateReadingForDay(data, 3), null);
+  assert.equal(gateReadingForDay({ gateDays: [] }, 0), null);
+});
+
+test('the Timeline locks future gate readings and follows the ribbon', () => {
+  const s = readFileSync('mobile/src/app/(tabs)/timeline.tsx', 'utf8');
+  assert.match(s, /onSelectDay=\{setSelectedDay\}/);
+  assert.match(s, /selectedDay > 0/);
+  assert.match(s, /!premium \? \(\s*<PremiumGate\s+title=\{`The gates on/);
 });

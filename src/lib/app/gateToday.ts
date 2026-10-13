@@ -37,6 +37,15 @@ export interface GateToday {
   reading: { theme: string; shadow: string; guidance: string };
 }
 
+/** How many days past today carry their own gate reading. */
+export const GATE_DAYS_AHEAD = 14;
+
+/** The Sun's gate(s) for one day after today; `dayIndex` counts days from today (1 is tomorrow). */
+export interface GateDay {
+  dayIndex: number;
+  gates: GateToday[];
+}
+
 export interface GateTodayResult {
   gates: GateToday[];
   /** The person's own Strategy and Authority practice, which decide. Null when their Type or Authority is not known. */

@@ -27,6 +27,7 @@ import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 import { LockIcon } from '@/components/LockIcon';
 import { VehicleToday } from '@/components/VehicleToday';
+import { gateReadingForDay } from '@/lib/gateDay';
 import { usePremium } from '@/lib/usePremium';
 import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
@@ -299,6 +300,8 @@ export default function Timeline() {
   const [filter, setFilter] = useState<Filter>('all');
   const [lens, setLens] = useState<TimelineLens>('all');
   const [openId, setOpenId] = useState<string | null>(null);
+  /** The day tapped in the ribbon at the top (0 is today). The Vehicle reading follows it. */
+  const [selectedDay, setSelectedDay] = useState(0);
   const [showMore, setShowMore] = useState(false);
   const [showAllSeasons, setShowAllSeasons] = useState(false);
   const [openMonths, setOpenMonths] = useState<string[]>([]);
@@ -370,6 +373,8 @@ export default function Timeline() {
   };
 
 
+  const dayTitle = (iso?: string) => (iso ? parseDay(iso).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : 'that day');
+
   const personalByDate = useMemo(() => {
     const m = new Map<string, number>();
     data?.personal.forEach((p) => m.set(p.date, p.day));
@@ -430,7 +435,7 @@ export default function Timeline() {
         <>
           {offline ? <OfflineNote savedAt={savedAt} /> : null}
           <FadeIn delay={40}>
-            <SignalRibbon data={data} />
+            <SignalRibbon data={data} onSelectDay={setSelectedDay} />
           </FadeIn>
           <FadeIn delay={60}>
             <Segmented
@@ -482,7 +487,21 @@ export default function Timeline() {
 
           {lens === 'road' ? null : (
           <>
-          {lens === 'vehicle' ? (
+          {lens === 'vehicle' && selectedDay > 0 ? (
+            !premium ? (
+              <PremiumGate
+                title={`The gates on ${dayTitle(data.personal[selectedDay]?.date)}`}
+                detail="Today's gate reading is free. Look ahead with Premium: what the Sun brings, where it tips over, and what to do, for each day."
+              />
+            ) : (() => {
+              const reading = gateReadingForDay(data, selectedDay);
+              return reading ? (
+                <VehicleToday data={reading} dayLabel={dayTitle(data.personal[selectedDay]?.date)} />
+              ) : (
+                <Text style={styles.sub}>Gate readings reach {data.gateDays?.length ?? 14} days ahead. Pick a nearer day to read it.</Text>
+              );
+            })()
+          ) : lens === 'vehicle' ? (
             data.gateToday && data.gateToday.gates.length > 0 ? (
               <>
                 <VehicleToday data={data.gateToday} />

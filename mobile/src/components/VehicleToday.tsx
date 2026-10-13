@@ -8,16 +8,17 @@ const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hou
 const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
 /** When the Sun is in the gate, in the person's own time. */
-export function gateWindow(g: Pick<GateToday, 'from' | 'until'>): string {
+export function gateWindow(g: Pick<GateToday, 'from' | 'until'>, dayWord = 'today'): string {
   const until = `${day(g.until)}, ${clock(g.until)}`;
-  return g.from ? `From ${clock(g.from)} today until ${until}` : `Until ${until}`;
+  return g.from ? `From ${clock(g.from)} ${dayWord} until ${until}` : `Until ${until}`;
 }
 
-function GateBlock({ g, index, total }: { g: GateToday; index: number; total: number }) {
+function GateBlock({ g, index, total, dayLabel }: { g: GateToday; index: number; total: number; dayLabel: string | null }) {
+  const dayWord = dayLabel ? 'that day' : 'today';
   return (
     <AccentView style={[styles.gate, { borderLeftColor: colors.vehicle }]}>
       <Text style={styles.when}>
-        {total > 1 ? (index === 0 ? 'Earlier today' : 'Later today') : 'Today'} · {gateWindow(g)}
+        {total > 1 ? (index === 0 ? `Earlier ${dayWord}` : `Later ${dayWord}`) : (dayLabel ?? 'Today')} · {gateWindow(g, dayWord)}
       </Text>
       <Text accessibilityRole="header" style={styles.gateTitle}>Gate {g.gate}: {g.name}</Text>
       <Text style={styles.body}>{g.meaning} It sits in the {g.center} Center, and the Sun is in line {g.line}.</Text>
@@ -37,17 +38,17 @@ function GateBlock({ g, index, total }: { g: GateToday; index: number; total: nu
  * Top of the Vehicle lens: the Sun's gate(s) today, what each means, how it meets this chart,
  * and what to do with it, anchored in the person's own Strategy and Authority. Conditions, never decisions.
  */
-export function VehicleToday({ data }: { data: GateTodayResult }) {
+export function VehicleToday({ data, dayLabel = null }: { data: GateTodayResult; dayLabel?: string | null }) {
   if (data.gates.length === 0) return null;
   return (
     <View style={styles.wrap}>
       <View style={styles.head}>
         <LensIcon lens="vehicle" size={13} />
         <Text accessibilityRole="header" style={styles.headText}>
-          {data.gates.length > 1 ? 'The gates the Sun crosses today' : 'The gate the Sun is in today'}
+          {dayLabel ? (data.gates.length > 1 ? `The gates the Sun crosses on ${dayLabel}` : `The gate the Sun is in on ${dayLabel}`) : data.gates.length > 1 ? 'The gates the Sun crosses today' : 'The gate the Sun is in today'}
         </Text>
       </View>
-      {data.gates.map((g, i) => <GateBlock key={g.gate} g={g} index={i} total={data.gates.length} />)}
+      {data.gates.map((g, i) => <GateBlock key={g.gate} g={g} index={i} total={data.gates.length} dayLabel={dayLabel} />)}
       {data.strategy || data.authority ? (
         <View style={styles.anchor}>
           <Text style={styles.label}>Your anchor</Text>
