@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
+import { TriadLoader } from '@/components/TriadLoader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useExplain } from '@/components/Explain';
 import { ChartRequestError, requestTransitCard, type DailyTransitHit } from '@/lib/api';
@@ -115,7 +116,7 @@ export function TransitSheet({ hit, onClose }: { hit: DailyTransitHit | null; on
               </View>
             ) : (
               <View style={styles.center} accessibilityLiveRegion="polite">
-                <ActivityIndicator color={colors.gold} />
+                <TriadLoader />
                 <Text style={styles.muted}>Reading this transit…</Text>
               </View>
             )}

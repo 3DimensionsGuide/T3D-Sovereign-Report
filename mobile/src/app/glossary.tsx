@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
+import { TriadLoader } from '@/components/TriadLoader';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TermPressable } from '@/components/Explain';
@@ -178,7 +179,7 @@ export default function Glossary() {
           ListEmptyComponent={
             loading ? (
               <View style={styles.center} accessibilityLiveRegion="polite">
-                <ActivityIndicator color={colors.gold} />
+                <TriadLoader />
               </View>
             ) : error ? (
               <ErrorState message={error} onRetry={load} />

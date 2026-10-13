@@ -2,8 +2,9 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
   type ReactNode,
 } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { Pressable } from '@/components/Pressable';
+import { TriadLoader } from '@/components/TriadLoader';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChartRequestError, requestExplain } from '@/lib/api';
@@ -137,7 +138,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
             <ScrollView ref={scroller} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
               {loading ? (
                 <View style={styles.center} accessibilityLiveRegion="polite">
-                  <ActivityIndicator color={colors.gold} />
+                  <TriadLoader />
                   <Text style={styles.muted}>Looking that up…</Text>
                 </View>
               ) : error ? (

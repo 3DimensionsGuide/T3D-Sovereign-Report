@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, StyleSheet, Switch, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
+import { TriadLoader } from '@/components/TriadLoader';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Field } from '@/components/Field';
 import { Segmented } from '@/components/Segmented';
@@ -433,7 +434,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
   if (loading && !data) {
     return (
       <View style={styles.center} accessibilityLiveRegion="polite">
-        <ActivityIndicator color={colors.gold} />
+        <TriadLoader />
         <Text style={styles.small}>Reading the two of you…</Text>
       </View>
     );

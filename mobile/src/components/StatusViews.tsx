@@ -1,5 +1,6 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { GoldButton } from '@/components/GoldButton';
+import { TriadLoader } from '@/components/TriadLoader';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 /**
@@ -28,7 +29,7 @@ export function ErrorState({
 export function LoadingState({ label }: { label: string }) {
   return (
     <View style={styles.loading} accessibilityLiveRegion="polite" accessibilityLabel={label}>
-      <ActivityIndicator color={colors.gold} />
+      <TriadLoader />
       <Text style={styles.loadingText}>{label}</Text>
     </View>
   );

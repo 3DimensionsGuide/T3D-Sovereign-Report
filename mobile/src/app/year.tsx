@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
+import { TriadLoader } from '@/components/TriadLoader';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoldButton } from '@/components/GoldButton';
@@ -49,7 +50,7 @@ export default function YearAheadScreen() {
           ) : null}
           {offline && data ? <OfflineNote savedAt={savedAt} /> : null}
 
-          {data && !y && (refreshing || !triedRefresh.current) ? <ActivityIndicator color={colors.gold} /> : null}
+          {data && !y && (refreshing || !triedRefresh.current) ? <TriadLoader /> : null}
           {data && !y && !refreshing && triedRefresh.current ? (
             <ErrorState message="We could not load your year ahead just now. Check your connection and try again." onRetry={() => refresh()} />
           ) : null}
