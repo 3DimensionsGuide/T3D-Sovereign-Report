@@ -32,7 +32,7 @@ export const SigilShareCard = forwardRef<View, Props>(function SigilShareCard({ 
     >
       <Glow color={colors.purple} opacity={0.8} style={styles.glow} />
       <View style={styles.top}>
-        <TriadSeal size={tall ? 44 : 22} />
+        <TriadSeal size={tall ? 44 : 20} />
         <Text style={styles.brand}>THE 3 DIMENSIONS</Text>
       </View>
       <View style={styles.middle}>
@@ -40,9 +40,9 @@ export const SigilShareCard = forwardRef<View, Props>(function SigilShareCard({ 
           {firstName ? `${firstName}'s T3D Sigil` : 'My T3D Sigil'}
         </Text>
         <View style={styles.art}>
-          <Sigil chart={chart} birthTimeKnown={birthTimeKnown} size={tall ? 292 : 236} />
+          <Sigil chart={chart} birthTimeKnown={birthTimeKnown} size={tall ? 292 : 192} />
         </View>
-        <Text style={styles.line} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.75}>
+        <Text style={styles.line} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
           {`${hd.type} · Life Path ${num.lifePath} · Sun in ${astro.tropicalSun.sign}`}
         </Text>
       </View>
@@ -59,12 +59,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.obsidian, borderWidth: 1, borderColor: colors.gold, borderRadius: 18, overflow: 'hidden',
     justifyContent: 'space-between',
   },
-  postPad: { padding: 20 },
+  postPad: { paddingHorizontal: 20, paddingVertical: 16 },
   tallPad: { paddingHorizontal: 24, paddingTop: 48, paddingBottom: 56 },
   glow: { height: 420 },
   top: { alignItems: 'center', gap: 8 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
-  middle: { alignItems: 'center', gap: 10 },
+  middle: { alignItems: 'center', gap: 8 },
   title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.parchment, textAlign: 'center', alignSelf: 'stretch' },
   art: { alignItems: 'center' },
   line: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.parchment, textAlign: 'center' },
