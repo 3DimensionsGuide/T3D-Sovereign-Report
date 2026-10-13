@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   back: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
   backText: { fontFamily: fonts.bodyBold, fontSize: 14, letterSpacing: 1, color: colors.gold },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 2, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment, marginTop: 4 },
   sub: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted, marginTop: 6 },
   card: {

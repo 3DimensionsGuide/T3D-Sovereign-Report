@@ -190,7 +190,7 @@ export default function Chart() {
 
 const styles = StyleSheet.create({
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
   name: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
   meta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, marginTop: space.sm },

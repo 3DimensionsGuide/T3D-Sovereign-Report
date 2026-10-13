@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
     borderColor: colors.hairline, padding: space.lg, gap: space.md,
   },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 22, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md, minHeight: 48 },

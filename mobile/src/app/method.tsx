@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: space.lg, paddingBottom: space.xxl, gap: space.md },
   back: { minHeight: TOUCH - 4, justifyContent: 'center', alignSelf: 'flex-start' },
   backText: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1.6, color: colors.parchmentMuted },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
   lede: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
   card: {

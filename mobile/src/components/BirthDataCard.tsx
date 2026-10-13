@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
     borderColor: colors.hairline, padding: space.lg, gap: 10,
   },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.parchmentMuted },
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: space.md },
   rowLabel: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted, flexShrink: 0 },
   rowValue: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment, textAlign: 'right', flexShrink: 1 },

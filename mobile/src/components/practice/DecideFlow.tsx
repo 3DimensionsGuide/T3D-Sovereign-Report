@@ -147,7 +147,7 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
 
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 14 },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
   progress: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },

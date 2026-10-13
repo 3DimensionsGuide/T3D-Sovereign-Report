@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   },
   stepText: { fontFamily: fonts.bodyBold, fontSize: 28, lineHeight: 32, color: colors.gold },
   pickerWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 52 },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 32, lineHeight: 40, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   center: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },

@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, padding: space.lg, gap: 14,
     ...heroCard,
   },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment },
   frame: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 25, color: colors.parchment },
   lens: { gap: 6, paddingLeft: space.md, borderLeftWidth: 4 },

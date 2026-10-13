@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
   showMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
   showMoreText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.gold },
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
