@@ -28,7 +28,7 @@ import { Chevron } from '@/components/Chevron';
 import { LockIcon } from '@/components/LockIcon';
 import { VehicleToday } from '@/components/VehicleToday';
 import { usePremium } from '@/lib/usePremium';
-import { isLaterMonthLocked, isTransitLocked } from '@/lib/timelineLock';
+import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
@@ -223,7 +223,7 @@ function spineSeason(s: ActiveSeason, i: number): SpineSeason {
   };
 }
 
-function EventRow({ e, open, onToggle, locked }: { e: TimelineEvent; open: boolean; onToggle: () => void; locked: boolean }) {
+function EventRow({ e, open, onToggle, locked, future }: { e: TimelineEvent; open: boolean; onToggle: () => void; locked: boolean; future: boolean }) {
   const flags: string[] = [];
   if (e.lord) flags.push('★ Lord of the Year');
   if (e.profectedHouse) flags.push('⌂ Your profected house');
@@ -261,7 +261,7 @@ function EventRow({ e, open, onToggle, locked }: { e: TimelineEvent; open: boole
         <View style={styles.eventBody}>
           <View style={styles.lockedBox}>
             <LockIcon size={18} />
-            <Text style={styles.lockedText}>The explanation of this transit is part of Premium. Subscriptions are not open yet.</Text>
+            <Text style={styles.lockedText}>{future ? 'Looking ahead past today is part of Premium: the full meaning of every future event. Subscriptions are not open yet.' : 'The explanation of this transit is part of Premium. Subscriptions are not open yet.'}</Text>
           </View>
           <GoldButton label="See what Premium includes" variant="ghost" onPress={() => router.push('/premium' as Href)} />
         </View>
@@ -390,7 +390,8 @@ export default function Timeline() {
                     key={e.id}
                     e={e}
                     open={openId === e.id}
-                    locked={isTransitLocked(e.kind, premium)}
+                    locked={isEventLocked(e.kind, day, localKey(new Date()), premium)}
+                    future={day > localKey(new Date())}
                     onToggle={() => { animateLayout(); setOpenId(openId === e.id ? null : e.id); }}
                   />
                 ))}
