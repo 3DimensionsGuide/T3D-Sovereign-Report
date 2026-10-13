@@ -14,7 +14,7 @@ import { StickyMiniWheel } from '@/components/readings/StickyMiniWheel';
 import { VehicleReading } from '@/components/readings/VehicleReading';
 import { nextFocus } from '@/lib/bodygraphFocus';
 import { nextOpenCard } from '@/lib/pinnedBar';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, space, guidance } from '@/theme/tokens';
 
 const OPTIONS = [
   { value: 'vehicle', label: 'Vehicle', icon: (on: boolean) => <LensIcon lens="vehicle" size={13} color={on ? colors.obsidian : undefined} /> },
@@ -104,7 +104,7 @@ export default function Readings() {
             <View style={styles.header}>
               <LensLabel lens={lens}>{head.eyebrow}</LensLabel>
               <Text accessibilityRole="header" style={styles.title}>{head.title}</Text>
-              <Text style={styles.sub}>{head.sub}</Text>
+              <Text style={guidance}>{head.sub}</Text>
             </View>
           </FadeIn>
           <Segmented options={OPTIONS} value={lens} onChange={setLens} />

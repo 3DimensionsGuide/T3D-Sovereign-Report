@@ -40,10 +40,24 @@ export const fonts = {
   display: 'PlayfairDisplay_600SemiBold',
   displayRegular: 'PlayfairDisplay_400Regular',
   displayItalic: 'PlayfairDisplay_400Regular_Italic',
+  /** The guidance voice: soft italic for the lines that explain or invite, never for data or buttons. */
+  voice: 'CormorantGaramond_500Medium_Italic',
   body: 'DMSans_400Regular',
   bodyMedium: 'DMSans_500Medium',
   bodyBold: 'DMSans_700Bold',
 } as const;
+
+/** The guidance voice as a ready-made text style, for the line under a page title. */
+export const guidance = {
+  fontFamily: 'CormorantGaramond_500Medium_Italic',
+  fontSize: 20,
+  lineHeight: 28,
+  letterSpacing: 0.2,
+  color: colors.parchmentMuted,
+} as const;
+
+/** Equal-width digits, so numbers that change (days, counts, scores) do not shift the text around them. */
+export const tabular = { fontVariant: ['tabular-nums', 'lining-nums'] } as const;
 
 /** 4pt spacing scale. */
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 } as const;

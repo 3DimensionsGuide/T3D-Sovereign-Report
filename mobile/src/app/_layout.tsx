@@ -10,6 +10,7 @@ import {
   PlayfairDisplay_400Regular_Italic,
   PlayfairDisplay_600SemiBold,
 } from '@expo-google-fonts/playfair-display';
+import { CormorantGaramond_500Medium_Italic } from '@expo-google-fonts/cormorant-garamond';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { useReduceMotion } from '@/lib/motion';
 import { colors } from '@/theme/tokens';
@@ -31,6 +32,7 @@ function RootLayout() {
     PlayfairDisplay_400Regular,
     PlayfairDisplay_400Regular_Italic,
     PlayfairDisplay_600SemiBold,
+    CormorantGaramond_500Medium_Italic,
     DMSans_400Regular,
     DMSans_500Medium,
     DMSans_700Bold,

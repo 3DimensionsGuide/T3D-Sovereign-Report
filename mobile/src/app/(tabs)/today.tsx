@@ -39,7 +39,7 @@ import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
 import { aspectId, natalId, planetId } from '@/lib/termIds';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 
@@ -280,7 +280,7 @@ export default function Today() {
             />
           </View>
           <Text accessibilityRole="header" style={styles.title}>{dateLabel}</Text>
-          <Text style={styles.sub}>{pulledBefore === false ? 'Read against your own chart. Pull down to refresh.' : 'Read against your own chart.'}</Text>
+          <Text style={guidance}>{pulledBefore === false ? 'Read against your own chart. Pull down to refresh.' : 'Read against your own chart.'}</Text>
         </View>
         <View style={styles.dateBar}>
           <Pressable

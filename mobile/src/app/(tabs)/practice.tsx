@@ -9,7 +9,7 @@ import { SevenDay } from '@/components/practice/SevenDay';
 import { Together } from '@/components/practice/Together';
 import { usePractice } from '@/lib/usePractice';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, space, guidance } from '@/theme/tokens';
 
 type Mode = 'decide' | 'together' | 'log' | 'week';
 
@@ -38,7 +38,7 @@ export default function Practice() {
     <Screen room="ritual" refreshing={refreshing} onRefresh={refresh}>
       <View style={styles.head}>
         <Text accessibilityRole="header" style={styles.title}>Practice</Text>
-        <Text style={styles.sub}>Decide through your design. Everything you write stays on this phone.</Text>
+        <Text style={guidance}>Decide through your design. Everything you write stays on this phone.</Text>
       </View>
       <Segmented options={OPTIONS} value={mode} onChange={setMode} />
       <Text style={styles.explain}>{EXPLAIN[mode]}</Text>

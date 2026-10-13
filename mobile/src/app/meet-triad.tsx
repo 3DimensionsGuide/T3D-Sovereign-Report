@@ -24,7 +24,7 @@ import { loadLiveBundle, savedLiveBundle, type TodayBundle } from '@/lib/todayBu
 import { useLocalDate } from '@/lib/useLocalDate';
 import { useMeetTriadHydrated, useMeetTriadStore } from '@/store/useMeetTriadStore';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
 function weekdayOf(key: string): string {
   const [y, m, d] = key.split('-').map(Number);
@@ -254,7 +254,7 @@ export default function MeetYourTriad() {
       <FadeIn>
         <Text style={styles.eyebrow}>MEET YOUR TRIAD</Text>
         <Text accessibilityRole="header" style={styles.title}>Seven days, three lenses</Text>
-        <Text style={styles.sub}>
+        <Text style={guidance}>
           One stop opens each day. Day {now} of {TOTAL_DAYS} · {doneCount} done.
         </Text>
       </FadeIn>

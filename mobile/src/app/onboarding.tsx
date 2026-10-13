@@ -17,7 +17,7 @@ import {
   ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
 } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 /** Local-time formatting (avoids the off-by-one-day bug of toISOString). */
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
   linkRow: { minHeight: 48, justifyContent: 'center' },
   link: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold, textDecorationLine: 'underline' },
-  lede: { fontFamily: fonts.displayItalic, fontSize: 18, lineHeight: 29, letterSpacing: 0.2, color: colors.parchmentMuted },
+  lede: { ...guidance },
   form: { gap: space.md, marginTop: space.md },
   pickerRow: {
     minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',

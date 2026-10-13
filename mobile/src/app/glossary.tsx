@@ -16,7 +16,7 @@ import { useChartData } from '@/lib/useChartData';
 import { useNumerology } from '@/lib/useNumerology';
 import { yourTermIds } from '@/lib/yourTerms';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
+import { colors, fonts, radius, space, TOUCH, guidance } from '@/theme/tokens';
 
 const LENS_OF: Record<GlossaryGroup, LensName> = {
   'Human Design': 'vehicle', Numerology: 'road', Astrology: 'stoplight', Timing: 'stoplight',
@@ -145,7 +145,7 @@ export default function Glossary() {
                 <Text style={styles.backText}>← Back</Text>
               </Pressable>
                             <Text accessibilityRole="header" style={styles.title}>Glossary</Text>
-              <Text style={styles.sub}>Every term, explained in plain language.</Text>
+              <Text style={guidance}>Every term, explained in plain language.</Text>
               <TextInput
                 value={query}
                 onChangeText={setQuery}

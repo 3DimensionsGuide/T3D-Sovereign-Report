@@ -10,7 +10,7 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { useTimeline } from '@/lib/useTimeline';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, heroCard, radius, space, TOUCH } from '@/theme/tokens';
+import { colors, fonts, heroCard, radius, space, TOUCH, guidance } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 function dayLabel(isoDay: string): string {
@@ -57,7 +57,7 @@ export default function YearAheadScreen() {
 
           {y ? (
             <>
-              <Text style={styles.lede}>
+              <Text style={guidance}>
                 Your year runs from {dayLabel(y.startsOn)} to {dayLabel(y.endsOn)}. You are {y.age}.
               </Text>
               <AccentView style={[styles.card, styles.heroCard, { borderLeftColor: colors.gold }]}>

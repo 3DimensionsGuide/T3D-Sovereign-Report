@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
+import { colors, fonts, radius, space, TOUCH, guidance } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 interface Section {
@@ -96,7 +96,7 @@ export default function Method() {
           </Pressable>
           <Text style={styles.eyebrow}>HOW THIS IS CALCULATED</Text>
           <Text accessibilityRole="header" style={styles.title}>Our method</Text>
-          <Text style={styles.lede}>
+          <Text style={guidance}>
             Accuracy is the point of this app. Here is what goes into your chart, in plain language.
           </Text>
           {SECTIONS.map((s) => (

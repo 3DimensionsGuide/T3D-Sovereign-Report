@@ -34,3 +34,11 @@ test('each tab is its own room, with its own light', () => {
   assert.match(read('mobile/src/app/(tabs)/readings.tsx'), /<Screen room=\{READING_ROOM\[lens\]\}/);
   assert.match(read('mobile/src/components/RoomArt.tsx'), /accessibilityElementsHidden/);
 });
+
+test('the guidance voice is loaded and used under page titles; changing digits use equal-width numbers', () => {
+  assert.match(read('mobile/src/app/_layout.tsx'), /CormorantGaramond_500Medium_Italic,/);
+  for (const f of ['(tabs)/today', '(tabs)/timeline', '(tabs)/readings', '(tabs)/practice', 'glossary', 'year', 'method', 'meet-triad']) {
+    assert.match(read(`mobile/src/app/${f}.tsx`), /style=\{guidance\}/, `${f} uses the guidance voice`);
+  }
+  assert.match(read('mobile/src/components/SignalRibbon.tsx'), /\.\.\.tabular/);
+});

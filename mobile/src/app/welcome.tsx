@@ -11,7 +11,7 @@ import { LensLabel } from '@/components/Lens';
 import { Image } from 'expo-image';
 import { ChartRequestError, requestBirthPreview } from '@/lib/api';
 import type { BirthPreview } from '@/lib/previewTypes';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   logo: { width: 208, aspectRatio: 694 / 506, alignSelf: 'flex-start' },
   eyebrow: { fontFamily: fonts.displayRegular, fontVariant: ['lining-nums'], fontSize: 15, letterSpacing: 5.5, textTransform: 'uppercase', color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
-  lede: { fontFamily: fonts.displayItalic, fontSize: 18, lineHeight: 29, letterSpacing: 0.2, color: colors.parchmentMuted },
+  lede: { ...guidance },
   pickerRow: {
     minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     gap: space.md, marginTop: space.lg,

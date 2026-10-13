@@ -22,7 +22,7 @@ import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineRe
 import { useTimeline } from '@/lib/useTimeline';
 import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 
@@ -395,7 +395,7 @@ export default function Timeline() {
         <View style={styles.header}>
           <LensLabel lens="road">The road ahead</LensLabel>
           <Text accessibilityRole="header" style={styles.title}>Timeline</Text>
-          <Text style={styles.sub}>The rest of this month first, measured against your own chart. Later months are under Show more.</Text>
+          <Text style={guidance}>The rest of this month first, measured against your own chart. Later months are under Show more.</Text>
         </View>
       </FadeIn>
 
