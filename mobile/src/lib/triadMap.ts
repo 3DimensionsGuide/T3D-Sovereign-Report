@@ -3,7 +3,7 @@
  * Plain data, so it can be tested without a phone. It uses only chart facts. No name, birth date, time or place.
  */
 import { signAt } from './carouselSlides';
-import { authorityId, numberId, planetId, profileId, typeId } from './termIds';
+import { authorityId, numberId, profileId, signId, typeId } from './termIds';
 
 export type MapLens = 'vehicle' | 'road' | 'stoplight';
 
@@ -20,11 +20,14 @@ export function triadMapGroups(chart: MapChart, birthTimeKnown: boolean): MapGro
   const { humanDesign: hd, numerology: num, astrology: astro } = chart;
   const profileLines = hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile;
   const stoplight: MapFact[] = [
-    { label: 'Sun', value: astro.tropicalSun.sign, termId: planetId('sun') },
-    { label: 'Moon', value: astro.tropicalMoon.sign, termId: planetId('moon') },
+    { label: 'Sun', value: astro.tropicalSun.sign, termId: signId(astro.tropicalSun.sign) },
+    { label: 'Moon', value: astro.tropicalMoon.sign, termId: signId(astro.tropicalMoon.sign) },
   ];
   // Rising needs a real birth time, so it is left off when the time is not known.
-  if (birthTimeKnown) stoplight.push({ label: 'Rising', value: signAt(astro.tropicalAscendant), termId: 'astro:ascendant' });
+  if (birthTimeKnown) {
+    const rising = signAt(astro.tropicalAscendant);
+    stoplight.push({ label: 'Rising', value: rising, termId: signId(rising) });
+  }
   return [
     {
       lens: 'vehicle', name: 'The Vehicle', system: 'Human Design',

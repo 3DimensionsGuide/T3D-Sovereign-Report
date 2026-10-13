@@ -25,7 +25,8 @@ test('every fact links to a glossary term', () => {
   assert.ok(ids.includes('hd:authority:Sacral'));
   assert.ok(ids.includes('hd:profile:4/1'));
   assert.ok(ids.includes('num:7'));
-  assert.ok(ids.includes('astro:planet:sun'));
+  // The Stoplight facts open the explanation of the sign itself, not of the planet.
+  assert.deepEqual(ids.slice(6), ['astro:sign:Libra', 'astro:sign:Aries', 'astro:sign:Scorpio']);
 });
 
 test('Rising is left off when the birth time is not known', () => {
