@@ -1,4 +1,6 @@
 import { toast } from '@/lib/toast';
+import { warn } from '@/lib/haptics';
+import { ErrorLine } from '@/components/ErrorLine';
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
@@ -62,8 +64,15 @@ export default function Onboarding() {
   const [codeBusy, setCodeBusy] = useState(false);
   const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
   const [chosen, setChosen] = useState(0);
+  const [shake, setShake] = useState(0);
   const onDateChange = (_event: unknown, value: Date) => setBirthDate(value);
   const onTimeChange = (_event: unknown, value: Date) => setBirthTime(value);
+
+  /** A problem happened: buzz, and nudge every error line and field so the eye goes to them. */
+  function flagError() {
+    warn();
+    setShake((n) => n + 1);
+  }
 
   function validateStep(which: number): boolean {
     const next: FieldErrors = {};
@@ -83,7 +92,9 @@ export default function Onboarding() {
       if (!country.trim()) next.country = 'Please enter your birth country.';
     }
     setErrors(next);
-    return Object.keys(next).length === 0;
+    const ok = Object.keys(next).length === 0;
+    if (!ok) flagError();
+    return ok;
   }
 
   function onContinue() {
@@ -101,6 +112,7 @@ export default function Onboarding() {
       setCandidates(found);
       setChosen(0);
     } catch (error) {
+      flagError();
       setSubmitError(
         error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
       );
@@ -150,6 +162,7 @@ export default function Onboarding() {
         router.replace('/today');
       }
     } catch (error) {
+      flagError();
       setCalculating(false);
       setSubmitError(
         error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
@@ -168,6 +181,7 @@ export default function Onboarding() {
       toast.success('Email confirmed');
       router.replace('/today');
     } catch (error) {
+      flagError();
       setCodeError(error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.');
     } finally {
       setCodeBusy(false);
@@ -183,6 +197,7 @@ export default function Onboarding() {
       toast.success('New code sent');
       setCodeStep({ ...codeStep, notice: 'A new code is on its way. It can take a minute to arrive.' });
     } catch (error) {
+      flagError();
       setCodeError(error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.');
     } finally {
       setCodeBusy(false);
@@ -211,7 +226,7 @@ export default function Onboarding() {
           </View>
         </FadeIn>
         <View style={styles.form}>
-          <Field label="6-digit code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))}
+          <Field shakeSignal={shake} label="6-digit code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))}
             keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" textContentType="oneTimeCode"
             error={codeError ?? undefined} placeholder="123456"
             why={codeStep.notice ?? 'The code works for 15 minutes.'} />
@@ -275,10 +290,7 @@ export default function Onboarding() {
         </View>
         <View style={styles.actions}>
           {submitError ? (
-            <Text accessibilityLiveRegion="polite" style={styles.submitError}>
-              {'⚠  '}
-              {submitError}
-            </Text>
+            <ErrorLine text={submitError} signal={shake} />
           ) : null}
           <GoldButton label="Calculate my chart" onPress={onSubmit} loading={loading} />
           <GoldButton label="Change my details" variant="ghost" onPress={() => setCandidates(null)} />
@@ -318,19 +330,19 @@ export default function Onboarding() {
       <View style={styles.form}>
         {step === 0 ? (
           <>
-            <Field label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
+            <Field shakeSignal={shake} label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
               autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
-            <Field label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
+            <Field shakeSignal={shake} label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
               autoCapitalize="words" autoComplete="additional-name" textContentType="middleName" returnKeyType="next"
               placeholder="As written on your birth certificate" />
-            <Field label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}
+            <Field shakeSignal={shake} label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}
               autoCapitalize="words" autoComplete="family-name" textContentType="familyName" returnKeyType="done" />
           </>
         ) : null}
 
         {step === 1 ? (
           <>
-            <Field label="Email" value={email} onChangeText={setEmail} error={errors.email}
+            <Field shakeSignal={shake} label="Email" value={email} onChangeText={setEmail} error={errors.email}
               autoCapitalize="none" autoCorrect={false} keyboardType="email-address"
               autoComplete="email" textContentType="emailAddress" />
             <View style={styles.pickerRow}>
@@ -351,7 +363,7 @@ export default function Onboarding() {
                 maximumDate={today} onValueChange={onDateChange} accessibilityLabel="Birth date" />
             </View>
             {errors.birthDate ? (
-              <Text accessibilityLiveRegion="polite" style={styles.submitError}>{errors.birthDate}</Text>
+              <ErrorLine text={errors.birthDate} signal={shake} />
             ) : null}
             <View style={styles.pickerRow}>
               <Text style={styles.pickerLabel}>Birth time</Text>
@@ -378,9 +390,9 @@ export default function Onboarding() {
 
         {step === 3 ? (
           <>
-            <Field label="Birth city" value={city} onChangeText={setCity} error={errors.city}
+            <Field shakeSignal={shake} label="Birth city" value={city} onChangeText={setCity} error={errors.city}
               autoCapitalize="words" placeholder="e.g. Harbor City, California" />
-            <Field label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
+            <Field shakeSignal={shake} label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
               autoCapitalize="words" placeholder="e.g. United States"
               why="Time zones and daylight saving rules differ by country and by year." />
           </>
@@ -389,10 +401,7 @@ export default function Onboarding() {
 
       <View style={styles.actions}>
         {submitError ? (
-          <Text accessibilityLiveRegion="polite" style={styles.submitError}>
-            {'⚠  '}
-            {submitError}
-          </Text>
+          <ErrorLine text={submitError} signal={shake} />
         ) : null}
         {step < 3 ? (
           <GoldButton label="Continue" onPress={onContinue} />
@@ -450,7 +459,6 @@ const styles = StyleSheet.create({
   unknownTime: { fontFamily: fonts.body, fontSize: 16, color: colors.parchmentMuted },
   hint: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   actions: { gap: space.md, marginTop: space.md },
-  submitError: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   confirmCard: {
     gap: 4, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,
     backgroundColor: colors.charcoal,

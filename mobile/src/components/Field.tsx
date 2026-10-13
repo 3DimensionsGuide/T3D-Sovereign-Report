@@ -1,20 +1,27 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { ErrorLine } from '@/components/ErrorLine';
+import { useShake } from '@/lib/useShake';
 import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
 
 interface Props extends Omit<TextInputProps, 'style'> {
   label: string;
   error?: string;
+  /** Change this number to shake the field again when the same error happens twice. */
+  shakeSignal?: number;
   /** Plain line under the field saying why it is asked. */
   why?: string;
 }
 
 /** Labeled text input with a gold focus ring and a spoken-aloud error line. */
-export function Field({ label, error, why, ...inputProps }: Props) {
+export function Field({ label, error, why, shakeSignal = 0, ...inputProps }: Props) {
   const [focused, setFocused] = useState(false);
+  const shake = useShake(!!error, `${error ?? ''}|${shakeSignal}`);
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>{label}</Text>
+      <Animated.View style={shake}>
       <TextInput
         accessibilityLabel={label}
         placeholderTextColor="rgba(245,245,243,0.45)"
@@ -31,11 +38,9 @@ export function Field({ label, error, why, ...inputProps }: Props) {
         }}
         style={[styles.input, focused && styles.focused, !!error && styles.errored]}
       />
+      </Animated.View>
       {error ? (
-        <Text accessibilityLiveRegion="polite" style={styles.error}>
-          {'⚠  '}
-          {error}
-        </Text>
+        <ErrorLine text={error} signal={shakeSignal} style={styles.error} />
       ) : why ? (
         <Text style={styles.why}>{why}</Text>
       ) : null}
