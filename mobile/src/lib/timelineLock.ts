@@ -10,3 +10,11 @@ const LOCKED_KINDS: readonly LockableKind[] = ['transit', 'return'];
 export function isTransitLocked(kind: LockableKind, premium: boolean): boolean {
   return !premium && LOCKED_KINDS.includes(kind);
 }
+
+/**
+ * The rest of this month is free. Later months are listed (the month and how many days have events)
+ * but open only with Premium.
+ */
+export function isLaterMonthLocked(premium: boolean): boolean {
+  return !premium;
+}

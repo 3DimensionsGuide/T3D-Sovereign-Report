@@ -28,7 +28,8 @@ import { Chevron } from '@/components/Chevron';
 import { LockIcon } from '@/components/LockIcon';
 import { VehicleToday } from '@/components/VehicleToday';
 import { usePremium } from '@/lib/usePremium';
-import { isTransitLocked } from '@/lib/timelineLock';
+import { isLaterMonthLocked, isTransitLocked } from '@/lib/timelineLock';
+import { PremiumGate } from '@/components/PremiumGate';
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
 const BAR_HEIGHT = 120;
@@ -544,9 +545,13 @@ export default function Timeline() {
                         >
                           <Text style={styles.monthName}>{monthTitle(key)}</Text>
                           <Text style={styles.monthCount}>{days.length} {days.length === 1 ? 'day' : 'days'}</Text>
-                          <Chevron open={open} style={styles.monthChevron} />
+                          {isLaterMonthLocked(premium) ? <LockIcon size={18} /> : <Chevron open={open} style={styles.monthChevron} />}
                         </Pressable>
-                        {open ? days.map((g) => renderDay(g)) : null}
+                        {open ? (
+                          isLaterMonthLocked(premium) ? (
+                            <PremiumGate title={`${monthTitle(key)} and later months`} detail="The rest of this month is free. Look further ahead with Premium: every sky event and gate change, month by month." />
+                          ) : days.map((g) => renderDay(g))
+                        ) : null}
                       </View>
                     );
                   })
