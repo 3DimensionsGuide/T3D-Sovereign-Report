@@ -109,6 +109,7 @@ function TransitRow({
 export default function Today() {
   const profile = useT3DStore((state) => state.profile);
   const chart = useT3DStore((state) => state.chart);
+  const premium = usePremium();
 
   const [today, setToday] = useState<TodayResult | null>(null);
   const [dayNum, setDayNum] = useState<DayNumerology | null>(null);
@@ -140,6 +141,15 @@ export default function Today() {
     if (!profile || !chart) return;
     const mine = ++requestId.current;
     const stillCurrent = () => mine === requestId.current;
+    // A day that is behind Premium is not fetched at all.
+    if (isTimingLocked(viewDate ?? new Date(), premium)) {
+      setToday(null);
+      setDayNum(null);
+      setTriad(null);
+      setError(null);
+      setOffline(false);
+      return;
+    }
     const localDate = viewDate ? localDateString(viewDate) : liveDate;
     const at = viewDate ? noonOf(viewDate).toISOString() : undefined;
     const key = `today|${chart.leadId}|${localDate}|${at ?? 'live'}`;
@@ -188,25 +198,15 @@ export default function Today() {
         setError(err instanceof ChartRequestError ? err.message : 'Something went wrong. Please try again.');
       }
     }
-  }, [profile, chart, viewDate, liveDate]);
+  }, [profile, chart, viewDate, liveDate, premium]);
 
   // A different day starts with the short list again.
   useEffect(() => setAllTransits(false), [viewDate, liveDate]);
 
-  const premium = usePremium();
-  const [timingLocked, setTimingLocked] = useState(false);
-  /** Bumped when a locked date is refused, so the date picker snaps back to the day being shown. */
-  const [pickerKey, setPickerKey] = useState(0);
   const goTo = useCallback((date: Date) => {
     if (date < MIN_DATE || date > MAX_DATE) return;
-    if (isTimingLocked(date, premium)) {
-      setTimingLocked(true);
-      setPickerKey((k) => k + 1);
-      return;
-    }
-    setTimingLocked(false);
     setViewDate(sameDay(date, new Date()) ? null : noonOf(date));
-  }, [premium]);
+  }, []);
 
   const step = useCallback((days: number) => {
     const base = viewDate ?? new Date();
@@ -249,6 +249,7 @@ export default function Today() {
   const relation = isToday
     ? null
     : localDateString(shown) < liveDate ? 'A DAY GONE BY' : 'A DAY AHEAD';
+  const locked = isTimingLocked(shown, premium);
   const dayWord = isToday ? 'today' : 'this day';
   const scrollRef = useRef<ScrollView | null>(null);
   const scrollOffset = useRef(0);
@@ -306,7 +307,6 @@ export default function Today() {
           </Pressable>
           <View style={styles.pickerWrap}>
             <DateTimePicker
-              key={pickerKey}
               value={shown}
               mode="date"
               display="compact"
@@ -326,18 +326,16 @@ export default function Today() {
             <Text style={styles.stepText}>›</Text>
           </Pressable>
         </View>
-        {timingLocked ? (
-          <PremiumGate title="Past and future days" detail="Look back and look ahead in Today’s Sky, not only today. Today stays free." />
-        ) : null}
-        {timingLocked && isToday ? (
-          <GoldButton label="Back to today" variant="ghost" onPress={() => { setTimingLocked(false); setPickerKey((k) => k + 1); }} />
-        ) : null}
         {!isToday ? (
-          <GoldButton label="Back to today" variant="ghost" onPress={() => { setTimingLocked(false); setViewDate(null); }} />
+          <GoldButton label="Back to today" variant="ghost" onPress={() => setViewDate(null)} />
         ) : null}
       </FadeIn>
 
-      {loading && !today ? (
+      {locked ? (
+        <PremiumGate title="Past and future days" detail="Look back and look ahead in Today’s Sky, not only today. Today stays free." />
+      ) : null}
+
+      {loading && !today && !locked ? (
         <SkeletonCards label="Reading the sky…" />
       ) : null}
 
@@ -345,7 +343,7 @@ export default function Today() {
 
       {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 
-      {error ? (
+      {error && !locked ? (
         <ErrorState message={error} onRetry={onRefresh} retrying={refreshing} />
       ) : null}
 

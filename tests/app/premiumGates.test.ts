@@ -23,7 +23,7 @@ test('Practice, Year ahead and Today use the gate with the Premium flag', () => 
     assert.match(s, /usePremium\(\)/, f);
     assert.match(s, /<PremiumGate/, f);
   }
-  assert.match(read('app/(tabs)/today.tsx'), /isTimingLocked\(date, premium\)/);
+  assert.match(read('app/(tabs)/today.tsx'), /isTimingLocked\(shown, premium\)/);
   assert.match(read('app/(tabs)/practice.tsx'), /premium && mode !== 'together'/);
 });
 
