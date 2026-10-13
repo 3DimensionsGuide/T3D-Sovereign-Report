@@ -1,3 +1,4 @@
+import { toast } from '@/lib/toast';
 import { useState } from 'react';
 import { Linking, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -21,6 +22,7 @@ export function ReminderPrompt() {
     const result = await enableReminder();
     setBusy(false);
     if (result === 'blocked') setBlocked(true);
+    else toast.success('Daily reminder is on');
   }
 
   return (
@@ -66,9 +68,11 @@ export function ReminderCard() {
     if (next) {
       const result = await enableReminder();
       setBlocked(result === 'blocked');
+      if (result !== 'blocked') toast.success('Daily reminder is on');
     } else {
       setBlocked(false);
       await disableReminder();
+      toast.success('Daily reminder is off');
     }
     setBusy(false);
   }
@@ -97,7 +101,7 @@ export function ReminderCard() {
             display="compact"
             themeVariant="dark"
             onValueChange={(_event: unknown, value: Date) =>
-              void setReminderTime(value.getHours(), value.getMinutes())
+              void setReminderTime(value.getHours(), value.getMinutes()).then(() => toast.success('Reminder time updated'))
             }
             accessibilityLabel="Reminder time"
           />

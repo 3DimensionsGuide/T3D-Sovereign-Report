@@ -1,3 +1,4 @@
+import { toast } from '@/lib/toast';
 import { useState } from 'react';
 import { select } from '@/lib/haptics';
 import { StyleSheet, Text, View } from 'react-native';
@@ -88,6 +89,7 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
             });
             reset();
             onSaved();
+            toast.success('Saved to your log');
           }}
         />
         <GoldButton label="Start over" variant="ghost" onPress={reset} />

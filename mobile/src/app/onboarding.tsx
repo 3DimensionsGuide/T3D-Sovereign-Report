@@ -1,3 +1,4 @@
+import { toast } from '@/lib/toast';
 import { useState } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
@@ -164,6 +165,7 @@ export default function Onboarding() {
     setCodeBusy(true);
     try {
       await confirmOptInCode(codeStep.leadId, codeStep.email, code.trim());
+      toast.success('Email confirmed');
       router.replace('/today');
     } catch (error) {
       setCodeError(error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.');
@@ -178,6 +180,7 @@ export default function Onboarding() {
     setCodeBusy(true);
     try {
       await requestOptInCode(codeStep.leadId, codeStep.email);
+      toast.success('New code sent');
       setCodeStep({ ...codeStep, notice: 'A new code is on its way. It can take a minute to arrive.' });
     } catch (error) {
       setCodeError(error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.');

@@ -37,3 +37,8 @@ export function lensTap(lens: LensName): void {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid).catch(() => undefined);
   }
 }
+
+/** A firm double knock for something that did not work, so the hand feels it as the eye reads the message. */
+export function warn(): void {
+  void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => undefined);
+}

@@ -9,6 +9,7 @@ import { PlayfairDisplay_400Regular, PlayfairDisplay_600SemiBold } from '@expo-g
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { colors } from '@/theme/tokens';
 import { ExplainProvider } from '@/components/Explain';
+import { ToastHost } from '@/components/ToastHost';
 import { pruneCache } from '@/lib/persistentCache';
 import { trackScreen } from '@/lib/track';
 import { initCrashReporting, wrapRoot } from '@/lib/sentry';
@@ -68,6 +69,7 @@ function RootLayout() {
         }}
       />
       </ExplainProvider>
+      <ToastHost />
     </SafeAreaProvider>
   );
 }
