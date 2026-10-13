@@ -51,13 +51,16 @@ export function TriadMap({ chart, birthTimeKnown, onOpenLens }: Props) {
         // The vertical bus joins the first and last fact; it starts and ends at their middles.
         const busTop = FACT_H / 2;
         const busH = bandH - FACT_H;
+        // The line up to the circle above: the gap, plus the empty space either side of each circle.
+        const prevBandH = gi === 0 ? HUB : groups[gi - 1].facts.length * FACT_H + (groups[gi - 1].facts.length - 1) * GAP;
+        const above = 22 + (prevBandH - HUB) / 2;
         return (
           <Animated.View
             key={g.lens}
             entering={reduce ? undefined : FadeIn.delay(250 + gi * 450).duration(600)}
             style={styles.band}
           >
-            <View style={[styles.spine, { backgroundColor: accent, height: 22 + (bandH - HUB) / 2 }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" />
+            <View style={[styles.spine, { backgroundColor: accent, top: -above, height: above + (bandH - HUB) / 2 }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" />
             <View style={{ width: HUB, height: bandH, justifyContent: 'center' }}>
               <Pressable
                 accessibilityRole="button"
@@ -103,7 +106,7 @@ const styles = StyleSheet.create({
   },
   centreText: { fontFamily: fonts.display, fontSize: 15, color: colors.gold },
   band: { flexDirection: 'row', alignItems: 'center' },
-  spine: { position: 'absolute', left: HUB / 2 - 1, top: -22, width: 2, opacity: 0.8 },
+  spine: { position: 'absolute', left: HUB / 2 - 1, width: 2, opacity: 0.8 },
   hub: {
     width: HUB, height: HUB, borderRadius: HUB / 2, borderWidth: 2, backgroundColor: colors.obsidian,
     alignItems: 'center', justifyContent: 'center',
