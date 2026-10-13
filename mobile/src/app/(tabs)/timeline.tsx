@@ -10,6 +10,8 @@ import { TimelinePinBar } from '@/components/TimelinePinBar';
 import { pinnedMonthAt, showJumpToday, type PinSection } from '@/lib/timelinePin';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
+import { select } from '@/lib/haptics';
+import { Disclosure } from '@/components/Disclosure';
 import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { Segmented } from '@/components/Segmented';
 import { aspectWord, bodyName, capFirst, houseTheme, natalName, ordinal } from '@/lib/skyText';
@@ -24,6 +26,8 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
 const BAR_HEIGHT = 120;
+/** Slow transits shown before "Show all": the tightest few, since the list is sorted that way. */
+const SEASONS_SHOWN = 3;
 
 type Filter = 'all' | 'moon' | 'sky' | 'transits';
 /** Timeline lenses. Vehicle shows the Sun's gate changes and the Moon's channel-completing days. */
@@ -169,8 +173,10 @@ function YearCard({ data }: { data: TimelineResult }) {
             </Text>
           </View>
         ) : null}
-        <CycleBlock title="Pinnacle" cycle={data.pinnacle.current} next={data.pinnacle.next} today={localKey(new Date())} />
-        <CycleBlock title="Challenge" cycle={data.challenge.current} next={data.challenge.next} today={localKey(new Date())} />
+        <Disclosure label={`Pinnacle ${numLabel(data.pinnacle.current.number)} and Challenge ${numLabel(data.challenge.current.number)}`}>
+          <CycleBlock title="Pinnacle" cycle={data.pinnacle.current} next={data.pinnacle.next} today={localKey(new Date())} />
+          <CycleBlock title="Challenge" cycle={data.challenge.current} next={data.challenge.next} today={localKey(new Date())} />
+        </Disclosure>
         <GoldButton label="Your year ahead ›" variant="ghost" onPress={() => router.push('/year' as Href)} />
       </Panel>
     </FadeIn>
@@ -273,6 +279,7 @@ export default function Timeline() {
   const [lens, setLens] = useState<TimelineLens>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const [showMore, setShowMore] = useState(false);
+  const [showAllSeasons, setShowAllSeasons] = useState(false);
   const [openMonths, setOpenMonths] = useState<string[]>([]);
 
   // Where each month's block sits on the page, so a pinned bar can name the month being read.
@@ -426,9 +433,20 @@ export default function Timeline() {
               <Panel label="Slow transits in effect" lens="stoplight">
                 <SpineAxis from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} fromLabel="Today" toLabel={shortDate(localKey(new Date(data.to)))} />
                 <SpineKey />
-                {data.seasons.map((s, i) => (
+                {(showAllSeasons ? data.seasons : data.seasons.slice(0, SEASONS_SHOWN)).map((s, i) => (
                   <SpineRow key={`${s.body}-${s.natal}-${s.aspect}-${i}`} s={spineSeason(s, i)} from={localKey(new Date(data.from))} to={localKey(new Date(data.to))} />
                 ))}
+                {data.seasons.length > SEASONS_SHOWN ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ expanded: showAllSeasons }}
+                    accessibilityLabel={showAllSeasons ? 'Show fewer slow transits' : `Show all ${data.seasons.length} slow transits`}
+                    onPress={() => { select(); setShowAllSeasons((v) => !v); }}
+                    style={styles.showMore}
+                  >
+                    <Text style={styles.showMoreText}>{showAllSeasons ? 'Show fewer' : `Show all ${data.seasons.length}`}</Text>
+                  </Pressable>
+                ) : null}
                 <Text style={styles.footnote}>
                   Each bar runs from when the planet comes within 3° of your chart to when it leaves. ★ marks your Lord of the Year.
                 </Text>
