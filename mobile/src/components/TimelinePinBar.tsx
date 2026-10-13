@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
+import { colors, fonts, radius, space, TOUCH, themes } from '@/theme/tokens';
+
+const T = themes.timeline;
 
 /**
  * Pinned under the status bar while you read down the Timeline: names the month you are in and,
@@ -35,8 +37,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: space.md,
     paddingVertical: 6, paddingHorizontal: space.md, minHeight: TOUCH,
     borderBottomLeftRadius: radius.md, borderBottomRightRadius: radius.md,
-    borderWidth: 1, borderTopWidth: 0, borderColor: colors.hairline,
-    backgroundColor: colors.charcoal,
+    borderWidth: 1, borderTopWidth: 0, borderColor: T.edge,
+    backgroundColor: T.surface,
   },
   text: { flex: 1, gap: 1 },
   month: { fontFamily: fonts.display, fontSize: 18, color: colors.parchment },

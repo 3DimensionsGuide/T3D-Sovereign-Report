@@ -7,7 +7,9 @@ import { GoldButton } from '@/components/GoldButton';
 import type { PracticeData } from '@/lib/practiceTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { addDays, daysBetween, usePracticeStore } from '@/store/usePracticeStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.practice;
 
 const DAYS = 7;
 
@@ -185,19 +187,19 @@ export function SevenDay({ data }: { data: PracticeData }) {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 14 },
+  card: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 14 },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   strip: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   pathLine: { position: 'absolute', left: 20, right: 20, top: 19, height: 2, backgroundColor: colors.hairline },
-  dot: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.charcoal, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.hairline },
+  dot: { width: 40, height: 40, borderRadius: 20, backgroundColor: T.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: T.edge },
   dotDone: { backgroundColor: colors.gold, borderColor: colors.gold },
   dotToday: { borderColor: colors.gold, borderWidth: 2 },
   dotText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
-  checkin: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
-  complete: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.gold, backgroundColor: colors.amethyst },
+  checkin: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 12 },
+  complete: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.gold, backgroundColor: T.raised },
   completeTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
   when: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
 });

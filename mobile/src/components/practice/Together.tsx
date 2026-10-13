@@ -15,11 +15,13 @@ import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastr
 import { localDateString } from '@/lib/useTimeline';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 import { TypeShape } from '@/components/practice/TypeShape';
 import { spokenPair, typeShapeKind } from '@/lib/typeShapes';
+
+const T = themes.practice;
 const sc = (t: string): string => t.charAt(0) + t.slice(1).toLowerCase().replace(/ · /g, ' · ');
 const pad = (n: number) => String(n).padStart(2, '0');
 const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -527,9 +529,9 @@ export function Together() {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
-  person: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, borderLeftWidth: 4, padding: space.lg, gap: 8 },
-  noteBox: { padding: space.md, borderRadius: radius.md, backgroundColor: colors.amethyst, borderWidth: 1, borderColor: colors.gold },
+  card: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 12 },
+  person: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, borderLeftWidth: 4, padding: space.lg, gap: 8 },
+  noteBox: { padding: space.md, borderRadius: radius.md, backgroundColor: T.raised, borderWidth: 1, borderColor: colors.gold },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   personTitle: { fontFamily: fonts.display, fontSize: 19, lineHeight: 26, color: colors.parchment },
@@ -538,14 +540,14 @@ const styles = StyleSheet.create({
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   center: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },
   pickerRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
-  chooseBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold, backgroundColor: colors.amethyst },
+  chooseBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold, backgroundColor: T.raised },
   chooseText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment, flexShrink: 1 },
-  placeRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
+  placeRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: T.edge },
   mark: { fontSize: 20, color: colors.gold },
   placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   rowBox: { gap: 4, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline },
-  pair: { flexDirection: 'row', gap: space.md, backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg },
+  pair: { flexDirection: 'row', gap: space.md, backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg },
   pairCell: { flex: 1, alignItems: 'center', gap: 4 },
   pairName: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
   pairType: { fontFamily: fonts.bodyMedium, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted, textAlign: 'center' },

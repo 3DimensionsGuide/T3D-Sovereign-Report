@@ -22,7 +22,7 @@ import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineRe
 import { useTimeline } from '@/lib/useTimeline';
 import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance, themes } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 import { LockIcon } from '@/components/LockIcon';
@@ -33,6 +33,8 @@ import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
 import { RoadToday } from '@/components/RoadToday';
 import { roadDayFor } from '@/lib/roadDay';
+
+const T = themes.timeline;
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
 const BAR_HEIGHT = 120;
@@ -612,7 +614,7 @@ const styles = StyleSheet.create({
   monthBtn: {
     minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: space.sm,
     paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1,
-    borderColor: colors.hairline, backgroundColor: colors.charcoal,
+    borderColor: T.edge, backgroundColor: T.surface,
   },
   monthName: { flex: 1, fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
   monthCount: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted },
@@ -629,9 +631,9 @@ const styles = StyleSheet.create({
     gap: space.md,
     padding: space.md,
     borderRadius: radius.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: T.surface,
     borderWidth: 1,
-    borderColor: colors.goldEdge,
+    borderColor: T.edge,
   },
   panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   panelLabel: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
@@ -655,11 +657,11 @@ const styles = StyleSheet.create({
     minHeight: 56,
     padding: space.md,
     borderRadius: radius.md,
-    backgroundColor: colors.charcoal,
+    backgroundColor: T.surface,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: T.edge,
   },
-  eventPressed: { backgroundColor: colors.surface },
+  eventPressed: { backgroundColor: T.surface },
   eventHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   eventGlyph: { width: 28, fontSize: 22, color: colors.gold, textAlign: 'center' },
   eventTitleWrap: { flex: 1, gap: 2 },

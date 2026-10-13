@@ -3,7 +3,9 @@ import { COLOR, SHAPE, WORD } from '@/components/SignalLamp';
 import { LENS_COLOR, LENS_TEXT, LensIcon, SignalMarker } from '@/components/Lens';
 import { lampForChoice, spokenChecks, type CheckKey } from '@/lib/practiceLamps';
 import type { PracticeStep } from '@/lib/practiceTypes';
-import { colors, fonts, radius } from '@/theme/tokens';
+import { colors, fonts, radius, themes } from '@/theme/tokens';
+
+const T = themes.practice;
 
 const NAME: Record<CheckKey, string> = { vehicle: 'Authority', road: 'Road', stoplight: 'Stoplight' };
 
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8 },
   lamp: {
     flex: 1, minHeight: 78, alignItems: 'center', justifyContent: 'center', gap: 4,
-    paddingVertical: 8, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.hairline,
+    paddingVertical: 8, borderRadius: radius.md, borderWidth: 1.5, borderColor: T.edge,
     backgroundColor: colors.obsidian,
   },
   name: { fontFamily: fonts.bodyBold, fontSize: 13 },

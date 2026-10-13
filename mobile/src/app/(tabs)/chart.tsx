@@ -25,7 +25,9 @@ import { Segmented } from '@/components/Segmented';
 import { useChartData } from '@/lib/useChartData';
 import { formatLongitude } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, guidance, radius, space } from '@/theme/tokens';
+import { colors, fonts, guidance, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.chart;
 
 const VIEW_OPTIONS = [
   { value: 'overview', label: 'Overview' },
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
   moreStack: { gap: space.md },
   sigilCard: {
     alignItems: 'center', gap: space.md, padding: space.lg, marginTop: space.md,
-    borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface,
   },
   sigilTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.parchment, alignSelf: 'flex-start' },
   sigilNote: { alignSelf: 'stretch' },

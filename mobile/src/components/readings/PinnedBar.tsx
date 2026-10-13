@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.readings;
 
 /**
  * The shared frame for the small drawing pinned to the top of a reading once the full one has scrolled out of view.
@@ -28,9 +30,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: space.md,
     paddingVertical: 8, paddingHorizontal: space.md,
     borderBottomLeftRadius: radius.md, borderBottomRightRadius: radius.md,
-    borderWidth: 1, borderTopWidth: 0, borderColor: colors.hairline,
+    borderWidth: 1, borderTopWidth: 0, borderColor: T.edge,
     // Fully solid, so reading text never shows through.
-    backgroundColor: colors.charcoal,
+    backgroundColor: T.surface,
   },
   text: { flex: 1, gap: 2 },
   type: { fontFamily: fonts.display, fontSize: 16, color: colors.parchment },

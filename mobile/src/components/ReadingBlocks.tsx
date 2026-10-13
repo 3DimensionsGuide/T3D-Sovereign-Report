@@ -8,9 +8,11 @@ import { capFirst } from '@/lib/skyText';
 import { GoldButton } from '@/components/GoldButton';
 import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { OfflineNote } from '@/components/OfflineNote';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
+
+const T = themes.readings;
 
 /**
  * Shared building blocks for the long-form readings (Vehicle, Road, Stoplight).
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
   contents: { gap: 6 },
   contentsLabel: { fontFamily: fonts.bodyBold, fontSize: 13 },
   contentsRow: { gap: 8, paddingRight: space.md },
-  contentsChip: { minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: colors.charcoal },
+  contentsChip: { minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: T.surface },
   contentsChipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
   readMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
@@ -293,20 +295,20 @@ const styles = StyleSheet.create({
   footnote: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
   card: {
     borderRadius: radius.lg,
-    backgroundColor: colors.charcoal,
+    backgroundColor: T.surface,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: T.edge,
     overflow: 'hidden',
   },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, minHeight: 64 },
-  pressed: { backgroundColor: colors.surface },
+  pressed: { backgroundColor: T.surface },
   badge: {
     minWidth: 48,
     height: 48,
     paddingHorizontal: 4,
     borderRadius: 24,
     borderWidth: 2,
-    backgroundColor: colors.surface,
+    backgroundColor: T.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -332,9 +334,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: radius.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: T.surface,
     borderWidth: 1,
-    borderColor: colors.hairline,
+    borderColor: T.edge,
   },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
 });

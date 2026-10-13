@@ -9,7 +9,9 @@ import { LAMP_WORD, VERDICT_LAMP } from '@/lib/practiceLamps';
 import type { PracticeData, VerdictKey } from '@/lib/practiceTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { usePracticeStore, type Decision, type Followed, type Outcome } from '@/store/usePracticeStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.practice;
 
 const OUTCOMES: Array<{ id: Outcome; label: string }> = [
   { id: 'good', label: 'Feels right' },
@@ -40,7 +42,7 @@ function Pick<T extends string>({ options, value, onChange }: {
             accessibilityState={{ selected }}
             accessibilityLabel={o.label}
             onPress={() => onChange(o.id)}
-            style={[styles.pick, selected && { borderColor: colors.gold, backgroundColor: colors.amethyst }]}
+            style={[styles.pick, selected && { borderColor: colors.gold, backgroundColor: T.raised }]}
           >
             <Text style={styles.pickText}>{selected ? '● ' : '○ '}{o.label}</Text>
           </Pressable>
@@ -165,7 +167,7 @@ export function DecisionLog({ data, onDecide }: { data: PracticeData; onDecide: 
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 12 },
+  card: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 12 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between' },
   date: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   status: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.gold },
@@ -178,9 +180,9 @@ const styles = StyleSheet.create({
   closer: { gap: 12 },
   closerLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   pickRow: { gap: 8 },
-  pick: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
+  pick: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: T.edge },
   pickText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   delete: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' },
   deleteText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted, textDecorationLine: 'underline' },
-  pattern: { gap: 8, padding: space.lg, borderRadius: radius.lg, backgroundColor: colors.amethyst, borderWidth: 1, borderColor: colors.gold },
+  pattern: { gap: 8, padding: space.lg, borderRadius: radius.lg, backgroundColor: T.raised, borderWidth: 1, borderColor: colors.gold },
 });

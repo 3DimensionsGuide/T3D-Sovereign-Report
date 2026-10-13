@@ -14,7 +14,9 @@ import { lampForChoice, VERDICT_LAMP, verdictFor } from '@/lib/practiceLamps';
 import type { PracticeData } from '@/lib/practiceTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { addDays, usePracticeStore } from '@/store/usePracticeStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.practice;
 
 const ORDER = ['vehicle', 'road', 'stoplight'] as const;
 
@@ -123,7 +125,7 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
                 select();
                 setAnswers((a) => ({ ...a, [step.key]: c.id }));
               }}
-              style={[styles.choice, selected && { borderColor: colors.gold, backgroundColor: colors.amethyst }]}
+              style={[styles.choice, selected && { borderColor: colors.gold, backgroundColor: T.raised }]}
             >
               <Text style={styles.choiceMark}>{selected ? '●' : '○'}</Text>
               <Text style={styles.choiceText}>{c.label}</Text>
@@ -148,18 +150,18 @@ export function DecideFlow({ data, onSaved }: { data: PracticeData; onSaved: () 
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: 14 },
+  card: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 14 },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
   progress: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   pace: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 22, color: colors.parchmentMuted },
-  decisionText: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 24, color: colors.parchment, padding: space.md, borderRadius: radius.md, backgroundColor: colors.amethyst },
+  decisionText: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 24, color: colors.parchment, padding: space.md, borderRadius: radius.md, backgroundColor: T.raised },
   prompt: { fontFamily: fonts.display, fontSize: 19, lineHeight: 27, color: colors.parchment },
   hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted, textAlign: 'center', marginTop: -6 },
   signal: { fontFamily: fonts.body, fontSize: 14, lineHeight: 22, color: colors.parchmentMuted },
   choices: { gap: 8 },
-  choice: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
+  choice: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: T.edge },
   choiceMark: { fontSize: 16, color: colors.gold },
   choiceLamp: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   choiceLampText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },

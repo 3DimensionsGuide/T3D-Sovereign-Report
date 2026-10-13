@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.timeline;
 
 const COPY = {
   vehicle:
@@ -24,7 +26,7 @@ export function TimeNote({ scope }: { scope: keyof typeof COPY }) {
 const styles = StyleSheet.create({
   box: {
     gap: 6, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold,
-    backgroundColor: colors.surface,
+    backgroundColor: T.surface,
   },
   label: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   body: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchment },

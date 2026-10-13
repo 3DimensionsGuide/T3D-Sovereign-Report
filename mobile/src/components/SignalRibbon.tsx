@@ -3,7 +3,9 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import { LensIcon, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import type { TimelineEvent, TimelineResult } from '@/lib/timelineTypes';
-import { colors, fonts, radius, space, tabular } from '@/theme/tokens';
+import { colors, fonts, radius, space, tabular, themes } from '@/theme/tokens';
+
+const T = themes.timeline;
 
 /** The marker an event carries: eclipses are caution, transits carry their own nature, the rest carry none. */
 export function eventSignal(e: TimelineEvent): SignalKind | null {
@@ -126,17 +128,17 @@ const styles = StyleSheet.create({
   ribbon: { gap: 6, paddingVertical: space.sm, paddingRight: space.md },
   cell: {
     width: CELL_W, minHeight: 88, alignItems: 'center', justifyContent: 'center', gap: 3,
-    borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
+    borderRadius: radius.md, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface,
   },
-  cellOn: { borderColor: colors.gold, backgroundColor: colors.goldWash },
+  cellOn: { borderColor: colors.gold, backgroundColor: T.wash },
   weekday: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.parchmentMuted },
   dayNum: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchment, ...tabular },
   markerSlot: { height: 18, alignItems: 'center', justifyContent: 'center' },
   quiet: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.hairline },
   pd: { fontFamily: fonts.body, fontSize: 12, color: colors.parchmentMuted, ...tabular },
   detail: {
-    gap: 8, padding: space.md, borderRadius: radius.md, backgroundColor: colors.charcoal,
-    borderWidth: 1, borderColor: colors.hairline,
+    gap: 8, padding: space.md, borderRadius: radius.md, backgroundColor: T.surface,
+    borderWidth: 1, borderColor: T.edge,
   },
   detailTitle: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   eventLine: { flexDirection: 'row', alignItems: 'center', gap: 8 },

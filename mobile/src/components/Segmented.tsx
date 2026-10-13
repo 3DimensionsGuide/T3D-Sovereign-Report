@@ -5,6 +5,7 @@ import { Pressable } from '@/components/Pressable';
 import { DURATION, EASE, isReduceMotion } from '@/lib/motion';
 import { colors, fonts, radius, TOUCH } from '@/theme/tokens';
 import { select } from '@/lib/haptics';
+import { useRoomTheme } from '@/theme/RoomTheme';
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -63,8 +64,9 @@ export function Segmented<T extends string>({
 
   const pill = useAnimatedStyle(() => ({ width: width.value, transform: [{ translateX: x.value }], opacity: width.value > 0 ? 1 : 0 }));
 
+  const th = useRoomTheme();
   return (
-    <View style={styles.frame}>
+    <View style={[styles.frame, { backgroundColor: th.surface, borderColor: th.edge }]}>
       <View style={styles.row} accessibilityRole="tablist">
         <Animated.View pointerEvents="none" style={[styles.pill, pill]} />
         {options.map((opt) => {
@@ -87,7 +89,7 @@ export function Segmented<T extends string>({
                 if (!selected) select();
                 onChange(opt.value);
               }}
-              style={({ pressed }) => [styles.item, compact && styles.compact, pressed && !selected && styles.pressed]}
+              style={({ pressed }) => [styles.item, compact && styles.compact, pressed && !selected && { backgroundColor: th.raised }]}
             >
               <View style={styles.inner}>
                 {typeof opt.icon === 'function' ? opt.icon(selected) : opt.icon}

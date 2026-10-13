@@ -4,8 +4,10 @@ import { buildBodygraphScene } from '@/charts/bodygraph';
 import { SceneView } from '@/components/SceneView';
 import { useChartData } from '@/lib/useChartData';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
 import { LENS_TEXT } from '@/components/Lens';
+
+const T = themes.readings;
 
 /** Your bodygraph at a glance, above the long reading. */
 export function VehicleSnapshot() {
@@ -40,7 +42,7 @@ export function VehicleSnapshot() {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row', alignItems: 'center', gap: space.md,
-    borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge,
     backgroundColor: colors.obsidian, padding: space.md,
   },
   figure: { width: 130 },

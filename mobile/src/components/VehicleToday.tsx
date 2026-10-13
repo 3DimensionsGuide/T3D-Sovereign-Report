@@ -2,7 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AccentView } from '@/components/AccentView';
 import { LensIcon } from '@/components/Lens';
 import type { GateToday, GateTodayResult } from '@/lib/timelineTypes';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.timeline;
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
   wrap: { gap: space.md },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headText: { fontFamily: fonts.display, fontSize: 22, lineHeight: 30, color: colors.vehicle },
-  gate: { gap: 8, padding: space.lg, borderRadius: radius.md, borderLeftWidth: 4, borderWidth: 1, borderColor: colors.goldEdge, backgroundColor: colors.surface },
+  gate: { gap: 8, padding: space.lg, borderRadius: radius.md, borderLeftWidth: 4, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface },
   when: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
   gateTitle: { fontFamily: fonts.display, fontSize: 22, lineHeight: 30, color: colors.parchment },
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },

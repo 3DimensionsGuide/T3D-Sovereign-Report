@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, StyleSheet, Text, View } from 'react-native';
 import { LENS_TEXT, LensIcon } from '@/components/Lens';
 import { buildTimeLordBar } from '@/lib/timeLordBar';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, space, themes } from '@/theme/tokens';
+
+const T = themes.readings;
 
 interface Props {
   planet: string;
@@ -65,7 +67,7 @@ export function TimeLordBar({ planet, startYear, endYear, yearsRemaining, next }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.charcoal, borderRadius: 22, borderWidth: 1, borderColor: colors.hairline,
+    backgroundColor: T.surface, borderRadius: 22, borderWidth: 1, borderColor: T.edge,
     padding: space.md, gap: 8,
   },
   title: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },

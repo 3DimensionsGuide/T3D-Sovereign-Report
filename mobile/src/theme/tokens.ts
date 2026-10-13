@@ -93,3 +93,38 @@ export const heroCard = {
   shadowRadius: 32,
   shadowOffset: { width: 0, height: 10 },
 } as const;
+
+/**
+ * One card, table and tab palette per tab, so each room feels like its own place.
+ * Every palette is a near-black tinted toward one hue, with a fine edge in that hue.
+ * Selected states keep the brand gold on every tab.
+ *  Today     : graphite and gold (the original luxury look)
+ *  Timeline  : evergreen. Green reads as growth and progress, the road ahead.
+ *  Readings  : midnight sapphire. Deep blue reads as study, depth and trust.
+ *  Practice  : copper espresso. Warm earth reads as ritual, energy and doing.
+ *  My Chart  : platinum slate. Cool silver reads as identity and clarity.
+ */
+export interface RoomTheme {
+  /** Card and panel background. */
+  surface: string;
+  /** A card on a card, and unselected chips. */
+  raised: string;
+  /** Outline of a card. */
+  edge: string;
+  /** Outline of a chip or button. */
+  line: string;
+  /** Divider between table rows. */
+  rule: string;
+  /** Fill of a selected chip or tab. */
+  wash: string;
+}
+
+export const themes = {
+  today: { surface: '#17161A', raised: '#232127', edge: 'rgba(212,175,55,0.30)', line: 'rgba(245,245,243,0.22)', rule: 'rgba(212,175,55,0.17)', wash: 'rgba(212,175,55,0.12)' },
+  timeline: { surface: '#101A15', raised: '#182620', edge: 'rgba(96,200,150,0.30)', line: 'rgba(205,238,220,0.22)', rule: 'rgba(96,200,150,0.18)', wash: 'rgba(212,175,55,0.13)' },
+  readings: { surface: '#10151F', raised: '#18202F', edge: 'rgba(128,166,232,0.30)', line: 'rgba(205,218,245,0.22)', rule: 'rgba(128,166,232,0.18)', wash: 'rgba(212,175,55,0.13)' },
+  practice: { surface: '#1A1310', raised: '#281D17', edge: 'rgba(216,134,88,0.32)', line: 'rgba(246,226,212,0.22)', rule: 'rgba(216,134,88,0.20)', wash: 'rgba(212,175,55,0.13)' },
+  chart: { surface: '#14161A', raised: '#1E2127', edge: 'rgba(205,212,226,0.30)', line: 'rgba(236,239,246,0.24)', rule: 'rgba(205,212,226,0.18)', wash: 'rgba(212,175,55,0.13)' },
+} as const satisfies Record<string, RoomTheme>;
+
+export type ThemeName = keyof typeof themes;

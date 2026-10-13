@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { NameColumn } from '@/lib/numerologyTypes';
 import { describeColumns, emptyColumns, passionColumn } from '@/lib/nameColumns';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.readings;
 
 /**
  * Your full birth name with every letter under its number, 1 to 9. The tallest column is marked with a
@@ -40,8 +42,8 @@ export function NameColumns({ columns }: { columns: readonly NameColumn[] }) {
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: space.sm, padding: space.sm, borderRadius: radius.md, backgroundColor: colors.charcoal,
-    borderWidth: 1, borderColor: colors.hairline,
+    gap: space.sm, padding: space.sm, borderRadius: radius.md, backgroundColor: T.surface,
+    borderWidth: 1, borderColor: T.edge,
   },
   row: { flexDirection: 'row', gap: 3, alignItems: 'stretch' },
   col: {
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent', gap: 2,
   },
   colTop: { borderColor: colors.road, backgroundColor: 'rgba(31,138,77,0.14)' },
-  colEmpty: { borderColor: colors.hairline, borderStyle: 'dashed' },
+  colEmpty: { borderColor: T.edge, borderStyle: 'dashed' },
   mark: { fontFamily: fonts.bodyBold, fontSize: 10, lineHeight: 12, color: colors.road },
   num: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchmentMuted },
   numTop: { color: colors.parchment },

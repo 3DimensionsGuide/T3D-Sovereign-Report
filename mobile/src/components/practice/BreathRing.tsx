@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { LensIcon } from '@/components/Lens';
 import { GoldButton } from '@/components/GoldButton';
-import { colors, fonts, radius } from '@/theme/tokens';
+import { colors, fonts, radius, themes } from '@/theme/tokens';
+
+const T = themes.practice;
 
 const BREATHS = 3;
 const COUNT_MS = 4000;
@@ -81,7 +83,7 @@ export function BreathRing() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.md, backgroundColor: colors.obsidian, borderWidth: 1, borderColor: colors.hairline },
+  wrap: { alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.md, backgroundColor: colors.obsidian, borderWidth: 1, borderColor: T.edge },
   stage: { width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' },
   ring: { position: 'absolute', width: SIZE, height: SIZE, borderRadius: SIZE / 2, borderWidth: 3, borderColor: colors.vehicle, backgroundColor: 'rgba(229,169,60,0.10)' },
   center: { alignItems: 'center', gap: 3 },

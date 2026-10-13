@@ -4,7 +4,9 @@ import { COLOR, Housing } from '@/components/SignalLamp';
 import { success } from '@/lib/haptics';
 import { LAMP_PHRASE, LAMP_WORD } from '@/lib/practiceLamps';
 import type { LampState } from '@/lib/triadTypes';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.practice;
 
 /**
  * The result of a decision: a lamp housing with the lit lamp, the word, and the sentence that says what it
@@ -41,7 +43,7 @@ export function ResultLamp({ state, title, text, extra }: { state: LampState; ti
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 10, padding: space.md, borderRadius: radius.md, backgroundColor: colors.amethyst, borderWidth: 1 },
+  card: { gap: 10, padding: space.md, borderRadius: radius.md, backgroundColor: T.raised, borderWidth: 1 },
   top: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   words: { flex: 1, gap: 2 },
   word: { fontFamily: fonts.display, fontSize: 40, lineHeight: 46 },

@@ -2,7 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AccentView } from '@/components/AccentView';
 import type { RoadDay } from '@/lib/roadDay';
 import { cycleLine } from '@/lib/numberWords';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.timeline;
 
 function numberText(m: { number: number; root: number | null }): string {
   return m.root ? `${m.number}/${m.root}` : String(m.number);
@@ -53,8 +55,8 @@ export function RoadToday({ day, dayLabel }: { day: RoadDay; dayLabel?: string |
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   card: {
-    backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1,
-    borderColor: colors.goldEdge, borderLeftWidth: 4, borderLeftColor: colors.road,
+    backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1,
+    borderColor: T.edge, borderLeftWidth: 4, borderLeftColor: colors.road,
     padding: space.lg, gap: 12,
   },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md },
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   strong: { fontFamily: fonts.bodyBold, color: colors.parchment },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { borderRadius: 999, borderWidth: 1, borderColor: colors.hairline, paddingHorizontal: 12, paddingVertical: 6 },
+  chip: { borderRadius: 999, borderWidth: 1, borderColor: T.edge, paddingHorizontal: 12, paddingVertical: 6 },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchment },
   divider: { height: 1, backgroundColor: colors.hairline },
 });

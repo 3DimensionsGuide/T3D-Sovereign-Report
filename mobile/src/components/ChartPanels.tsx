@@ -14,7 +14,9 @@ import { Segmented } from '@/components/Segmented';
 import type { SkyPosition } from '@/lib/api';
 import { nowContacts, nowPlanets, nowRows, zodiacShift } from '@/lib/wheelNow';
 import { SceneView } from '@/components/SceneView';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.chart;
 
 // ───────────────────────── shared bits ─────────────────────────
 
@@ -432,12 +434,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.goldEdge,
+    borderColor: T.edge,
     backgroundColor: colors.obsidian,
   },
   chipLabel: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment, marginTop: space.sm },
   chipScroll: { gap: 8, paddingVertical: 2 },
-  aspectChip: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surfaceRaised },
+  aspectChip: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: T.line, backgroundColor: T.raised },
   aspectChipOn: { borderColor: colors.gold, backgroundColor: 'rgba(212,175,55,0.15)' },
   aspectChipText: { fontSize: 17, color: colors.parchment },
   learnBtn: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
@@ -452,7 +454,7 @@ const styles = StyleSheet.create({
   headline: { gap: 2 },
   headType: { fontFamily: fonts.display, fontSize: 26, color: colors.parchment },
   headMeta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
-  section: { gap: space.sm, marginTop: space.sm, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: 'rgba(212,175,55,0.18)', backgroundColor: colors.surface },
+  section: { gap: space.sm, marginTop: space.sm, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: T.rule, backgroundColor: T.surface },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sectionTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
   hotspot: { position: 'absolute', width: 44, height: 44, borderRadius: 22 },
@@ -463,7 +465,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
     paddingVertical: 6,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.goldLine,
+    borderBottomColor: T.rule,
   },
   glyph: { width: 26, fontSize: 18, color: colors.parchment, textAlign: 'center' },
   rowName: { flexShrink: 1, fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
@@ -473,15 +475,15 @@ const styles = StyleSheet.create({
   strong: { fontFamily: fonts.bodyBold, color: colors.parchment },
   twoCol: { flexDirection: 'row', gap: space.md },
   gateCol: { flex: 1, gap: 2 },
-  gateColHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: colors.goldEdge },
+  gateColHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: T.edge },
   gateColTitle: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   gateColSub: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
-  gateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.goldLine },
+  gateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.rule },
   gatePlanet: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted, flexShrink: 1 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   centerChip: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 12, borderRadius: radius.sm, borderWidth: 1 },
   centerChipOn: { backgroundColor: 'rgba(229,169,60,0.18)', borderColor: colors.vehicle },
-  centerChipOff: { backgroundColor: colors.surfaceRaised, borderColor: colors.line, borderStyle: 'dashed' },
+  centerChipOff: { backgroundColor: T.raised, borderColor: T.line, borderStyle: 'dashed' },
   centerMark: { width: 11, height: 11, borderRadius: 3, borderWidth: 1.5, borderColor: colors.vehicle },
   centerMarkOn: { backgroundColor: colors.vehicle },
   centerMarkOff: { backgroundColor: 'transparent', borderStyle: 'dashed', borderColor: colors.parchmentMuted },

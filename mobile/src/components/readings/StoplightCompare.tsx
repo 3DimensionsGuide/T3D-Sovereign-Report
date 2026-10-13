@@ -2,7 +2,9 @@ import { SIGN_GLYPH } from '@/lib/signGlyphs';
 import { StyleSheet, Text, View } from 'react-native';
 import type { BigThreeLens } from '@/lib/stoplightTypes';
 import { LENS_TEXT } from '@/components/Lens';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+
+const T = themes.readings;
 
 /** Tropical and sidereal Big Three side by side; differing signs are marked in words. */
 export function StoplightCompare({ tropical, sidereal }: { tropical: BigThreeLens; sidereal: BigThreeLens }) {
@@ -57,7 +59,7 @@ export function ElementBalance({ lens }: { lens: BigThreeLens }) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge,
     backgroundColor: colors.obsidian, padding: space.md, gap: space.sm,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
   sign: { fontFamily: fonts.body, fontSize: 16, color: colors.parchment },
   diff: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   same: { fontFamily: fonts.body, fontSize: 13, color: colors.parchment, opacity: 0.8 },
-  track: { flex: 1, height: 10, borderRadius: 5, backgroundColor: colors.charcoal, overflow: 'hidden' },
+  track: { flex: 1, height: 10, borderRadius: 5, backgroundColor: T.surface, overflow: 'hidden' },
   fill: { height: 10, backgroundColor: colors.stoplight },
   count: { width: 48, textAlign: 'right', fontFamily: fonts.body, fontSize: 13, color: colors.parchment },
 });

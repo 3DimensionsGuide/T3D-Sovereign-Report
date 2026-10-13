@@ -2,7 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Polygon, Rect, Text as SvgText } from 'react-native-svg';
 import { LENS_COLOR, LENS_TEXT } from '@/components/Lens';
 import type { ChallengeCard, PinnacleCard } from '@/lib/numerologyTypes';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, space, themes } from '@/theme/tokens';
+
+const T = themes.readings;
 
 const W = 340;
 const H = 176;
@@ -61,6 +63,6 @@ export function RoadPath({ pinnacles, challenges }: { pinnacles: PinnacleCard[];
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: space.xs, padding: space.md, borderRadius: 22, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal },
+  wrap: { gap: space.xs, padding: space.md, borderRadius: 22, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface },
   caption: { fontFamily: fonts.bodyBold, fontSize: 13 },
 });

@@ -9,7 +9,8 @@ import { useReduceMotion } from '@/lib/motion';
 import { PARALLAX } from '@/lib/parallax';
 import { useSkyLook } from '@/lib/useSkyLook';
 import { ROOMS, type RoomName } from '@/theme/rooms';
-import { colors, space } from '@/theme/tokens';
+import { colors, space, themes } from '@/theme/tokens';
+import { ROOM_THEME, RoomThemeContext } from '@/theme/RoomTheme';
 
 /** Obsidian page with a soft amethyst glow at the top and a scrolling body. */
 interface ScreenProps {
@@ -43,6 +44,7 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
     : base.glows;
   const artOpacity = isSky ? sky.starOpacity : 1;
   return (
+    <RoomThemeContext.Provider value={themes[ROOM_THEME[room]]}>
     <View style={styles.root}>
       <ParallaxLayer scrollY={scrollY} factor={reduce ? 0 : PARALLAX.glow}>
         {glows.map((g, i) => (
@@ -78,6 +80,7 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
         {overlay}
       </SafeAreaView>
     </View>
+    </RoomThemeContext.Provider>
   );
 }
 
