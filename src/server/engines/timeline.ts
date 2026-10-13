@@ -40,6 +40,7 @@ import type {
 import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/road-content';
 import { personalYearNumber } from '../../lib/numerology/personalYear';
 import { buildGateEvents, type GateVehicle } from '../../lib/app/gateEvents';
+import { meaning as dayNumberMeaning, type DayNumberMeaning } from './dayNumerology';
 import { buildGateToday, GATE_DAYS_AHEAD, type GateDay, type GateTodayResult } from '../../lib/app/gateToday';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
@@ -139,6 +140,8 @@ export interface TimelineResult {
   pinnacle: { current: CycleWindow; next: CycleWindow | null };
   challenge: { current: CycleWindow; next: CycleWindow | null };
   numberMeanings: Record<number, { word: string; line: string }>;
+  /** The full reading for each Personal Day number (1 to 9, 11, 22, 33), for the day chosen in the Road view. */
+  dayMeanings: Record<number, DayNumberMeaning>;
   /** The Sun's gate(s) today, read against the person's chart. Absent when the chart has no Human Design gates. */
   gateToday?: GateTodayResult;
   /** The Sun's gate(s) for each of the next days after today (index 0 is tomorrow), so a chosen future day has its own reading. */
@@ -320,6 +323,10 @@ function reduceKeepMasters(n: number): number {
   while (v > 9 && v !== 11 && v !== 22 && v !== 33) v = digitSum(v);
   return v;
 }
+
+const DAY_MEANINGS: Record<number, DayNumberMeaning> = Object.fromEntries(
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33].map((n) => [n, dayNumberMeaning(n)]),
+);
 
 const NUMBER_MEANINGS: Record<number, { word: string; line: string }> = {
   1: { word: 'Beginnings', line: 'Independence, new starts, self-reliance and original leadership.' },
@@ -806,6 +813,7 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     pinnacle: pickCycles(input.pinnacles, age, input.birthDate, 'pinnacle'),
     challenge: pickCycles(input.challenges, age, input.birthDate, 'challenge'),
     numberMeanings: NUMBER_MEANINGS,
+    dayMeanings: DAY_MEANINGS,
     gateToday,
     gateDays,
   };

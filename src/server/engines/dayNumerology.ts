@@ -139,7 +139,7 @@ export const DAY_NUMBER_CONTENT = CONTENT;
 
 const ROOT: Record<number, number> = { 11: 2, 22: 4, 33: 6 };
 
-function meaning(n: number): DayNumberMeaning {
+export function meaning(n: number): DayNumberMeaning {
   const c = CONTENT[n] ?? CONTENT[9]!;
   return { number: n, root: ROOT[n] ?? null, ...c };
 }

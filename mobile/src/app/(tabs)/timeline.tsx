@@ -31,6 +31,8 @@ import { gateReadingForDay } from '@/lib/gateDay';
 import { usePremium } from '@/lib/usePremium';
 import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
+import { RoadToday } from '@/components/RoadToday';
+import { roadDayFor } from '@/lib/roadDay';
 
 /** A month takes the pinned bar over this far before its header reaches the top, so the bar never reads "Timeline" while a month is on screen. */
 const BAR_HEIGHT = 120;
@@ -446,6 +448,20 @@ export default function Timeline() {
             />
           </FadeIn>
           {lens === 'all' || lens === 'road' ? <YearCard data={data} /> : null}
+
+          {lens === 'road' ? (
+            selectedDay > 0 && !premium ? (
+              <PremiumGate
+                title={`Your Personal Day on ${dayTitle(data.personal[selectedDay]?.date)}`}
+                detail="Today's Personal Day reading is free. Look ahead with Premium: the theme, where to lean in and what to watch, for each day."
+              />
+            ) : (() => {
+              const rd = roadDayFor(data, selectedDay);
+              return rd ? (
+                <RoadToday day={rd} dayLabel={selectedDay > 0 ? dayTitle(rd.date) : null} />
+              ) : null;
+            })()
+          ) : null}
 
           {lens === 'road' ? (
             <Panel label="Your Personal Days" lens="road">

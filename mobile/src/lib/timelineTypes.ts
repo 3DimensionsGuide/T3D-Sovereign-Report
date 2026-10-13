@@ -1,3 +1,4 @@
+import type { DayNumberMeaning } from '@/lib/dayNumerologyTypes';
 /** Shapes returned by POST /api/app/timeline (mirrors the server's timeline.ts). */
 import type { AspectNature, DailyAspect, NatalPointName, SkyBody } from '@/lib/api';
 
@@ -132,6 +133,8 @@ export interface TimelineResult {
   pinnacle: { current: CycleWindow; next: CycleWindow | null };
   challenge: { current: CycleWindow; next: CycleWindow | null };
   numberMeanings: Record<number, { word: string; line: string }>;
+  /** Full Personal Day readings by number. Optional: older saved copies do not have it. */
+  dayMeanings?: Record<number, DayNumberMeaning>;
   reminder: string;
   /** Optional: copies saved before this was added do not have it. */
   yearAhead?: YearAhead;
