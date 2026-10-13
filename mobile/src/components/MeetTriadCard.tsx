@@ -7,7 +7,7 @@ import { lensTap } from '@/lib/haptics';
 import { currentStop, showTodayCard, STOPS, TOTAL_DAYS } from '@/lib/meetTriad';
 import { useLocalDate } from '@/lib/useLocalDate';
 import { useMeetTriadHydrated, useMeetTriadStore } from '@/store/useMeetTriadStore';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, heroCard, radius, space } from '@/theme/tokens';
 
 /** The first-week card on Today. It starts the seven days the first time it shows, and goes away when the week is over. */
 export function MeetTriadCard() {
@@ -49,7 +49,7 @@ export function MeetTriadCard() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.gold,
+    backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, ...heroCard,
     padding: space.lg, flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 64,
   },
   shapes: { flexDirection: 'row', gap: 4 },

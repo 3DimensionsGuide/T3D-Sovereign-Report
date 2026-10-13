@@ -9,7 +9,7 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { useTimeline } from '@/lib/useTimeline';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
+import { colors, fonts, heroCard, radius, space, TOUCH } from '@/theme/tokens';
 
 import { AccentView } from '@/components/AccentView';
 function dayLabel(isoDay: string): string {
@@ -59,7 +59,7 @@ export default function YearAheadScreen() {
               <Text style={styles.lede}>
                 Your year runs from {dayLabel(y.startsOn)} to {dayLabel(y.endsOn)}. You are {y.age}.
               </Text>
-              <AccentView style={[styles.card, { borderLeftColor: colors.gold }]}>
+              <AccentView style={[styles.card, styles.heroCard, { borderLeftColor: colors.gold }]}>
                 <Text style={styles.cardEyebrow}>THE SHORT VERSION</Text>
                 <Text style={styles.body}>{y.summary}</Text>
               </AccentView>
@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
     borderLeftWidth: 4, padding: space.lg, gap: 10,
   },
+  heroCard: { ...heroCard },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },
   cardTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
