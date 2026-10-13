@@ -5,7 +5,7 @@ import {
 import { Modal, ScrollView, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import { TriadLoader } from '@/components/TriadLoader';
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChartRequestError, requestExplain } from '@/lib/api';
 import type { ExplainEntry, GlossaryGroup } from '@/lib/explainTypes';
@@ -161,6 +161,19 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
                       <LockIcon size={18} />
                       <Text style={styles.lockedText}>The full explanation is part of Premium. Subscriptions are not open yet.</Text>
                     </View>
+                  ) : null}
+                  {entry.locked ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel="See what Premium includes"
+                      onPress={() => {
+                        close();
+                        router.push('/premium' as unknown as Href);
+                      }}
+                      style={styles.browse}
+                    >
+                      <Text style={styles.browseText}>SEE WHAT PREMIUM INCLUDES</Text>
+                    </Pressable>
                   ) : null}
                   {entry.yours ? (
                     <AccentView style={[styles.yours, { borderLeftColor: accent }]}>

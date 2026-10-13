@@ -148,6 +148,7 @@ export default function MeetYourTriad() {
             <LockIcon size={16} />
             <Text style={styles.premiumText}>Part of Premium, which opens days 4 to 7. Subscriptions are not open yet.</Text>
           </View>
+          <GoldButton label="See what Premium includes" variant="ghost" onPress={() => router.push('/premium' as unknown as Href)} />
         </>
       );
     }
