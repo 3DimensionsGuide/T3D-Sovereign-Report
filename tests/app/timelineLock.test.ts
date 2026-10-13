@@ -24,3 +24,8 @@ test('a locked Timeline row still lists, and says the explanation is part of Pre
   assert.match(src, /See what Premium includes/);
   assert.match(src, /open && !locked/, 'the explanation text is not rendered at all while locked');
 });
+
+test('the Vehicle lens ignores the hidden Moon, Sky and Transits filter, so it is never emptied by it', () => {
+  const src = readFileSync('mobile/src/app/(tabs)/timeline.tsx', 'utf8');
+  assert.match(src, /const kinds = lens === 'vehicle' \? null : FILTER_KINDS\[filter\]/);
+});

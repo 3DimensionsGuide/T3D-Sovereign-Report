@@ -332,7 +332,9 @@ export default function Timeline() {
 
   const groups = useMemo(() => {
     if (!data) return [];
-    const kinds = FILTER_KINDS[filter];
+    // The Vehicle lens only ever lists gate changes, and its filter row is hidden, so a filter picked under
+    // All or Stoplight (Moon, Sky, Transits) must not carry over and empty it.
+    const kinds = lens === 'vehicle' ? null : FILTER_KINDS[filter];
     const byDay = new Map<string, TimelineEvent[]>();
     for (const e of data.events) {
       if (kinds && !kinds.includes(e.kind)) continue;
