@@ -3,7 +3,7 @@ import type { TriadToday } from '@/lib/triadTypes';
 import { Disclosure } from '@/components/Disclosure';
 import { lensFromGlyph } from '@/components/Lens';
 import { MotionLensIcon } from '@/components/LensMotion';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, heroCard, radius, space } from '@/theme/tokens';
 
 function Lens({ glyph, accent, label, title, lines }: {
   glyph: string; accent: string; label: string; title: string; lines: (string | null)[];
@@ -98,7 +98,8 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
-    borderColor: colors.gold, padding: space.lg, gap: 14,
+    borderColor: colors.hairline, padding: space.lg, gap: 14,
+    ...heroCard,
   },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.gold },
   title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment },

@@ -51,3 +51,15 @@ export const radius = { sm: 8, md: 14, lg: 22 } as const;
 
 /** Apple's minimum comfortable touch target is 44pt; we use 52. */
 export const TOUCH = 52;
+
+/**
+ * The raised look for the one or two hero cards on a screen: a faint light edge along the top
+ * and a soft purple glow underneath. Ordinary cards stay flat so the hero cards stand out.
+ */
+export const heroCard = {
+  borderTopColor: 'rgba(245,245,243,0.24)',
+  shadowColor: colors.purple,
+  shadowOpacity: 0.9,
+  shadowRadius: 22,
+  shadowOffset: { width: 0, height: 8 },
+} as const;

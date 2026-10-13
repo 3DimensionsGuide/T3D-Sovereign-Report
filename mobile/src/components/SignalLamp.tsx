@@ -6,7 +6,7 @@ import { LENS_LABEL, LENS_TEXT, SIGNAL_COLOR, SignalMarker, type LensName, type 
 import { lensTap } from '@/lib/haptics';
 import { MotionLensIcon } from '@/components/LensMotion';
 import type { DailySignal, Lamp, LampState } from '@/lib/triadTypes';
-import { colors, fonts, radius, space } from '@/theme/tokens';
+import { colors, fonts, heroCard, radius, space } from '@/theme/tokens';
 
 /**
  * The T3D signal lamp. A real three-lamp housing, top to bottom: Pause, Slow, Go.
@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
     padding: space.lg, gap: space.md,
+    ...heroCard,
   },
   title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
   hero: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
