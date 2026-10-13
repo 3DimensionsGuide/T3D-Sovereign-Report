@@ -39,6 +39,7 @@ export const colors = {
 export const fonts = {
   display: 'PlayfairDisplay_600SemiBold',
   displayRegular: 'PlayfairDisplay_400Regular',
+  displayItalic: 'PlayfairDisplay_400Regular_Italic',
   body: 'DMSans_400Regular',
   bodyMedium: 'DMSans_500Medium',
   bodyBold: 'DMSans_700Bold',

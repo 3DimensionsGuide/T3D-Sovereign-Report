@@ -5,7 +5,11 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { PlayfairDisplay_400Regular, PlayfairDisplay_600SemiBold } from '@expo-google-fonts/playfair-display';
+import {
+  PlayfairDisplay_400Regular,
+  PlayfairDisplay_400Regular_Italic,
+  PlayfairDisplay_600SemiBold,
+} from '@expo-google-fonts/playfair-display';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { colors } from '@/theme/tokens';
 import { ExplainProvider } from '@/components/Explain';
@@ -23,6 +27,7 @@ configureNotifications();
 function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     PlayfairDisplay_400Regular,
+    PlayfairDisplay_400Regular_Italic,
     PlayfairDisplay_600SemiBold,
     DMSans_400Regular,
     DMSans_500Medium,
