@@ -38,6 +38,9 @@ import { SIGNAL_COLOR, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/com
 import type { TriadToday } from '@/lib/triadTypes';
 import { TransitSheet } from '@/components/TransitSheet';
 import { aspectId, natalId, planetId } from '@/lib/termIds';
+import { PremiumGate } from '@/components/PremiumGate';
+import { isTimingLocked } from '@/lib/premiumGates';
+import { usePremium } from '@/lib/usePremium';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
@@ -190,10 +193,17 @@ export default function Today() {
   // A different day starts with the short list again.
   useEffect(() => setAllTransits(false), [viewDate, liveDate]);
 
+  const premium = usePremium();
+  const [timingLocked, setTimingLocked] = useState(false);
   const goTo = useCallback((date: Date) => {
     if (date < MIN_DATE || date > MAX_DATE) return;
+    if (isTimingLocked(date, premium)) {
+      setTimingLocked(true);
+      return;
+    }
+    setTimingLocked(false);
     setViewDate(sameDay(date, new Date()) ? null : noonOf(date));
-  }, []);
+  }, [premium]);
 
   const step = useCallback((days: number) => {
     const base = viewDate ?? new Date();
@@ -312,6 +322,9 @@ export default function Today() {
             <Text style={styles.stepText}>›</Text>
           </Pressable>
         </View>
+        {timingLocked ? (
+          <PremiumGate title="Past and future days" detail="Look back and look ahead in Today’s Sky, not only today. Today stays free." />
+        ) : null}
         {!isToday ? (
           <GoldButton label="Back to today" variant="ghost" onPress={() => setViewDate(null)} />
         ) : null}

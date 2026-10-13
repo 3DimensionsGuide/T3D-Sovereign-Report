@@ -7,7 +7,9 @@ import { DecideFlow } from '@/components/practice/DecideFlow';
 import { DecisionLog } from '@/components/practice/DecisionLog';
 import { SevenDay } from '@/components/practice/SevenDay';
 import { Together } from '@/components/practice/Together';
+import { PremiumGate } from '@/components/PremiumGate';
 import { usePractice } from '@/lib/usePractice';
+import { usePremium } from '@/lib/usePremium';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space, guidance } from '@/theme/tokens';
 
@@ -33,6 +35,7 @@ export default function Practice() {
   const chart = useT3DStore((s) => s.chart);
   const { data, error, loading, retry, offline, savedAt, refresh, refreshing } = usePractice(chart?.leadId, profile?.email.trim());
   const [mode, setMode] = useState<Mode>('week');
+  const premium = usePremium();
 
   return (
     <Screen room="ritual" refreshing={refreshing} onRefresh={refresh}>
@@ -40,10 +43,13 @@ export default function Practice() {
         <Text accessibilityRole="header" style={styles.title}>Practice</Text>
         <Text style={guidance}>Decide through your design. Everything you write stays on this phone.</Text>
       </View>
-      <Segmented options={OPTIONS} value={mode} onChange={setMode} />
-      <Text style={styles.explain}>{EXPLAIN[mode]}</Text>
-      {mode === 'together' ? <Together /> : null}
-      {mode !== 'together' ? (
+      {!premium ? (
+        <PremiumGate title="The Practice tab" detail="Daily practices that put your Strategy and timing to work: a seven-day experiment, a three-check decision flow, your history, and deciding together." />
+      ) : null}
+      {premium ? <Segmented options={OPTIONS} value={mode} onChange={setMode} /> : null}
+      {premium ? <Text style={styles.explain}>{EXPLAIN[mode]}</Text> : null}
+      {premium && mode === 'together' ? <Together /> : null}
+      {premium && mode !== 'together' ? (
       <ReadingStatus loading={loading} error={error} hasData={!!data} loadingText="Loading your practice…" onRetry={retry} offline={offline} savedAt={savedAt}>
         {data ? (
           mode === 'decide' ? (

@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoldButton } from '@/components/GoldButton';
 import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { OfflineNote } from '@/components/OfflineNote';
+import { PremiumGate } from '@/components/PremiumGate';
+import { usePremium } from '@/lib/usePremium';
 import { useTimeline } from '@/lib/useTimeline';
 import { yearQuote } from '@/lib/skyText';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -22,11 +24,12 @@ export default function YearAheadScreen() {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
   const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
-  const y = data?.yearAhead;
+  const premium = usePremium();
+  const y = premium ? data?.yearAhead : undefined;
 
   // A copy saved before this screen existed has no year ahead in it. Fetch a fresh one once, by itself.
   const triedRefresh = useRef(false);
-  const missing = Boolean(data) && !y;
+  const missing = premium && Boolean(data) && !y;
   useEffect(() => {
     if (missing && !offline && !triedRefresh.current) {
       triedRefresh.current = true;
@@ -44,14 +47,18 @@ export default function YearAheadScreen() {
           <Text style={styles.eyebrow}>YOUR YEAR AHEAD</Text>
           <Text accessibilityRole="header" style={styles.title}>The year in one view</Text>
 
-          {loading && !data ? <LoadingState label="Reading your year…" /> : null}
-          {error && !data ? (
+          {!premium ? (
+            <PremiumGate title="Your year ahead" detail="Your Personal Year, the topic and Lord of your year, and the longer chapter you are in, laid out in order." />
+          ) : null}
+
+          {premium && loading && !data ? <LoadingState label="Reading your year…" /> : null}
+          {premium && error && !data ? (
             <ErrorState message={error} onRetry={retry} />
           ) : null}
-          {offline && data ? <OfflineNote savedAt={savedAt} /> : null}
+          {premium && offline && data ? <OfflineNote savedAt={savedAt} /> : null}
 
-          {data && !y && (refreshing || !triedRefresh.current) ? <TriadLoader /> : null}
-          {data && !y && !refreshing && triedRefresh.current ? (
+          {premium && data && !y && (refreshing || !triedRefresh.current) ? <TriadLoader /> : null}
+          {premium && data && !y && !refreshing && triedRefresh.current ? (
             <ErrorState message="We could not load your year ahead just now. Check your connection and try again." onRetry={() => refresh()} />
           ) : null}
 
