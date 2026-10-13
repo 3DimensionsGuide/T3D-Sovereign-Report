@@ -53,8 +53,8 @@ export function RoadToday({ day, dayLabel }: { day: RoadDay; dayLabel?: string |
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   card: {
-    backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
-    borderColor: colors.hairline, borderLeftWidth: 4, borderLeftColor: colors.road,
+    backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1,
+    borderColor: colors.goldEdge, borderLeftWidth: 4, borderLeftColor: colors.road,
     padding: space.lg, gap: 12,
   },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md },

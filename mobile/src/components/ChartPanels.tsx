@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   chipLabel: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment, marginTop: space.sm },
   chipScroll: { gap: 8, paddingVertical: 2 },
   aspectChip: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal },
-  aspectChipOn: { borderColor: colors.gold, backgroundColor: colors.amethyst },
+  aspectChipOn: { borderColor: colors.gold, backgroundColor: colors.goldWash },
   aspectChipText: { fontSize: 17, color: colors.parchment },
   learnBtn: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
   learnText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },

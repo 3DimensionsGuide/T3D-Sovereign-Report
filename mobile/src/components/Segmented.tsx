@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   compact: { minHeight: 44 },
   inner: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
-  pressed: { backgroundColor: colors.amethyst },
+  pressed: { backgroundColor: colors.surface },
   label: { flexShrink: 1, fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.4, color: colors.parchmentMuted },
   labelSelected: { fontFamily: fonts.bodyBold, color: colors.obsidian },
 });

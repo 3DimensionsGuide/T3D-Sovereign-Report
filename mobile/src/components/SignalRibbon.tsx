@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     width: CELL_W, minHeight: 88, alignItems: 'center', justifyContent: 'center', gap: 3,
     borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
   },
-  cellOn: { borderColor: colors.gold, backgroundColor: colors.amethyst },
+  cellOn: { borderColor: colors.gold, backgroundColor: colors.goldWash },
   weekday: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.parchmentMuted },
   dayNum: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchment, ...tabular },
   markerSlot: { height: 18, alignItems: 'center', justifyContent: 'center' },

@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     padding: space.md,
     borderRadius: radius.md,
     borderLeftWidth: 4,
-    backgroundColor: colors.amethyst,
+    backgroundColor: colors.surface,
   },
   locked: {
     flexDirection: 'row', alignItems: 'center', gap: 10, padding: space.md, borderRadius: radius.md,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 14,
     borderRadius: radius.sm,
-    backgroundColor: colors.amethyst,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.hairline,
   },

@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   wrap: { gap: space.md },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headText: { fontFamily: fonts.display, fontSize: 22, lineHeight: 30, color: colors.vehicle },
-  gate: { gap: 8, padding: space.md, borderRadius: radius.md, borderLeftWidth: 4, backgroundColor: colors.amethyst },
+  gate: { gap: 8, padding: space.lg, borderRadius: radius.md, borderLeftWidth: 4, borderWidth: 1, borderColor: colors.goldEdge, backgroundColor: colors.surface },
   when: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
   gateTitle: { fontFamily: fonts.display, fontSize: 22, lineHeight: 30, color: colors.parchment },
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },

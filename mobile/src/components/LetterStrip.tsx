@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.lg,
-    backgroundColor: colors.amethyst,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.gold,
   },

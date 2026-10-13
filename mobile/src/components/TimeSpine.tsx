@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   cycleTrack: { flexDirection: 'row', height: 34, borderRadius: radius.sm, overflow: 'hidden', backgroundColor: colors.obsidian },
   segment: { justifyContent: 'center', paddingHorizontal: 8 },
   segNow: { backgroundColor: LENS_COLOR.road },
-  segNext: { backgroundColor: colors.amethyst, borderLeftWidth: 1, borderLeftColor: colors.hairline },
+  segNext: { backgroundColor: colors.surface, borderLeftWidth: 1, borderLeftColor: colors.hairline },
   segText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
   segTextNow: { color: colors.parchment },
   cycleToday: { position: 'absolute', top: 0, bottom: 0, width: 3, marginLeft: -1, backgroundColor: colors.gold },

@@ -24,7 +24,7 @@ export function TimeNote({ scope }: { scope: keyof typeof COPY }) {
 const styles = StyleSheet.create({
   box: {
     gap: 6, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold,
-    backgroundColor: colors.amethyst,
+    backgroundColor: colors.surface,
   },
   label: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   body: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchment },

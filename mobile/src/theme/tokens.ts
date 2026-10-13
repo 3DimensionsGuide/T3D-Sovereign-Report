@@ -19,6 +19,15 @@ export const colors = {
   purple: '#2E1A47',
   amethyst: '#1F1235',
 
+  /** Smoked graphite: the luxury surface for cards, tabs and sheets. Neutral, so gold and the Triad colors carry the color. */
+  surface: '#17161A',
+  /** One step lighter, for a card sitting on a card. */
+  surfaceRaised: '#201E24',
+  /** A faint gold wash for the selected state of a tab or chip. */
+  goldWash: 'rgba(212,175,55,0.12)',
+  /** A fine gold edge for a card that is worth a second look. */
+  goldEdge: 'rgba(212,175,55,0.30)',
+
   gold: '#D4AF37',
   sun: '#F2C94C',
 
