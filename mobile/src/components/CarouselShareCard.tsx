@@ -37,7 +37,7 @@ export const CarouselShareCard = forwardRef<View, Props>(function CarouselShareC
       <Glow color={colors.purple} opacity={0.8} style={styles.glow} />
       <Text style={styles.brand}>{firstName ? `${firstName.toUpperCase()}'S TRIAD` : 'THE 3 DIMENSIONS'}</Text>
       <View style={styles.middle}>
-        <Mark lens={lens} size={52} />
+        <Mark lens={lens} size={38} />
         <Text style={styles.name}>{slide.name}</Text>
         <Text style={styles.question}>{slide.question}</Text>
         <View style={[styles.rule, { backgroundColor: accent }]} />
@@ -65,19 +65,19 @@ export const CarouselShareCard = forwardRef<View, Props>(function CarouselShareC
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.obsidian, borderWidth: 1, borderColor: colors.gold, borderRadius: 18, overflow: 'hidden',
-    justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 22,
+    justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 18,
   },
   glow: { height: 420 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
-  middle: { alignItems: 'center', gap: 10, alignSelf: 'stretch' },
-  name: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment, marginTop: 6 },
-  question: { fontFamily: fonts.voice, fontSize: 18, lineHeight: 24, color: colors.parchmentMuted, textAlign: 'center' },
-  rule: { width: 48, height: 2, borderRadius: 1, marginVertical: 6 },
-  facts: { alignSelf: 'stretch', gap: 10 },
+  middle: { alignItems: 'center', gap: 6, alignSelf: 'stretch' },
+  name: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.parchment },
+  question: { fontFamily: fonts.voice, fontSize: 17, lineHeight: 22, color: colors.parchmentMuted, textAlign: 'center' },
+  rule: { width: 48, height: 2, borderRadius: 1, marginVertical: 4 },
+  facts: { alignSelf: 'stretch', gap: 6 },
   fact: { alignItems: 'center' },
   factLabel: { fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 2, color: colors.parchmentMuted, textTransform: 'uppercase' },
-  factValue: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.parchment, textAlign: 'center', alignSelf: 'stretch' },
-  footer: { alignItems: 'center', gap: 8 },
+  factValue: { fontFamily: fonts.display, fontSize: 22, lineHeight: 28, color: colors.parchment, textAlign: 'center', alignSelf: 'stretch' },
+  footer: { alignItems: 'center', gap: 6, paddingTop: 8 },
   dots: { flexDirection: 'row', gap: 6 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.parchmentMuted, opacity: 0.9 },
   url: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.gold },
