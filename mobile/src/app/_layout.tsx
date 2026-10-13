@@ -11,6 +11,7 @@ import {
   PlayfairDisplay_600SemiBold,
 } from '@expo-google-fonts/playfair-display';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
+import { useReduceMotion } from '@/lib/motion';
 import { colors } from '@/theme/tokens';
 import { ExplainProvider } from '@/components/Explain';
 import { ToastHost } from '@/components/ToastHost';
@@ -25,6 +26,7 @@ SplashScreen.preventAutoHideAsync();
 configureNotifications();
 
 function RootLayout() {
+  const reduceMotion = useReduceMotion();
   const [fontsLoaded, fontError] = useFonts({
     PlayfairDisplay_400Regular,
     PlayfairDisplay_400Regular_Italic,
@@ -70,9 +72,16 @@ function RootLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: colors.obsidian },
-          animation: 'fade',
+          // Screens you open slide in from the right and slide back out the same way, so you always know
+          // where you came from. Swiping right from anywhere on the screen goes back. Reduce Motion: a quiet fade.
+          animation: reduceMotion ? 'fade' : 'slide_from_right',
+          gestureEnabled: true,
+          fullScreenGestureEnabled: true,
         }}
-      />
+      >
+        <Stack.Screen name="(tabs)" options={{ animation: 'fade', gestureEnabled: false }} />
+        <Stack.Screen name="index" options={{ animation: 'fade', gestureEnabled: false }} />
+      </Stack>
       </ExplainProvider>
       <ToastHost />
     </SafeAreaProvider>
