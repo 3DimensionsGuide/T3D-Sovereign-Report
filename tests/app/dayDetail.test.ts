@@ -9,10 +9,9 @@ test('the day card under the ribbon opens each row into its analysis', () => {
   assert.match(ribbon, /<DayDetail/);
   assert.match(ribbon, /premium=\{premium\}/);
   const d = read('mobile/src/components/DayDetail.tsx');
-  assert.match(d, /toggle\('personal'\)/);
+  assert.doesNotMatch(d, /toggle\('personal'\)/, 'the Personal Day is read in its own card, not repeated here');
   assert.match(d, /isEventLocked\(e\.kind, dayKey, todayKey, premium\)/);
   assert.match(d, /gate\.reading\.theme/);
-  assert.match(d, /<RoadDayBlock/);
 });
 
 test('Timeline passes Premium to the ribbon', () => {
@@ -29,4 +28,14 @@ test('future days stay behind Premium in the shared day blocks', () => {
   const b = read('mobile/src/components/DayLenses.tsx');
   assert.match(b, /selectedDay > 0 && !premium/);
   assert.match(b, /if \(!premium\)/);
+});
+
+test('the gate panel matches Your year, with the extra analysis under Show more', () => {
+  const v = read('mobile/src/components/VehicleToday.tsx');
+  assert.match(v, /<Disclosure label="Show more">/);
+  assert.match(v, /styles\.panel/);
+  const more = v.slice(v.indexOf('<Disclosure label="Show more">'), v.indexOf('</Disclosure>'));
+  for (const t of ['Where it tips over', 'What to do with it', 'How it meets your chart']) assert.ok(more.includes(t), t);
+  const before = v.slice(0, v.indexOf('<Disclosure label="Show more">'));
+  assert.ok(before.includes('What the Sun brings'));
 });

@@ -4,7 +4,6 @@ import { Chevron } from '@/components/Chevron';
 import { LensIcon, SIGNAL_LABEL, SignalMarker, type SignalKind } from '@/components/Lens';
 import { LockIcon } from '@/components/LockIcon';
 import { Pressable } from '@/components/Pressable';
-import { RoadDayBlock } from '@/components/DayLenses';
 import { select } from '@/lib/haptics';
 import { animateLayout } from '@/lib/motion';
 import { gateReadingForDay } from '@/lib/gateDay';
@@ -32,36 +31,18 @@ const ordinalHouse = (n: number) => `${n}${n % 10 === 1 && n !== 11 ? 'st' : n %
 const shortDay = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
 /**
- * The card under the ribbon: the day's Personal Day and its events, each one a row that opens into
- * what it means. Today's readings are free; transits and future days are Premium, like the lists below.
+ * The card under the ribbon: the day's events, each one a row that opens into what it means. The Personal Day
+ * is read in its own card beneath, so it is not repeated here. Today's readings are free; transits and future days are Premium, like the lists below.
  */
 export function DayDetail({ data, index, dayKey, todayKey, premium, events, signalOf, title, personalDay }: Props) {
   const [openId, setOpenId] = useState<string | null>(null);
   useEffect(() => setOpenId(null), [dayKey]);
   const toggle = (id: string) => { select(); animateLayout(); setOpenId((cur) => (cur === id ? null : id)); };
   const gates = gateReadingForDay(data, index)?.gates ?? [];
-  const personalOpen = openId === 'personal';
 
   return (
     <View style={styles.detail} accessibilityLiveRegion="polite">
       <Text maxFontSizeMultiplier={1.15} style={styles.title}>{title} · Personal Day {personalDay}</Text>
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ expanded: personalOpen }}
-        accessibilityLabel={`Personal Day ${personalDay}. ${personalOpen ? 'Expanded.' : 'Double tap to read what it means.'}`}
-        onPress={() => toggle('personal')}
-        style={styles.row}
-      >
-        <View style={styles.rowHead}>
-          <LensIcon lens="road" size={14} />
-          <Text maxFontSizeMultiplier={1.15} style={styles.rowText}>
-            Personal Day {personalDay}{data.dayMeanings?.[personalDay] ? ` · ${data.dayMeanings[personalDay]!.label}` : ''}
-          </Text>
-          {!premium && index > 0 ? <LockIcon size={16} /> : <Chevron open={personalOpen} style={styles.chevron} />}
-        </View>
-      </Pressable>
-      {personalOpen ? <RoadDayBlock data={data} selectedDay={index} premium={premium} /> : null}
 
       {events.length === 0 ? (
         <Text maxFontSizeMultiplier={1.15} style={styles.quiet}>A quiet sky. Nothing close to your chart.</Text>
