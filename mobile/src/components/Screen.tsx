@@ -1,8 +1,12 @@
 import type { MutableRefObject, ReactNode, RefObject } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Glow } from '@/components/Glow';
 import { RoomArtLayer } from '@/components/RoomArt';
+import { ParallaxLayer } from '@/components/ParallaxLayer';
+import { useReduceMotion } from '@/lib/motion';
+import { PARALLAX } from '@/lib/parallax';
 import { useSkyLook } from '@/lib/useSkyLook';
 import { ROOMS, type RoomName } from '@/theme/rooms';
 import { colors, space } from '@/theme/tokens';
@@ -27,6 +31,8 @@ interface ScreenProps {
 
 export function Screen({ children, refreshing = false, onRefresh, scrollRef, scrollOffset, onScrollY, overlay, room = 'sky' }: ScreenProps) {
   const { width } = useWindowDimensions();
+  const scrollY = useSharedValue(0);
+  const reduce = useReduceMotion();
   const base = ROOMS[room];
   // Today's sky follows the time of day; every other room keeps its own fixed light.
   const sky = useSkyLook(room === 'sky');
@@ -35,19 +41,24 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
   const artOpacity = isSky ? sky.starOpacity : 1;
   return (
     <View style={styles.root}>
-      {glows.map((g, i) => (
-        <Glow key={i} color={g.color} opacity={g.opacity} cx={g.cx} style={styles.glow} />
-      ))}
-      <RoomArtLayer kind={base.art} color={base.artColor} width={width} opacity={artOpacity} />
+      <ParallaxLayer scrollY={scrollY} factor={reduce ? 0 : PARALLAX.glow}>
+        {glows.map((g, i) => (
+          <Glow key={i} color={g.color} opacity={g.opacity} cx={g.cx} style={styles.glow} />
+        ))}
+      </ParallaxLayer>
+      <ParallaxLayer scrollY={scrollY} factor={reduce ? 0 : PARALLAX.art}>
+        <RoomArtLayer kind={base.art} color={base.artColor} width={width} opacity={artOpacity} />
+      </ParallaxLayer>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView
           ref={scrollRef}
           scrollEventThrottle={16}
-          onScroll={scrollOffset || onScrollY ? (e) => {
+          onScroll={(e) => {
             const y = e.nativeEvent.contentOffset.y;
+            scrollY.value = y;
             if (scrollOffset) scrollOffset.current = y;
             onScrollY?.(y);
-          } : undefined}
+          }}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"

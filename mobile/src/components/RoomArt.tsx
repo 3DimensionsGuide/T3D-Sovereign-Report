@@ -20,7 +20,7 @@ const STARS = (() => {
 
 /**
  * One piece of faint line art behind a room's content. Decorative only: hidden from screen readers,
- * ignores touches, and never moves.
+ * ignores touches, and drifts slowly as the page scrolls (see ParallaxLayer).
  */
 export function RoomArtLayer({
   kind, color, width, opacity = 1,
