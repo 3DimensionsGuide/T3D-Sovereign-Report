@@ -25,13 +25,13 @@ export const SigilWallpaper = forwardRef<View, Props>(function SigilWallpaper({ 
     <View ref={ref} collapsable={false} style={[styles.card, WALLPAPER]}>
       <Svg width={WALLPAPER.width} height={WALLPAPER.height} style={StyleSheet.absoluteFill} pointerEvents="none">
         <Defs>
-          <RadialGradient id={id} cx={WALLPAPER.width / 2} cy={cy} r={250} gradientUnits="userSpaceOnUse">
+          <RadialGradient id={id} cx={WALLPAPER.width / 2} cy={cy} r={layout.glowRadius} gradientUnits="userSpaceOnUse">
             <Stop offset="0" stopColor={colors.purple} stopOpacity={0.55 * layout.opacity} />
             <Stop offset="0.5" stopColor={colors.purple} stopOpacity={0.2 * layout.opacity} />
             <Stop offset="1" stopColor={colors.purple} stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Circle cx={WALLPAPER.width / 2} cy={cy} r={250} fill={`url(#${id})`} />
+        <Circle cx={WALLPAPER.width / 2} cy={cy} r={layout.glowRadius} fill={`url(#${id})`} />
       </Svg>
       <View style={[styles.art, { top: layout.top, opacity: layout.opacity }]}>
         <Sigil chart={chart} birthTimeKnown={birthTimeKnown} size={layout.sigilSize} />
@@ -41,6 +41,6 @@ export const SigilWallpaper = forwardRef<View, Props>(function SigilWallpaper({ 
 });
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.obsidian, borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: colors.hairline },
+  card: { backgroundColor: colors.obsidian, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: colors.hairline },
   art: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
 });
