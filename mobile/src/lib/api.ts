@@ -600,3 +600,41 @@ export async function requestPlaceCheck(
   );
   return data.candidates;
 }
+
+/** What an invite link may show: the sender's first name (only if they agreed), Type, Life Path and Sun sign. */
+export interface InvitePreview {
+  firstName: string | null;
+  type: string | null;
+  lifePath: number | null;
+  sunSign: string | null;
+}
+
+/** Makes a signed 30-day invite link for the person with this chart. */
+export function requestInviteCreate(
+  leadId: number, email: string, showName: boolean, timeKnown: boolean,
+): Promise<{ token: string; url: string }> {
+  return postApp<{ token: string; url: string }>(
+    '/api/app/invite',
+    { action: 'create', leadId, email, showName, timeKnown },
+    'We could not make the invite. Please try again.',
+  );
+}
+
+export function requestInvitePreview(token: string): Promise<InvitePreview> {
+  return postApp<InvitePreview>('/api/app/invite', { action: 'preview', token }, 'This invite is no longer available.');
+}
+
+/** Who is opening the invite: someone with a saved chart, or just a birth date (time and place are optional). */
+export type InviteViewer =
+  | { leadId: number; email: string }
+  | { birthDate: string; birthTime: string | null; place: { latitude: number; longitude: number; timezone: string } | null };
+
+export function requestInviteTogether(
+  token: string, localDate: string, you: InviteViewer, youTimeKnown = true,
+): Promise<DecideTogether> {
+  return postApp<DecideTogether>(
+    '/api/app/invite',
+    { action: 'together', token, localDate, youTimeKnown, you },
+    'Could not build your reading. Please try again.',
+  );
+}

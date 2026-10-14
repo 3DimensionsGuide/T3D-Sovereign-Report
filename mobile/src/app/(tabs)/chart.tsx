@@ -15,6 +15,7 @@ import type { LensName } from '@/components/Lens';
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
 import { HeadsUpCard } from '@/components/HeadsUpCard';
+import { InviteCard } from '@/components/InviteCard';
 import { Sigil } from '@/components/Sigil';
 import { TriadMap } from '@/components/TriadMap';
 import { TriadCard } from '@/components/TriadCard';
@@ -180,6 +181,7 @@ export default function Chart() {
         <Disclosure label="Birth details, reminder and settings">
           <View style={styles.moreStack}>
             <BirthDataCard profile={profile} />
+            <InviteCard />
             <ReminderCard />
             <HeadsUpCard />
             <GoldButton label="Edit birth details" variant="ghost" onPress={() => router.push('/onboarding')} />

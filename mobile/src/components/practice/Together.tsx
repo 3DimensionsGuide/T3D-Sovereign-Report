@@ -407,51 +407,14 @@ function SkyView({ s, h }: { s: Synastry | null; h: HouseOverlays | null }) {
   );
 }
 
-function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () => void }) {
-  const profile = useT3DStore((s) => s.profile);
-  const chart = useT3DStore((s) => s.chart);
-  const clearPartner = usePartnerStore((s) => s.clearPartner);
-  const [data, setData] = useState<DecideTogether | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+/** The four views of two people. Used for a saved person and for an invite. */
+export function TogetherReading({ data, partnerLabel }: { data: DecideTogether; partnerLabel: string }) {
   const [view, setView] = useState<View_>('decide');
-
-  const load = useCallback(async () => {
-    if (!profile || !chart) return;
-    setError(null);
-    setLoading(true);
-    try {
-      setData(await requestDecideTogether(chart.leadId, profile.email.trim(), localDateString(), profile.birthTimeKnown !== false, partner));
-    } catch (e) {
-      setError(e instanceof ChartRequestError ? e.message : 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, [profile, chart, partner]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  if (loading && !data) {
-    return (
-      <View style={styles.center} accessibilityLiveRegion="polite">
-        <TriadLoader />
-        <Text style={styles.small}>Reading the two of you…</Text>
-      </View>
-    );
-  }
-  if (error || !data) {
-    return (
-      <ErrorState message={error ?? 'Something went wrong. Try again in a moment.'} onRetry={load} />
-    );
-  }
-
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
         <Text style={styles.eyebrow}>Together</Text>
-        <Text accessibilityRole="header" style={styles.title}>You and {partner.label}</Text>
+        <Text accessibilityRole="header" style={styles.title}>You and {partnerLabel}</Text>
         <Text style={styles.small}>
           Four views of the two of you. Each of you still decides through your own Strategy and Authority.
         </Text>
@@ -459,7 +422,7 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
 
       <Segmented options={VIEW_OPTIONS} value={view} onChange={setView} compact />
 
-      {view === 'channels' ? <ChannelsView c={data.connections} e={data.centers} partnerLabel={partner.label} /> : null}
+      {view === 'channels' ? <ChannelsView c={data.connections} e={data.centers} partnerLabel={partnerLabel} /> : null}
       {view === 'numbers' ? <NumbersView n={data.numbers} /> : null}
       {view === 'sky' ? <SkyView s={data.sky} h={data.houses} /> : null}
 
@@ -504,6 +467,52 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
       </View>
       ) : null}
 
+    </View>
+  );
+}
+
+function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () => void }) {
+  const profile = useT3DStore((s) => s.profile);
+  const chart = useT3DStore((s) => s.chart);
+  const clearPartner = usePartnerStore((s) => s.clearPartner);
+  const [data, setData] = useState<DecideTogether | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    if (!profile || !chart) return;
+    setError(null);
+    setLoading(true);
+    try {
+      setData(await requestDecideTogether(chart.leadId, profile.email.trim(), localDateString(), profile.birthTimeKnown !== false, partner));
+    } catch (e) {
+      setError(e instanceof ChartRequestError ? e.message : 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [profile, chart, partner]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading && !data) {
+    return (
+      <View style={styles.center} accessibilityLiveRegion="polite">
+        <TriadLoader />
+        <Text style={styles.small}>Reading the two of you…</Text>
+      </View>
+    );
+  }
+  if (error || !data) {
+    return (
+      <ErrorState message={error ?? 'Something went wrong. Try again in a moment.'} onRetry={load} />
+    );
+  }
+
+  return (
+    <View style={{ gap: space.md }}>
+      <TogetherReading data={data} partnerLabel={partner.label} />
       <GoldButton label="Change person" variant="ghost" onPress={onChange} />
       <GoldButton
         label="Remove from this phone"

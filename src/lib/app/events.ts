@@ -7,7 +7,7 @@
 
 export const SCREENS = [
   'today', 'chart', 'practice', 'readings', 'timeline', 'glossary',
-  'method', 'onboarding', 'share-card', 'welcome', 'year', 'your-data',
+  'method', 'onboarding', 'share-card', 'welcome', 'year', 'your-data', 'invite',
 ] as const;
 
 /** Tags carried by links on shared cards (?ref=...). */
