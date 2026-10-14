@@ -43,12 +43,14 @@ test('the guidance voice is loaded and used under page titles; changing digits u
   assert.match(read('mobile/src/components/SignalRibbon.tsx'), /\.\.\.tabular/);
 });
 
-test('the first-time tour shows once, can be skipped, and can be replayed from About', () => {
-  const tour = read('mobile/src/components/CoachTour.tsx');
-  assert.match(tour, /label="Skip"/);
-  assert.match(tour, /useReduceMotion/);
-  assert.match(tour, /accessibilityViewIsModal/);
+test('the welcome note shows once on Today, uses the person\'s own Type, and can be shown again from About', () => {
+  const card = read('mobile/src/components/FirstRunCard.tsx');
+  assert.match(card, /label="Got it"/);
+  assert.match(card, /firstRunLine\(chart\)/);
   assert.match(read('mobile/src/store/useCoachStore.ts'), /t3d-coach-v1/);
-  assert.match(read('mobile/src/app/(tabs)/_layout.tsx'), /<CoachTour \/>/);
-  assert.match(read('mobile/src/app/your-data.tsx'), /Replay the welcome tour/);
+  assert.doesNotMatch(read('mobile/src/app/(tabs)/_layout.tsx'), /CoachTour/);
+  const today = read('mobile/src/app/(tabs)/today.tsx');
+  assert.match(today, /<FirstRunCard \/>/);
+  assert.match(today, /coachSeen \? <ReminderPrompt \/>/);
+  assert.match(read('mobile/src/app/your-data.tsx'), /Show the welcome note again/);
 });
