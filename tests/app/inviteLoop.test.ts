@@ -13,8 +13,18 @@ test('the follow-up names the friend and their Type, and says what the person ge
   assert.doesNotMatch(inviteFollowUp('  ', 'Generator').body, /undefined|null/);
 });
 
-test('the card message puts the invite link on its own line', () => {
-  assert.equal(cardInviteMessage('My T3D Triad · https://x', 'https://i/abc'), 'My T3D Triad · https://x\nWant to see how our charts fit? https://i/abc');
+test('the card message holds one link only, last, on its own line', () => {
+  const m = cardInviteMessage('My T3D Triad', 'https://3dimensions.guide/i/abc');
+  assert.equal(m, 'My T3D Triad. Want to see how our charts fit?\nhttps://3dimensions.guide/i/abc');
+  assert.equal((m.match(/https?:\/\//g) ?? []).length, 1);
+  assert.ok(m.endsWith('/i/abc'));
+});
+
+test('sharing with an invite replaces the card link instead of adding a second one', () => {
+  const s = readFileSync('mobile/src/app/share-card.tsx', 'utf8');
+  assert.match(s, /return cardInviteMessage\(label, url\)/);
+  assert.match(s, /await messageFor\(label, `\$\{label\} · \$\{LINKS\[kind\]\}`\)/);
+  assert.doesNotMatch(s, /addInvite/);
 });
 
 test('the two new counts are on both lists', () => {
@@ -35,5 +45,5 @@ test('sharing a card can add an invite link, off by default, and never for the w
   assert.match(s, /useState\(false\);\n  const \[withInvite/);
   assert.match(s, /Let friends compare charts with me/);
   assert.match(s, /kind !== 'wallpaper' \? \(\n        <>\n          <View style=\{styles\.switchRow\}>\n            <Text style=\{styles\.switchLabel\}>Let friends/);
-  assert.match(s, /await addInvite\(/);
+  assert.match(s, /await messageFor\(/);
 });

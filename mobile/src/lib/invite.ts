@@ -22,7 +22,7 @@ export function inviteFollowUp(name: string | null, type: string | null): { titl
   };
 }
 
-/** The line added to a shared card when the person lets friends compare charts with them. */
-export function cardInviteMessage(base: string, url: string): string {
-  return `${base}\nWant to see how our charts fit? ${url}`;
+/** The message for a shared card when the person lets friends compare charts: the words, then the one invite link on its own line. */
+export function cardInviteMessage(label: string, url: string): string {
+  return `${label}. Want to see how our charts fit?\n${url}`;
 }

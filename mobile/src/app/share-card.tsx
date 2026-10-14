@@ -80,11 +80,14 @@ export default function ShareCard() {
 
   if (!chart || !profile) return <Redirect href="/onboarding" />;
 
-  /** When the person lets friends compare charts, makes a fresh invite link and adds it under the message. */
-  async function addInvite(base: string): Promise<string> {
-    if (!withInvite || !chart || !profile) return base;
+  /**
+   * The words that go with a shared card. Normally the card's link. When the person lets friends compare charts, the
+   * invite link replaces it, so the message holds one link only (two links in one message get merged by some apps).
+   */
+  async function messageFor(label: string, plain: string): Promise<string> {
+    if (!withInvite || !chart || !profile) return plain;
     const { url } = await requestInviteCreate(chart.leadId, profile.email.trim(), withName && profile.firstName.trim().length > 0, profile.birthTimeKnown !== false);
-    return cardInviteMessage(base, url);
+    return cardInviteMessage(label, url);
   }
 
   const failure = (e: unknown, fallback: string) => (e instanceof ChartRequestError ? e.message : fallback);
@@ -95,8 +98,8 @@ export default function ShareCard() {
     try {
       const size = kind === 'wallpaper' ? WALLPAPER_CAPTURE : { width: 1080, height: tall ? 1920 : 1350 };
       const uri = await captureRef(cardRef, { format: 'png', quality: 1, ...size, result: 'tmpfile' });
-      const baseMessage = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'wallpaper' ? 'My T3D Sigil wallpaper' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad'} · ${LINKS[kind]}`;
-      const message = await addInvite(baseMessage);
+      const label = kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'wallpaper' ? 'My T3D Sigil wallpaper' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad';
+      const message = await messageFor(label, `${label} · ${LINKS[kind]}`);
       const result = await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
       if (result.action === Share.sharedAction) success();
       if (result.action === Share.sharedAction && withInvite) trackAction('invite_sent');
@@ -110,7 +113,7 @@ export default function ShareCard() {
   async function onShareLink() {
     setError(null);
     try {
-      const result = await Share.share({ message: await addInvite(LINKS[kind]) });
+      const result = await Share.share({ message: await messageFor('My T3D chart', LINKS[kind]) });
       if (result.action === Share.sharedAction && withInvite) trackAction('invite_sent');
     } catch (e) {
       setError(failure(e, 'We could not open the share sheet. Please try again.'));
