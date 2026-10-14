@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.parchmentMuted, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: colors.gold },
   radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.gold },
-  title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 38, lineHeight: 46, color: colors.parchment },
   linkRow: { minHeight: 48, justifyContent: 'center' },
   link: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold, textDecorationLine: 'underline' },
   lede: { ...guidance },

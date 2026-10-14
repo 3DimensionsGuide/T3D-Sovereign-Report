@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, padding: space.lg, gap: space.md,
   },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontSize: 22, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md, minHeight: 48 },
   label: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },

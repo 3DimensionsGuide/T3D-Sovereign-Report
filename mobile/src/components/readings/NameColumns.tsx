@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   colTop: { borderColor: colors.road, backgroundColor: 'rgba(31,138,77,0.14)' },
   colEmpty: { borderColor: T.edge, borderStyle: 'dashed' },
-  mark: { fontFamily: fonts.bodyBold, fontSize: 10, lineHeight: 12, color: colors.road },
+  mark: { fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 14, color: colors.road },
   num: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchmentMuted },
   numTop: { color: colors.parchment },
   letters: { flexGrow: 1, alignItems: 'center', gap: 1, minHeight: 20 },

@@ -204,7 +204,7 @@ export default function ShareCard() {
 
 const styles = StyleSheet.create({
   header: { gap: 6, paddingTop: space.lg },
-  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 30, lineHeight: 38, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   preview: { alignItems: 'center', marginVertical: space.md },
   switchRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },

@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.gold, borderStyle: 'dashed',
   },
   text: { flex: 1, gap: 6 },
-  title: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.gold },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.gold },
   detail: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchment },
 });

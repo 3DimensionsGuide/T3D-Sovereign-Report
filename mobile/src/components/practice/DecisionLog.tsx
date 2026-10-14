@@ -11,7 +11,7 @@ import { localDateString } from '@/lib/useTimeline';
 import { splitRecentDecisions } from '@/lib/decisionRecent';
 import { animateLayout } from '@/lib/motion';
 import { usePracticeStore, type Decision, type Followed, type Outcome } from '@/store/usePracticeStore';
-import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes, TOUCH } from '@/theme/tokens';
 
 const T = themes.practice;
 
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   cardTop: { flexDirection: 'row', justifyContent: 'space-between' },
   date: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   status: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.gold },
-  title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   decisionText: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 25, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   pickRow: { gap: 8 },
   pick: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.md, borderWidth: 1, borderColor: T.edge },
   pickText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
-  delete: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' },
+  delete: { minHeight: TOUCH, justifyContent: 'center', alignSelf: 'flex-start' },
   deleteText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted, textDecorationLine: 'underline' },
   pattern: { gap: 8, padding: space.lg, borderRadius: radius.lg, backgroundColor: T.raised, borderWidth: 1, borderColor: colors.gold },
 });

@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   muted: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4 },
-  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 35, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 35, color: colors.parchment },
   summary: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 25, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 25, color: colors.parchment },
   picture: {
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   related: { gap: 8 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
-    minHeight: 44,
+    minHeight: TOUCH,
     justifyContent: 'center',
     paddingHorizontal: 14,
     borderRadius: radius.sm,

@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   back: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
   backText: { fontFamily: fonts.bodyBold, fontSize: 14, letterSpacing: 1, color: colors.gold },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 2, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment, marginTop: 4 },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 30, lineHeight: 38, color: colors.parchment, marginTop: 4 },
   sub: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted, marginTop: 6 },
   card: {
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   glyph: { width: 30, alignItems: 'center' },
   trio: { flexDirection: 'row', gap: 1, width: 30, justifyContent: 'center' },
   dayLabel: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4 },
-  stopTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26, color: colors.parchment },
+  stopTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26, color: colors.parchment },
   statusCol: { alignItems: 'center', gap: 2, minWidth: 64 },
   statusWord: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchment, textAlign: 'center' },
   content: { gap: space.md },

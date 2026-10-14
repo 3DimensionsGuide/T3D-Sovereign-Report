@@ -258,12 +258,12 @@ function Teaser({ accent, lens, label, value }: { accent: string; lens: 'vehicle
 
 const styles = StyleSheet.create({
   head: { alignItems: 'center', gap: space.md, paddingTop: space.lg, paddingBottom: space.md },
-  heading: { fontFamily: fonts.display, fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
+  heading: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: space.md },
   teaser: { gap: 2, paddingVertical: 4 },
-  teaserValue: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31 },
+  teaserValue: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 31 },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },
-  title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },

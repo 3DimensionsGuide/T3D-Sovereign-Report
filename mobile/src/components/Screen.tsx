@@ -1,5 +1,6 @@
 import type { MutableRefObject, ReactNode, RefObject } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useIsFocused } from 'expo-router';
 import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Glow } from '@/components/Glow';
@@ -32,6 +33,7 @@ interface ScreenProps {
 
 export function Screen({ children, refreshing = false, onRefresh, scrollRef, scrollOffset, onScrollY, overlay, room = 'sky' }: ScreenProps) {
   const { width } = useWindowDimensions();
+  const focused = useIsFocused();
   const scrollY = useSharedValue(0);
   const reduce = useReduceMotion();
   const base = ROOMS[room];
@@ -52,7 +54,7 @@ export function Screen({ children, refreshing = false, onRefresh, scrollRef, scr
         ))}
       </ParallaxLayer>
       <ParallaxLayer scrollY={scrollY} factor={reduce ? 0 : PARALLAX.art}>
-        <RoomArtLayer kind={base.art} color={base.artColor} width={width} opacity={artOpacity} />
+        <RoomArtLayer kind={base.art} color={base.artColor} width={width} opacity={artOpacity} paused={!focused} />
         {isSky ? <SkySun color={sky.glow.color} width={width} sun={sky.sun} /> : null}
       </ParallaxLayer>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>

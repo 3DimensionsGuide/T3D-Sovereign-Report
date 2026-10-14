@@ -67,14 +67,14 @@ export function RevealView({ chart, birthTimeKnown, firstName, onContinue, onSha
 const styles = StyleSheet.create({
   wrap: { gap: space.md, paddingTop: space.lg },
   head: { alignItems: 'center', gap: space.md, paddingBottom: space.sm },
-  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
   card: {
     backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
     padding: space.lg, gap: 6,
   },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   label: { fontFamily: fonts.bodyBold, fontSize: 14 },
-  hero: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
+  hero: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   line: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   actions: { gap: space.sm, paddingTop: space.sm },
 });

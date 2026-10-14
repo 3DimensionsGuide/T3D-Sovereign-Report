@@ -1,7 +1,7 @@
 import { useEffect, useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
-  Easing, FadeIn, useAnimatedProps, useSharedValue, withDelay, withRepeat, withSequence, withTiming,
+  Easing, FadeIn, cancelAnimation, useAnimatedProps, useSharedValue, withDelay, withRepeat, withSequence, withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Polygon, Stop } from 'react-native-svg';
 import { useReduceMotion } from '@/lib/motion';
@@ -22,9 +22,14 @@ const STARS = (() => {
 })();
 
 /** One star that slowly brightens and dims, out of step with its neighbours. Only the opacity changes. */
-function TwinkleStar({ x, y, r, color, low, index }: { x: number; y: number; r: number; color: string; low: number; index: number }) {
+function TwinkleStar({ x, y, r, color, low, index, paused }: { x: number; y: number; r: number; color: string; low: number; index: number; paused: boolean }) {
   const glow = useSharedValue(low);
   useEffect(() => {
+    if (paused) {
+      cancelAnimation(glow);
+      glow.value = low;
+      return;
+    }
     const period = 2200 + (index % 5) * 700;
     glow.value = withDelay(
       (index % 7) * 450,
@@ -36,7 +41,8 @@ function TwinkleStar({ x, y, r, color, low, index }: { x: number; y: number; r: 
         -1,
       ),
     );
-  }, [glow, low, index]);
+    return () => cancelAnimation(glow);
+  }, [glow, low, index, paused]);
   const animatedProps = useAnimatedProps(() => ({ opacity: glow.value }));
   return <AnimatedCircle cx={`${x}%`} cy={y} r={r} fill={color} animatedProps={animatedProps} />;
 }
@@ -46,8 +52,8 @@ function TwinkleStar({ x, y, r, color, low, index }: { x: number; y: number; r: 
  * ignores touches, and drifts slowly as the page scrolls (see ParallaxLayer).
  */
 export function RoomArtLayer({
-  kind, color, width, opacity = 1,
-}: { kind: ArtKind; color: string; width: number; opacity?: number }) {
+  kind, color, width, opacity = 1, paused = false,
+}: { kind: ArtKind; color: string; width: number; opacity?: number; paused?: boolean }) {
   const fade = `fade${useId().replace(/\W/g, '')}`;
   const reduce = useReduceMotion();
   if (kind === 'none' || opacity < 0.01) return null;
@@ -70,7 +76,7 @@ export function RoomArtLayer({
         {kind === 'stars'
           ? STARS.map((s, i) => (
               i % 6 === 0 && !reduce ? (
-                <TwinkleStar key={i} x={s.x} y={s.y + 40} r={s.r + 0.3} color={color} low={s.o} index={i} />
+                <TwinkleStar key={i} x={s.x} y={s.y + 40} r={s.r + 0.3} color={color} low={s.o} index={i} paused={paused} />
               ) : (
                 <Circle key={i} cx={`${s.x}%`} cy={s.y + 40} r={s.r} fill={color} opacity={s.o} />
               )

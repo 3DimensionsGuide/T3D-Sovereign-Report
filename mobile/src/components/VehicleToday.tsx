@@ -112,7 +112,7 @@ export function VehicleToday({ data, dayLabel = null }: { data: GateTodayResult;
 const styles = StyleSheet.create({
   panel: { gap: space.md, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headText: { flex: 1, fontFamily: fonts.display, fontSize: 20, lineHeight: 26, color: colors.vehicle },
+  headText: { flex: 1, fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26, color: colors.vehicle },
   gate: { gap: 8 },
   gateDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.rule, paddingTop: space.md },
   when: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
   moonWrap: { gap: space.md, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.rule, paddingTop: space.md },
-  moonHead: { fontFamily: fonts.display, fontSize: 18, lineHeight: 25, color: colors.parchment },
+  moonHead: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 18, lineHeight: 25, color: colors.parchment },
   anchor: { gap: 6 },
   foot: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
 });

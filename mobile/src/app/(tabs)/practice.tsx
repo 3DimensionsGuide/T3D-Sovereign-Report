@@ -68,7 +68,7 @@ export default function Practice() {
 
 const styles = StyleSheet.create({
   head: { gap: 6, paddingTop: space.sm },
-  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 36, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 30, lineHeight: 36, color: colors.parchment },
   explain: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
 });

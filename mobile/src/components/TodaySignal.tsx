@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
     padding: space.lg, gap: space.md,
   },
-  title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   row: { gap: 4 },
   rowHead: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   lensName: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.4 },

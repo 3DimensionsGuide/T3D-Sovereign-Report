@@ -53,7 +53,7 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
     </View>
   );
   return (
-    <Glass hero style={styles.card}>
+    <Glass style={styles.card}>
       <Text style={styles.eyebrow}>{isToday ? "TODAY'S TRIAD" : "THIS DAY'S TRIAD"}</Text>
       <Text accessibilityRole="header" style={styles.title}>{isToday ? 'One frame for today' : 'One frame for this day'}</Text>
       <Text style={styles.frame}>{lead}</Text>
@@ -101,12 +101,12 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, padding: space.lg, gap: 14,
   },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 26, lineHeight: 33, color: colors.parchment },
   frame: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 25, color: colors.parchment },
   lens: { gap: 6, paddingLeft: space.md, borderLeftWidth: 4 },
   lensHead: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   lensLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8 },
-  lensTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
+  lensTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   steps: { gap: 10, padding: space.md, borderRadius: radius.md, backgroundColor: colors.amethyst },
   stepsLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },

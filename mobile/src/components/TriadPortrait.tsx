@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useIsFocused } from 'expo-router';
 import { useSharedValue } from 'react-native-reanimated';
 import { Pressable } from '@/components/Pressable';
 import Svg, { Circle, Defs, LinearGradient, Line, Polygon, Stop } from 'react-native-svg';
@@ -32,6 +33,7 @@ interface Props {
 export function TriadPortrait({ chart, onOpenLens, live = false }: Props) {
   const reduce = useReduceMotion();
   const surge = useSharedValue(0);
+  const focused = useIsFocused();
   const { humanDesign: hd, numerology: num, astrology: astro } = chart;
   const profileLines = hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile;
   const vehicle = { head: hd.type, sub: `Profile ${profileLines}` };
@@ -50,7 +52,7 @@ export function TriadPortrait({ chart, onOpenLens, live = false }: Props) {
 
   return (
     <View style={styles.wrap}>
-      {live ? <TriadCircuit reduce={reduce} surge={surge} /> : null}
+      {live ? <TriadCircuit reduce={reduce} surge={surge} paused={!focused} /> : null}
       {live ? null : <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 100 ${HEIGHT_UNITS}`} preserveAspectRatio="xMidYMid meet">
         <Defs>
           <LinearGradient id="vr" gradientUnits="userSpaceOnUse" x1={V.x} y1={V.y} x2={R.x} y2={R.y}>
@@ -120,10 +122,10 @@ const styles = StyleSheet.create({
   left: { left: 0, width: '46%' },
   right: { right: 0, width: '46%', alignItems: 'flex-end' },
   lens: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 0.4 },
-  head: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: colors.parchment },
+  head: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 17, lineHeight: 22, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.parchmentMuted },
   alignRight: { textAlign: 'right' },
   core: { position: 'absolute', left: '50%', width: '20%', marginLeft: '-10%', alignItems: 'center', justifyContent: 'center' },
-  coreText: { fontFamily: fonts.display, fontSize: 20, color: 'transparent' },
-  centre: { position: 'absolute', left: 0, right: 0, textAlign: 'center', fontFamily: fonts.display, fontSize: 22, color: colors.parchmentMuted },
+  coreText: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, color: 'transparent' },
+  centre: { position: 'absolute', left: 0, right: 0, textAlign: 'center', fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, color: colors.parchmentMuted },
 });

@@ -61,7 +61,7 @@ export function CalculatingView({ done }: { done: boolean }) {
 
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', gap: space.lg, paddingTop: space.xxl },
-  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
   rows: { gap: space.lg, alignSelf: 'stretch', paddingHorizontal: space.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   rowText: { flex: 1, gap: 2 },

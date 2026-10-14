@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline,
     padding: space.lg, gap: space.md,
   },
-  title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   hero: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
   housing: {
     width: 64, paddingVertical: 8, gap: 8, alignItems: 'center',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   lampOff: { borderColor: 'rgba(245,245,243,0.14)', backgroundColor: 'transparent', shadowOpacity: 0 },
   heroText: { flex: 1, gap: 4 },
-  word: { fontFamily: fonts.display, fontSize: 40, lineHeight: 46 },
+  word: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 40, lineHeight: 46 },
   phrase: { fontFamily: fonts.bodyBold, fontSize: 16, lineHeight: 22, color: colors.parchment },
   reason: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   rows: { gap: space.xs, paddingTop: space.sm, borderTopWidth: 1, borderTopColor: colors.hairline },

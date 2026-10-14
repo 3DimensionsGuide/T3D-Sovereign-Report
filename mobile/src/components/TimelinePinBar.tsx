@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     backgroundColor: T.surface,
   },
   text: { flex: 1, gap: 1 },
-  month: { fontFamily: fonts.display, fontSize: 18, color: colors.parchment },
+  month: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 18, color: colors.parchment },
   detail: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   jump: {
     minHeight: TOUCH, justifyContent: 'center', paddingHorizontal: space.md,

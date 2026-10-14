@@ -35,6 +35,6 @@ const styles = StyleSheet.create({
     backgroundColor: T.surface,
   },
   text: { flex: 1, gap: 2 },
-  type: { fontFamily: fonts.display, fontSize: 16, color: colors.parchment },
+  type: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 16, color: colors.parchment },
   line: { fontFamily: fonts.bodyMedium, fontSize: 13 },
 });

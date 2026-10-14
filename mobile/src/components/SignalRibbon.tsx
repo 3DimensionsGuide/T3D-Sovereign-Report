@@ -117,7 +117,7 @@ export function SignalRibbon({ data, onSelectDay, premium = false }: Props) {
 
 const styles = StyleSheet.create({
   wrap: { gap: space.sm },
-  title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   ribbon: { gap: 6, paddingVertical: space.sm, paddingRight: space.md },
   cell: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface,
   },
   cellOn: { borderColor: colors.gold, backgroundColor: T.wash },
-  weekday: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.parchmentMuted },
+  weekday: { fontFamily: fonts.bodyMedium, fontSize: 12, color: colors.parchmentMuted },
   dayNum: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchment, ...tabular },
   markerSlot: { height: 18, alignItems: 'center', justifyContent: 'center' },
   quiet: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.hairline },

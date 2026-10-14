@@ -22,7 +22,7 @@ import type { ActiveSeason, CycleWindow, TimelineEvent, TimelineKind, TimelineRe
 import { useTimeline } from '@/lib/useTimeline';
 import { OfflineNote } from '@/components/OfflineNote';
 import { useT3DStore } from '@/store/useT3DStore';
-import { colors, fonts, radius, space, guidance, themes } from '@/theme/tokens';
+import { colors, fonts, radius, space, guidance, themes, TOUCH } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 import { LockIcon } from '@/components/LockIcon';
@@ -659,14 +659,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1,
     borderColor: T.edge, backgroundColor: T.surface,
   },
-  monthName: { flex: 1, fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
+  monthName: { flex: 1, fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, color: colors.parchment },
   monthCount: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted },
   monthChevron: { fontFamily: fonts.bodyBold, fontSize: 24, lineHeight: 26, color: colors.gold },
   showMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
   showMoreText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.gold },
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
     borderColor: T.edge,
   },
   panelHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  panelLabel: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
+  panelLabel: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26 },
   natureTag: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   contactGlyph: { fontSize: 13, color: colors.vehicle },
   natureWord: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchment },
@@ -691,8 +691,8 @@ const styles = StyleSheet.create({
   dayHead: { gap: 2 },
   node: { position: 'absolute', left: -28, top: 7, width: 14, height: 14, borderRadius: 7, backgroundColor: colors.obsidian, borderWidth: 3, borderColor: '#1F8A4D' },
   nodeFirst: { backgroundColor: colors.gold, borderColor: colors.gold },
-  dayTitle: { fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
-  personalRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  dayTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, color: colors.parchment },
+  personalRow: { minHeight: TOUCH, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   personalRight: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   personalChevron: { fontFamily: fonts.bodyBold, fontSize: 22, lineHeight: 24, color: colors.gold },
   personalDate: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
@@ -723,7 +723,7 @@ const styles = StyleSheet.create({
   eventFlags: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.gold },
   eventBody: { gap: 6, paddingTop: 4 },
   reminder: {
-    fontFamily: fonts.displayRegular,
+    fontFamily: fonts.displayRegular, fontVariant: ['lining-nums'],
     fontSize: 15,
     lineHeight: 23,
     color: colors.parchmentMuted,

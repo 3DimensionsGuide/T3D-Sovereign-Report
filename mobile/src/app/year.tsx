@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   back: { minHeight: TOUCH - 4, justifyContent: 'center', alignSelf: 'flex-start' },
   backText: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1.6, color: colors.parchmentMuted },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   lede: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
   card: {
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   heroCard: { ...heroCard },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
-  cardTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
+  cardTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 13, lineHeight: 20, color: colors.parchmentMuted },
   item: { gap: 6 },

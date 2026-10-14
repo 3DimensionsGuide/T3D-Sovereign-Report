@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     width: HUB, height: HUB, borderRadius: HUB / 2, borderWidth: 1.5, borderColor: colors.gold,
     backgroundColor: colors.amethyst, alignItems: 'center', justifyContent: 'center',
   },
-  centreText: { fontFamily: fonts.display, fontSize: 13, color: colors.gold },
+  centreText: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 13, color: colors.gold },
   band: { flexDirection: 'row', alignItems: 'center' },
   spine: { position: 'absolute', left: HUB / 2 - 1, width: 2, opacity: 0.8 },
   hub: {
@@ -120,6 +120,6 @@ const styles = StyleSheet.create({
     minHeight: FACT_H, justifyContent: 'center', paddingVertical: 3, paddingHorizontal: 12,
     backgroundColor: colors.charcoal, borderRadius: radius.md, borderLeftWidth: 4,
   },
-  factLabel: { fontFamily: fonts.bodyBold, fontSize: 9, letterSpacing: 1.6, color: colors.parchmentMuted, textTransform: 'uppercase' },
-  factValue: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: colors.parchment },
+  factLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.2, color: colors.parchmentMuted, textTransform: 'uppercase' },
+  factValue: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 17, lineHeight: 22, color: colors.parchment },
 });

@@ -147,12 +147,12 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: space.lg, paddingBottom: space.lg, gap: space.md },
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xl },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.stoplight },
-  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 35, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 35, color: colors.parchment },
   nature: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   muted: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
   section: { gap: 6 },
-  label: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1.8, color: colors.gold },
+  label: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 25, color: colors.parchment },
   meet: {
     gap: 8,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   meetLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.vehicle },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
-    minHeight: 44,
+    minHeight: TOUCH,
     justifyContent: 'center',
     paddingHorizontal: 14,
     borderRadius: radius.sm,

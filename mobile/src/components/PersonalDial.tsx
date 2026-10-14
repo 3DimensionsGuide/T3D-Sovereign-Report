@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   dial: { width: SIZE, height: SIZE },
   marker: { position: 'absolute', top: 0, left: 0, width: SIZE, height: SIZE },
   center: { position: 'absolute', top: 0, left: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' },
-  number: { fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
+  number: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, color: colors.parchment },
   label: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
   word: { fontFamily: fonts.bodyBold, fontSize: 13, lineHeight: 17, color: colors.parchment, textAlign: 'center' },
 });

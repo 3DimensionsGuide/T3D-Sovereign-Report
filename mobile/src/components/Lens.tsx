@@ -22,8 +22,8 @@ export const LENS_COLOR: Record<LensName, string> = {
 /** Lighter tints for small lens-coloured TEXT, so it reads at WCAG AAA (7:1) on the dark base. Icons keep the brand colours. */
 export const LENS_TEXT: Record<LensName, string> = {
   vehicle: '#E5A93C',
-  road: '#46C27F',
-  stoplight: '#F2827E',
+  road: '#5BD08F',
+  stoplight: '#F79A95',
 };
 
 export const LENS_LABEL: Record<LensName, string> = {

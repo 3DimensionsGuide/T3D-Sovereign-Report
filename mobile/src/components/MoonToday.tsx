@@ -63,7 +63,7 @@ export function MoonToday({ day, dayLabel = null }: { day: MoonDay; dayLabel?: s
 const styles = StyleSheet.create({
   panel: { gap: space.md, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headText: { flex: 1, fontFamily: fonts.display, fontSize: 20, lineHeight: 26, color: colors.stoplight },
+  headText: { flex: 1, fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26, color: colors.stoplight },
   block: { gap: 8 },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.rule, paddingTop: space.md },
   when: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },

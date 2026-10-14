@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: radius.sm + 2,
   },
-  compact: { minHeight: 44 },
+  compact: { minHeight: 48 },
   inner: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
   pressed: { backgroundColor: colors.surface },
   label: { flexShrink: 1, fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.4, color: colors.parchmentMuted },

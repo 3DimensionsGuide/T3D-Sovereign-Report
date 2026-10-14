@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   top: { alignItems: 'center', gap: 8 },
   brand: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 3.2, color: colors.gold },
   middle: { alignItems: 'center', gap: 8 },
-  title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.parchment, textAlign: 'center', alignSelf: 'stretch' },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 26, lineHeight: 32, color: colors.parchment, textAlign: 'center', alignSelf: 'stretch' },
   art: { alignItems: 'center' },
   line: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.parchment, textAlign: 'center' },
   footer: { alignItems: 'center', gap: 3 },

@@ -14,7 +14,7 @@ import { Segmented } from '@/components/Segmented';
 import type { SkyPosition } from '@/lib/api';
 import { nowContacts, nowPlanets, nowRows, zodiacShift } from '@/lib/wheelNow';
 import { SceneView } from '@/components/SceneView';
-import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes, TOUCH } from '@/theme/tokens';
 
 const T = themes.chart;
 
@@ -452,17 +452,17 @@ const styles = StyleSheet.create({
   dash: { width: 22, height: 0, borderTopWidth: 3, borderRadius: 2 },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   headline: { gap: 2 },
-  headType: { fontFamily: fonts.display, fontSize: 26, color: colors.parchment },
+  headType: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 26, color: colors.parchment },
   headMeta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   section: { gap: space.sm, marginTop: space.sm, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: T.rule, backgroundColor: T.surface },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 26 },
+  sectionTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26 },
   hotspot: { position: 'absolute', width: 44, height: 44, borderRadius: 22 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.sm,
-    minHeight: 40,
+    minHeight: TOUCH,
     paddingVertical: 6,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: T.rule,
@@ -478,10 +478,10 @@ const styles = StyleSheet.create({
   gateColHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: T.edge },
   gateColTitle: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   gateColSub: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
-  gateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.rule },
+  gateRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: TOUCH, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.rule },
   gatePlanet: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted, flexShrink: 1 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  centerChip: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 12, borderRadius: radius.sm, borderWidth: 1 },
+  centerChip: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: TOUCH, paddingHorizontal: 12, borderRadius: radius.sm, borderWidth: 1 },
   centerChipOn: { backgroundColor: 'rgba(229,169,60,0.18)', borderColor: colors.vehicle },
   centerChipOff: { backgroundColor: T.raised, borderColor: T.line, borderStyle: 'dashed' },
   centerMark: { width: 11, height: 11, borderRadius: 3, borderWidth: 1.5, borderColor: colors.vehicle },

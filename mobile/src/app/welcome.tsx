@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   // The logo is 694 by 506, so the box keeps that shape and the lettering is never squashed.
   logo: { width: 208, aspectRatio: 694 / 506, alignSelf: 'flex-start' },
   eyebrow: { fontFamily: fonts.displayRegular, fontVariant: ['lining-nums'], fontSize: 15, letterSpacing: 5.5, textTransform: 'uppercase', color: colors.gold },
-  title: { fontFamily: fonts.display, fontSize: 38, lineHeight: 46, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 38, lineHeight: 46, color: colors.parchment },
   lede: { ...guidance },
   pickerRow: {
     minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4, padding: space.lg, gap: 10,
   },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6 },
-  cardTitle: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
+  cardTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   note: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   linkRow: { minHeight: 48, justifyContent: 'center', marginTop: space.md },

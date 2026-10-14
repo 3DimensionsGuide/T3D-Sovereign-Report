@@ -97,5 +97,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gold,
   },
-  bubbleText: { fontFamily: fonts.display, fontSize: 34, color: colors.gold },
+  bubbleText: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, color: colors.gold },
 });

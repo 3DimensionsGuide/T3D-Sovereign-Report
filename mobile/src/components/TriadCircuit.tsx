@@ -1,7 +1,7 @@
 import { useEffect, useId } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
-  Easing, useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming,
+  Easing, cancelAnimation, useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, G, Line, LinearGradient, Polygon, RadialGradient, Stop, Text as SvgText } from 'react-native-svg';
@@ -153,6 +153,8 @@ interface Props {
   reduce: boolean;
   /** Flashes the whole circuit; the portrait fires it when the core is tapped. */
   surge: SharedValue<number>;
+  /** True while the screen is not in view: the loops stop so the circuit costs no battery. */
+  paused?: boolean;
 }
 
 /**
@@ -161,7 +163,7 @@ interface Props {
  * lights in turn, the core charges, then sparks run round the triangle and out along the spokes.
  * Decorative only: hidden from screen readers and ignores touches.
  */
-export function TriadCircuit({ reduce, surge }: Props) {
+export function TriadCircuit({ reduce, surge, paused = false }: Props) {
   const uid = useId().replace(/\W/g, '');
   const on = useSharedValue(reduce ? 1 : 0);
   const t = useSharedValue(0);
@@ -174,10 +176,19 @@ export function TriadCircuit({ reduce, surge }: Props) {
       on.value = 1;
       return;
     }
-    on.value = withTiming(1, { duration: 2400, easing: Easing.out(Easing.cubic) });
+    if (paused) {
+      cancelAnimation(t);
+      cancelAnimation(sway);
+      return;
+    }
+    if (on.value < 1) on.value = withTiming(1, { duration: 2400, easing: Easing.out(Easing.cubic) });
     t.value = withRepeat(withTiming(1, { duration: 3600, easing: Easing.linear }), -1, false);
     sway.value = withRepeat(withTiming(1, { duration: 11000, easing: Easing.linear }), -1, false);
-  }, [reduce, on, t, sway]);
+    return () => {
+      cancelAnimation(t);
+      cancelAnimation(sway);
+    };
+  }, [reduce, paused, on, t, sway]);
 
   const tilt = useAnimatedStyle(() => ({
     transform: [

@@ -46,9 +46,9 @@ const styles = StyleSheet.create({
   card: { gap: 10, padding: space.md, borderRadius: radius.md, backgroundColor: T.raised, borderWidth: 1 },
   top: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   words: { flex: 1, gap: 2 },
-  word: { fontFamily: fonts.display, fontSize: 40, lineHeight: 46 },
+  word: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 40, lineHeight: 46 },
   phrase: { fontFamily: fonts.bodyBold, fontSize: 16, lineHeight: 22, color: colors.parchment },
-  title: { fontFamily: fonts.display, fontSize: 19, lineHeight: 26, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 19, lineHeight: 26, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 22, color: colors.parchmentMuted },
 });

@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
   back: { minHeight: TOUCH - 4, justifyContent: 'center', alignSelf: 'flex-start' },
   backText: { fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1.6, color: colors.parchmentMuted },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontSize: 34, lineHeight: 42, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   card: {
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
     borderLeftWidth: 4, padding: space.lg, gap: 10,
   },
   cardEyebrow: { fontFamily: fonts.bodyBold, fontSize: 20 },
-  cardTitle: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
+  cardTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger },
   deleteButton: {

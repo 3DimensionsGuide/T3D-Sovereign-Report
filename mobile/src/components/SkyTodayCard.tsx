@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, borderLeftWidth: 4, padding: space.lg, gap: 10,
   },
   moonHead: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  cardTitle: { fontFamily: fonts.display, fontSize: 24, color: colors.parchment },
+  cardTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, color: colors.parchment },
   moonLine: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   strong: { fontFamily: fonts.bodyBold, color: colors.parchment },

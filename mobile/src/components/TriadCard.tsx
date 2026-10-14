@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   glyph: { fontSize: 26 },
   metaphor: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
-  system: { fontFamily: fonts.display, fontSize: 22, color: colors.parchment },
+  system: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, color: colors.parchment },
   rows: { gap: 10 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: space.md },
   rowLabel: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted, flexShrink: 0 },

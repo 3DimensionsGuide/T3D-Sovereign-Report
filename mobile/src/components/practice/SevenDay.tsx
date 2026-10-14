@@ -189,7 +189,7 @@ export function SevenDay({ data }: { data: PracticeData }) {
 const styles = StyleSheet.create({
   card: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 14 },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
-  title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 31, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 31, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
   strip: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -200,6 +200,6 @@ const styles = StyleSheet.create({
   dotText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
   checkin: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 12 },
   complete: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.gold, backgroundColor: T.raised },
-  completeTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 27, color: colors.parchment },
+  completeTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.parchment },
   when: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
 });

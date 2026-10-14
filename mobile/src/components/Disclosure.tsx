@@ -4,7 +4,7 @@ import { Pressable } from '@/components/Pressable';
 import { Chevron } from '@/components/Chevron';
 import { select } from '@/lib/haptics';
 import { animateLayout } from '@/lib/motion';
-import { colors, fonts, space } from '@/theme/tokens';
+import { colors, fonts, space, TOUCH } from '@/theme/tokens';
 
 interface Props {
   /** What the tap opens, in plain words: "How to use today", "More about the Moon". */
@@ -42,7 +42,7 @@ export function Disclosure({ label, children, defaultOpen = false }: Props) {
 
 const styles = StyleSheet.create({
   wrap: { gap: space.sm },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: TOUCH },
   label: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 22, lineHeight: 24, color: colors.gold },
   body: { gap: space.sm },

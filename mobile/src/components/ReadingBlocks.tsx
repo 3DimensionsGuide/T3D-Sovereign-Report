@@ -8,7 +8,7 @@ import { capFirst } from '@/lib/skyText';
 import { GoldButton } from '@/components/GoldButton';
 import { ErrorState, LoadingState } from '@/components/StatusViews';
 import { OfflineNote } from '@/components/OfflineNote';
-import { colors, fonts, radius, space, themes } from '@/theme/tokens';
+import { colors, fonts, radius, space, themes, TOUCH } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   contents: { gap: 6 },
   contentsLabel: { fontFamily: fonts.bodyBold, fontSize: 13 },
   contentsRow: { gap: 8, paddingRight: space.md },
-  contentsChip: { minHeight: 44, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: T.surface },
+  contentsChip: { minHeight: TOUCH, paddingHorizontal: 14, justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, backgroundColor: T.surface },
   contentsChipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
   readMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
   sectionHead: { gap: 6, marginTop: space.lg },
-  sectionTitle: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.parchment },
+  sectionTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 30, color: colors.parchment },
   footnote: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
   card: {
     borderRadius: radius.lg,

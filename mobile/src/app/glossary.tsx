@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   secCount: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   fold: { minHeight: TOUCH, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.hairline },
   foldText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
-  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 38, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 30, lineHeight: 38, color: colors.parchment },
   search: {
     minHeight: TOUCH,
     borderRadius: radius.md,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   filters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   filter: {
-    minHeight: 44,
+    minHeight: TOUCH,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
