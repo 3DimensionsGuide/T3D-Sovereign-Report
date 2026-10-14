@@ -132,3 +132,13 @@ test('"Show the welcome note again" brings the first-week card back too', () => 
   const s = readFileSync('mobile/src/app/your-data.tsx', 'utf8');
   assert.match(s, /useCoachStore\.getState\(\)\.replay\(\);\n\s+useJourneyStore\.getState\(\)\.clearAll\(\);/);
 });
+
+test('every first start-up brings back the welcome note and the first-week card', async () => {
+  const { isFirstIntroduction } = await import('../../mobile/src/lib/firstTime');
+  assert.equal(isFirstIntroduction(false, undefined), true); // brand new, or after Delete my data
+  assert.equal(isFirstIntroduction(true, '1990-05-04'), true); // came through the welcome screen, including the preview
+  assert.equal(isFirstIntroduction(true, undefined), false); // only editing birth details from My Chart
+  const onboarding = readFileSync('mobile/src/app/onboarding.tsx', 'utf8');
+  assert.match(onboarding, /isFirstIntroduction\(useT3DStore\.getState\(\)\.chart !== null, startDate\)/);
+  assert.match(onboarding, /useCoachStore\.getState\(\)\.replay\(\);\s*useJourneyStore\.getState\(\)\.clearAll\(\);/);
+});

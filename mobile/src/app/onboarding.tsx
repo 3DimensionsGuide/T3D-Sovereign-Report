@@ -17,6 +17,9 @@ import { TriadSeal } from '@/components/TriadSeal';
 import {
   ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
 } from '@/lib/api';
+import { isFirstIntroduction } from '@/lib/firstTime';
+import { useCoachStore } from '@/store/useCoachStore';
+import { useJourneyStore } from '@/store/useJourneyStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
@@ -153,7 +156,13 @@ export default function Onboarding() {
     setCalculating(true);
     try {
       const { chart, optInCode } = await requestChart(profile);
+      const firstTime = isFirstIntroduction(useT3DStore.getState().chart !== null, startDate);
       setChart(profile, chart);
+      if (firstTime) {
+        // A new start-up always lands on Today with the welcome note and the first-week card.
+        useCoachStore.getState().replay();
+        useJourneyStore.getState().clearAll();
+      }
       setCalcDone(true);
       await new Promise((resolve) => setTimeout(resolve, 900));
       setPendingCode(
