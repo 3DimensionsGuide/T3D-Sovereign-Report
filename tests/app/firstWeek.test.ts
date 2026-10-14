@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { JOURNEY_DAYS, SHOWN, dayNumber, journeyTitle, journeyView, type JourneyInput } from '../../mobile/src/lib/journey';
+import { JOURNEY_DAYS, SHOWN, dayNumber, doneNote, journeyTitle, journeyView, type JourneyInput } from '../../mobile/src/lib/journey';
 import { REMINDER_LINES, reminderLine } from '../../mobile/src/lib/reminderLines';
 
 const base: JourneyInput = { startedOn: '2026-10-13', today: '2026-10-13', dismissed: false, premium: false, visited: {}, decisions: 0, people: 0 };
@@ -36,11 +36,11 @@ test('steps tick off from what the person really did', () => {
   assert.deepEqual(v.steps.map((s) => s.key), ['readings', 'timeline']);
 });
 
-test('when everything is done the card says so and lists every step', () => {
+test('when everything is done the card lists every step, each marked done', () => {
   const v = journeyView({ ...base, visited: { chart: true, readings: true, timeline: true } });
   assert.equal(v.allDone, true);
   assert.equal(v.steps.length, 3);
-  assert.equal(journeyTitle(v), 'You have been through all of it');
+  assert.ok(v.all.every((s) => s.done));
 });
 
 test('the card goes away when dismissed and after two weeks', () => {
@@ -50,9 +50,15 @@ test('the card goes away when dismissed and after two weeks', () => {
   assert.equal(JOURNEY_DAYS, 14);
 });
 
-test('titles: day count in week one, then a plain line', () => {
-  assert.equal(journeyTitle({ dayNumber: 3, allDone: false }), 'Day 3 of your first week');
-  assert.equal(journeyTitle({ dayNumber: 9, allDone: false }), 'A few things you have not tried yet');
+test('the title and the bar follow the step you are on, not the calendar', () => {
+  assert.equal(journeyTitle(0, 5), 'Day 1 of 5');
+  assert.equal(journeyTitle(1, 5), 'Day 2 of 5');
+  assert.equal(journeyTitle(2, 3), 'Day 3 of 3');
+  assert.equal(doneNote(0), '');
+  assert.equal(doneNote(2), '2 done');
+  const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
+  assert.match(card, /journeyTitle\(index, v\.all\.length\)/);
+  assert.match(card, /\(index \+ 1\) \/ v\.all\.length/);
 });
 
 test('the reminder has seven different wordings and none says anything about the day', () => {

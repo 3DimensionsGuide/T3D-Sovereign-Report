@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { router, type Href } from 'expo-router';
 import { Glass } from '@/components/Glass';
 import { Pressable } from '@/components/Pressable';
-import { journeyTitle, journeyView } from '@/lib/journey';
+import { doneNote, journeyTitle, journeyView } from '@/lib/journey';
 import { usePremium } from '@/lib/usePremium';
 import { localDateString } from '@/lib/useTimeline';
 import { useJourneyStore } from '@/store/useJourneyStore';
@@ -33,7 +33,7 @@ export function JourneyCard() {
   return (
     <Glass style={styles.card}>
       <View style={styles.head}>
-        <Text accessibilityRole="header" style={styles.title}>{journeyTitle(v)}</Text>
+        <Text accessibilityRole="header" style={styles.title}>{journeyTitle(index, v.all.length)}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Hide the first week card" onPress={dismiss} style={styles.close} hitSlop={8}>
           <Text style={styles.closeText}>✕</Text>
         </Pressable>
@@ -41,14 +41,14 @@ export function JourneyCard() {
       <View
         accessible
         accessibilityRole="progressbar"
-        accessibilityLabel={`${v.doneCount} of ${v.total} done`}
-        accessibilityValue={{ min: 0, max: v.total, now: v.doneCount }}
+        accessibilityLabel={`Day ${index + 1} of ${v.all.length} of your first week${v.doneCount > 0 ? `, ${v.doneCount} done` : ''}`}
+        accessibilityValue={{ min: 1, max: v.all.length, now: index + 1 }}
         style={styles.progressRow}
       >
         <View style={styles.track}>
-          <View style={[styles.fill, { width: `${(v.doneCount / v.total) * 100}%` }]} />
+          <View style={[styles.fill, { width: `${((index + 1) / v.all.length) * 100}%` }]} />
         </View>
-        <Text style={styles.count}>{v.doneCount} of {v.total}</Text>
+        <Text style={styles.count}>{doneNote(v.doneCount)}</Text>
       </View>
       <View style={styles.pager}>
         <Pressable

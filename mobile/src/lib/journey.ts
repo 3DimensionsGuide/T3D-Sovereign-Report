@@ -83,8 +83,12 @@ export function journeyView(i: JourneyInput): JourneyView {
   return { show, dayNumber: day, steps: allDone ? all : next, all, firstOpen, doneCount, total: all.length, allDone };
 }
 
-/** The heading's second line. */
-export function journeyTitle(v: Pick<JourneyView, 'dayNumber' | 'allDone'>): string {
-  if (v.allDone) return 'You have been through all of it';
-  return v.dayNumber <= 7 ? `Day ${v.dayNumber} of your first week` : 'A few things you have not tried yet';
+/** The heading: the step you are looking at, counted as a day of the plan. */
+export function journeyTitle(index: number, total: number): string {
+  return `Day ${index + 1} of ${total}`;
+}
+
+/** The note beside the bar: how many steps are done, or nothing yet. */
+export function doneNote(doneCount: number): string {
+  return doneCount > 0 ? `${doneCount} done` : '';
 }
