@@ -3,6 +3,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { firstRunLine } from '@/lib/reveal';
 import { useCoachStore } from '@/store/useCoachStore';
 import { useT3DStore } from '@/store/useT3DStore';
+import { Glass } from '@/components/Glass';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
 /**
@@ -16,7 +17,7 @@ export function FirstRunCard() {
   const chart = useT3DStore((s) => s.chart);
   if (!hydrated || seen || !chart) return null;
   return (
-    <View style={styles.card}>
+    <Glass style={styles.card}>
       <Text style={styles.eyebrow}>WELCOME</Text>
       <Text accessibilityRole="header" style={styles.title}>{firstRunLine(chart)}</Text>
       <Text style={styles.body}>
@@ -24,13 +25,13 @@ export function FirstRunCard() {
         underline explains itself when you tap it.
       </Text>
       <GoldButton label="Got it" onPress={finish} />
-    </View>
+    </Glass>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.goldEdge,
+    borderColor: colors.goldEdge,
     padding: space.lg, gap: space.md,
   },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },

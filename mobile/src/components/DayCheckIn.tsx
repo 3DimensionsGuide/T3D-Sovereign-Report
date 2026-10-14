@@ -4,6 +4,7 @@ import { Pressable } from '@/components/Pressable';
 import { select } from '@/lib/haptics';
 import { FEELINGS, FEELING_GLYPH, FEELING_WORD, type DayContext, type Feeling } from '@/lib/dayLog';
 import { useDayLogStore } from '@/store/useDayLogStore';
+import { Glass } from '@/components/Glass';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
 /**
@@ -21,7 +22,7 @@ export function DayCheckIn({ date, ctx }: { date: string; ctx: DayContext }) {
   }
 
   return (
-    <View style={styles.card}>
+    <Glass style={styles.card}>
       <Text accessibilityRole="header" style={styles.title}>How did today land?</Text>
       <Text style={styles.body}>
         {entry ? `You marked today ${FEELING_WORD[entry.feeling].toLowerCase()}. Tap another to change it.` : 'One tap. Your answers stay on this phone.'}
@@ -54,13 +55,13 @@ export function DayCheckIn({ date, ctx }: { date: string; ctx: DayContext }) {
           <Text style={styles.linkText}>See your rhythm ({count} {count === 1 ? 'day' : 'days'} logged)</Text>
         </Pressable>
       ) : null}
-    </View>
+    </Glass>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
+    borderColor: colors.hairline,
     padding: space.lg, gap: space.sm,
   },
   title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 28, color: colors.parchment },

@@ -6,7 +6,8 @@ import { LENS_LABEL, LENS_TEXT, SIGNAL_COLOR, SignalMarker, type LensName, type 
 import { lensTap } from '@/lib/haptics';
 import { MotionLensIcon } from '@/components/LensMotion';
 import type { DailySignal, Lamp, LampState } from '@/lib/triadTypes';
-import { colors, fonts, heroCard, radius, space } from '@/theme/tokens';
+import { Glass } from '@/components/Glass';
+import { colors, fonts, radius, space } from '@/theme/tokens';
 import { animateLayout } from '@/lib/motion';
 import { Chevron } from '@/components/Chevron';
 
@@ -136,7 +137,7 @@ interface Props {
 export function SignalLamp({ signal, isToday }: Props) {
   const { overall } = signal;
   return (
-    <View style={styles.card}>
+    <Glass hero style={styles.card}>
       <Text maxFontSizeMultiplier={1.3} accessibilityRole="header" style={styles.title}>{isToday ? 'The signal today' : 'The signal for this day'}</Text>
 
       <View
@@ -158,15 +159,14 @@ export function SignalLamp({ signal, isToday }: Props) {
         <LensRow lens="road" lamp={signal.road} missing="" />
         <LensRow lens="stoplight" lamp={signal.stoplight} missing="" />
       </View>
-    </View>
+    </Glass>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
+    borderColor: colors.hairline,
     padding: space.lg, gap: space.md,
-    ...heroCard,
   },
   title: { fontFamily: fonts.display, fontSize: 22, lineHeight: 29, color: colors.parchment },
   hero: { flexDirection: 'row', alignItems: 'center', gap: space.lg },

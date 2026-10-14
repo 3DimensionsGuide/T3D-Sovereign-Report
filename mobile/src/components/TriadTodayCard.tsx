@@ -3,7 +3,8 @@ import type { TriadToday } from '@/lib/triadTypes';
 import { Disclosure } from '@/components/Disclosure';
 import { lensFromGlyph } from '@/components/Lens';
 import { MotionLensIcon } from '@/components/LensMotion';
-import { colors, fonts, heroCard, radius, space } from '@/theme/tokens';
+import { Glass } from '@/components/Glass';
+import { colors, fonts, radius, space } from '@/theme/tokens';
 
 function Lens({ glyph, accent, label, title, lines }: {
   glyph: string; accent: string; label: string; title: string; lines: (string | null)[];
@@ -52,7 +53,7 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
     </View>
   );
   return (
-    <View style={styles.card}>
+    <Glass hero style={styles.card}>
       <Text style={styles.eyebrow}>{isToday ? "TODAY'S TRIAD" : "THIS DAY'S TRIAD"}</Text>
       <Text accessibilityRole="header" style={styles.title}>{isToday ? 'One frame for today' : 'One frame for this day'}</Text>
       <Text style={styles.frame}>{lead}</Text>
@@ -91,15 +92,13 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
           <Text style={styles.closing}>{data.closing}</Text>
         </>
       )}
-    </View>
+    </Glass>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
     borderColor: colors.hairline, padding: space.lg, gap: 14,
-    ...heroCard,
   },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontSize: 26, lineHeight: 33, color: colors.parchment },
