@@ -76,13 +76,16 @@ test('the card is one slim tile: the whole tile opens the step, numbered pills s
   assert.match(card, /reduce \? undefined : FadeIn/);
 });
 
-test('only the day you are on is lit, and only the lit pill can carry a tick', () => {
+test('the pills are a sequence: every day up to the one you are on is lit with a tick, later days are dim with a number', () => {
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
   const block = (name: string) => new RegExp(`${name}: \\{([^}]*)\\}`).exec(card)![1]!;
-  assert.match(block('pillCurrent'), /backgroundColor: colors\.gold/);
-  assert.doesNotMatch(card, /pillDone|pillTextDone/);
-  assert.match(card, /current && s\.done \? '✓' : String\(i \+ 1\)/);
-  assert.doesNotMatch(card, /(?<!&& )s\.done \? '✓'/);
+  assert.match(card, /const lit = i <= index;/);
+  assert.match(card, /lit \? '✓' : String\(i \+ 1\)/);
+  assert.match(block('pillLit'), /backgroundColor: colors\.gold/);
+  assert.doesNotMatch(block('pill'), /backgroundColor/);
+  assert.doesNotMatch(card, /pillCurrent|pillDone|s\.done \? '✓'/);
+  // A dim pill can never carry a tick: the tick and the fill come from the same condition.
+  assert.equal((card.match(/'✓'/g) ?? []).length, 1);
   assert.equal(doneSuffix(0), '');
   assert.equal(doneSuffix(2), '  ·  2 done');
 });

@@ -15,8 +15,8 @@ import { colors, fonts, space } from '@/theme/tokens';
 
 /**
  * On Today, below the signal: one slim tile for a short guided plan, one step a day.
- * The whole tile opens the step. A row of numbered pills switches days; a finished day shows a tick.
- * Gold is used only for the tick and the current day, so the signal stays the page's one hero.
+ * The whole tile opens the step. A row of numbered pills switches days and shows how far along you are: every day
+ * up to the one you are on is lit with a tick, and the days ahead are dim. Gold stays small, so the signal is the page's one hero.
  */
 export function JourneyCard() {
   const { startedOn, visited, dismissed, start, dismiss } = useJourneyStore();
@@ -40,7 +40,7 @@ export function JourneyCard() {
   return (
     <Glass style={styles.card}>
       <View style={styles.head}>
-        <Text accessibilityRole="header" style={styles.top} numberOfLines={1}>
+        <Text accessibilityRole="header" style={styles.top} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
           <Text style={styles.gold}>Your first week</Text>
           {`  ·  ${dayOf(index, total)}${doneSuffix(v.doneCount)}`}
         </Text>
@@ -69,6 +69,8 @@ export function JourneyCard() {
       <View style={styles.pills} accessibilityRole="tablist">
         {v.all.map((s, i) => {
           const current = i === index;
+          // A sequence: every day up to the one you are on is lit with a tick; later days are dim with their number.
+          const lit = i <= index;
           return (
             <Pressable
               key={s.key}
@@ -78,9 +80,9 @@ export function JourneyCard() {
               onPress={() => setPicked(i)}
               style={styles.pillHit}
             >
-              <View style={[styles.pill, current && styles.pillCurrent]}>
-                <Text style={[styles.pillText, current && styles.pillTextCurrent]}>
-                  {current && s.done ? '✓' : String(i + 1)}
+              <View style={[styles.pill, lit && styles.pillLit]}>
+                <Text style={[styles.pillText, lit && styles.pillTextLit]}>
+                  {lit ? '✓' : String(i + 1)}
                 </Text>
               </View>
             </Pressable>
@@ -107,8 +109,8 @@ const styles = StyleSheet.create({
   pills: { flexDirection: 'row', gap: space.sm },
   pillHit: { flex: 1, height: 48, justifyContent: 'center' },
   pill: { height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  // Only the day you are on is lit, and only the lit pill can show a tick. Every other pill is dim with its number.
-  pillCurrent: { backgroundColor: colors.gold, borderColor: colors.gold },
+  // Lit: gold with a tick, for every day up to the one you are on. Dim: an outline with the number, for the days ahead.
+  pillLit: { backgroundColor: colors.gold, borderColor: colors.gold },
   pillText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
-  pillTextCurrent: { color: colors.obsidian },
+  pillTextLit: { color: colors.obsidian },
 });
