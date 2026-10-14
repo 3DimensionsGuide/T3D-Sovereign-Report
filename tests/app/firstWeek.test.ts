@@ -83,3 +83,20 @@ test('the reminder is scheduled once for each weekday, and the card is wired int
 test('the old unused tour is gone', () => {
   assert.equal(existsSync('mobile/src/components/CoachTour.tsx'), false);
 });
+
+test('every step can be paged back to, and the card opens on the first step not done', () => {
+  const v = journeyView({ ...base, premium: true, visited: { chart: true, readings: true } });
+  assert.deepEqual(v.all.map((s) => s.key), ['chart', 'readings', 'timeline', 'practice', 'tribe']);
+  assert.equal(v.all[v.firstOpen]!.key, 'timeline');
+  assert.equal(v.all[0]!.done, true);
+  assert.equal(journeyView({ ...base, visited: { chart: true, readings: true, timeline: true } }).firstOpen, 0);
+  const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
+  assert.match(card, /accessibilityLabel="Previous step"/);
+  assert.match(card, /accessibilityLabel="Next step"/);
+  assert.match(card, /step\.done \? '✓  '/);
+});
+
+test('"Show the welcome note again" brings the first-week card back too', () => {
+  const s = readFileSync('mobile/src/app/your-data.tsx', 'utf8');
+  assert.match(s, /useCoachStore\.getState\(\)\.replay\(\);\n\s+useJourneyStore\.getState\(\)\.clearAll\(\);/);
+});

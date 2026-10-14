@@ -47,6 +47,10 @@ export interface JourneyView {
   /** 1 to 7 for the first week, then 8 and up. */
   dayNumber: number;
   steps: JourneyStep[];
+  /** Every step, in order, so the card can be paged back and forth. */
+  all: JourneyStep[];
+  /** Which step to show first: the first one not done yet (or the first, when all are done). */
+  firstOpen: number;
   doneCount: number;
   total: number;
   allDone: boolean;
@@ -75,7 +79,8 @@ export function journeyView(i: JourneyInput): JourneyView {
   const show = !i.dismissed && day <= JOURNEY_DAYS;
   // Next steps first (up to three), so the card is never a long list; finished steps follow only when nothing is left.
   const next = all.filter((s) => !s.done).slice(0, SHOWN);
-  return { show, dayNumber: day, steps: allDone ? all : next, doneCount, total: all.length, allDone };
+  const firstOpen = Math.max(0, all.findIndex((s) => !s.done));
+  return { show, dayNumber: day, steps: allDone ? all : next, all, firstOpen, doneCount, total: all.length, allDone };
 }
 
 /** The heading's second line. */

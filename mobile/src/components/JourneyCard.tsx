@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { router, type Href } from 'expo-router';
 import { Glass } from '@/components/Glass';
@@ -24,8 +24,11 @@ export function JourneyCard() {
   const v = journeyView({ startedOn: startedOn ?? today, today, dismissed, premium, visited, decisions, people });
   if (!v.show) return null;
 
-  const next = v.steps.find((s) => !s.done) ?? null;
-  const more = v.allDone ? 0 : v.total - v.doneCount - 1;
+  // The person can page back and forth through the steps; it opens on the first one not done yet.
+  const [picked, setPicked] = useState<number | null>(null);
+  const index = Math.min(Math.max(picked ?? v.firstOpen, 0), v.all.length - 1);
+  const step = v.all[index]!;
+  const go = (delta: number) => setPicked(Math.min(Math.max(index + delta, 0), v.all.length - 1));
 
   return (
     <Glass style={styles.card}>
@@ -47,19 +50,38 @@ export function JourneyCard() {
         </View>
         <Text style={styles.count}>{v.doneCount} of {v.total}</Text>
       </View>
-      {next ? (
+      <View style={styles.pager}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Next: ${next.label}. ${next.detail}${more > 0 ? ` ${more} more after this.` : ''}`}
-          onPress={() => router.push(next.route as Href)}
+          accessibilityLabel="Previous step"
+          accessibilityState={{ disabled: index === 0 }}
+          disabled={index === 0}
+          onPress={() => go(-1)}
+          style={[styles.arrow, index === 0 && styles.arrowOff]}
+        >
+          <Text style={styles.chev}>‹</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Step ${index + 1} of ${v.all.length}${step.done ? ', done' : ''}. ${step.label}. ${step.detail}`}
+          onPress={() => router.push(step.route as Href)}
           style={styles.step}
         >
-          <Text style={styles.stepLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{next.label}</Text>
+          <Text style={styles.stepLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+            {step.done ? '✓  ' : ''}{step.label}
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Next step"
+          accessibilityState={{ disabled: index === v.all.length - 1 }}
+          disabled={index === v.all.length - 1}
+          onPress={() => go(1)}
+          style={[styles.arrow, index === v.all.length - 1 && styles.arrowOff]}
+        >
           <Text style={styles.chev}>›</Text>
         </Pressable>
-      ) : (
-        <Text style={styles.small}>Everything here is yours to come back to.</Text>
-      )}
+      </View>
     </Glass>
   );
 }
@@ -74,11 +96,14 @@ const styles = StyleSheet.create({
   track: { flex: 1, height: 6, borderRadius: 3, backgroundColor: colors.hairline, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3, backgroundColor: colors.gold },
   count: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
+  pager: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
+  arrow: { width: 44, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
+  arrowOff: { opacity: 0.35 },
   step: {
-    minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md,
+    flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.md,
     borderRadius: radius.md, borderWidth: 1, borderColor: colors.line,
   },
-  stepLabel: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
+  stepLabel: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   chev: { fontFamily: fonts.body, fontSize: 24, color: colors.parchmentMuted },
 });

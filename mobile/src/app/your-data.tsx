@@ -119,6 +119,7 @@ export default function YourData() {
             onPress={() => {
               router.navigate('/today' as Href);
               useCoachStore.getState().replay();
+              useJourneyStore.getState().clearAll();
             }}
           />
           <GoldButton
