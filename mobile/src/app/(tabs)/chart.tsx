@@ -164,6 +164,7 @@ export default function Chart() {
             Drawn only from your chart, so no two are alike: your Vehicle in the centre, your Road around it, and your Sun, Moon and Rising on the outer ring.
           </Text>
           <GoldButton label="Share your Sigil" variant="ghost" onPress={() => router.push({ pathname: '/share-card', params: { kind: 'sigil' } } as unknown as Href)} />
+          <GoldButton label="Make a wallpaper" variant="ghost" onPress={() => router.push({ pathname: '/share-card', params: { kind: 'wallpaper' } } as unknown as Href)} />
         </View>
       </FadeIn>
 

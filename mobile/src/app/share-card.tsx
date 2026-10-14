@@ -8,6 +8,8 @@ import { GoldButton } from '@/components/GoldButton';
 import { ProfileShareCard } from '@/components/ProfileShareCard';
 import { CarouselShareCard } from '@/components/CarouselShareCard';
 import { SigilShareCard } from '@/components/SigilShareCard';
+import { SigilWallpaper } from '@/components/SigilWallpaper';
+import { WALLPAPER_CAPTURE, type WallpaperVariant } from '@/lib/wallpaper';
 import { StoryShareCard } from '@/components/StoryShareCard';
 import { TodayShareCard } from '@/components/TodayShareCard';
 import { Segmented } from '@/components/Segmented';
@@ -17,11 +19,12 @@ import { useTriadToday } from '@/lib/useTriadToday';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, space } from '@/theme/tokens';
 
-type Kind = 'profile' | 'sigil' | 'carousel' | 'today';
+type Kind = 'profile' | 'sigil' | 'wallpaper' | 'carousel' | 'today';
 
 const KINDS = [
   { value: 'profile', label: 'My Triad' },
   { value: 'sigil', label: 'Sigil' },
+  { value: 'wallpaper', label: 'Wallpaper' },
   { value: 'carousel', label: 'Carousel' },
   { value: 'today', label: 'Today' },
 ] as const;
@@ -38,10 +41,16 @@ const SHAPES = [
   { value: 'story', label: 'Story' },
 ] as const;
 
+const SCREENS = [
+  { value: 'lock', label: 'Lock screen' },
+  { value: 'home', label: 'Home screen' },
+] as const;
+
 /** Each card type carries its own tag, so we can count visits that come from it. */
 const LINKS: Record<Kind, string> = {
   profile: 'https://3dimensions.guide/?ref=card-profile',
   sigil: 'https://3dimensions.guide/?ref=card-sigil',
+  wallpaper: 'https://3dimensions.guide/',
   carousel: 'https://3dimensions.guide/?ref=card-carousel',
   today: 'https://3dimensions.guide/?ref=card-today',
 };
@@ -52,8 +61,9 @@ export default function ShareCard() {
   const cardRef = useRef<View>(null);
   // My Chart's Sigil button opens this screen on the Sigil card.
   const { kind: startKind } = useLocalSearchParams<{ kind?: string }>();
-  const [kind, setKind] = useState<Kind>(startKind === 'sigil' ? 'sigil' : 'profile');
+  const [kind, setKind] = useState<Kind>(startKind === 'sigil' ? 'sigil' : startKind === 'wallpaper' ? 'wallpaper' : 'profile');
   const [shape, setShape] = useState<Shape>('post');
+  const [screen, setScreen] = useState<WallpaperVariant>('lock');
   const [lens, setLens] = useState<Lens>('vehicle');
   const tall = (kind === 'profile' || kind === 'sigil') && shape === 'story';
   const triad = useTriadToday(chart?.leadId, profile?.email.trim());
@@ -70,8 +80,9 @@ export default function ShareCard() {
     setError(null);
     setBusy(true);
     try {
-      const uri = await captureRef(cardRef, { format: 'png', quality: 1, width: 1080, height: tall ? 1920 : 1350, result: 'tmpfile' });
-      const message = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad'} · ${LINKS[kind]}`;
+      const size = kind === 'wallpaper' ? WALLPAPER_CAPTURE : { width: 1080, height: tall ? 1920 : 1350 };
+      const uri = await captureRef(cardRef, { format: 'png', quality: 1, ...size, result: 'tmpfile' });
+      const message = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'wallpaper' ? 'My T3D Sigil wallpaper' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad'} · ${LINKS[kind]}`;
       const result = await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
       if (result.action === Share.sharedAction) success();
     } catch {
@@ -101,6 +112,8 @@ export default function ShareCard() {
             ? 'The card shows today’s date, your Type and Authority, your Personal Day and the main sky contact. It never shows your birth date, time, place or last name.'
             : kind === 'carousel'
             ? 'Three slides, one for each lens, made for an Instagram carousel. Pick a slide, save it, then post all three together. It never shows your birth date, time, place or last name.'
+            : kind === 'wallpaper'
+            ? 'Your Sigil as a wallpaper, with no text on it. Lock screen leaves room for the clock. Home screen is dimmer so your icons stay easy to read. In the share sheet choose “Save Image”, then set it as wallpaper from Photos.'
             : kind === 'sigil'
             ? 'Your Sigil is a drawing made from your chart, so no two are the same. The card shows it with your Type, Life Path and Sun sign. It never shows your birth date, time, place or last name.'
             : 'The card shows your Type, Life Path and Sun sign. Choose Story for the tall Instagram Stories shape. It never shows your birth date, time, place or last name.'}
@@ -109,7 +122,8 @@ export default function ShareCard() {
 
       <Segmented options={KINDS} value={kind} onChange={setKind} compact />
       {kind === 'carousel' ? <Segmented options={SLIDES} value={lens} onChange={setLens} compact /> : null}
-      {kind !== 'today' && kind !== 'carousel' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
+      {kind === 'wallpaper' ? <Segmented options={SCREENS} value={screen} onChange={setScreen} compact /> : null}
+      {kind !== 'today' && kind !== 'carousel' && kind !== 'wallpaper' ? <Segmented options={SHAPES} value={shape} onChange={setShape} compact /> : null}
 
       <View style={styles.preview}>
         {kind === 'today' ? (
@@ -129,6 +143,8 @@ export default function ShareCard() {
             firstName={withName && first ? first : null}
             birthNumber={birthNumber}
           />
+        ) : kind === 'wallpaper' ? (
+          <SigilWallpaper ref={cardRef} chart={chart} variant={screen} birthTimeKnown={profile.birthTimeKnown} />
         ) : kind === 'sigil' ? (
           <SigilShareCard
             ref={cardRef}
@@ -154,10 +170,11 @@ export default function ShareCard() {
         )}
       </View>
 
-      {kind !== 'today' && !profile.birthTimeKnown ? (
+      {kind !== 'today' && kind !== 'wallpaper' && !profile.birthTimeKnown ? (
         <Text style={styles.small}>Moon and Rising are left off because your birth time is not known.</Text>
       ) : null}
 
+      {kind !== 'wallpaper' ? (
       <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>Add my first name</Text>
         <Switch
@@ -167,14 +184,19 @@ export default function ShareCard() {
           accessibilityLabel="Add my first name"
         />
       </View>
+      ) : null}
 
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-      <GoldButton label={kind === 'carousel' ? `Share or save slide ${LENSES.indexOf(lens) + 1} of 3` : 'Share or save image'} onPress={onShare} loading={busy} disabled={(kind === 'today' && !triad.data) || (kind === 'carousel' && lens === 'road' && numerology.loading && birthNumber === null)} />
+      <GoldButton label={kind === 'carousel' ? `Share or save slide ${LENSES.indexOf(lens) + 1} of 3` : kind === 'wallpaper' ? 'Save wallpaper' : 'Share or save image'} onPress={onShare} loading={busy} disabled={(kind === 'today' && !triad.data) || (kind === 'carousel' && lens === 'road' && numerology.loading && birthNumber === null)} />
       <Text style={styles.small}>In the share sheet, choose “Save Image” to keep it in Photos.</Text>
+      {kind !== 'wallpaper' ? (
+        <>
       <GoldButton label="Share the link only" variant="ghost" onPress={onShareLink} />
       <Text style={styles.small}>
         Some apps, such as Notes, keep only the picture. Share the link on its own to add it there.
       </Text>
+        </>
+      ) : null}
       <GoldButton label="BACK" variant="ghost" onPress={() => router.back()} />
     </Screen>
   );
