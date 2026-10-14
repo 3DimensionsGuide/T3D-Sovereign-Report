@@ -56,3 +56,9 @@ test('animation loops stop when the screen is not in view', () => {
   assert.match(src('mobile/src/components/TriadCircuit.tsx'), /cancelAnimation\(t\)/);
   assert.match(src('mobile/src/components/RoomArt.tsx'), /cancelAnimation\(glow\)/);
 });
+
+test('the circuit resumes each loop from where it stopped, one whole turn at a time, so returning to the tab does not jump', () => {
+  const c = src('mobile/src/components/TriadCircuit.tsx');
+  assert.match(c, /withTiming\(t\.value \+ 1,/);
+  assert.match(c, /withTiming\(sway\.value \+ 1,/);
+});

@@ -182,8 +182,10 @@ export function TriadCircuit({ reduce, surge, paused = false }: Props) {
       return;
     }
     if (on.value < 1) on.value = withTiming(1, { duration: 2400, easing: Easing.out(Easing.cubic) });
-    t.value = withRepeat(withTiming(1, { duration: 3600, easing: Easing.linear }), -1, false);
-    sway.value = withRepeat(withTiming(1, { duration: 11000, easing: Easing.linear }), -1, false);
+    // Each loop runs one full turn from wherever it stopped (start to start + 1). Everything that reads these
+    // values repeats every whole number, so coming back to the tab carries on smoothly instead of jumping.
+    t.value = withRepeat(withTiming(t.value + 1, { duration: 3600, easing: Easing.linear }), -1, false);
+    sway.value = withRepeat(withTiming(sway.value + 1, { duration: 11000, easing: Easing.linear }), -1, false);
     return () => {
       cancelAnimation(t);
       cancelAnimation(sway);
