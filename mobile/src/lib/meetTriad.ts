@@ -150,25 +150,3 @@ function vehicleReason(v?: { authority?: string | null; strategy?: string | null
   if (authority) return `Your Authority is ${authority}. Check the choice against it.`;
   return `Your Strategy is to ${first}. Check the choice against it.`;
 }
-
-/** The stops whose content sits inside one of Today's three folds (days 5 to 7 live on other tabs). */
-const FOLD_STOP_DAYS = 4;
-
-/**
- * Which day of the first week to flag on a Today fold, or null. A fold is flagged when today's stop is about its
- * lens, the stop is not done, the person can open it, and the seven days are not over.
- */
-export function foldFocus(
-  lens: 'vehicle' | 'road' | 'stoplight',
-  startedOn: string | null,
-  todayKey: string,
-  done: readonly number[],
-  premium: boolean,
-): number | null {
-  if (!startedOn || daysBetween(startedOn, todayKey) >= TOTAL_DAYS) return null;
-  const day = currentStop(startedOn, todayKey);
-  if (day > FOLD_STOP_DAYS) return null;
-  const stop = STOPS[day - 1]!;
-  if (stop.lens !== lens || done.includes(day) || (!stop.free && !premium)) return null;
-  return day;
-}
