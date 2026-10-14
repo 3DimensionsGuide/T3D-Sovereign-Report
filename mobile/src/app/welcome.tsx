@@ -9,6 +9,9 @@ import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { LensLabel } from '@/components/Lens';
 import { Image } from 'expo-image';
+import { useIsFocused } from 'expo-router';
+import { LogoLights } from '@/components/LogoLights';
+import { useReduceMotion } from '@/lib/motion';
 import { ChartRequestError, requestBirthPreview } from '@/lib/api';
 import type { BirthPreview } from '@/lib/previewTypes';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
@@ -19,6 +22,8 @@ const toDateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-$
 
 /** First screen: a taste of the reading from a birth date alone. Nothing is saved. */
 export default function Welcome() {
+  const reduceMotion = useReduceMotion();
+  const focused = useIsFocused();
   const [today] = useState(() => new Date());
   const [birthDate, setBirthDate] = useState(new Date(1990, 0, 1, 12, 0));
   const [loading, setLoading] = useState(false);
@@ -50,13 +55,15 @@ export default function Welcome() {
     <Screen>
       <FadeIn>
         <View style={styles.hero}>
-          <Image
-            source={require('../../assets/images/logo-t3d.png')}
-            contentFit="contain"
-            accessible
-            accessibilityLabel="The 3 Dimensions logo: T3D with three lights, red, amber and green"
+          <View
             style={styles.logo}
-          />
+            accessible
+            accessibilityRole="image"
+            accessibilityLabel="The 3 Dimensions logo: T3D with three lights, red, amber and green"
+          >
+            <Image source={require('../../assets/images/logo-t3d-wordmark.png')} contentFit="contain" style={StyleSheet.absoluteFill} />
+            <LogoLights reduce={reduceMotion} paused={!focused} />
+          </View>
           <Text style={styles.eyebrow}>The 3 Dimensions</Text>
           <Text accessibilityRole="header" style={styles.title}>
             Your vehicle,{'\n'}your road,{'\n'}your timing.

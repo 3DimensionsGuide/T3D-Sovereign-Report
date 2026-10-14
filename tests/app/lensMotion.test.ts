@@ -47,5 +47,5 @@ test('the lens movement is used where lenses appear', () => {
   assert.match(read('mobile/src/components/RoadStrip.tsx'), /lensTap\('road'\)/);
   assert.match(read('mobile/src/components/TriadTodayCard.tsx'), /<MotionLensIcon/);
   assert.match(read('mobile/src/app/(tabs)/today.tsx'), /<TriadSeal\s+size=\{36\}/);
-  assert.match(read('mobile/src/app/welcome.tsx'), /logo-t3d\.png/);
+  assert.match(read('mobile/src/app/welcome.tsx'), /logo-t3d-wordmark\.png/);
 });
