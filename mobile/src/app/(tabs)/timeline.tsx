@@ -1,6 +1,6 @@
 import { yearRangeLabel } from '@/lib/teaser';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { splitCurrentMonth, splitWeek } from '@/lib/timelineMonths';
+import { splitCurrentMonth, splitPersonalDays, splitWeek } from '@/lib/timelineMonths';
 import { SkeletonCards } from '@/components/Skeleton';
 import { router, type Href } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
@@ -306,6 +306,7 @@ export default function Timeline() {
   /** The day tapped in the ribbon at the top (0 is today). The Vehicle reading follows it. */
   const [selectedDay, setSelectedDay] = useState(0);
   const [showMore, setShowMore] = useState(false);
+  const [showAllPersonal, setShowAllPersonal] = useState(false);
   const [showAllSeasons, setShowAllSeasons] = useState(false);
   const [openMonths, setOpenMonths] = useState<string[]>([]);
 
@@ -367,6 +368,7 @@ export default function Timeline() {
   // The first block is stored as 'now'; the month it shows is this month.
   const pinMonthKey = pinMonth === 'now' || pinMonth === null ? nowMonthKey : pinMonth;
   const dayCount = (key: string) => groups.filter(([d]) => d.startsWith(key)).length;
+  const personalSplit = useMemo(() => (data ? splitPersonalDays(data.personal, localKey(new Date())) : { week: [], rest: [] }), [data]);
   const weekSplit = useMemo(() => splitWeek(split.now, localKey(new Date())), [split]);
   const visibleGroups = weekSplit.week;
   const restDays = weekSplit.rest.length;
@@ -462,13 +464,23 @@ export default function Timeline() {
 
           {lens === 'road' ? (
             <Panel label="Your Personal Days" lens="road">
-              {data.personal.slice(0, 14).map((d) => (
+              {(showAllPersonal ? [...personalSplit.week, ...personalSplit.rest] : personalSplit.week).map((d) => (
                 <View key={d.date} style={styles.personalRow}>
                   <Text style={styles.personalDate}>{shortDate(d.date)}</Text>
                   <Text style={styles.dayBadge}>Personal Day {numLabel(d.day)}</Text>
                 </View>
               ))}
-              <Text style={styles.footnote}>The next two weeks. Pick Stoplight to see the sky events.</Text>
+              {personalSplit.rest.length > 0 ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: showAllPersonal }}
+                  onPress={() => { animateLayout(); setShowAllPersonal((v) => !v); }}
+                  style={({ pressed }) => [styles.showMore, pressed && { opacity: 0.8 }]}
+                >
+                  <Text style={styles.showMoreText}>{showAllPersonal ? 'Show less' : 'Show more'}</Text>
+                </Pressable>
+              ) : null}
+              <Text style={styles.footnote}>The week ahead first; the rest of the month is under Show more. Pick Stoplight to see the sky events.</Text>
             </Panel>
           ) : null}
 

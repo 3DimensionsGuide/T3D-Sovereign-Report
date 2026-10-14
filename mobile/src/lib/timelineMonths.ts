@@ -44,3 +44,19 @@ export function splitWeek<T>(nowGroups: DayGroup<T>[], todayKey: string, days = 
     rest: nowGroups.filter(([day]) => day >= end),
   };
 }
+
+export interface PersonalSplit<T> {
+  week: T[];
+  /** The rest of the current month after the week. */
+  rest: T[];
+}
+
+/** Personal days: the next `days` days first, then the remainder of today's month (later months are left out). */
+export function splitPersonalDays<T extends { date: string }>(items: T[], todayKey: string, days = 7): PersonalSplit<T> {
+  const end = addDaysKey(todayKey, days);
+  const month = monthOf(todayKey);
+  return {
+    week: items.filter((d) => d.date >= todayKey && d.date < end),
+    rest: items.filter((d) => d.date >= end && monthOf(d.date) === month),
+  };
+}

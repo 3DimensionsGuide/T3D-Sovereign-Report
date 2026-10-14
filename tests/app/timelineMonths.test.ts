@@ -61,3 +61,15 @@ test('Timeline shows the week first and the rest of the month behind Show more',
   assert.match(src, /showMore && restDays > 0/);
   assert.match(src, /Rest of \{monthTitle\(nowMonthKey\)\}/);
 });
+
+test('personal days: the week first, then the rest of this month only', async () => {
+  const { splitPersonalDays } = await import('../../mobile/src/lib/timelineMonths');
+  const items = Array.from({ length: 20 }, (_, i) => ({ date: `2026-10-${String(13 + i).padStart(2, '0')}`.replace(/-(3[2-9]|[4-9]\d)$/, '-99') })).filter((d) => !d.date.endsWith('-99'));
+  const keys = [...items.map((d) => d.date), '2026-11-01', '2026-11-02'].map((date) => ({ date }));
+  const s = splitPersonalDays(keys, '2026-10-13');
+  assert.deepEqual(s.week.map((d) => d.date), ['2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17', '2026-10-18', '2026-10-19']);
+  assert.equal(s.rest[0]!.date, '2026-10-20');
+  assert.equal(s.rest[s.rest.length - 1]!.date, '2026-10-31');
+  const late = splitPersonalDays([{ date: '2026-10-30' }, { date: '2026-10-31' }, { date: '2026-11-01' }], '2026-10-30');
+  assert.equal(late.rest.length, 0);
+});
