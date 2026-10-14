@@ -21,6 +21,8 @@ import { OfflineNote } from '@/components/OfflineNote';
 import { ReminderPrompt } from '@/components/ReminderCard';
 import { FirstRunCard } from '@/components/FirstRunCard';
 import { DayCheckIn } from '@/components/DayCheckIn';
+import { foldFocus, TOTAL_DAYS } from '@/lib/meetTriad';
+import { useMeetTriadStore } from '@/store/useMeetTriadStore';
 import { useCoachStore } from '@/store/useCoachStore';
 import { aspectWord, bodyName, natalName } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
@@ -114,6 +116,7 @@ export default function Today() {
   const profile = useT3DStore((state) => state.profile);
   const chart = useT3DStore((state) => state.chart);
   const premium = usePremium();
+  const week = useMeetTriadStore();
 
   const [today, setToday] = useState<TodayResult | null>(null);
   const [dayNum, setDayNum] = useState<DayNumerology | null>(null);
@@ -280,6 +283,13 @@ export default function Today() {
     AccessibilityInfo.announceForAccessibility(`Showing number ${n} in the list.`);
   }, []);
 
+  /** "Day 2 of 7" on the fold that holds today's stop of the first week; only on the live day. */
+  const foldBadge = (lens: 'vehicle' | 'road' | 'stoplight'): string | null => {
+    if (!isToday) return null;
+    const day = foldFocus(lens, week.startedOn, liveDate, week.done, week.premium);
+    return day ? `Day ${day} of ${TOTAL_DAYS}` : null;
+  };
+
   const numbered = today ? hasWheelPositions(today.transits) : false;
 
   return (
@@ -381,7 +391,7 @@ export default function Today() {
               <TriadTodayCard data={triad} isToday={isToday} />
             </FadeIn>
           ) : null}
-          <Fold id="today-road" lens="road" title="The road today" hint="Your personal day and where you are on the road">
+          <Fold id="today-road" lens="road" badge={foldBadge('road')} title="The road today" hint="Your personal day and where you are on the road">
           <RoadStrip date={localDateString(shown)} personalYear={dayNum?.personalYear ?? null} />
 
           {dayNum ? (
@@ -392,7 +402,7 @@ export default function Today() {
 
           </Fold>
 
-          <Fold id="today-sky" lens="stoplight" title="The sky today" hint="The Moon, the planets and the transits to your chart">
+          <Fold id="today-sky" lens="stoplight" badge={foldBadge('stoplight')} title="The sky today" hint="The Moon, the planets and the transits to your chart">
           <FadeIn delay={80}>
             <SkyTodayCard today={today} />
           </FadeIn>
@@ -437,7 +447,7 @@ export default function Today() {
 
           </Fold>
 
-          <Fold id="today-vehicle" lens="vehicle" title="The vehicle today" hint="The gates the Sun and Moon are in today">
+          <Fold id="today-vehicle" lens="vehicle" badge={foldBadge('vehicle')} title="The vehicle today" hint="The gates the Sun and Moon are in today">
           <FadeIn delay={120}>
             <BodygraphChip today={today} />
           </FadeIn>
