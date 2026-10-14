@@ -11,7 +11,7 @@ const SCREENS = new Set([
 ]);
 
 /** One-word moments, matching ACTIONS in src/lib/app/events.ts. */
-const ACTIONS = new Set(['reveal_seen', 'paywall_seen', 'tribe_added', 'invite_sent', 'backup_exported', 'backup_restored']);
+const ACTIONS = new Set(['reveal_seen', 'paywall_seen', 'tribe_added', 'invite_sent', 'backup_exported', 'backup_restored', 'invite_viewed', 'invite_chart_started']);
 
 const RESEND_AFTER_MS = 30_000;
 const lastSent = new Map<string, number>();

@@ -6,6 +6,9 @@ import { captureRef } from 'react-native-view-shot';
 import { Screen } from '@/components/Screen';
 import { GoldButton } from '@/components/GoldButton';
 import { ProfileShareCard } from '@/components/ProfileShareCard';
+import { ChartRequestError, requestInviteCreate } from '@/lib/api';
+import { cardInviteMessage } from '@/lib/invite';
+import { trackAction } from '@/lib/track';
 import { CarouselShareCard } from '@/components/CarouselShareCard';
 import { SigilShareCard } from '@/components/SigilShareCard';
 import { SigilWallpaper } from '@/components/SigilWallpaper';
@@ -71,10 +74,20 @@ export default function ShareCard() {
   const numerology = useNumerology(chart?.leadId, profile?.email.trim());
   const birthNumber = numerology.data?.birthday?.number ?? null;
   const [withName, setWithName] = useState(false);
+  const [withInvite, setWithInvite] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!chart || !profile) return <Redirect href="/onboarding" />;
+
+  /** When the person lets friends compare charts, makes a fresh invite link and adds it under the message. */
+  async function addInvite(base: string): Promise<string> {
+    if (!withInvite || !chart || !profile) return base;
+    const { url } = await requestInviteCreate(chart.leadId, profile.email.trim(), withName && profile.firstName.trim().length > 0, profile.birthTimeKnown !== false);
+    return cardInviteMessage(base, url);
+  }
+
+  const failure = (e: unknown, fallback: string) => (e instanceof ChartRequestError ? e.message : fallback);
 
   async function onShare() {
     setError(null);
@@ -82,11 +95,13 @@ export default function ShareCard() {
     try {
       const size = kind === 'wallpaper' ? WALLPAPER_CAPTURE : { width: 1080, height: tall ? 1920 : 1350 };
       const uri = await captureRef(cardRef, { format: 'png', quality: 1, ...size, result: 'tmpfile' });
-      const message = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'wallpaper' ? 'My T3D Sigil wallpaper' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad'} · ${LINKS[kind]}`;
+      const baseMessage = `${kind === 'today' ? 'My frame for today' : kind === 'sigil' ? 'My T3D Sigil' : kind === 'wallpaper' ? 'My T3D Sigil wallpaper' : kind === 'carousel' ? `My T3D Triad, ${LENSES.indexOf(lens) + 1} of 3` : 'My T3D Triad'} · ${LINKS[kind]}`;
+      const message = await addInvite(baseMessage);
       const result = await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, url: uri });
       if (result.action === Share.sharedAction) success();
-    } catch {
-      setError('We could not make the image. Please try again.');
+      if (result.action === Share.sharedAction && withInvite) trackAction('invite_sent');
+    } catch (e) {
+      setError(failure(e, 'We could not make the image. Please try again.'));
     } finally {
       setBusy(false);
     }
@@ -95,9 +110,10 @@ export default function ShareCard() {
   async function onShareLink() {
     setError(null);
     try {
-      await Share.share({ message: LINKS[kind] });
-    } catch {
-      setError('We could not open the share sheet. Please try again.');
+      const result = await Share.share({ message: await addInvite(LINKS[kind]) });
+      if (result.action === Share.sharedAction && withInvite) trackAction('invite_sent');
+    } catch (e) {
+      setError(failure(e, 'We could not open the share sheet. Please try again.'));
     }
   }
 
@@ -184,6 +200,25 @@ export default function ShareCard() {
           accessibilityLabel="Add my first name"
         />
       </View>
+      ) : null}
+
+      {kind !== 'wallpaper' ? (
+        <>
+          <View style={styles.switchRow}>
+            <Text style={styles.switchLabel}>Let friends compare charts with me</Text>
+            <Switch
+              value={withInvite}
+              onValueChange={setWithInvite}
+              trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor={colors.switchOff}
+              accessibilityLabel="Let friends compare charts with me"
+            />
+          </View>
+          {withInvite ? (
+            <Text style={styles.small}>
+              Adds a link under your post. Friends who open it see how their chart fits with yours. It never shows your birth date, time or place, and it stops working after 30 days.
+            </Text>
+          ) : null}
+        </>
       ) : null}
 
       {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}

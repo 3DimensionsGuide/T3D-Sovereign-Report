@@ -17,6 +17,8 @@ import {
   type InvitePreview, type InviteViewer, type PlaceCandidate,
 } from '@/lib/api';
 import type { DecideTogether } from '@/lib/togetherTypes';
+import { inviteFollowUp } from '@/lib/invite';
+import { trackAction } from '@/lib/track';
 import { localDateString } from '@/lib/useTimeline';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
@@ -74,6 +76,8 @@ export default function InviteScreen() {
   }, [token, profile]);
 
   const hasChart = !!chart && !!profile;
+  const sawReading = !!data;
+  useEffect(() => { if (sawReading) trackAction('invite_viewed'); }, [sawReading]);
   const onShow = () => {
     if (hasChart) return void run({ leadId: chart.leadId, email: profile.email.trim() });
     // Someone without a chart: birth date, birth place and (unless unknown) birth time, all required.
@@ -229,21 +233,32 @@ export default function InviteScreen() {
         </View>
       ) : (
         <View style={{ gap: space.md }}>
+          {!hasChart ? <MakeChartCard who={who} type={data.people[1].certainty === 'sure' ? data.people[1].type : null} birthDate={dateString(birthDate)} /> : null}
+
           <TogetherReading data={data} partnerLabel={data.people[1].label} />
 
-          {!hasChart ? (
-            <View style={styles.card}>
-              <Text style={styles.eyebrow}>YOUR OWN CHART</Text>
-              <Text accessibilityRole="header" style={styles.title}>Get your full T3D chart</Text>
-              <Text style={styles.body}>Your Vehicle, Road and Stoplight, read together, with a daily frame built from your own timing.</Text>
-              <GoldButton label="Make my chart" onPress={() => router.push({ pathname: '/onboarding', params: { birthDate: dateString(birthDate) } })} />
-            </View>
-          ) : null}
+          {!hasChart ? <MakeChartCard who={who} type={data.people[1].certainty === 'sure' ? data.people[1].type : null} birthDate={dateString(birthDate)} /> : null}
 
           <GoldButton label="Done" variant="ghost" onPress={() => router.replace(hasChart ? '/today' : '/')} />
         </View>
       )}
     </Screen>
+  );
+}
+
+/** The next step for someone who opened an invite without a chart: named after the friend, one clear button. */
+function MakeChartCard({ who, type, birthDate }: { who: string; type: string | null; birthDate: string }) {
+  const copy = inviteFollowUp(who === 'A friend' ? null : who, type);
+  return (
+    <View style={styles.card}>
+      <Text style={styles.eyebrow}>YOUR OWN CHART</Text>
+      <Text accessibilityRole="header" style={styles.title}>{copy.title}</Text>
+      <Text style={styles.body}>{copy.body}</Text>
+      <GoldButton
+        label="Make my chart"
+        onPress={() => { trackAction('invite_chart_started'); router.push({ pathname: '/onboarding', params: { birthDate: birthDate } }); }}
+      />
+    </View>
   );
 }
 

@@ -13,6 +13,7 @@ export const SCREENS = [
 /** Moments worth counting, so you can see where people go and where they stop. Matches mobile/src/lib/track.ts. */
 export const ACTIONS = [
   'reveal_seen', 'paywall_seen', 'tribe_added', 'invite_sent', 'backup_exported', 'backup_restored',
+  'invite_viewed', 'invite_chart_started',
 ] as const;
 
 /** Tags carried by links on shared cards (?ref=...). */
