@@ -1,7 +1,7 @@
 import { useEffect, useId } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
-  Easing, cancelAnimation, useAnimatedProps, useSharedValue, withRepeat, withTiming, type SharedValue,
+  Easing, cancelAnimation, useAnimatedProps, useSharedValue, withDelay, withRepeat, withTiming, type SharedValue,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, G, RadialGradient, Stop } from 'react-native-svg';
 import { LOGO_HALO, LOGO_LIGHTS, LOGO_SIZE } from '@/lib/logoLights';
@@ -14,14 +14,22 @@ const LIGHT = [colors.stoplight, colors.vehicle, colors.road] as const;
 
 function Light({ index, gid, on, t, animate }: { index: number; gid: string; on: SharedValue<number>; t: SharedValue<number>; animate: boolean }) {
   const { cx, cy, r } = LOGO_LIGHTS[index];
-  const lit = useAnimatedProps(() => ({ opacity: stagger(on.value, index, 3, 0.2) }));
+  // Each light gets its own third of the switch-on, with no overlap, so you can watch them go one by one.
+  const lit = useAnimatedProps(() => ({ opacity: stagger(on.value, index, 3, 0) }));
   const halo = useAnimatedProps(() => ({
-    fillOpacity: stagger(on.value, index, 3, 0.2) * (0.16 + 0.1 * Math.sin(wrap01(t.value + index / 3) * Math.PI * 2)),
+    fillOpacity: stagger(on.value, index, 3, 0) * (0.24 + 0.14 * Math.sin(wrap01(t.value + index / 3) * Math.PI * 2)),
   }));
+  // A ring of light that spreads out from a light the moment it switches on.
+  const burst = useAnimatedProps(() => {
+    const p = stagger(on.value, index, 3, 0);
+    const live = p > 0 && p < 1;
+    return { r: r + p * r * 1.6, strokeOpacity: live ? (1 - p) * 0.9 : 0 };
+  });
   return (
     <>
-      <Circle cx={cx} cy={cy} r={r} fill={colors.obsidian} stroke={colors.hairline} strokeWidth={2} />
+      <Circle cx={cx} cy={cy} r={r} fill={colors.obsidian} stroke={LIGHT[index]} strokeOpacity={0.35} strokeWidth={2} />
       <AnimatedCircle cx={cx} cy={cy} r={LOGO_HALO} fill={LIGHT[index]} animatedProps={animate ? halo : undefined} fillOpacity={animate ? undefined : 0.18} />
+      {animate ? <AnimatedCircle cx={cx} cy={cy} fill="none" stroke={LIGHT[index]} strokeWidth={5} animatedProps={burst} /> : null}
       <AnimatedG animatedProps={animate ? lit : undefined}>
         <Circle cx={cx} cy={cy} r={r} fill={`url(#${gid})`} />
         <Circle cx={cx - 8} cy={cy - 9} r={4.5} fill="#FFFFFF" fillOpacity={0.55} />
@@ -49,7 +57,8 @@ export function LogoLights({ reduce, paused = false }: { reduce: boolean; paused
       cancelAnimation(t);
       return;
     }
-    if (on.value < 1) on.value = withTiming(1, { duration: 1800, easing: Easing.out(Easing.cubic) });
+    // A short pause so the screen has faded in, then about four seconds for the three lights to switch on.
+    if (on.value < 1) on.value = withDelay(900, withTiming(1, { duration: 4200, easing: Easing.inOut(Easing.quad) }));
     t.value = withRepeat(withTiming(t.value + 1, { duration: 3200, easing: Easing.linear }), -1, false);
     return () => cancelAnimation(t);
   }, [reduce, paused, on, t]);

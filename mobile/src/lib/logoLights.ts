@@ -12,7 +12,7 @@ export const LOGO_LIGHTS = [
 ] as const;
 
 /** Halo radius around a lit light. */
-export const LOGO_HALO = 46;
+export const LOGO_HALO = 54;
 
 /** Switch-on order: the way a signal is read, top to bottom. */
 export const LOGO_ORDER = [0, 1, 2] as const;
