@@ -26,6 +26,8 @@ export function JourneyCard() {
   const reduce = useReduceMotion();
   const today = localDateString();
   const [picked, setPicked] = useState<number | null>(null);
+  // Tapping the day you are already on steps the lit run back one, so even Day 1 can be switched off again.
+  const [litBack, setLitBack] = useState(false);
 
   useEffect(() => { start(today); }, [start, today]);
 
@@ -36,6 +38,7 @@ export function JourneyCard() {
   const total = v.all.length;
   const index = Math.min(Math.max(picked ?? v.firstOpen, 0), total - 1);
   const step = v.all[index]!;
+  const litTo = litBack ? index - 1 : index;
 
   return (
     <Glass style={styles.card}>
@@ -70,14 +73,18 @@ export function JourneyCard() {
         {v.all.map((s, i) => {
           const current = i === index;
           // A sequence: every day up to the one you are on is lit with a tick; later days are dim with their number.
-          const lit = i <= index;
+          const lit = i <= litTo;
           return (
             <Pressable
               key={s.key}
               accessibilityRole="tab"
               accessibilityState={{ selected: current }}
               accessibilityLabel={`${dayOf(i, total)}, ${s.label}, ${s.done ? 'done' : 'not done yet'}`}
-              onPress={() => setPicked(i)}
+              onPress={() => {
+                if (current && !litBack) { setLitBack(true); return; }
+                setPicked(i);
+                setLitBack(false);
+              }}
               style={styles.pillHit}
             >
               <View style={[styles.pill, lit && styles.pillLit]}>

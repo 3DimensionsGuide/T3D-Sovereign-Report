@@ -79,7 +79,7 @@ test('the card is one slim tile: the whole tile opens the step, numbered pills s
 test('the pills are a sequence: every day up to the one you are on is lit with a tick, later days are dim with a number', () => {
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
   const block = (name: string) => new RegExp(`${name}: \\{([^}]*)\\}`).exec(card)![1]!;
-  assert.match(card, /const lit = i <= index;/);
+  assert.match(card, /const lit = i <= litTo;/);
   assert.match(card, /lit \? '✓' : String\(i \+ 1\)/);
   assert.match(block('pillLit'), /backgroundColor: colors\.gold/);
   assert.doesNotMatch(block('pill'), /backgroundColor/);
