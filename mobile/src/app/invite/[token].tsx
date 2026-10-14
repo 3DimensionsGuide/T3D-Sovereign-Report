@@ -26,9 +26,9 @@ const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${p
 const timeString = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
 /**
- * Where an invite link lands. Someone with a chart sees the reading at once; someone without one adds a birth date
- * and gets a first look, then is encouraged to add birth time and place for the complete reading. What they type is
- * sent once to build their view and is never saved, here or on the server.
+ * Where an invite link lands. Someone with a chart sees the reading at once. Someone without one adds their birth
+ * date, place and time (the time can be marked unknown, as when making a chart) and then sees the reading. What they
+ * type is sent once to build their view and is never saved, here or on the server.
  */
 export default function InviteScreen() {
   const { token } = useLocalSearchParams<{ token?: string }>();
