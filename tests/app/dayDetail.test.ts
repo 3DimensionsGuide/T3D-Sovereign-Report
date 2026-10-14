@@ -39,3 +39,16 @@ test('the gate panel matches Your year, with the extra analysis under Show more'
   const before = v.slice(0, v.indexOf('<Disclosure label="Show more">'));
   assert.ok(before.includes('What the Sun brings'));
 });
+
+test('decision log: this week and anything still open first, older closed ones behind Show more', async () => {
+  const { splitRecentDecisions } = await import('../../mobile/src/lib/decisionRecent');
+  const now = Date.parse('2026-10-13T12:00:00Z');
+  const d = (id: string, createdAt: string, closed: boolean) => ({ id, createdAt, closed });
+  const s = splitRecentDecisions([
+    d('new', '2026-10-12T09:00:00Z', true),
+    d('openOld', '2026-08-01T09:00:00Z', false),
+    d('oldClosed', '2026-09-01T09:00:00Z', true),
+  ], now);
+  assert.deepEqual(s.recent.map((x) => x.id), ['new', 'openOld']);
+  assert.deepEqual(s.older.map((x) => x.id), ['oldClosed']);
+});

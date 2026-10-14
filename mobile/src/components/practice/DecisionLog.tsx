@@ -8,6 +8,8 @@ import { COLOR, SHAPE } from '@/components/SignalLamp';
 import { LAMP_WORD, VERDICT_LAMP } from '@/lib/practiceLamps';
 import type { PracticeData, VerdictKey } from '@/lib/practiceTypes';
 import { localDateString } from '@/lib/useTimeline';
+import { splitRecentDecisions } from '@/lib/decisionRecent';
+import { animateLayout } from '@/lib/motion';
 import { usePracticeStore, type Decision, type Followed, type Outcome } from '@/store/usePracticeStore';
 import { colors, fonts, radius, space, themes } from '@/theme/tokens';
 
@@ -146,6 +148,7 @@ function Pattern({ decisions }: { decisions: Decision[] }) {
 
 export function DecisionLog({ data, onDecide }: { data: PracticeData; onDecide: () => void }) {
   const decisions = usePracticeStore((s) => s.decisions);
+  const [showOlder, setShowOlder] = useState(false);
   if (decisions.length === 0) {
     return (
       <View style={styles.card}>
@@ -161,12 +164,34 @@ export function DecisionLog({ data, onDecide }: { data: PracticeData; onDecide: 
   return (
     <View style={{ gap: space.md }}>
       <Pattern decisions={decisions} />
-      {decisions.map((d) => <DecisionCard key={d.id} decision={d} verdicts={data.decide.verdicts} />)}
+      {(() => {
+        const { recent, older } = splitRecentDecisions(decisions, Date.now());
+        return (
+          <>
+            {recent.length === 0 ? <Text style={styles.small}>Nothing new this week. Your older decisions are under Show more.</Text> : null}
+            {recent.map((d) => <DecisionCard key={d.id} decision={d} verdicts={data.decide.verdicts} />)}
+            {older.length > 0 ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ expanded: showOlder }}
+                accessibilityLabel={showOlder ? 'Show fewer decisions' : `Show ${older.length} older ${older.length === 1 ? 'decision' : 'decisions'}`}
+                onPress={() => { animateLayout(); setShowOlder((v) => !v); }}
+                style={({ pressed }) => [styles.showMore, pressed && { opacity: 0.8 }]}
+              >
+                <Text style={styles.showMoreText}>{showOlder ? 'Show less' : `Show more (${older.length} older)`}</Text>
+              </Pressable>
+            ) : null}
+            {showOlder ? older.map((d) => <DecisionCard key={d.id} decision={d} verdicts={data.decide.verdicts} />) : null}
+          </>
+        );
+      })()}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  showMore: { minHeight: 48, justifyContent: 'center', alignSelf: 'flex-start' },
+  showMoreText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.gold },
   card: { backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg, gap: 12 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between' },
   date: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
