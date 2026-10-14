@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -9,11 +9,7 @@ import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { LensLabel } from '@/components/Lens';
 import { Image } from 'expo-image';
-import { MoonIcon } from '@/components/MoonIcon';
-import { ChartRequestError, requestBirthPreview, requestSkyNow, type SkyNow } from '@/lib/api';
-import { INTENTS } from '@/lib/intent';
-import { phaseMeaning } from '@/lib/skyText';
-import { useIntentStore } from '@/store/useIntentStore';
+import { ChartRequestError, requestBirthPreview } from '@/lib/api';
 import type { BirthPreview } from '@/lib/previewTypes';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
 
@@ -28,16 +24,6 @@ export default function Welcome() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<BirthPreview | null>(null);
-  const [sky, setSky] = useState<SkyNow | null>(null);
-  const intent = useIntentStore((st) => st.intent);
-  const setIntent = useIntentStore((st) => st.setIntent);
-
-  // The Moon tonight is a nice-to-have: if it cannot load, the screen simply goes without it.
-  useEffect(() => {
-    let active = true;
-    requestSkyNow().then((d) => { if (active) setSky(d); }).catch(() => {});
-    return () => { active = false; };
-  }, []);
 
   async function onShow() {
     setError(null);
@@ -79,43 +65,6 @@ export default function Welcome() {
             Start with your birth date and see a first piece of your reading. No sign-up, and we
             save nothing at this step.
           </Text>
-        </View>
-      </FadeIn>
-
-      {sky ? (
-        <FadeIn delay={60}>
-          <View style={styles.moonRow} accessible accessibilityLabel={`The Moon tonight: ${sky.phase} in ${sky.moonSign}, ${sky.illuminationPercent} percent lit. ${phaseMeaning(sky.waxing, sky.phase)}`}>
-            <MoonIcon illuminationPercent={sky.illuminationPercent} waxing={sky.waxing} size={72} hero />
-            <View style={styles.flex}>
-              <Text style={styles.moonTitle}>The Moon tonight</Text>
-              <Text style={styles.moonLine}>{sky.phase} in {sky.moonSign} · {sky.illuminationPercent}% lit</Text>
-              <Text style={styles.note}>{phaseMeaning(sky.waxing, sky.phase)}</Text>
-            </View>
-          </View>
-        </FadeIn>
-      ) : null}
-
-      <FadeIn delay={90}>
-        <View style={styles.intentBox} accessibilityRole="radiogroup">
-          <Text style={styles.pickerLabel}>What brings you here?</Text>
-          <View style={styles.chips}>
-            {INTENTS.map((o) => {
-              const on = intent === o.id;
-              return (
-                <Pressable
-                  key={o.id}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: on }}
-                  accessibilityLabel={o.label}
-                  onPress={() => setIntent(on ? null : o.id)}
-                  style={({ pressed }) => [styles.chip, on && styles.chipOn, pressed && { opacity: 0.8 }]}
-                >
-                  <Text style={[styles.chipText, on && styles.chipTextOn]}>{on ? '✓ ' : ''}{o.label}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-          <Text style={styles.note}>Optional. It only decides what we point you to first, and stays on this phone.</Text>
         </View>
       </FadeIn>
 
@@ -202,19 +151,6 @@ const styles = StyleSheet.create({
   },
   pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   actions: { marginTop: space.md },
-  flex: { flex: 1, gap: 2 },
-  moonRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginTop: space.lg },
-  moonTitle: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
-  moonLine: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold },
-  intentBox: { gap: space.sm, marginTop: space.lg },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: {
-    minHeight: 48, paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.hairline,
-    backgroundColor: colors.charcoal, alignItems: 'center', justifyContent: 'center',
-  },
-  chipOn: { borderColor: colors.gold, backgroundColor: colors.surfaceRaised },
-  chipText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
-  chipTextOn: { color: colors.gold },
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger, marginTop: space.sm },
   results: { gap: space.md, marginTop: space.md },
   card: {
