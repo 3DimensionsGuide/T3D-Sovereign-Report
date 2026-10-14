@@ -8,7 +8,7 @@
 export type WallpaperVariant = 'lock' | 'home';
 
 /** Logical size of the card on screen; the saved image is scaled up to CAPTURE. */
-export const WALLPAPER = { width: 240, height: 520 } as const;
+export const WALLPAPER = { width: 340, height: 738 } as const;
 export const WALLPAPER_CAPTURE = { width: 1179, height: 2556 } as const;
 
 export interface WallpaperLayout {
@@ -21,7 +21,7 @@ export interface WallpaperLayout {
 }
 
 export function wallpaperLayout(variant: WallpaperVariant): WallpaperLayout {
-  if (variant === 'lock') return { sigilSize: 200, top: 200, opacity: 1, glowRadius: 167 };
-  const sigilSize = 188;
-  return { sigilSize, top: Math.round((WALLPAPER.height - sigilSize) / 2), opacity: 0.55, glowRadius: 167 };
+  if (variant === 'lock') return { sigilSize: 283, top: 283, opacity: 1, glowRadius: 237 };
+  const sigilSize = 266;
+  return { sigilSize, top: Math.round((WALLPAPER.height - sigilSize) / 2), opacity: 0.55, glowRadius: 237 };
 }
