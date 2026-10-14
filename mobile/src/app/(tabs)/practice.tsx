@@ -28,7 +28,7 @@ const EXPLAIN: Record<Mode, string> = {
   week: 'A seven-day experiment: three short check-ins a day.',
   decide: 'Run one decision through three checks: Authority, Road, Stoplight.',
   log: 'Your saved decisions, and how each one turned out.',
-  together: 'Decide with one other person, using both charts.',
+  together: 'Add friends and romantic interests, and see how you fit with each of them.',
 };
 
 export default function Practice() {

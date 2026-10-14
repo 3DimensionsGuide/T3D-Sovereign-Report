@@ -11,7 +11,9 @@ import { LensLabel } from '@/components/Lens';
 import {
   ChartRequestError, requestDecideTogether, requestPlaceCheck, type PlaceCandidate,
 } from '@/lib/api';
-import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastry, TogetherPerson, CenterEffects, HouseOverlays } from '@/lib/togetherTypes';
+import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastry, TogetherPerson, CenterEffects, HouseOverlays, TribeMember, TribeRelation } from '@/lib/togetherTypes';
+import { RELATION_LABEL, RELATION_OPTIONS } from '@/lib/tribe';
+import { TribeIntro, TribeList } from '@/components/practice/Tribe';
 import { localDateString } from '@/lib/useTimeline';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -27,9 +29,11 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const timeString = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () => void }) {
-  const saved = usePartnerStore((s) => s.partner);
-  const setPartner = usePartnerStore((s) => s.setPartner);
+function PartnerForm({ member, onDone, onCancel }: { member?: TribeMember; onDone: (id: string | null) => void; onCancel?: () => void }) {
+  const saved = member?.profile ?? null;
+  const addPerson = usePartnerStore((s) => s.addPerson);
+  const updatePerson = usePartnerStore((s) => s.updatePerson);
+  const [relation, setRelation] = useState<TribeRelation>(member?.relation ?? 'friend');
   const [today] = useState(() => new Date());
   const [label, setLabel] = useState(saved?.label ?? '');
   const [place, setPlace] = useState('');
@@ -67,7 +71,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
   function onSave() {
     const place = candidates?.[chosen];
     if (!place) return;
-    setPartner({
+    const profile: PartnerProfile = {
       label: label.trim().slice(0, 24),
       birthDate: dateString(birthDate as Date),
       birthTime: timeKnown && birthTime ? timeString(birthTime) : null,
@@ -75,8 +79,13 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
       latitude: place.latitude,
       longitude: place.longitude,
       timezone: place.timezone,
-    });
-    onDone();
+    };
+    if (member) {
+      updatePerson(member.id, profile, relation);
+      onDone(member.id);
+    } else {
+      onDone(addPerson(profile, relation));
+    }
   }
 
   if (candidates) {
@@ -105,7 +114,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
             </View>
           </Pressable>
         ))}
-        <GoldButton label="Save on this phone" onPress={onSave} />
+        <GoldButton label={member ? 'Save changes' : 'Add to My Tribe'} onPress={onSave} />
         <GoldButton label="Change details" variant="ghost" onPress={() => setCandidates(null)} />
       </View>
     );
@@ -113,12 +122,14 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
 
   return (
     <View style={styles.card}>
-      <Text style={styles.eyebrow}>Decide together</Text>
-      <Text accessibilityRole="header" style={styles.title}>Who are you deciding with?</Text>
+      <Text style={styles.eyebrow}>{member ? 'Edit person' : 'Add to My Tribe'}</Text>
+      <Text accessibilityRole="header" style={styles.title}>{member ? `Update ${member.profile.label}` : 'Who would you like to add?'}</Text>
       <Text style={styles.body}>
-        Add one other person. Their details are used to work out their Type and Authority and are kept on this phone only. They
-        are not saved on our server.
+        Their birth details are used to work out their Type, Authority and chart, and are kept on this phone only. They are not
+        saved on our server.
       </Text>
+      <Text style={styles.pickerLabel}>How do you know them?</Text>
+      <Segmented options={RELATION_OPTIONS} value={relation} onChange={setRelation} compact />
       <Field label="Name or nickname" value={label} onChangeText={setLabel} maxLength={24} autoCapitalize="words" returnKeyType="next" />
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>Their birth date</Text>
@@ -408,12 +419,12 @@ function SkyView({ s, h }: { s: Synastry | null; h: HouseOverlays | null }) {
 }
 
 /** The four views of two people. Used for a saved person and for an invite. */
-export function TogetherReading({ data, partnerLabel }: { data: DecideTogether; partnerLabel: string }) {
+export function TogetherReading({ data, partnerLabel, relation }: { data: DecideTogether; partnerLabel: string; relation?: string }) {
   const [view, setView] = useState<View_>('decide');
   return (
     <View style={{ gap: space.md }}>
       <View style={styles.card}>
-        <Text style={styles.eyebrow}>Together</Text>
+        <Text style={styles.eyebrow}>{relation ? `${relation} · Together` : 'Together'}</Text>
         <Text accessibilityRole="header" style={styles.title}>You and {partnerLabel}</Text>
         <Text style={styles.small}>
           Four views of the two of you. Each of you still decides through your own Strategy and Authority.
@@ -471,10 +482,11 @@ export function TogetherReading({ data, partnerLabel }: { data: DecideTogether; 
   );
 }
 
-function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () => void }) {
+function Reading({ member, onBack, onEdit }: { member: TribeMember; onBack: () => void; onEdit: () => void }) {
+  const partner = member.profile;
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const clearPartner = usePartnerStore((s) => s.clearPartner);
+  const removePerson = usePartnerStore((s) => s.removePerson);
   const [data, setData] = useState<DecideTogether | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -496,31 +508,40 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
     void load();
   }, [load]);
 
+  const back = <GoldButton label="Back to My Tribe" variant="ghost" onPress={onBack} />;
+
   if (loading && !data) {
     return (
-      <View style={styles.center} accessibilityLiveRegion="polite">
-        <TriadLoader />
-        <Text style={styles.small}>Reading the two of you…</Text>
+      <View style={{ gap: space.md }}>
+        {back}
+        <View style={styles.center} accessibilityLiveRegion="polite">
+          <TriadLoader />
+          <Text style={styles.small}>Reading the two of you…</Text>
+        </View>
       </View>
     );
   }
   if (error || !data) {
     return (
-      <ErrorState message={error ?? 'Something went wrong. Try again in a moment.'} onRetry={load} />
+      <View style={{ gap: space.md }}>
+        {back}
+        <ErrorState message={error ?? 'Something went wrong. Try again in a moment.'} onRetry={load} />
+      </View>
     );
   }
 
   return (
     <View style={{ gap: space.md }}>
-      <TogetherReading data={data} partnerLabel={partner.label} />
-      <GoldButton label="Change person" variant="ghost" onPress={onChange} />
+      {back}
+      <TogetherReading data={data} partnerLabel={partner.label} relation={RELATION_LABEL[member.relation]} />
+      <GoldButton label="Edit person" variant="ghost" onPress={onEdit} />
       <GoldButton
-        label="Remove from this phone"
+        label="Remove from My Tribe"
         variant="ghost"
         onPress={() =>
           Alert.alert(`Remove ${partner.label}?`, 'Their birth details will be deleted from this phone.', [
             { text: 'Keep', style: 'cancel' },
-            { text: 'Remove', style: 'destructive', onPress: clearPartner },
+            { text: 'Remove', style: 'destructive', onPress: () => { removePerson(member.id); onBack(); } },
           ])
         }
       />
@@ -528,13 +549,27 @@ function Reading({ partner, onChange }: { partner: PartnerProfile; onChange: () 
   );
 }
 
+type Screen_ = { kind: 'list' } | { kind: 'add' } | { kind: 'edit'; id: string } | { kind: 'read'; id: string };
+
+/** My Tribe: the people you read connections with. */
 export function Together() {
-  const partner = usePartnerStore((s) => s.partner);
-  const [editing, setEditing] = useState(false);
-  if (!partner || editing) {
-    return <PartnerForm onDone={() => setEditing(false)} onCancel={partner ? () => setEditing(false) : undefined} />;
+  const people = usePartnerStore((s) => s.people);
+  const [screen, setScreen] = useState<Screen_>({ kind: 'list' });
+  const find = (id: string) => people.find((p) => p.id === id);
+
+  if (screen.kind === 'add') {
+    return <PartnerForm onDone={(id) => setScreen(id ? { kind: 'read', id } : { kind: 'list' })} onCancel={() => setScreen({ kind: 'list' })} />;
   }
-  return <Reading partner={partner} onChange={() => setEditing(true)} />;
+  if (screen.kind === 'edit') {
+    const m = find(screen.id);
+    if (m) return <PartnerForm member={m} onDone={(id) => setScreen({ kind: 'read', id: id ?? m.id })} onCancel={() => setScreen({ kind: 'read', id: m.id })} />;
+  }
+  if (screen.kind === 'read') {
+    const m = find(screen.id);
+    if (m) return <Reading member={m} onBack={() => setScreen({ kind: 'list' })} onEdit={() => setScreen({ kind: 'edit', id: m.id })} />;
+  }
+  if (people.length === 0) return <TribeIntro onAdd={() => setScreen({ kind: 'add' })} />;
+  return <TribeList people={people} onOpen={(id) => setScreen({ kind: 'read', id })} onAdd={() => setScreen({ kind: 'add' })} />;
 }
 
 const styles = StyleSheet.create({

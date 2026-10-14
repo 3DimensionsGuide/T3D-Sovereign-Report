@@ -80,3 +80,14 @@ export interface PartnerProfile {
   longitude: number;
   timezone: string;
 }
+
+/** How you know someone in your tribe. */
+export type TribeRelation = 'friend' | 'romantic';
+
+/** One person in My Tribe: their birth details (this phone only) and how you know them. */
+export interface TribeMember {
+  id: string;
+  relation: TribeRelation;
+  profile: PartnerProfile;
+  addedAt: string;
+}
