@@ -6,8 +6,10 @@
  * Desktop: a tall section with a pinned stage. Scroll progress (0–1) moves
  * through three scenes: Vehicle (amber), Road (emerald), Stoplight (crimson).
  * Scene 1 builds an illustrative bodygraph centre by centre.
- * Mobile / reduced motion: the same content as static stacked scenes.
- * Only transform and opacity are animated.
+ * Scene 2 draws a winding road toward a rising horizon, with four pinnacle markers switching on.
+ * Scene 3 turns a zodiac wheel until a moving planet meets a natal point, then the signal goes red, amber, green.
+ * Mobile / reduced motion: the same content as static stacked scenes, with every drawing fully built.
+ * Only transform, opacity and SVG paint (stroke and fill) are animated; nothing that moves layout.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -105,6 +107,114 @@ function Bodygraph({ build, dim }: { build: number; dim: number }) {
   );
 }
 
+
+// ── The Road: a winding road to the horizon, four pinnacle markers ──────────
+const ROAD_SEGMENTS: readonly { d: string; width: number }[] = [
+  { d: 'M150 435 C60 380 240 330 150 280', width: 38 },
+  { d: 'M150 280 C70 235 220 190 150 150', width: 22 },
+  { d: 'M150 150 C140 138 150 128 150 118', width: 10 },
+];
+const ROAD_CENTRE = 'M150 435 C60 380 240 330 150 280 C70 235 220 190 150 150 C140 138 150 128 150 118';
+// Where the four pinnacles sit along the road (x, y, size), with how far the road must be drawn before each lights.
+const PINNACLES: readonly { x: number; y: number; r: number; at: number }[] = [
+  { x: 142, y: 365, r: 15, at: 0.2 },
+  { x: 162, y: 288, r: 13, at: 0.44 },
+  { x: 143, y: 216, r: 11, at: 0.68 },
+  { x: 155, y: 153, r: 9,  at: 0.9 },
+];
+
+function RoadDrawing({ build, dim }: { build: number; dim: number }) {
+  const drawn = clamp01(build / 0.95);
+  const rise = clamp01((build - 0.05) / 0.6);
+  return (
+    <svg
+      viewBox="0 0 300 445"
+      role="img"
+      aria-label="Illustration of a winding road leading to a glowing horizon, with four pinnacle markers lighting up along the way"
+      style={{ width: '100%', maxWidth: 360, height: 'auto', opacity: dim, transition: 'opacity 0.5s var(--ease)' }}
+    >
+      <g style={{ transformBox: 'fill-box', transformOrigin: 'center', transform: `scale(${0.7 + 0.3 * rise})`, opacity: 0.15 + 0.85 * rise, transition: 'opacity 0.4s var(--ease), transform 0.4s var(--ease)' }}>
+        <circle cx="150" cy="112" r="34" fill="var(--emerald)" fillOpacity="0.14" />
+        <circle cx="150" cy="112" r="16" fill="var(--emerald)" fillOpacity="0.3" />
+        <circle cx="150" cy="112" r="5" fill="var(--emerald)" />
+      </g>
+      <line x1="30" y1="118" x2="270" y2="118" stroke="var(--emerald)" strokeWidth="1" strokeOpacity="0.35" />
+      <g fill="none" stroke="var(--emerald)" strokeLinecap="round" strokeOpacity={0.1 + 0.14 * drawn} style={{ transition: 'stroke-opacity 0.4s var(--ease)' }}>
+        {ROAD_SEGMENTS.map(seg => <path key={seg.d} d={seg.d} strokeWidth={seg.width} />)}
+      </g>
+      <path
+        d={ROAD_CENTRE}
+        fill="none" stroke="var(--emerald)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="1" strokeDashoffset={1 - drawn} pathLength={1}
+        style={{ transition: 'stroke-dashoffset 0.35s var(--ease)' }}
+      />
+      {PINNACLES.map((m, i) => {
+        const on = clamp01((build - m.at) / 0.08);
+        return (
+          <g key={i} style={{ transformBox: 'fill-box', transformOrigin: 'center', transform: `scale(${0.6 + 0.4 * on})`, opacity: 0.12 + 0.88 * on, transition: 'opacity 0.35s var(--ease), transform 0.35s var(--ease)' }}>
+            <circle cx={m.x} cy={m.y} r={m.r} fill="var(--base)" stroke="var(--emerald)" strokeWidth="2" />
+            <text x={m.x} y={m.y + m.r * 0.36} textAnchor="middle" fontSize={m.r * 1.05} fontWeight="700" fill="var(--emerald)" style={{ fontFamily: 'inherit' }}>{i + 1}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── The Stoplight: a zodiac wheel, a moving planet, and a signal that changes ─
+const WHEEL = { cx: 150, cy: 125, r: 100 };
+const NATAL_ANGLE = 60; // degrees clockwise from the top
+const wheelPoint = (deg: number, radius: number) => {
+  const a = (deg * Math.PI) / 180;
+  return { x: WHEEL.cx + radius * Math.sin(a), y: WHEEL.cy - radius * Math.cos(a) };
+};
+const LAMPS: readonly { cy: number; color: string; label: string }[] = [
+  { cy: 297, color: 'var(--signal-red)', label: 'Pause' },
+  { cy: 345, color: 'var(--amber)', label: 'Slow' },
+  { cy: 393, color: 'var(--emerald)', label: 'Go' },
+];
+
+function SignalDrawing({ build, dim }: { build: number; dim: number }) {
+  const ring = clamp01(build / 0.3);
+  const travel = clamp01((build - 0.3) / 0.55);
+  const eased = 1 - Math.pow(1 - travel, 3);
+  const angle = NATAL_ANGLE - 360 * (1 - eased);
+  const meet = travel >= 1;
+  const lit = build < 0.3 ? -1 : build < 0.62 ? 0 : build < 0.85 ? 1 : 2;
+  const natal = wheelPoint(NATAL_ANGLE, WHEEL.r);
+  return (
+    <svg
+      viewBox="0 0 300 445"
+      role="img"
+      aria-label="Illustration of a zodiac wheel where a moving planet meets a fixed point, while a signal light changes from red to amber to green"
+      style={{ width: '100%', maxWidth: 360, height: 'auto', opacity: dim, transition: 'opacity 0.5s var(--ease)' }}
+    >
+      <circle cx={WHEEL.cx} cy={WHEEL.cy} r={WHEEL.r} fill="none" stroke="var(--signal-red)" strokeWidth="2" strokeDasharray="1" strokeDashoffset={1 - ring} pathLength={1} strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.35s var(--ease)' }} />
+      <circle cx={WHEEL.cx} cy={WHEEL.cy} r={WHEEL.r - 22} fill="none" stroke="var(--signal-red)" strokeWidth="1" strokeOpacity={0.45 * ring} style={{ transition: 'stroke-opacity 0.4s var(--ease)' }} />
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = wheelPoint(i * 30, WHEEL.r);
+        const b = wheelPoint(i * 30, WHEEL.r - 22);
+        const on = clamp01((ring - i / 14) * 6);
+        return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--signal-red)" strokeWidth="1.5" strokeOpacity={0.12 + 0.7 * on} style={{ transition: 'stroke-opacity 0.3s var(--ease)' }} />;
+      })}
+      <circle cx={natal.x} cy={natal.y} r="7" fill="none" stroke="var(--signal-red)" strokeWidth="2" strokeOpacity={0.3 + 0.7 * ring} />
+      <circle cx={natal.x} cy={natal.y} r="16" fill="var(--signal-red)" fillOpacity={meet ? 0.22 : 0} style={{ transition: 'fill-opacity 0.4s var(--ease)' }} />
+      <g style={{ transformOrigin: `${WHEEL.cx}px ${WHEEL.cy}px`, transform: `rotate(${angle}deg)`, transition: 'transform 0.25s linear', opacity: clamp01((build - 0.22) / 0.08) }}>
+        <circle cx={WHEEL.cx} cy={WHEEL.cy - WHEEL.r} r="7" fill="var(--signal-red)" />
+      </g>
+      <rect x="112" y="258" width="76" height="180" rx="22" fill="var(--base)" stroke="var(--signal-red)" strokeWidth="2" strokeOpacity="0.7" />
+      {LAMPS.map((l, i) => {
+        const on = lit === i;
+        return (
+          <g key={l.label}>
+            <circle cx="150" cy={l.cy} r="27" fill={l.color} fillOpacity={on ? 0.22 : 0} style={{ transition: 'fill-opacity 0.4s var(--ease)' }} />
+            <circle cx="150" cy={l.cy} r="18" fill={l.color} fillOpacity={on ? 1 : 0.1} stroke={l.color} strokeWidth="1.5" strokeOpacity={on ? 1 : 0.4} style={{ transition: 'fill-opacity 0.4s var(--ease), stroke-opacity 0.4s var(--ease)' }} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function SceneText({ scene, index }: { scene: Scene; index: number }) {
   return (
     <>
@@ -174,7 +284,9 @@ export default function TriadStory() {
         <h2 id="triad-heading" className="t3d-h2" style={{ marginBottom: 40 }}>One journey, three lenses.</h2>
         {SCENES.map((scene, i) => (
           <article key={scene.key} className={`t3d-card flash-${scene.key}`} style={{ padding: 'clamp(20px,4vw,32px)', marginBottom: 16 }}>
-            {i === 0 && <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}><Bodygraph build={1} dim={1} /></div>}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+              {i === 0 ? <Bodygraph build={1} dim={1} /> : i === 1 ? <RoadDrawing build={1} dim={1} /> : <SignalDrawing build={1} dim={1} />}
+            </div>
             <SceneText scene={scene} index={i} />
           </article>
         ))}
@@ -186,7 +298,10 @@ export default function TriadStory() {
   // ── Pinned scroll story ────────────────────────────────────────────────────
   const active = progress < 0.34 ? 0 : progress < 0.67 ? 1 : 2;
   const vehicleBuild = clamp01(progress / 0.26);
-  const bodyDim = active === 0 ? 1 : 0.16;
+  const roadBuild = clamp01((progress - 0.34) / 0.26);
+  const signalBuild = clamp01((progress - 0.67) / 0.26);
+  // The drawing for the lens you are on is bright; ones already passed stay as a faint ghost; ones ahead are hidden.
+  const dimFor = (i: number) => (active === i ? 1 : active > i ? 0.16 : 0);
   const scene = SCENES[active];
 
   return (
@@ -198,8 +313,16 @@ export default function TriadStory() {
         display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center',
         padding: '80px clamp(24px,5vw,80px) 40px', gap: 'clamp(24px,4vw,64px)',
       }}>
-        <div aria-hidden={active !== 0} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <Bodygraph build={vehicleBuild} dim={bodyDim} />
+        <div style={{ position: 'relative', width: '100%', maxWidth: 'min(360px, calc((100vh - 140px) * 300 / 445))', justifySelf: 'center', aspectRatio: '300 / 445' }}>
+          <div aria-hidden={active !== 0} style={{ position: 'absolute', inset: 0 }}>
+            <Bodygraph build={vehicleBuild} dim={dimFor(0)} />
+          </div>
+          <div aria-hidden={active !== 1} style={{ position: 'absolute', inset: 0 }}>
+            <RoadDrawing build={roadBuild} dim={dimFor(1)} />
+          </div>
+          <div aria-hidden={active !== 2} style={{ position: 'absolute', inset: 0 }}>
+            <SignalDrawing build={signalBuild} dim={dimFor(2)} />
+          </div>
         </div>
 
         <div>
