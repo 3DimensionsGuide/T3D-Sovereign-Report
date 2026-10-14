@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import { router, type Href } from 'expo-router';
+import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BackupCard } from '@/components/BackupCard';
 import { GoldButton } from '@/components/GoldButton';
+import { feedbackUrl } from '@/lib/feedback';
 import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
 import { clearReminder } from '@/lib/reminder';
 import { clearAllCached } from '@/lib/persistentCache';
@@ -111,6 +113,17 @@ export default function YourData() {
             label="READ THE PRIVACY POLICY"
             variant="ghost"
             onPress={() => { void WebBrowser.openBrowserAsync('https://www.3dimensions.guide/privacy'); }}
+          />
+
+          <GoldButton
+            label="Send feedback"
+            variant="ghost"
+            onPress={() => {
+              const url = feedbackUrl(Constants.expoConfig?.version ?? '1.0.0', `${Platform.OS} ${String(Platform.Version)}`);
+              Linking.openURL(url).catch(() => {
+                Alert.alert('Could not open Mail', 'Email privacy@3dimensions.guide and tell us what you noticed.');
+              });
+            }}
           />
 
           <GoldButton
