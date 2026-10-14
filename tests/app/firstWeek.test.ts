@@ -71,7 +71,11 @@ test('the reminder is scheduled once for each weekday, and the card is wired int
   const r = readFileSync('mobile/src/lib/reminder.ts', 'utf8');
   assert.match(r, /\[1, 2, 3, 4, 5, 6, 7\]\.map/);
   assert.match(r, /SchedulableTriggerInputTypes\.WEEKLY/);
-  assert.match(readFileSync('mobile/src/app/(tabs)/today.tsx', 'utf8'), /<JourneyCard \/>/);
+  const today = readFileSync('mobile/src/app/(tabs)/today.tsx', 'utf8');
+  assert.match(today, /<JourneyCard \/>/);
+  // The signal comes first: the card and the reminder question sit below it.
+  assert.ok(today.indexOf('<SignalLamp') < today.indexOf('<JourneyCard'));
+  assert.ok(today.indexOf('<SignalLamp') < today.indexOf('<ReminderPrompt'));
   assert.match(readFileSync('mobile/src/app/(tabs)/_layout.tsx', 'utf8'), /markVisited\(current\)/);
   assert.match(readFileSync('mobile/src/app/your-data.tsx', 'utf8'), /useJourneyStore\.getState\(\)\.clearAll\(\)/);
 });

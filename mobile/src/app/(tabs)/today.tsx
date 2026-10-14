@@ -347,10 +347,6 @@ export default function Today() {
 
       {today ? <FirstRunCard /> : null}
 
-      {today && coachSeen ? <ReminderPrompt /> : null}
-
-      {today && coachSeen ? <JourneyCard /> : null}
-
       {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 
       {error && !locked ? (
@@ -369,6 +365,8 @@ export default function Today() {
               <TodaySignal today={today} triad={triad} isToday={isToday} />
             </FadeIn>
           )}
+          {coachSeen ? <ReminderPrompt /> : null}
+          {coachSeen && isToday ? <JourneyCard /> : null}
           {isToday ? (
             <DayCheckIn
               date={liveDate}
