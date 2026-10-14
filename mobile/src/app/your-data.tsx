@@ -11,6 +11,7 @@ import { clearAllCached } from '@/lib/persistentCache';
 import { crashReportingOn, sendTestCrashReport } from '@/lib/sentry';
 import { useCoachStore } from '@/store/useCoachStore';
 import { usePartnerStore } from '@/store/usePartnerStore';
+import { useDayLogStore } from '@/store/useDayLogStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
@@ -39,7 +40,7 @@ const SECTIONS: Section[] = [
     title: 'Where your information lives',
     paragraphs: [
       'On our server: your name, email, birth date, time and place, and your calculated chart, so your readings load each time.',
-      'On this phone only: your decision log, your 7-day check-ins, and the other person you decide with. We never receive these.',
+      'On this phone only: your decision log, your 7-day check-ins, your daily "How did today land?" answers, and the other person you decide with. We never receive these.',
     ],
   },
 ];
@@ -61,6 +62,7 @@ export default function YourData() {
       useT3DStore.getState().reset();
       usePartnerStore.getState().clearPartner();
       usePracticeStore.getState().clearAll();
+      useDayLogStore.getState().clearAll();
       await clearAllCached();
       await clearReminder();
       router.replace('/onboarding' as Href);
@@ -74,7 +76,7 @@ export default function YourData() {
   function confirmDelete() {
     Alert.alert(
       'Delete all your data?',
-      'This removes your details and chart from our server and clears your decision log and check-ins from this phone. It cannot be undone.',
+      'This removes your details and chart from our server and clears your decision log, check-ins and daily answers from this phone. It cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Delete everything', style: 'destructive', onPress: () => { void deleteEverything(); } },

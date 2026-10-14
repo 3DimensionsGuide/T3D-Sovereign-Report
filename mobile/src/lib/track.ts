@@ -7,7 +7,7 @@ import { API_BASE_URL } from '@/lib/api';
  */
 const SCREENS = new Set([
   'today', 'chart', 'practice', 'readings', 'timeline', 'glossary',
-  'method', 'onboarding', 'share-card', 'welcome', 'year', 'your-data', 'invite',
+  'method', 'onboarding', 'share-card', 'welcome', 'year', 'your-data', 'invite', 'rhythm',
 ]);
 
 const RESEND_AFTER_MS = 30_000;

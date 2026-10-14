@@ -20,6 +20,7 @@ import { getCached, setCached } from '@/lib/persistentCache';
 import { OfflineNote } from '@/components/OfflineNote';
 import { ReminderPrompt } from '@/components/ReminderCard';
 import { FirstRunCard } from '@/components/FirstRunCard';
+import { DayCheckIn } from '@/components/DayCheckIn';
 import { useCoachStore } from '@/store/useCoachStore';
 import { aspectWord, bodyName, natalName } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
@@ -364,6 +365,16 @@ export default function Today() {
               <TodaySignal today={today} triad={triad} isToday={isToday} />
             </FadeIn>
           )}
+          {isToday ? (
+            <DayCheckIn
+              date={liveDate}
+              ctx={{
+                personalDay: dayNum?.personal.number ?? null,
+                signal: triad?.signal?.overall.state ?? null,
+                moonSign: today.moon.sign ?? null,
+              }}
+            />
+          ) : null}
           {isToday ? <MeetTriadCard /> : null}
           {triad ? (
             <FadeIn delay={40}>
