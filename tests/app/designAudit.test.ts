@@ -62,3 +62,9 @@ test('the circuit resumes each loop from where it stopped, one whole turn at a t
   assert.match(c, /withTiming\(t\.value \+ 1,/);
   assert.match(c, /withTiming\(sway\.value \+ 1,/);
 });
+
+test('the Today title is one line with no year, since the date pill shows the full date', () => {
+  const t = src('mobile/src/app/(tabs)/today.tsx');
+  assert.ok(!/\{ year: 'numeric' \}/.test(t.slice(t.indexOf('const dateLabel'), t.indexOf('const relation'))));
+  assert.match(t, /style=\{styles\.title\} numberOfLines=\{1\} adjustsFontSizeToFit/);
+});

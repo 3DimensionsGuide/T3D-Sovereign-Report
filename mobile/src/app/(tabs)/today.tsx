@@ -248,7 +248,8 @@ export default function Today() {
 
   const shown = viewDate ?? new Date(`${liveDate}T12:00:00`);
   const dateLabel = shown.toLocaleDateString(undefined, {
-    weekday: 'long', month: 'long', day: 'numeric', ...(isToday ? {} : { year: 'numeric' }),
+    // No year here: the date pill under the title always shows the full date with its year.
+    weekday: 'long', month: 'long', day: 'numeric',
   });
   const relation = isToday
     ? null
@@ -297,7 +298,7 @@ export default function Today() {
                 : undefined}
             />
           </View>
-          <Text accessibilityRole="header" style={styles.title}>{dateLabel}</Text>
+          <Text accessibilityRole="header" style={styles.title} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{dateLabel}</Text>
           <Text style={guidance}>{pulledBefore === false ? 'Read against your own chart. Pull down to refresh.' : 'Read against your own chart.'}</Text>
         </View>
         <View style={styles.dateBar}>
