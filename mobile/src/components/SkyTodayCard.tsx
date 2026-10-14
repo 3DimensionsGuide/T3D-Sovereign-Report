@@ -3,6 +3,7 @@ import { AccentView } from '@/components/AccentView';
 import { Disclosure } from '@/components/Disclosure';
 import { Term } from '@/components/Explain';
 import { MoonIcon } from '@/components/MoonIcon';
+import { SkyRing } from '@/components/SkyRing';
 import type { TodayResult } from '@/lib/api';
 import { bodyName, contactSentence, houseTheme, ordinal, phaseMeaning } from '@/lib/skyText';
 import { houseId, planetId } from '@/lib/termIds';
@@ -35,6 +36,12 @@ export function SkyTodayCard({ today }: { today: TodayResult }) {
       </Text>
 
       <View style={styles.divider} />
+
+      {today.positions && today.positions.length ? (
+        <Disclosure label="Where everything is now" defaultOpen>
+          <SkyRing positions={today.positions} />
+        </Disclosure>
+      ) : null}
 
       <Text style={styles.body}>
         <Text style={styles.strong}>Sun in {sun.formatted}, </Text>
