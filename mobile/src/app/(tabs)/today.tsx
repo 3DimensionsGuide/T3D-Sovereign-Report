@@ -19,6 +19,8 @@ import { useLocalDate } from '@/lib/useLocalDate';
 import { getCached, setCached } from '@/lib/persistentCache';
 import { OfflineNote } from '@/components/OfflineNote';
 import { ReminderPrompt } from '@/components/ReminderCard';
+import { FirstRunCard } from '@/components/FirstRunCard';
+import { useCoachStore } from '@/store/useCoachStore';
 import { aspectWord, bodyName, natalName } from '@/lib/skyText';
 import { Term } from '@/components/Explain';
 import { TimeNote } from '@/components/TimeNote';
@@ -107,6 +109,7 @@ function TransitRow({
 }
 
 export default function Today() {
+  const coachSeen = useCoachStore((s) => s.seen);
   const profile = useT3DStore((state) => state.profile);
   const chart = useT3DStore((state) => state.chart);
   const premium = usePremium();
@@ -339,7 +342,9 @@ export default function Today() {
         <SkeletonCards label="Reading the sky…" />
       ) : null}
 
-      {today ? <ReminderPrompt /> : null}
+      {today ? <FirstRunCard /> : null}
+
+      {today && coachSeen ? <ReminderPrompt /> : null}
 
       {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 

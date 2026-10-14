@@ -12,6 +12,7 @@ import { FadeIn } from '@/components/FadeIn';
 import { Field } from '@/components/Field';
 import { GoldButton } from '@/components/GoldButton';
 import { CalculatingView } from '@/components/CalculatingView';
+import { RevealView } from '@/components/RevealView';
 import { TriadSeal } from '@/components/TriadSeal';
 import {
   ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
@@ -59,6 +60,9 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
   /** Set after the chart is built, when the person asked for emails and a code was sent. */
   const [codeStep, setCodeStep] = useState<{ leadId: number; email: string; notice: string | null } | null>(null);
+  /** The chart is built and the reveal is on screen; the code step (if any) waits behind it. */
+  const [revealing, setRevealing] = useState(false);
+  const [pendingCode, setPendingCode] = useState<{ leadId: number; email: string; notice: string | null } | null>(null);
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeBusy, setCodeBusy] = useState(false);
@@ -152,15 +156,16 @@ export default function Onboarding() {
       setChart(profile, chart);
       setCalcDone(true);
       await new Promise((resolve) => setTimeout(resolve, 900));
-      if (profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')) {
-        setCodeStep({
-          leadId: chart.leadId,
-          email: profile.email,
-          notice: optInCode === 'failed' ? 'We could not send the code just now. Tap "Send a new code" to try again.' : null,
-        });
-      } else {
-        router.replace('/today');
-      }
+      setPendingCode(
+        profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')
+          ? {
+              leadId: chart.leadId,
+              email: profile.email,
+              notice: optInCode === 'failed' ? 'We could not send the code just now. Tap "Send a new code" to try again.' : null,
+            }
+          : null,
+      );
+      setRevealing(true);
     } catch (error) {
       flagError();
       setCalculating(false);
@@ -202,6 +207,30 @@ export default function Onboarding() {
     } finally {
       setCodeBusy(false);
     }
+  }
+
+  function leaveReveal() {
+    if (pendingCode) {
+      setCodeStep(pendingCode);
+      setRevealing(false);
+    } else {
+      router.replace('/today');
+    }
+  }
+
+  const revealChart = useT3DStore.getState().chart;
+  if (revealing && !codeStep && revealChart) {
+    return (
+      <Screen>
+        <RevealView
+          chart={revealChart}
+          birthTimeKnown={timeKnown}
+          firstName={firstName.trim() || null}
+          onContinue={leaveReveal}
+          onShare={() => router.push('/share-card')}
+        />
+      </Screen>
+    );
   }
 
   if (calculating && !codeStep) {

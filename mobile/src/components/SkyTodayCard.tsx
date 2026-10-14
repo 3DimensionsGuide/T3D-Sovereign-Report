@@ -19,7 +19,7 @@ export function SkyTodayCard({ today }: { today: TodayResult }) {
   return (
     <AccentView style={styles.card} accent={colors.stoplight}>
       <View style={styles.moonHead}>
-        <MoonIcon illuminationPercent={moon.illuminationPercent} waxing={moon.waxing} size={44} />
+        <MoonIcon illuminationPercent={moon.illuminationPercent} waxing={moon.waxing} size={96} hero />
         <View style={styles.flex}>
           <Text accessibilityRole="header" style={styles.cardTitle}>The sky today</Text>
           <Text style={styles.moonLine}>

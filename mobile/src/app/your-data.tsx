@@ -109,7 +109,7 @@ export default function YourData() {
           />
 
           <GoldButton
-            label="Replay the welcome tour"
+            label="Show the welcome note again"
             variant="ghost"
             onPress={() => {
               router.navigate('/today' as Href);

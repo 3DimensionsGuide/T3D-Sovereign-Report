@@ -1,12 +1,15 @@
-import { useId } from 'react';
+import { useEffect, useId } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, {
+  Easing, FadeIn, useAnimatedProps, useSharedValue, withDelay, withRepeat, withSequence, withTiming,
+} from 'react-native-reanimated';
 import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Polygon, Stop } from 'react-native-svg';
 import { useReduceMotion } from '@/lib/motion';
 import { LENS_COLOR } from '@/components/Lens';
 import type { RoomArt as ArtKind } from '@/theme/rooms';
 
 const HEIGHT = 460;
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /** A fixed set of star positions, so the sky looks the same every time you open the tab. */
 const STARS = (() => {
@@ -17,6 +20,26 @@ const STARS = (() => {
   };
   return Array.from({ length: 34 }, () => ({ x: next() * 100, y: next() * 330, r: 0.5 + next() * 0.9, o: 0.12 + next() * 0.33 }));
 })();
+
+/** One star that slowly brightens and dims, out of step with its neighbours. Only the opacity changes. */
+function TwinkleStar({ x, y, r, color, low, index }: { x: number; y: number; r: number; color: string; low: number; index: number }) {
+  const glow = useSharedValue(low);
+  useEffect(() => {
+    const period = 2200 + (index % 5) * 700;
+    glow.value = withDelay(
+      (index % 7) * 450,
+      withRepeat(
+        withSequence(
+          withTiming(Math.min(0.85, low + 0.5), { duration: period, easing: Easing.inOut(Easing.sin) }),
+          withTiming(low, { duration: period, easing: Easing.inOut(Easing.sin) }),
+        ),
+        -1,
+      ),
+    );
+  }, [glow, low, index]);
+  const animatedProps = useAnimatedProps(() => ({ opacity: glow.value }));
+  return <AnimatedCircle cx={`${x}%`} cy={y} r={r} fill={color} animatedProps={animatedProps} />;
+}
 
 /**
  * One piece of faint line art behind a room's content. Decorative only: hidden from screen readers,
@@ -46,7 +69,11 @@ export function RoomArtLayer({
         </Defs>
         {kind === 'stars'
           ? STARS.map((s, i) => (
-              <Circle key={i} cx={`${s.x}%`} cy={s.y + 40} r={s.r} fill={color} opacity={s.o} />
+              i % 6 === 0 && !reduce ? (
+                <TwinkleStar key={i} x={s.x} y={s.y + 40} r={s.r + 0.3} color={color} low={s.o} index={i} />
+              ) : (
+                <Circle key={i} cx={`${s.x}%`} cy={s.y + 40} r={s.r} fill={color} opacity={s.o} />
+              )
             ))
           : null}
         {kind === 'road'

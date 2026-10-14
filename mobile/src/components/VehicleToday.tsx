@@ -1,3 +1,4 @@
+import { HexagramGlyph } from '@/components/HexagramGlyph';
 import { StyleSheet, Text, View } from 'react-native';
 import { Disclosure } from '@/components/Disclosure';
 import { LensIcon } from '@/components/Lens';
@@ -22,7 +23,10 @@ function GateBlock({ g, index, total, dayLabel }: { g: GateToday; index: number;
       <Text style={styles.when}>
         {total > 1 ? (index === 0 ? `Earlier ${dayWord}` : `Later ${dayWord}`) : (dayLabel ?? 'Today')} · {gateWindow(g, dayWord)}
       </Text>
-      <Text accessibilityRole="header" style={styles.gateTitle}>Gate {g.gate}: {g.name}</Text>
+      <View style={styles.titleRow}>
+        <HexagramGlyph gate={g.gate} size={26} />
+        <Text accessibilityRole="header" style={[styles.gateTitle, styles.titleText]}>Gate {g.gate}: {g.name}</Text>
+      </View>
       <Text style={styles.body}>{g.meaning} It sits in the {g.center} Center, and the Sun is in line {g.line}.</Text>
       <Text style={styles.label}>What the Sun brings</Text>
       <Text style={styles.body}>{g.reading.theme}</Text>
@@ -43,9 +47,12 @@ function MoonBlock({ m, dayWord }: { m: MoonChannel; dayWord: string }) {
   return (
     <View style={styles.gate}>
       <Text style={styles.when}>{gateWindow(m, dayWord)}</Text>
-      <Text accessibilityRole="header" style={styles.gateTitle}>
-        Moon in Gate {m.gate}: Channel {m.channel}{m.channelName ? `, ${m.channelName}` : ''}
-      </Text>
+      <View style={styles.titleRow}>
+        <HexagramGlyph gate={m.gate} size={26} />
+        <Text accessibilityRole="header" style={[styles.gateTitle, styles.titleText]}>
+          Moon in Gate {m.gate}: Channel {m.channel}{m.channelName ? `, ${m.channelName}` : ''}
+        </Text>
+      </View>
       <Text style={styles.body}>Gate {m.gate} ({m.name}) is the missing half of a channel you hold one gate of. While the Moon is here that channel is lit for you: a spark, not a decision.</Text>
       <Text style={styles.label}>What the channel brings</Text>
       <Text style={styles.body}>{m.reading.theme}</Text>
@@ -109,6 +116,8 @@ const styles = StyleSheet.create({
   gate: { gap: 8 },
   gateDivider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.rule, paddingTop: space.md },
   when: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  titleText: { flex: 1 },
   gateTitle: { fontFamily: fonts.bodyBold, fontSize: 18, lineHeight: 25, color: colors.parchment },
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
