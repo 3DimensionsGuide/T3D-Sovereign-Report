@@ -4,17 +4,18 @@ import Animated, {
   Easing, useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
-import Svg, { Circle, Defs, G, Line, LinearGradient, Polygon, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, G, Line, LinearGradient, Polygon, RadialGradient, Stop, Text as SvgText } from 'react-native-svg';
 import { LENS_COLOR } from '@/components/Lens';
 import {
   CORE, CORE_CIRCUMFERENCE, CORE_DISC, CORE_RING, CORNERS, CORNER_R, CORNER_S, CORNER_V, EDGES, SPOKES,
   backOf, clamp01, mixHex, pulseOffset, stagger, wrap01, type Pt, type Trace,
 } from '@/lib/triadCircuit';
-import { colors } from '@/theme/tokens';
+import { colors, fonts } from '@/theme/tokens';
 
 const AnimatedLine = Animated.createAnimatedComponent(Line);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);
+const AnimatedText = Animated.createAnimatedComponent(SvgText);
 
 const LENSES = [LENS_COLOR.vehicle, LENS_COLOR.road, LENS_COLOR.stoplight] as const;
 const SPARK = '#FFF6D6';
@@ -129,7 +130,9 @@ function Core({ clock, animate }: { clock: Clock; animate: boolean }) {
   const breath = useAnimatedProps(() => ({
     fillOpacity: 0.1 + clamp01((on.value - 0.5) * 2) * (0.09 + 0.09 * Math.sin(t.value * Math.PI * 2)) + surge.value * 0.25,
   }));
+  const word = useAnimatedProps(() => ({ fillOpacity: 0.4 + 0.4 * clamp01((on.value - 0.5) * 2) }));
   return (
+    <>
     <G rotation={-90} origin={`${CORE.x}, ${CORE.y}`}>
       <Circle cx={CORE.x} cy={CORE.y} r={CORE_DISC} fill={colors.obsidian} fillOpacity={0.85} stroke={colors.goldEdge} strokeWidth={0.5} />
       <AnimatedCircle cx={CORE.x} cy={CORE.y} r={CORE_DISC} fill={colors.gold} animatedProps={breath} />
@@ -139,6 +142,9 @@ function Core({ clock, animate }: { clock: Clock; animate: boolean }) {
         <AnimatedCircle cx={CORE.x} cy={CORE.y} r={CORE_RING} fill="none" stroke={SPARK} strokeWidth={2} strokeLinecap="round" strokeDasharray={`3.5 ${C}`} animatedProps={comet} />
       ) : null}
     </G>
+    {/* Drawn inside the tilting layer so the glass of the core can never cover it. */}
+    <AnimatedText x={CORE.x} y={CORE.y + 2.7} fontSize={7.6} fontFamily={fonts.display} textAnchor="middle" fill={colors.parchment} animatedProps={word}>T3D</AnimatedText>
+    </>
   );
 }
 

@@ -124,6 +124,6 @@ const styles = StyleSheet.create({
   sub: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.parchmentMuted },
   alignRight: { textAlign: 'right' },
   core: { position: 'absolute', left: '50%', width: '20%', marginLeft: '-10%', alignItems: 'center', justifyContent: 'center' },
-  coreText: { fontFamily: fonts.display, fontSize: 20, color: colors.gold },
+  coreText: { fontFamily: fonts.display, fontSize: 20, color: 'transparent' },
   centre: { position: 'absolute', left: 0, right: 0, textAlign: 'center', fontFamily: fonts.display, fontSize: 22, color: colors.parchmentMuted },
 });
