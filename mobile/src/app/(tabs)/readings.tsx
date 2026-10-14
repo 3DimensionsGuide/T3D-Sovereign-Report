@@ -126,6 +126,6 @@ export default function Readings() {
 const styles = StyleSheet.create({
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3 },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 32, lineHeight: 40, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
 });

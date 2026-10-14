@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
   showMoreText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.gold },
   header: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 3, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 32, lineHeight: 40, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xxl },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },

@@ -7,6 +7,7 @@ import { DecideFlow } from '@/components/practice/DecideFlow';
 import { DecisionLog } from '@/components/practice/DecisionLog';
 import { SevenDay } from '@/components/practice/SevenDay';
 import { Together } from '@/components/practice/Together';
+import { LensLabel } from '@/components/Lens';
 import { PremiumGate } from '@/components/PremiumGate';
 import { usePractice } from '@/lib/usePractice';
 import { usePremium } from '@/lib/usePremium';
@@ -40,6 +41,7 @@ export default function Practice() {
   return (
     <Screen room="ritual" refreshing={refreshing} onRefresh={refresh}>
       <View style={styles.head}>
+        <LensLabel lens="vehicle">Put it to work</LensLabel>
         <Text accessibilityRole="header" style={styles.title}>Practice</Text>
         <Text style={guidance}>Decide through your design. Everything you write stays on this phone.</Text>
       </View>
@@ -67,8 +69,8 @@ export default function Practice() {
 }
 
 const styles = StyleSheet.create({
-  head: { gap: 6, paddingTop: space.sm },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 34, color: colors.parchment },
+  head: { gap: 6, paddingTop: space.lg, paddingBottom: space.sm },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 32, lineHeight: 40, color: colors.parchment },
   explain: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
 });

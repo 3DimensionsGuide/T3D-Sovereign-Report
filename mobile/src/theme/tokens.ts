@@ -79,10 +79,10 @@ export const tabular = { fontVariant: ['tabular-nums', 'lining-nums'] } as const
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 } as const;
 
 /**
- * The type scale: every in-app font size is one of these ten steps (share cards and wallpapers are drawn
+ * The type scale: every in-app font size is one of these eleven steps (share cards and wallpapers are drawn
  * on fixed canvases and keep their own sizes). Line heights follow the size.
  */
-export const TYPE = { caption: 12, label: 13, body: 15, bodyLg: 17, title: 20, subhead: 22, heading: 24, headingLg: 28, display: 34, hero: 40 } as const;
+export const TYPE = { caption: 12, label: 13, body: 15, bodyLg: 17, title: 20, subhead: 22, heading: 24, headingLg: 28, headline: 32, display: 34, hero: 40 } as const;
 export const TYPE_STEPS: readonly number[] = Object.values(TYPE);
 
 /** The four letter-spacings: normal text, small labels, eyebrows, and the wordmark. */
