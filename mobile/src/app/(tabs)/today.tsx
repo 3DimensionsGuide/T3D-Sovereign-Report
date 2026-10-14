@@ -20,6 +20,7 @@ import { getCached, setCached } from '@/lib/persistentCache';
 import { OfflineNote } from '@/components/OfflineNote';
 import { ReminderPrompt } from '@/components/ReminderCard';
 import { FirstRunCard } from '@/components/FirstRunCard';
+import { JourneyCard } from '@/components/JourneyCard';
 import { DayCheckIn } from '@/components/DayCheckIn';
 import { useCoachStore } from '@/store/useCoachStore';
 import { aspectWord, bodyName, natalName } from '@/lib/skyText';
@@ -347,6 +348,8 @@ export default function Today() {
       {today ? <FirstRunCard /> : null}
 
       {today && coachSeen ? <ReminderPrompt /> : null}
+
+      {today && coachSeen ? <JourneyCard /> : null}
 
       {offline && today ? <OfflineNote savedAt={savedCopyAt} /> : null}
 

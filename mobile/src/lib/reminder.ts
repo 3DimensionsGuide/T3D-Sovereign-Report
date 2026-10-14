@@ -1,13 +1,14 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useReminderStore } from '@/store/useReminderStore';
+import { REMINDER_LINES, reminderLine } from '@/lib/reminderLines';
 import { anyAlertOn, planAlerts, type AlertKind, type AlertSource } from '@/lib/personalAlerts';
 
 /**
  * The daily "Today's frame is ready" reminder.
  * It is a local notification: the phone itself shows it at the chosen time, so no
- * server, no account and no personal data is involved. The text is the same every
- * day and makes no claim about the day.
+ * server, no account and no personal data is involved. The wording changes with the weekday but
+ * never makes a claim about the day: every line only says Today's frame is ready.
  */
 
 const CHANNEL_ID = 'daily-frame';
@@ -34,7 +35,7 @@ async function cancelAlerts(): Promise<void> {
   );
 }
 export const REMINDER_TITLE = 'T3D';
-export const REMINDER_BODY = 'Today’s frame is ready.';
+export const REMINDER_BODY = REMINDER_LINES[0]!;
 
 /** Shows a reminder as a banner even if the app is open. Call once at startup. */
 export function configureNotifications(): void {
@@ -63,18 +64,23 @@ async function ensureChannel(): Promise<void> {
 
 async function schedule(hour: number, minute: number): Promise<void> {
   await ensureChannel();
-  // One repeating reminder only: clear what was there, then set the new time.
+  // Clear what was there, then set one reminder for each day of the week, each with its own neutral wording.
   await cancelDaily();
-  await Notifications.scheduleNotificationAsync({
-    identifier: DAILY_ID,
-    content: { title: REMINDER_TITLE, body: REMINDER_BODY },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour,
-      minute,
-      channelId: CHANNEL_ID,
-    },
-  });
+  await Promise.all(
+    [1, 2, 3, 4, 5, 6, 7].map((weekday) =>
+      Notifications.scheduleNotificationAsync({
+        identifier: `${DAILY_ID}-${weekday}`,
+        content: { title: REMINDER_TITLE, body: reminderLine(weekday) },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+          weekday,
+          hour,
+          minute,
+          channelId: CHANNEL_ID,
+        },
+      }),
+    ),
+  );
 }
 
 export type EnableResult = 'on' | 'blocked';

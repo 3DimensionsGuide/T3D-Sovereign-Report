@@ -14,6 +14,7 @@ import { useCoachStore } from '@/store/useCoachStore';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { useDayLogStore } from '@/store/useDayLogStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
+import { useJourneyStore } from '@/store/useJourneyStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
 
@@ -63,6 +64,7 @@ export default function YourData() {
       useT3DStore.getState().reset();
       usePartnerStore.getState().clearPartner();
       usePracticeStore.getState().clearAll();
+      useJourneyStore.getState().clearAll();
       useDayLogStore.getState().clearAll();
       await clearAllCached();
       await clearReminder();
