@@ -205,7 +205,7 @@ function phase(): TermDrawing {
   stops.forEach(([pct, waxing], i) => {
     const cx = 30 + i * 37.1;
     const cy = 72;
-    prims.push(dot(cx, cy, 15, '#1B1B20', LINE, 1.2));
+    prims.push(dot(cx, cy, 15, c.well, LINE, 1.2));
     const m = moonShape(pct, waxing, 15, cx, cy);
     if (m.kind === 'full') prims.push(dot(cx, cy, 15, c.parchment));
     else if (m.kind === 'path') prims.push({ k: 'path', d: m.d, fill: c.parchment });
@@ -230,7 +230,7 @@ function eclipse(): TermDrawing {
       { k: 'path', d: 'M 165 66 L 266 69 L 266 79 L 165 82 Z', fill: c.stoplight, op: 0.3 },
       dot(165, 74, 9, c.muted),
       text(165, 100, 'Moon', { size: 12, fill: c.parchment }),
-      dot(270, 74, 15, '#1B1B20', c.parchment, 2),
+      dot(270, 74, 15, c.well, c.parchment, 2),
       text(270, 116, 'Earth', { size: 12, fill: c.parchment }),
       text(218, 54, 'Shadow', { size: 11, fill: c.stoplight }),
       text(160, 140, 'An eclipse: Sun, Moon and Earth line up', { size: 11 }),
@@ -321,7 +321,7 @@ function channelDrawing(full: boolean): TermDrawing {
       line(88, 78, 160, 78, c.vehicle, 5),
       line(160, 78, 232, 78, FAINT, 2, '5 5'),
       dot(88, 78, 7, c.parchment, c.vehicle, 2),
-      dot(232, 78, 7, '#1B1B20', LINE, 2),
+      dot(232, 78, 7, c.well, LINE, 2),
       text(88, 118, 'Your gate', { size: 12, fill: c.parchment }),
       text(232, 116, 'Partner gate', { size: 12, anchor: 'middle' }),
       text(232, 127, 'not in your chart', { size: 10 }),
@@ -359,10 +359,10 @@ function profileDrawing(): TermDrawing {
   return {
     scene: scene([
       text(160, 16, 'Example: a 3/5 profile', { size: 12 }),
-      dot(86, 66, 30, '#1B1B20', c.personality, 2.5),
+      dot(86, 66, 30, c.well, c.personality, 2.5),
       text(86, 66, '3', { size: 28, fill: c.parchment, bold: true }),
       text(160, 66, '/', { size: 44, fill: c.muted }),
-      dot(234, 66, 30, '#1B1B20', c.design, 2.5),
+      dot(234, 66, 30, c.well, c.design, 2.5),
       text(234, 66, '5', { size: 28, fill: c.parchment, bold: true }),
       text(86, 112, 'Conscious', { size: 12, fill: c.parchment, bold: true }),
       text(86, 128, 'Personality line', { size: 11 }),
@@ -434,7 +434,7 @@ function master(): TermDrawing {
   const nums: ReadonlyArray<readonly [string, string]> = [['11', 'not 2'], ['22', 'not 4'], ['33', 'not 6']];
   nums.forEach(([n, not], i) => {
     const x = 62 + i * 98;
-    prims.push(dot(x, 64, 30, '#1B1B20', c.road, 2.5), text(x, 64, n, { size: 26, fill: c.parchment, bold: true }), text(x, 108, `kept whole,`, { size: 11 }), text(x, 122, not, { size: 11, fill: c.parchment }));
+    prims.push(dot(x, 64, 30, c.well, c.road, 2.5), text(x, 64, n, { size: 26, fill: c.parchment, bold: true }), text(x, 108, `kept whole,`, { size: 11 }), text(x, 122, not, { size: 11, fill: c.parchment }));
   });
   prims.push(text(160, 16, 'Master numbers', { size: 14, fill: c.parchment, bold: true }));
   return { scene: scene(prims), label: 'Three circles holding 11, 22 and 33. Each is kept whole instead of being reduced to a single digit.' };

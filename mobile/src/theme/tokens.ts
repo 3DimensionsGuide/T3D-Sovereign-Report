@@ -46,7 +46,8 @@ export const colors = {
   /** Secondary text — still above 7:1 (WCAG AAA) on obsidian. */
   parchmentMuted: 'rgba(245,245,243,0.72)',
   hairline: 'rgba(245,245,243,0.14)',
-  danger: '#FF8A8A',
+  /** Errors and warnings: the same light red as Stoplight text, so there is one light red in the app. */
+  danger: '#F79A95',
   /** Off position of every switch. */
   switchOff: '#6B6B73',
 } as const;
@@ -67,7 +68,7 @@ export const guidance = {
   fontFamily: 'CormorantGaramond_500Medium_Italic',
   fontSize: 20,
   lineHeight: 28,
-  letterSpacing: 0.2,
+  letterSpacing: 0.3,
   color: colors.parchmentMuted,
 } as const;
 
@@ -76,6 +77,17 @@ export const tabular = { fontVariant: ['tabular-nums', 'lining-nums'] } as const
 
 /** 4pt spacing scale. */
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 } as const;
+
+/**
+ * The type scale: every in-app font size is one of these ten steps (share cards and wallpapers are drawn
+ * on fixed canvases and keep their own sizes). Line heights follow the size.
+ */
+export const TYPE = { caption: 12, label: 13, body: 15, bodyLg: 17, title: 20, subhead: 22, heading: 24, headingLg: 28, display: 34, hero: 40 } as const;
+export const TYPE_STEPS: readonly number[] = Object.values(TYPE);
+
+/** The four letter-spacings: normal text, small labels, eyebrows, and the wordmark. */
+export const TRACKING = { tight: 0.3, label: 1.6, eyebrow: 2, wide: 3, wordmark: 5.5 } as const;
+export const TRACKING_STEPS: readonly number[] = Object.values(TRACKING);
 
 export const radius = { sm: 8, md: 14, lg: 22 } as const;
 

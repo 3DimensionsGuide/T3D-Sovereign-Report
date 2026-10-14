@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   top: { left: 0, right: 0, alignItems: 'center' },
   left: { left: 0, width: '46%' },
   right: { right: 0, width: '46%', alignItems: 'flex-end' },
-  lens: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 0.4 },
+  lens: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 0.3 },
   head: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 17, lineHeight: 22, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.parchmentMuted },
   alignRight: { textAlign: 'right' },

@@ -164,7 +164,7 @@ function PartnerForm({ onDone, onCancel }: { onDone: () => void; onCancel?: () =
       ) : null}
       <View style={styles.pickerRow}>
         <Text style={styles.pickerLabel}>Birth time unknown</Text>
-        <Switch value={timeUnknown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
+        <Switch value={timeUnknown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor={colors.switchOff}
           accessibilityLabel="Birth time unknown" />
       </View>
       {!timeKnown ? (
@@ -543,22 +543,22 @@ const styles = StyleSheet.create({
   noteBox: { padding: space.md, borderRadius: radius.md, backgroundColor: T.raised, borderWidth: 1, borderColor: colors.gold },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 31, color: colors.parchment },
-  personTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 19, lineHeight: 26, color: colors.parchment },
+  personTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
-  small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  small: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   center: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },
   pickerRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
   chooseBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold, backgroundColor: T.raised },
   chooseText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
-  pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment, flexShrink: 1 },
+  pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment, flexShrink: 1 },
   placeRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: T.edge },
   mark: { fontSize: 20, color: colors.gold },
-  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
   rowBox: { gap: 4, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline },
   pair: { flexDirection: 'row', gap: space.md, backgroundColor: T.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, padding: space.lg },
   pairCell: { flex: 1, alignItems: 'center', gap: 4 },
-  pairName: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchment },
+  pairName: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   pairType: { fontFamily: fonts.bodyMedium, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted, textAlign: 'center' },
   stepRow: { flexDirection: 'row', gap: 10 },
   stepNum: { fontFamily: fonts.bodyBold, fontSize: 15, lineHeight: 23, color: colors.gold, width: 16 },

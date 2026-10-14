@@ -180,7 +180,7 @@ export default function ShareCard() {
         <Switch
           value={withName}
           onValueChange={setWithName}
-          trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
+          trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor={colors.switchOff}
           accessibilityLabel="Add my first name"
         />
       </View>
@@ -204,10 +204,10 @@ export default function ShareCard() {
 
 const styles = StyleSheet.create({
   header: { gap: 6, paddingTop: space.lg },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 30, lineHeight: 38, color: colors.parchment },
-  small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 35, color: colors.parchment },
+  small: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   preview: { alignItems: 'center', marginVertical: space.md },
   switchRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
-  switchLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  switchLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
 });

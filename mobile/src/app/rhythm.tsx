@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: { padding: space.lg, gap: space.md, paddingBottom: space.xl * 2 },
   back: { minHeight: TOUCH - 4, justifyContent: 'center', alignSelf: 'flex-start' },
-  backText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 32, lineHeight: 40, color: colors.parchment },
+  backText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchmentMuted },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   card: {
     backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,

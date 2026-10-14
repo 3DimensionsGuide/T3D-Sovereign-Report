@@ -41,11 +41,11 @@ const styles = StyleSheet.create({
     backgroundColor: T.surface,
   },
   text: { flex: 1, gap: 1 },
-  month: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 18, color: colors.parchment },
+  month: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 17, color: colors.parchment },
   detail: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
   jump: {
     minHeight: TOUCH, justifyContent: 'center', paddingHorizontal: space.md,
     borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold,
   },
-  jumpText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.gold },
+  jumpText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold },
 });

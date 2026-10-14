@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     borderColor: colors.goldEdge,
     padding: space.lg, gap: space.md,
   },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 32, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
 });

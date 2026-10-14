@@ -89,5 +89,5 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', gap: 3 },
   word: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.parchment },
   count: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted },
-  note: { alignSelf: 'stretch', fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted, textAlign: 'center' },
+  note: { alignSelf: 'stretch', fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted, textAlign: 'center' },
 });

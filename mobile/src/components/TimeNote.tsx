@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     gap: 6, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold,
     backgroundColor: T.surface,
   },
-  label: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
-  body: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchment },
+  label: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.parchmentMuted },
+  body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchment },
 });

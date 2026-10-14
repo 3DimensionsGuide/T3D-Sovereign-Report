@@ -120,6 +120,6 @@ const styles = StyleSheet.create({
     minHeight: FACT_H, justifyContent: 'center', paddingVertical: 3, paddingHorizontal: 12,
     backgroundColor: colors.charcoal, borderRadius: radius.md, borderLeftWidth: 4,
   },
-  factLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.2, color: colors.parchmentMuted, textTransform: 'uppercase' },
+  factLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.parchmentMuted, textTransform: 'uppercase' },
   factValue: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 17, lineHeight: 22, color: colors.parchment },
 });

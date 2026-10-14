@@ -50,7 +50,7 @@ export function Field({ label, error, why, shakeSignal = 0, ...inputProps }: Pro
 
 const styles = StyleSheet.create({
   wrap: { gap: 6 },
-  label: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.2, color: colors.parchmentMuted },
+  label: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.3, color: colors.parchmentMuted },
   input: {
     minHeight: TOUCH,
     borderRadius: radius.md,
@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
   },
   focused: { borderColor: colors.gold },
   errored: { borderColor: colors.danger },
-  error: { fontFamily: fonts.body, fontSize: 14, color: colors.danger },
+  error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   why: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
 });

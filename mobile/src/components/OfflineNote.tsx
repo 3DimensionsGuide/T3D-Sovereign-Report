@@ -22,5 +22,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,
     backgroundColor: colors.charcoal, padding: space.md,
   },
-  text: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  text: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
 });

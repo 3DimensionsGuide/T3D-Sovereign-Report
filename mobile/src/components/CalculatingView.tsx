@@ -65,6 +65,6 @@ const styles = StyleSheet.create({
   rows: { gap: space.lg, alignSelf: 'stretch', paddingHorizontal: space.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   rowText: { flex: 1, gap: 2 },
-  lens: { fontFamily: fonts.bodyBold, fontSize: 14 },
+  lens: { fontFamily: fonts.bodyBold, fontSize: 15 },
   line: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchment },
 });

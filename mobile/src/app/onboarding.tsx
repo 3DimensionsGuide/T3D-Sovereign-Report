@@ -465,7 +465,7 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   hero: { gap: space.md, paddingTop: space.lg },
   stepNote: {
-    fontFamily: fonts.displayRegular, fontVariant: ['lining-nums'], fontSize: 13, letterSpacing: 4,
+    fontFamily: fonts.displayRegular, fontVariant: ['lining-nums'], fontSize: 13, letterSpacing: 3,
     textTransform: 'uppercase', color: colors.parchmentMuted,
   },
   progress: { flexDirection: 'row', gap: 6 },
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.parchmentMuted, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: colors.gold },
   radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.gold },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 38, lineHeight: 46, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 40, lineHeight: 48, color: colors.parchment },
   linkRow: { minHeight: 48, justifyContent: 'center' },
   link: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.gold, textDecorationLine: 'underline' },
   lede: { ...guidance },
@@ -487,9 +487,9 @@ const styles = StyleSheet.create({
     minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     gap: space.md,
   },
-  pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment, flexShrink: 1 },
-  unknownTime: { fontFamily: fonts.body, fontSize: 16, color: colors.parchmentMuted },
-  hint: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment, flexShrink: 1 },
+  unknownTime: { fontFamily: fonts.body, fontSize: 17, color: colors.parchmentMuted },
+  hint: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   actions: { gap: space.md, marginTop: space.md },
   confirmCard: {
     gap: 4, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline,
@@ -502,5 +502,5 @@ const styles = StyleSheet.create({
   },
   placeRowOn: { borderColor: colors.gold },
   placeText: { flex: 1, gap: 2 },
-  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
 });

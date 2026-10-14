@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
   resting: { backgroundColor: colors.amethyst, borderWidth: 1, borderColor: colors.hairline },
   restingLabel: { color: colors.parchmentMuted },
   inactive: { opacity: 0.55 },
-  label: { fontFamily: fonts.bodyBold, fontSize: 16, letterSpacing: 0.6, color: colors.obsidian },
+  label: { fontFamily: fonts.bodyBold, fontSize: 17, letterSpacing: 0.3, color: colors.obsidian },
   ghostLabel: { color: colors.parchment },
 });

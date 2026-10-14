@@ -53,10 +53,10 @@ const styles = StyleSheet.create({
   colTop: { borderColor: colors.road, backgroundColor: 'rgba(31,138,77,0.14)' },
   colEmpty: { borderColor: T.edge, borderStyle: 'dashed' },
   mark: { fontFamily: fonts.bodyBold, fontSize: 12, lineHeight: 14, color: colors.road },
-  num: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.parchmentMuted },
+  num: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchmentMuted },
   numTop: { color: colors.parchment },
   letters: { flexGrow: 1, alignItems: 'center', gap: 1, minHeight: 20 },
-  letter: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 18, color: colors.parchment },
+  letter: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 19, color: colors.parchment },
   count: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted, marginTop: 4 },
   key: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
 });

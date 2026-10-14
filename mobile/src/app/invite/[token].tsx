@@ -190,7 +190,7 @@ export default function InviteScreen() {
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>I do not know my birth time</Text>
             <Switch value={!timeKnown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: colors.switchOff, true: colors.gold }}
-              ios_backgroundColor="#6B6B73" accessibilityLabel="I do not know my birth time" />
+              ios_backgroundColor={colors.switchOff} accessibilityLabel="I do not know my birth time" />
           </View>
           {!timeKnown ? (
             <Text style={styles.small}>Without a birth time your Moon, Rising sign and exact Human Design cannot be pinned down, so the reading will say where it depends.</Text>
@@ -262,18 +262,18 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, gap: space.md },
   teaser: { gap: 2, paddingVertical: 4 },
   teaserValue: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 31 },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchment },
-  small: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  small: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
   center: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },
   actions: { gap: space.sm },
   pickerRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
-  pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment, flexShrink: 1 },
+  pickerLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment, flexShrink: 1 },
   chooseBtn: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 16, borderRadius: radius.md, borderWidth: 1, borderColor: colors.gold, backgroundColor: colors.surfaceRaised },
   chooseText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   placeRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderColor: colors.hairline },
   mark: { fontSize: 20, color: colors.gold },
-  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  placeLabel: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
 });

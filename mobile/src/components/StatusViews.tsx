@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     gap: space.md, padding: space.lg, borderRadius: radius.md,
     borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.charcoal,
   },
-  errorText: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.danger },
+  errorText: { fontFamily: fonts.body, fontSize: 17, lineHeight: 26, color: colors.danger },
   loading: { alignItems: 'center', gap: space.sm, paddingVertical: space.lg },
-  loadingText: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted, textAlign: 'center' },
+  loadingText: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted, textAlign: 'center' },
 });

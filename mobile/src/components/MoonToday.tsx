@@ -66,9 +66,9 @@ const styles = StyleSheet.create({
   headText: { flex: 1, fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26, color: colors.stoplight },
   block: { gap: 8 },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.rule, paddingTop: space.md },
-  when: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 20, color: colors.parchmentMuted },
-  title: { fontFamily: fonts.bodyBold, fontSize: 18, lineHeight: 25, color: colors.parchment },
+  when: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 21, color: colors.parchmentMuted },
+  title: { fontFamily: fonts.bodyBold, fontSize: 17, lineHeight: 24, color: colors.parchment },
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },
-  body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.parchmentMuted },
-  foot: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  body: { fontFamily: fonts.body, fontSize: 17, lineHeight: 26, color: colors.parchmentMuted },
+  foot: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
 });

@@ -181,5 +181,5 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.lg, marginTop: space.sm,
   },
   deleteBusy: { opacity: 0.5 },
-  deleteText: { fontFamily: fonts.bodyBold, fontSize: 14, letterSpacing: 1.6, color: colors.danger },
+  deleteText: { fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 1.6, color: colors.danger },
 });

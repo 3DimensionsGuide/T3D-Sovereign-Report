@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   col: { flex: 1 },
   head: { fontFamily: fonts.bodyMedium, fontSize: 13, color: LENS_TEXT.stoplight },
   name: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
-  sign: { fontFamily: fonts.body, fontSize: 16, color: colors.parchment },
+  sign: { fontFamily: fonts.body, fontSize: 17, color: colors.parchment },
   diff: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
   same: { fontFamily: fonts.body, fontSize: 13, color: colors.parchment, opacity: 0.8 },
   track: { flex: 1, height: 10, borderRadius: 5, backgroundColor: T.surface, overflow: 'hidden' },

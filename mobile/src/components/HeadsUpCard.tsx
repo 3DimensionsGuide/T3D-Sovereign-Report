@@ -75,6 +75,6 @@ const styles = StyleSheet.create({
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md, minHeight: 56 },
   text: { flex: 1, gap: 2 },
-  label: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  label: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
   detail: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
 });

@@ -118,7 +118,7 @@ export function SignalRibbon({ data, onSelectDay, premium = false }: Props) {
 const styles = StyleSheet.create({
   wrap: { gap: space.sm },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
-  sub: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  sub: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   ribbon: { gap: 6, paddingVertical: space.sm, paddingRight: space.md },
   cell: {
     width: CELL_W, minHeight: 88, alignItems: 'center', justifyContent: 'center', gap: 3,

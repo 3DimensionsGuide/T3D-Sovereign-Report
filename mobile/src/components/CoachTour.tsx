@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.obsidian, justifyContent: 'center', padding: space.lg },
   glow: { height: 460 },
   sheet: { gap: space.lg },
-  count: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted, letterSpacing: 1 },
+  count: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted, letterSpacing: 1.6 },
   page: { gap: space.lg, minHeight: 300, justifyContent: 'center' },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   rows: { gap: space.lg },

@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   openWrap: { gap: space.sm },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 56 },
   headText: { flex: 1, gap: 2 },
-  title: { fontFamily: fonts.bodyBold, fontSize: 16 },
+  title: { fontFamily: fonts.bodyBold, fontSize: 17 },
   hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.parchmentMuted },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 24, lineHeight: 26, color: colors.parchmentMuted },
   body: { gap: space.md },

@@ -42,7 +42,7 @@ export const SIGNAL_LABEL: Record<SignalKind, string> = {
 /** Signal colours are not lens colours: flow is a calm teal, friction a warm coral, caution the gold. */
 export const SIGNAL_COLOR: Record<SignalKind, string> = {
   flow: '#4FD1B5',
-  friction: '#F0836B',
+  friction: '#F79A95',
   caution: colors.sun,
   neutral: colors.parchmentMuted,
 };

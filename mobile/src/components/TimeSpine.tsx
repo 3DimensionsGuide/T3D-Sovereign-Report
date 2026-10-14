@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   bar: { position: 'absolute', top: 0, bottom: 0, borderRadius: 7 },
   cutLeft: { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 },
   cutRight: { borderTopRightRadius: 0, borderBottomRightRadius: 0 },
-  cut: { position: 'absolute', top: -3, fontFamily: fonts.bodyBold, fontSize: 18, lineHeight: 20, color: colors.obsidian },
+  cut: { position: 'absolute', top: -3, fontFamily: fonts.bodyBold, fontSize: 17, lineHeight: 19, color: colors.obsidian },
   exact: { position: 'absolute', top: 2, bottom: 2, width: 3, marginLeft: -1, borderRadius: 1, backgroundColor: colors.obsidian },
   meta: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.parchmentMuted },
   cycle: { gap: 6 },

@@ -55,5 +55,5 @@ const styles = StyleSheet.create({
     borderColor: colors.hairline, padding: space.lg, gap: 12,
   },
   bar: { borderRadius: 6, backgroundColor: colors.hairline },
-  caption: { fontFamily: fonts.body, fontSize: 14, color: colors.parchmentMuted, textAlign: 'center', marginTop: 2 },
+  caption: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted, textAlign: 'center', marginTop: 2 },
 });

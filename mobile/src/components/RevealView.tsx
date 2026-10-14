@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     padding: space.lg, gap: 6,
   },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  label: { fontFamily: fonts.bodyBold, fontSize: 14 },
+  label: { fontFamily: fonts.bodyBold, fontSize: 15 },
   hero: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
   line: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   actions: { gap: space.sm, paddingTop: space.sm },

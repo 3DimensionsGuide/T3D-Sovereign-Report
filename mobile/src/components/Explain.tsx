@@ -296,10 +296,10 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', gap: space.md, paddingVertical: space.xl },
   muted: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
   error: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.danger, textAlign: 'center' },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.4 },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2 },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 35, color: colors.parchment },
   summary: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 25, color: colors.parchment },
-  body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 25, color: colors.parchment },
+  body: { fontFamily: fonts.body, fontSize: 17, lineHeight: 27, color: colors.parchment },
   picture: {
     borderRadius: radius.md,
     backgroundColor: colors.obsidian,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.gold, borderStyle: 'dashed',
   },
   lockedText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold },
-  yoursLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.8, color: colors.gold },
+  yoursLabel: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6, color: colors.parchmentMuted },
   related: { gap: 8 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.line,
   },
-  chipText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.parchment },
+  chipText: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
   browse: {
     minHeight: TOUCH,
     alignItems: 'center',

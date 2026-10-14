@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   bumpNow: { borderColor: colors.gold, borderWidth: 2 },
   markerTrack: { height: 18, position: 'relative' },
   marker: { position: 'absolute', top: 0, marginLeft: -8 },
-  sentence: { fontFamily: fonts.bodyMedium, fontSize: 16, lineHeight: 23, color: colors.parchment },
-  match: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: LENS_TEXT.road },
+  sentence: { fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 24, color: colors.parchment },
+  match: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: LENS_TEXT.road },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 22, lineHeight: 24, color: colors.gold, marginLeft: 'auto' },
 });

@@ -10,11 +10,13 @@ export const chartColors = {
   stoplight: '#C83E3E',
   parchment: '#F5F5F3',
   muted: '#B9B7B2',
+  /** The dark fill behind a dot or badge in a drawing. */
+  well: '#1B1B20',
   /** Human Design convention: Personality = conscious (light), Design = unconscious (red). */
   personality: '#F5F5F3',
   design: '#E0605C',
   /** Aspect line colors (always also distinguished by dash style + legend). */
   flow: '#4FD1B5',
-  friction: '#F0836B',
+  friction: '#F79A95',
   conjunction: '#D4AF37',
 } as const;

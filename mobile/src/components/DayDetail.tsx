@@ -113,9 +113,9 @@ const styles = StyleSheet.create({
   rowText: { flex: 1, fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchment },
   chevron: { fontFamily: fonts.bodyBold, fontSize: 22, color: colors.gold, width: 24 },
   noMarker: { width: 15, height: 15 },
-  quiet: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.parchmentMuted },
+  quiet: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   body: { gap: 6, paddingBottom: space.sm },
   bodyText: { fontFamily: fonts.body, fontSize: 15, lineHeight: 23, color: colors.parchmentMuted },
   label: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold, marginTop: 4 },
-  lockNote: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 21, color: colors.gold, paddingBottom: space.sm },
+  lockNote: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.gold, paddingBottom: space.sm },
 });

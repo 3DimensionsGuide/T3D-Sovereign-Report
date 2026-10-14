@@ -134,5 +134,5 @@ const styles = StyleSheet.create({
   sunSwatch: { backgroundColor: colors.gold },
   moonSwatch: { borderWidth: 2, borderColor: colors.parchment },
   definedSwatch: { backgroundColor: colors.vehicle, borderRadius: 2 },
-  open: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.gold, minHeight: 20 },
+  open: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.gold, minHeight: 20 },
 });

@@ -63,10 +63,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.charcoal, borderRadius: radius.lg, borderWidth: 1,
     borderColor: colors.goldEdge, padding: space.lg, gap: space.md,
   },
-  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.gold },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.parchmentMuted },
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 29, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md, minHeight: 52 },
-  label: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  label: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
   error: { fontFamily: fonts.body, fontSize: 15, color: colors.danger },
 });

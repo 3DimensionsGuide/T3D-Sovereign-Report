@@ -128,5 +128,5 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, color: colors.parchment },
   body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md, minHeight: 48 },
-  label: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
+  label: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchment },
 });

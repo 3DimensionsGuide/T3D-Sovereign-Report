@@ -48,5 +48,5 @@ const styles = StyleSheet.create({
   figure: { width: 130 },
   facts: { flex: 1, gap: space.sm },
   k: { fontFamily: fonts.body, fontSize: 13, color: LENS_TEXT.vehicle },
-  v: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 18, color: colors.parchment },
+  v: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 17, color: colors.parchment },
 });
