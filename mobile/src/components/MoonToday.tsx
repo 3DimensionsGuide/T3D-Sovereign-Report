@@ -1,3 +1,4 @@
+import { SIGN_GLYPH } from '@/lib/signGlyphs';
 import { StyleSheet, Text, View } from 'react-native';
 import { Disclosure } from '@/components/Disclosure';
 import { LensIcon } from '@/components/Lens';
@@ -22,7 +23,7 @@ function SignBlock({ s, index, total, dayWord }: { s: MoonDaySegment; index: num
       <Text style={styles.when}>
         {total > 1 ? `${index === 0 ? 'Earlier' : 'Later'} ${dayWord} · ` : ''}{moonWindow(s, dayWord)}
       </Text>
-      <Text accessibilityRole="header" style={styles.title}>Moon in {s.sign}</Text>
+      <Text accessibilityRole="header" style={styles.title}>{SIGN_GLYPH[s.sign] ? `${SIGN_GLYPH[s.sign]} ` : ''}Moon in {s.sign}</Text>
       <Text style={styles.body}>
         The Moon moves through your {ordinal(s.house)} house, {s.houseName}: {s.houseTheme.charAt(0).toLowerCase()}{s.houseTheme.slice(1)}
       </Text>

@@ -1,3 +1,4 @@
+import { NumberSigil } from '@/components/NumberSigil';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
@@ -33,6 +34,7 @@ function DayBlock({ kind, meaning, bare = false }: { kind: 'GLOBAL' | 'YOURS'; m
       ) : (
       <View style={styles.head}>
         <View style={styles.badge}>
+          <NumberSigil text={numberText(meaning)} />
           <Text style={styles.badgeText}>{numberText(meaning)}</Text>
         </View>
         <View style={styles.flex}>
@@ -87,6 +89,7 @@ export function DayNumerologyCard({ data }: { data: DayNumerology }) {
         style={({ pressed }) => [styles.summary, pressed && { opacity: 0.8 }]}
       >
         <View style={styles.badge}>
+          <NumberSigil text={numberText(p)} />
           <RollingNumber value={numberText(p)} style={styles.badgeText} />
         </View>
         <View style={styles.flex}>
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   badge: {
     minWidth: 56, height: 56, borderRadius: 28, paddingHorizontal: 8, alignItems: 'center',
-    justifyContent: 'center', borderWidth: 2, borderColor: colors.road,
+    justifyContent: 'center',
   },
   badgeText: { fontFamily: fonts.display, fontSize: 24, color: colors.parchment },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.road },

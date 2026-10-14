@@ -1,3 +1,4 @@
+import { NumberSigil } from '@/components/NumberSigil';
 import { StyleSheet, Text, View } from 'react-native';
 import { AccentView } from '@/components/AccentView';
 import { Disclosure } from '@/components/Disclosure';
@@ -22,6 +23,7 @@ export function RoadToday({ day, dayLabel }: { day: RoadDay; dayLabel?: string |
     >
       <View style={styles.head}>
         <View style={styles.badge}>
+          <NumberSigil text={numberText(m)} />
           <Text style={styles.badgeText}>{numberText(m)}</Text>
         </View>
         <View style={styles.flex}>
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   badge: {
     minWidth: 56, height: 56, borderRadius: 28, paddingHorizontal: 8, alignItems: 'center',
-    justifyContent: 'center', borderWidth: 2, borderColor: colors.road,
+    justifyContent: 'center',
   },
   badgeText: { fontFamily: fonts.display, fontSize: 24, color: colors.parchment },
   eyebrow: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, color: colors.road },
