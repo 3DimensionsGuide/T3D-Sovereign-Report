@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { trackAction } from '@/lib/track';
 import { router, type Href } from 'expo-router';
 import { GoldButton } from '@/components/GoldButton';
 import { LockIcon } from '@/components/LockIcon';
@@ -6,6 +8,7 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 
 /** The note a locked feature shows in place of its content: what it is, and a way to see Premium. */
 export function PremiumGate({ title, detail }: { title: string; detail: string }) {
+  useEffect(() => { trackAction('paywall_seen'); }, []);
   return (
     <View style={styles.wrap}>
       <View style={styles.box} accessible accessibilityLabel={`${title} is part of Premium. Subscriptions are not open yet. ${detail}`}>

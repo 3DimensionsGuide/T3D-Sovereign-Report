@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { trackAction } from '@/lib/track';
 import { FadeIn } from '@/components/FadeIn';
 import { GoldButton } from '@/components/GoldButton';
 import { LENS_TEXT } from '@/components/Lens';
@@ -27,6 +29,7 @@ interface Props {
  */
 export function RevealView({ chart, birthTimeKnown, firstName, onContinue, onShare }: Props) {
   const stages = buildReveal(chart, birthTimeKnown);
+  useEffect(() => { trackAction('reveal_seen'); }, []);
   return (
     <View style={styles.wrap}>
       <FadeIn>

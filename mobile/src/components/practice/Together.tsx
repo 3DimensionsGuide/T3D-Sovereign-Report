@@ -12,6 +12,7 @@ import {
   ChartRequestError, requestDecideTogether, requestPlaceCheck, type PlaceCandidate,
 } from '@/lib/api';
 import type { DecideTogether, HdConnections, NumberPair, PartnerProfile, Synastry, TogetherPerson, CenterEffects, HouseOverlays, TribeMember, TribeRelation } from '@/lib/togetherTypes';
+import { trackAction } from '@/lib/track';
 import { RELATION_LABEL, RELATION_OPTIONS } from '@/lib/tribe';
 import { TribeIntro, TribeList } from '@/components/practice/Tribe';
 import { localDateString } from '@/lib/useTimeline';
@@ -84,7 +85,9 @@ function PartnerForm({ member, onDone, onCancel }: { member?: TribeMember; onDon
       updatePerson(member.id, profile, relation);
       onDone(member.id);
     } else {
-      onDone(addPerson(profile, relation));
+      const id = addPerson(profile, relation);
+      if (id) trackAction('tribe_added');
+      onDone(id);
     }
   }
 

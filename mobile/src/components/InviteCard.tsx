@@ -4,6 +4,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { ChartRequestError, requestInviteCreate } from '@/lib/api';
 import { inviteMessage } from '@/lib/invite';
 import { success } from '@/lib/haptics';
+import { trackAction } from '@/lib/track';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
 
@@ -27,7 +28,7 @@ export function InviteCard() {
     try {
       const { url } = await requestInviteCreate(chart.leadId, profile.email.trim(), showName, profile.birthTimeKnown !== false);
       const result = await Share.share({ message: inviteMessage(showName ? first : null, url) });
-      if (result.action === Share.sharedAction) success();
+      if (result.action === Share.sharedAction) { success(); trackAction('invite_sent'); }
     } catch (e) {
       setError(e instanceof ChartRequestError ? e.message : 'We could not make the invite. Please try again.');
     } finally {

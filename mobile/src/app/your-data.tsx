@@ -4,6 +4,7 @@ import { Pressable } from '@/components/Pressable';
 import { router, type Href } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BackupCard } from '@/components/BackupCard';
 import { GoldButton } from '@/components/GoldButton';
 import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
 import { clearReminder } from '@/lib/reminder';
@@ -127,6 +128,8 @@ export default function YourData() {
             The welcome screen is what a new person sees first. Swipe right to come back. Do not press “Create my full chart” there
             unless you want to start over.
           </Text>
+
+          <BackupCard />
 
           {__DEV__ && crashReportingOn ? (
             <GoldButton label="Send a test crash report" variant="ghost" onPress={sendTestCrashReport} />
