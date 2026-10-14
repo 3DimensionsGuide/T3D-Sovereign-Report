@@ -120,6 +120,15 @@ export default function YourData() {
               useCoachStore.getState().replay();
             }}
           />
+          <GoldButton
+            label="Preview the welcome screen"
+            variant="ghost"
+            onPress={() => router.push('/welcome' as Href)}
+          />
+          <Text style={styles.body}>
+            The welcome screen is what a new person sees first. Swipe right to come back. Do not press “Create my full chart” there
+            unless you want to start over.
+          </Text>
 
           {__DEV__ && crashReportingOn ? (
             <GoldButton label="Send a test crash report" variant="ghost" onPress={sendTestCrashReport} />
