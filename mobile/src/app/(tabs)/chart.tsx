@@ -27,6 +27,7 @@ import { Segmented } from '@/components/Segmented';
 import { useChartData } from '@/lib/useChartData';
 import { formatLongitude } from '@/lib/api';
 import { useT3DStore } from '@/store/useT3DStore';
+import { TriadEdge } from '@/components/TriadEdge';
 import { colors, fonts, guidance, radius, space, themes } from '@/theme/tokens';
 
 const T = themes.chart;
@@ -158,6 +159,7 @@ export default function Chart() {
 
       <FadeIn delay={340}>
         <View style={styles.sigilCard}>
+          <TriadEdge />
           <Text accessibilityRole="header" style={styles.sigilTitle}>Your Sigil</Text>
           <Sigil chart={chart} birthTimeKnown={profile.birthTimeKnown} size={240} />
           <Text style={[guidance, styles.sigilNote]}>
@@ -170,6 +172,7 @@ export default function Chart() {
 
       <FadeIn delay={350}>
         <View style={styles.sigilCard}>
+          <TriadEdge />
           <Text accessibilityRole="header" style={styles.sigilTitle}>Your Triad Map</Text>
           <Text style={[guidance, styles.sigilNote, styles.mapNote]}>
             Your whole chart, grouped by lens. Tap a circle to open its reading, or any fact to learn what it means.
@@ -227,7 +230,7 @@ const styles = StyleSheet.create({
   moreStack: { gap: space.md },
   sigilCard: {
     alignItems: 'center', gap: space.md, padding: space.lg, marginTop: space.md,
-    borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: T.edge, backgroundColor: T.surface, overflow: 'hidden',
   },
   sigilTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 30, color: colors.parchment, alignSelf: 'flex-start' },
   sigilNote: { alignSelf: 'stretch' },

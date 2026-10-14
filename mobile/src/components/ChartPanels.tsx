@@ -14,6 +14,7 @@ import { Segmented } from '@/components/Segmented';
 import type { SkyPosition } from '@/lib/api';
 import { nowContacts, nowPlanets, nowRows, zodiacShift } from '@/lib/wheelNow';
 import { SceneView } from '@/components/SceneView';
+import { TriadEdge } from '@/components/TriadEdge';
 import { colors, fonts, radius, space, themes, TOUCH } from '@/theme/tokens';
 
 const T = themes.chart;
@@ -23,6 +24,7 @@ const T = themes.chart;
 function Section({ title, lens, children }: { title: string; lens: LensName; children: React.ReactNode }) {
   return (
     <View style={styles.section}>
+      <TriadEdge />
       <View style={styles.sectionHead}>
         <LensIcon lens={lens} size={13} />
         <Text accessibilityRole="header" style={[styles.sectionTitle, { color: LENS_TEXT[lens] }]}>{title}</Text>
@@ -454,7 +456,7 @@ const styles = StyleSheet.create({
   headline: { gap: 2 },
   headType: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, color: colors.parchment },
   headMeta: { fontFamily: fonts.body, fontSize: 15, color: colors.parchmentMuted },
-  section: { gap: space.sm, marginTop: space.sm, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: T.rule, backgroundColor: T.surface },
+  section: { gap: space.sm, marginTop: space.sm, padding: space.md, borderRadius: radius.lg, borderWidth: 1, borderColor: T.rule, backgroundColor: T.surface, overflow: 'hidden' },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sectionTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 26 },
   hotspot: { position: 'absolute', width: 44, height: 44, borderRadius: 22 },

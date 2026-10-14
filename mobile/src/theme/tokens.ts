@@ -112,9 +112,10 @@ export const heroCard = {
  * Selected states keep the brand gold on every tab.
  *  Today     : graphite and gold (the original luxury look)
  *  Timeline  : evergreen. Green reads as growth and progress, the road ahead.
- *  Readings  : midnight sapphire. Deep blue reads as study, depth and trust.
+ *  Readings  : deep midnight blue, bluer than My Chart so the two neighbours read apart. Deep blue reads as study, depth and trust.
  *  Practice  : copper espresso. Warm earth reads as ritual, energy and doing.
- *  My Chart  : platinum slate. Cool silver reads as identity and clarity.
+ *  My Chart  : brushed platinum: lighter surface and brighter silver edge than Today's matte graphite, and the only
+ *              room whose cards carry all three Triad colors (see TriadEdge).
  */
 export interface RoomTheme {
   /** Card and panel background. */
@@ -134,9 +135,9 @@ export interface RoomTheme {
 export const themes = {
   today: { surface: '#17161A', raised: '#232127', edge: 'rgba(212,175,55,0.30)', line: 'rgba(245,245,243,0.22)', rule: 'rgba(212,175,55,0.17)', wash: 'rgba(212,175,55,0.12)' },
   timeline: { surface: '#101A15', raised: '#182620', edge: 'rgba(96,200,150,0.30)', line: 'rgba(205,238,220,0.22)', rule: 'rgba(96,200,150,0.18)', wash: 'rgba(212,175,55,0.13)' },
-  readings: { surface: '#10151F', raised: '#18202F', edge: 'rgba(128,166,232,0.30)', line: 'rgba(205,218,245,0.22)', rule: 'rgba(128,166,232,0.18)', wash: 'rgba(212,175,55,0.13)' },
+  readings: { surface: '#0E1626', raised: '#172237', edge: 'rgba(128,166,232,0.34)', line: 'rgba(205,218,245,0.22)', rule: 'rgba(128,166,232,0.18)', wash: 'rgba(212,175,55,0.13)' },
   practice: { surface: '#1A1310', raised: '#281D17', edge: 'rgba(216,134,88,0.32)', line: 'rgba(246,226,212,0.22)', rule: 'rgba(216,134,88,0.20)', wash: 'rgba(212,175,55,0.13)' },
-  chart: { surface: '#14161A', raised: '#1E2127', edge: 'rgba(205,212,226,0.30)', line: 'rgba(236,239,246,0.24)', rule: 'rgba(205,212,226,0.18)', wash: 'rgba(212,175,55,0.13)' },
+  chart: { surface: '#1D2128', raised: '#232731', edge: 'rgba(205,212,226,0.42)', line: 'rgba(236,239,246,0.26)', rule: 'rgba(205,212,226,0.24)', wash: 'rgba(212,175,55,0.13)' },
 } as const satisfies Record<string, RoomTheme>;
 
 export type ThemeName = keyof typeof themes;
