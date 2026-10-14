@@ -45,10 +45,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="timeline"
+        name="chart"
         options={{
-          title: 'Timeline',
-          tabBarIcon: icon('timeline'),
+          title: 'My Chart',
+          tabBarIcon: icon('chart'),
         }}
       />
       <Tabs.Screen
@@ -59,17 +59,17 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="timeline"
+        options={{
+          title: 'Timeline',
+          tabBarIcon: icon('timeline'),
+        }}
+      />
+      <Tabs.Screen
         name="practice"
         options={{
           title: 'Practice',
           tabBarIcon: icon('practice'),
-        }}
-      />
-      <Tabs.Screen
-        name="chart"
-        options={{
-          title: 'My Chart',
-          tabBarIcon: icon('chart'),
         }}
       />
     </Tabs>
