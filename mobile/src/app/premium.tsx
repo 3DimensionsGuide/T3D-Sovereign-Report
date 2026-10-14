@@ -16,6 +16,9 @@ import { colors, fonts, guidance, radius, space } from '@/theme/tokens';
 const ACCENT: Record<PremiumAccent, string> = { vehicle: colors.vehicle, road: colors.road, stoplight: colors.stoplight };
 const GLYPH: Record<PremiumAccent, string> = { vehicle: '◆', road: '▲', stoplight: '●' };
 
+// Apple's standard licence agreement applies until T3D has its own terms page.
+const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+
 type Plan = 'yearly' | 'monthly';
 
 export default function PremiumScreen() {
@@ -123,10 +126,18 @@ export default function PremiumScreen() {
           <Text style={styles.small}>
             Bought the Sovereign report? You get {PRICES.reportBuyerMonths} months of Premium free.
           </Text>
+          <Text style={styles.small}>
+            T3D is for reflection and entertainment. It does not predict events and is not medical, legal or financial advice.
+          </Text>
           <GoldButton
             label="READ THE PRIVACY POLICY"
             variant="ghost"
             onPress={() => { void WebBrowser.openBrowserAsync('https://www.3dimensions.guide/privacy'); }}
+          />
+          <GoldButton
+            label="TERMS OF USE"
+            variant="ghost"
+            onPress={() => { void WebBrowser.openBrowserAsync(TERMS_URL); }}
           />
         </View>
       </FadeIn>
