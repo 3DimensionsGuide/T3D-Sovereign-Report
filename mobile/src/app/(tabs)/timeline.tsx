@@ -31,7 +31,9 @@ import { gateReadingForDay } from '@/lib/gateDay';
 import { usePremium } from '@/lib/usePremium';
 import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
-import { RoadDayBlock, StoplightDayBlock, VehicleDayBlock } from '@/components/DayLenses';
+import { dayTitleOf, RoadDayBlock, StoplightDayBlock, VehicleDayBlock } from '@/components/DayLenses';
+import { RoadToday } from '@/components/RoadToday';
+import { roadDayFor } from '@/lib/roadDay';
 
 const T = themes.timeline;
 
@@ -307,6 +309,8 @@ export default function Timeline() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [showMore, setShowMore] = useState(false);
   const [showAllPersonal, setShowAllPersonal] = useState(false);
+  /** The Personal Day row that is open, by date. */
+  const [openPersonal, setOpenPersonal] = useState<string | null>(null);
   const [showAllSeasons, setShowAllSeasons] = useState(false);
   const [openMonths, setOpenMonths] = useState<string[]>([]);
 
@@ -469,9 +473,33 @@ export default function Timeline() {
           {lens === 'road' ? (
             <Panel label="Your Personal Days" lens="road">
               {(showAllPersonal ? [...personalSplit.week, ...personalSplit.rest] : personalSplit.week).map((d) => (
-                <View key={d.date} style={styles.personalRow}>
-                  <Text style={styles.personalDate}>{shortDate(d.date)}</Text>
-                  <Text style={styles.dayBadge}>Personal Day {numLabel(d.day)}</Text>
+                <View key={d.date}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ expanded: openPersonal === d.date }}
+                    accessibilityLabel={`${shortDate(d.date)}, Personal Day ${numLabel(d.day)}. ${openPersonal === d.date ? 'Expanded.' : 'Double tap to read this day.'}`}
+                    onPress={() => { select(); animateLayout(); setOpenPersonal((cur) => (cur === d.date ? null : d.date)); }}
+                    style={({ pressed }) => [styles.personalRow, pressed && { opacity: 0.8 }]}
+                  >
+                    <Text style={styles.personalDate}>{shortDate(d.date)}</Text>
+                    <View style={styles.personalRight}>
+                      <Text style={styles.dayBadge}>Personal Day {numLabel(d.day)}</Text>
+                      <Chevron open={openPersonal === d.date} style={styles.personalChevron} />
+                    </View>
+                  </Pressable>
+                  {openPersonal === d.date ? (
+                    d.date !== localKey(new Date()) && !premium ? (
+                      <PremiumGate
+                        title={`Your Personal Day on ${dayTitleOf(d.date)}`}
+                        detail="Today's Personal Day reading is free. Look ahead with Premium: the theme, where to lean in and what to watch, for each day."
+                      />
+                    ) : (() => {
+                      const rd = roadDayFor(data, data.personal.findIndex((p) => p.date === d.date));
+                      return rd ? <RoadToday day={rd} dayLabel={d.date === localKey(new Date()) ? null : dayTitleOf(d.date)} /> : (
+                        <Text style={styles.footnote}>The full reading for this day is not saved on this phone yet. Pull down to refresh the Timeline.</Text>
+                      );
+                    })()
+                  ) : null}
                 </View>
               ))}
               {personalSplit.rest.length > 0 ? (
@@ -484,7 +512,7 @@ export default function Timeline() {
                   <Text style={styles.showMoreText}>{showAllPersonal ? 'Show less' : 'Show more'}</Text>
                 </Pressable>
               ) : null}
-              <Text style={styles.footnote}>The week ahead first; the rest of the month is under Show more. Pick Stoplight to see the sky events.</Text>
+              <Text style={styles.footnote}>The week ahead first; the rest of the month is under Show more. Tap a day to read it. Pick Stoplight to see the sky events.</Text>
             </Panel>
           ) : null}
 
@@ -665,6 +693,8 @@ const styles = StyleSheet.create({
   nodeFirst: { backgroundColor: colors.gold, borderColor: colors.gold },
   dayTitle: { fontFamily: fonts.display, fontSize: 20, color: colors.parchment },
   personalRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  personalRight: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  personalChevron: { fontFamily: fonts.bodyBold, fontSize: 22, lineHeight: 24, color: colors.gold },
   personalDate: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.parchment },
   dayBadge: { fontFamily: fonts.bodyMedium, fontSize: 13, letterSpacing: 0.6, color: colors.gold },
   event: {
