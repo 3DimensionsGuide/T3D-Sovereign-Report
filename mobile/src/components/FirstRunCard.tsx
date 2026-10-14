@@ -1,6 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { router, type Href } from 'expo-router';
 import { GoldButton } from '@/components/GoldButton';
+import { intentPlan } from '@/lib/intent';
 import { firstRunLine } from '@/lib/reveal';
+import { usePremium } from '@/lib/usePremium';
+import { useIntentStore } from '@/store/useIntentStore';
 import { useCoachStore } from '@/store/useCoachStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space } from '@/theme/tokens';
@@ -14,6 +18,8 @@ export function FirstRunCard() {
   const seen = useCoachStore((s) => s.seen);
   const finish = useCoachStore((s) => s.finish);
   const chart = useT3DStore((s) => s.chart);
+  const intent = useIntentStore((s) => s.intent);
+  const premium = usePremium();
   if (!hydrated || seen || !chart) return null;
   return (
     <View style={styles.card}>
@@ -23,6 +29,14 @@ export function FirstRunCard() {
         Start with the signal lamp below. Everything else opens one fold at a time. Any word with a dotted
         underline explains itself when you tap it.
       </Text>
+      {intent ? <Text style={styles.body}>{intentPlan(intent, premium).line}</Text> : null}
+      {intent && intentPlan(intent, premium).href ? (
+        <GoldButton
+          label={intentPlan(intent, premium).button ?? 'Open'}
+          variant="ghost"
+          onPress={() => { finish(); router.push(intentPlan(intent, premium).href as Href); }}
+        />
+      ) : null}
       <GoldButton label="Got it" onPress={finish} />
     </View>
   );

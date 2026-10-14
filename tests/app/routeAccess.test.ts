@@ -12,7 +12,7 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = join(process.cwd(), 'src/app/api/app');
-const PUBLIC_ROUTES = new Set(['place-check', 'preview', 'event']); // take no lead id; rate limited only
+const PUBLIC_ROUTES = new Set(['place-check', 'preview', 'event', 'sky-now']); // take no lead id; rate limited only
 const TOKEN_ROUTES = new Set(['invite']); // open with a signed invite token; checked by their own tests below
 const routes = readdirSync(ROOT, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(ROOT, d.name, 'route.ts')))
@@ -87,4 +87,10 @@ test('the invite route pairs a viewer\'s lead id with their email, and never sen
   const preview = src.slice(src.indexOf("body.action === 'preview'"), src.indexOf('// ---- together ----'));
   assert.doesNotMatch(preview, /birth|latitude|longitude|timezone|email/i);
   assert.match(src, /isUnderMinimumAge\(y\.birthDate\)/, 'refuses a first look for an under-age birth date');
+});
+
+test('the welcome-screen Moon route is public, rate limited, and touches no data store', () => {
+  const src = routes.find((r) => r.name === 'sky-now')!.src;
+  assert.match(src, /limitRequest\(request, 'preview'\)/);
+  assert.doesNotMatch(src, /@\/server\/db|\.insert\(|\.update\(|console\.|request\.json/);
 });

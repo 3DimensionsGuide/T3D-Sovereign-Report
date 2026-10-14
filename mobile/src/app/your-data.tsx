@@ -12,6 +12,7 @@ import { crashReportingOn, sendTestCrashReport } from '@/lib/sentry';
 import { useCoachStore } from '@/store/useCoachStore';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { useDayLogStore } from '@/store/useDayLogStore';
+import { useIntentStore } from '@/store/useIntentStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
@@ -63,6 +64,7 @@ export default function YourData() {
       usePartnerStore.getState().clearPartner();
       usePracticeStore.getState().clearAll();
       useDayLogStore.getState().clearAll();
+      useIntentStore.getState().clear();
       await clearAllCached();
       await clearReminder();
       router.replace('/onboarding' as Href);

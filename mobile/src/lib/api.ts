@@ -536,6 +536,18 @@ export function requestBirthPreview(birthDate: string): Promise<BirthPreview> {
   );
 }
 
+/** The Moon tonight for the welcome screen. Public: no person, nothing saved. */
+export interface SkyNow {
+  moonSign: string;
+  phase: string;
+  waxing: boolean;
+  illuminationPercent: number;
+}
+
+export function requestSkyNow(): Promise<SkyNow> {
+  return postApp<SkyNow>('/api/app/sky-now', {}, 'Could not read the sky.');
+}
+
 /** Deletes everything saved on the server for this person's email. */
 export function requestDeleteMyData(leadId: number, email: string): Promise<{ removed: number; blanked: number }> {
   return postApp<{ removed: number; blanked: number }>(
