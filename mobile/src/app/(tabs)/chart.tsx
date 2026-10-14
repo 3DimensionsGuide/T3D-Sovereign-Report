@@ -14,6 +14,7 @@ import { MiniWheel } from '@/components/MiniWheel';
 import type { LensName } from '@/components/Lens';
 import { BirthDataCard } from '@/components/BirthDataCard';
 import { ReminderCard } from '@/components/ReminderCard';
+import { HeadsUpCard } from '@/components/HeadsUpCard';
 import { Sigil } from '@/components/Sigil';
 import { TriadMap } from '@/components/TriadMap';
 import { TriadCard } from '@/components/TriadCard';
@@ -180,6 +181,7 @@ export default function Chart() {
           <View style={styles.moreStack}>
             <BirthDataCard profile={profile} />
             <ReminderCard />
+            <HeadsUpCard />
             <GoldButton label="Edit birth details" variant="ghost" onPress={() => router.push('/onboarding')} />
           </View>
         </Disclosure>

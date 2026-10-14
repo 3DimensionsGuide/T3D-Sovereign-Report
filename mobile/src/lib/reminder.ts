@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useReminderStore } from '@/store/useReminderStore';
+import { anyAlertOn, planAlerts, type AlertKind, type AlertSource } from '@/lib/personalAlerts';
 
 /**
  * The daily "Today's frame is ready" reminder.
@@ -10,6 +11,28 @@ import { useReminderStore } from '@/store/useReminderStore';
  */
 
 const CHANNEL_ID = 'daily-frame';
+const ALERT_CHANNEL_ID = 'sky-alerts';
+const DAILY_ID = 'daily-frame';
+const ALERT_PREFIX = 'alert-';
+
+/** Cancels the daily reminder (and any older unnamed one) but leaves the heads-up alerts alone. */
+async function cancelDaily(): Promise<void> {
+  const pending = await Notifications.getAllScheduledNotificationsAsync();
+  await Promise.all(
+    pending
+      .filter((n) => !n.identifier.startsWith(ALERT_PREFIX))
+      .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
+  );
+}
+
+async function cancelAlerts(): Promise<void> {
+  const pending = await Notifications.getAllScheduledNotificationsAsync();
+  await Promise.all(
+    pending
+      .filter((n) => n.identifier.startsWith(ALERT_PREFIX))
+      .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
+  );
+}
 export const REMINDER_TITLE = 'T3D';
 export const REMINDER_BODY = 'Today’s frame is ready.';
 
@@ -41,8 +64,9 @@ async function ensureChannel(): Promise<void> {
 async function schedule(hour: number, minute: number): Promise<void> {
   await ensureChannel();
   // One repeating reminder only: clear what was there, then set the new time.
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await cancelDaily();
   await Notifications.scheduleNotificationAsync({
+    identifier: DAILY_ID,
     content: { title: REMINDER_TITLE, body: REMINDER_BODY },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -79,7 +103,7 @@ export async function enableReminder(): Promise<EnableResult> {
 export async function disableReminder(): Promise<void> {
   useReminderStore.getState().set({ enabled: false, asked: true });
   try {
-    await Notifications.cancelAllScheduledNotificationsAsync();
+    await cancelDaily();
   } catch {
     // Nothing scheduled, nothing to cancel.
   }
@@ -123,5 +147,62 @@ export async function syncReminder(): Promise<void> {
     await schedule(store.hour, store.minute);
   } catch {
     // Keep the saved setting; try again next launch.
+  }
+}
+
+async function ensurePermission(): Promise<boolean> {
+  try {
+    let status = (await Notifications.getPermissionsAsync()).status;
+    if (status !== 'granted') status = (await Notifications.requestPermissionsAsync()).status;
+    return status === 'granted';
+  } catch {
+    return false;
+  }
+}
+
+/** Turns one heads-up category on or off. Turning one on asks permission first; 'blocked' means iPhone Settings said no. */
+export async function setAlertOn(kind: AlertKind, on: boolean): Promise<'on' | 'off' | 'blocked'> {
+  const store = useReminderStore.getState();
+  if (on && !(await ensurePermission())) return 'blocked';
+  store.set({ alerts: { ...store.alerts, [kind]: on } });
+  return on ? 'on' : 'off';
+}
+
+async function ensureAlertChannel(): Promise<void> {
+  if (Platform.OS !== 'android') return;
+  await Notifications.setNotificationChannelAsync(ALERT_CHANNEL_ID, {
+    name: 'Sky heads-ups',
+    importance: Notifications.AndroidImportance.DEFAULT,
+  });
+}
+
+/**
+ * Makes the phone's scheduled heads-ups match the chosen categories and the latest Timeline: clears the old
+ * ones and schedules the next few (never more than the plan allows). Safe to run as often as the Timeline changes.
+ */
+export async function syncAlerts(source: AlertSource | null | undefined): Promise<void> {
+  const { alerts } = useReminderStore.getState();
+  try {
+    await cancelAlerts();
+    if (!anyAlertOn(alerts)) return;
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      useReminderStore.getState().set({ alerts: { gate: false, moonChannel: false, moonSign: false } });
+      return;
+    }
+    await ensureAlertChannel();
+    for (const a of planAlerts(source, alerts, Date.now())) {
+      await Notifications.scheduleNotificationAsync({
+        identifier: a.id,
+        content: { title: a.title, body: a.body, data: { kind: a.kind } },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: new Date(a.atMs),
+          channelId: ALERT_CHANNEL_ID,
+        },
+      });
+    }
+  } catch {
+    // The settings are saved; the schedule is rebuilt the next time the Timeline loads.
   }
 }
