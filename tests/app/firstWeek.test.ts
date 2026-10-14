@@ -77,6 +77,15 @@ test('the card is one slim tile: the whole tile opens the step, numbered pills s
   assert.match(card, /reduce \? undefined : FadeIn/);
 });
 
+test('only the day you are on is a solid pill; a finished day is an outline with a tick', () => {
+  const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
+  const block = (name: string) => new RegExp(`${name}: \\{([^}]*)\\}`).exec(card)![1]!;
+  assert.match(block('pillCurrent'), /backgroundColor: colors\.gold/);
+  assert.doesNotMatch(block('pillDone'), /backgroundColor/);
+  assert.match(card, /current && styles\.pillTextCurrent/);
+  assert.doesNotMatch(card, /current && !s\.done/);
+});
+
 test('the reminder has seven different wordings and none says anything about the day', () => {
   assert.equal(REMINDER_LINES.length, 7);
   assert.equal(new Set(REMINDER_LINES).size, 7);

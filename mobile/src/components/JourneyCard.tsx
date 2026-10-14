@@ -79,7 +79,7 @@ export function JourneyCard() {
               style={styles.pillHit}
             >
               <View style={[styles.pill, s.done && styles.pillDone, current && styles.pillCurrent]}>
-                <Text style={[styles.pillText, s.done && styles.pillTextDone, current && !s.done && styles.pillTextCurrent]}>
+                <Text style={[styles.pillText, s.done && styles.pillTextDone, current && styles.pillTextCurrent]}>
                   {s.done ? '✓' : String(i + 1)}
                 </Text>
               </View>
@@ -107,9 +107,10 @@ const styles = StyleSheet.create({
   pills: { flexDirection: 'row', gap: space.sm },
   pillHit: { flex: 1, height: 48, justifyContent: 'center' },
   pill: { height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  pillDone: { backgroundColor: colors.gold, borderColor: colors.gold },
-  pillCurrent: { borderWidth: 2, borderColor: colors.gold },
+  // Done: a gold outline with a gold tick. Current: the one solid gold pill. Moving to another day hands the solid fill over.
+  pillDone: { borderColor: colors.gold },
+  pillCurrent: { backgroundColor: colors.gold, borderColor: colors.gold },
   pillText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
-  pillTextDone: { color: colors.obsidian },
-  pillTextCurrent: { color: colors.gold },
+  pillTextDone: { color: colors.gold },
+  pillTextCurrent: { color: colors.obsidian },
 });
