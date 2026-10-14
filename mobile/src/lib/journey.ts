@@ -87,21 +87,18 @@ export function journeyView(i: JourneyInput): JourneyView {
 
 const WORDS: Record<number, string> = { 1: 'One', 2: 'Two', 3: 'Three', 4: 'Four', 5: 'Five' };
 
-/** The card's heading: what it is, in a sentence. */
-export function journeyHeading(total: number): string {
+/** The line that explains the card. Shown only until the first step is done. */
+export function journeyHint(total: number): string {
   const n = WORDS[total] ?? String(total);
-  return `${n} small ${total === 1 ? 'step' : 'steps'} to get to know your chart`;
+  return `${n} small ${total === 1 ? 'step' : 'steps'} to get to know your chart. One a day is plenty.`;
 }
 
-/** What the card is for and how to use it. */
-export const JOURNEY_PURPOSE = 'One a day is plenty. Tap a day to see its step, then open it. A step ticks off when you have done it.';
-
-/** The status of the step on show. */
-export function stepStatus(index: number, done: boolean): string {
-  return `Day ${index + 1} · ${done ? 'Done' : 'Not done yet'}`;
+/** Where you are, for the card's top line. */
+export function dayOf(index: number, total: number): string {
+  return `Day ${index + 1} of ${total}`;
 }
 
-/** How many are done, written out. */
-export function doneNote(doneCount: number, total: number): string {
-  return `${doneCount} of ${total} done`;
+/** What a screen reader says for the step tile. */
+export function stepSpoken(index: number, total: number, step: { label: string; detail: string; cta: string; done: boolean }): string {
+  return `${dayOf(index, total)}${step.done ? ', done' : ''}. ${step.label}. ${step.detail} ${step.cta}.`;
 }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { JOURNEY_DAYS, JOURNEY_PURPOSE, SHOWN, STEPS, dayNumber, doneNote, journeyHeading, journeyView, stepStatus, type JourneyInput } from '../../mobile/src/lib/journey';
+import { JOURNEY_DAYS, SHOWN, STEPS, dayNumber, dayOf, journeyHint, journeyView, stepSpoken, type JourneyInput } from '../../mobile/src/lib/journey';
 import { REMINDER_LINES, reminderLine } from '../../mobile/src/lib/reminderLines';
 
 const base: JourneyInput = { startedOn: '2026-10-13', today: '2026-10-13', dismissed: false, premium: false, visited: {}, decisions: 0, people: 0 };
@@ -50,14 +50,15 @@ test('the card goes away when dismissed and after two weeks', () => {
   assert.equal(JOURNEY_DAYS, 14);
 });
 
-test('the card says what it is for, in plain words', () => {
-  assert.equal(journeyHeading(5), 'Five small steps to get to know your chart');
-  assert.equal(journeyHeading(3), 'Three small steps to get to know your chart');
-  assert.match(JOURNEY_PURPOSE, /One a day is plenty/);
-  assert.match(JOURNEY_PURPOSE, /ticks off/);
-  assert.equal(stepStatus(1, false), 'Day 2 · Not done yet');
-  assert.equal(stepStatus(0, true), 'Day 1 · Done');
-  assert.equal(doneNote(2, 5), '2 of 5 done');
+test('the card says what it is for, in plain words, and the spoken label gives day, step and action', () => {
+  assert.equal(journeyHint(5), 'Five small steps to get to know your chart. One a day is plenty.');
+  assert.equal(journeyHint(3), 'Three small steps to get to know your chart. One a day is plenty.');
+  assert.equal(dayOf(1, 5), 'Day 2 of 5');
+  assert.equal(
+    stepSpoken(0, 5, { label: 'Open My Chart and see your Triad', detail: 'Your Vehicle, Road and Stoplight in one picture.', cta: 'Open My Chart', done: false }),
+    'Day 1 of 5. Open My Chart and see your Triad. Your Vehicle, Road and Stoplight in one picture. Open My Chart.',
+  );
+  assert.match(stepSpoken(1, 5, { label: 'x', detail: 'y', cta: 'z', done: true }), /^Day 2 of 5, done\./);
 });
 
 test('each step has a button that names where it goes', () => {
@@ -65,13 +66,15 @@ test('each step has a button that names where it goes', () => {
   assert.deepEqual(STEPS.map((s) => s.cta), ['Open My Chart', 'Open Readings', 'Open Timeline', 'Start a decision', 'Open My Tribe']);
 });
 
-test('the card shows numbered days with a tick when done, the chosen step, and a button to open it', () => {
+test('the card is one slim tile: the whole tile opens the step, numbered pills switch days, no gold button', () => {
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
   assert.match(card, /s\.done \? '✓' : String\(i \+ 1\)/);
   assert.match(card, /accessibilityRole="tab"/);
-  assert.match(card, /journeyHeading\(v\.all\.length\)/);
-  assert.match(card, /stepStatus\(index, step\.done\)/);
   assert.match(card, /router\.push\(step\.route/);
+  assert.match(card, /v\.doneCount === 0 \? <Text style=\{styles\.hint\}>/);
+  assert.doesNotMatch(card, /GoldButton/);
+  assert.doesNotMatch(card, /surfaceRaised/);
+  assert.match(card, /reduce \? undefined : FadeIn/);
 });
 
 test('the reminder has seven different wordings and none says anything about the day', () => {
