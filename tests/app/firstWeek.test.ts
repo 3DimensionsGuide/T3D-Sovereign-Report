@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { JOURNEY_DAYS, SHOWN, STEPS, dayNumber, dayOf, journeyHint, journeyView, stepSpoken, type JourneyInput } from '../../mobile/src/lib/journey';
+import { JOURNEY_DAYS, SHOWN, STEPS, dayNumber, dayOf, doneSuffix, journeyHint, journeyView, stepSpoken, type JourneyInput } from '../../mobile/src/lib/journey';
 import { REMINDER_LINES, reminderLine } from '../../mobile/src/lib/reminderLines';
 
 const base: JourneyInput = { startedOn: '2026-10-13', today: '2026-10-13', dismissed: false, premium: false, visited: {}, decisions: 0, people: 0 };
@@ -68,7 +68,6 @@ test('each step has a button that names where it goes', () => {
 
 test('the card is one slim tile: the whole tile opens the step, numbered pills switch days, no gold button', () => {
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
-  assert.match(card, /s\.done \? '✓' : String\(i \+ 1\)/);
   assert.match(card, /accessibilityRole="tab"/);
   assert.match(card, /router\.push\(step\.route/);
   assert.match(card, /v\.doneCount === 0 \? <Text style=\{styles\.hint\}>/);
@@ -77,13 +76,15 @@ test('the card is one slim tile: the whole tile opens the step, numbered pills s
   assert.match(card, /reduce \? undefined : FadeIn/);
 });
 
-test('only the day you are on is a solid pill; a finished day is an outline with a tick', () => {
+test('only the day you are on is lit, and only the lit pill can carry a tick', () => {
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
   const block = (name: string) => new RegExp(`${name}: \\{([^}]*)\\}`).exec(card)![1]!;
   assert.match(block('pillCurrent'), /backgroundColor: colors\.gold/);
-  assert.doesNotMatch(block('pillDone'), /backgroundColor/);
-  assert.match(card, /current && styles\.pillTextCurrent/);
-  assert.doesNotMatch(card, /current && !s\.done/);
+  assert.doesNotMatch(card, /pillDone|pillTextDone/);
+  assert.match(card, /current && s\.done \? '✓' : String\(i \+ 1\)/);
+  assert.doesNotMatch(card, /(?<!&& )s\.done \? '✓'/);
+  assert.equal(doneSuffix(0), '');
+  assert.equal(doneSuffix(2), '  ·  2 done');
 });
 
 test('the reminder has seven different wordings and none says anything about the day', () => {

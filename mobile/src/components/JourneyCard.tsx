@@ -4,7 +4,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { router, type Href } from 'expo-router';
 import { Glass } from '@/components/Glass';
 import { Pressable } from '@/components/Pressable';
-import { dayOf, journeyHint, journeyView, stepSpoken } from '@/lib/journey';
+import { dayOf, doneSuffix, journeyHint, journeyView, stepSpoken } from '@/lib/journey';
 import { useReduceMotion } from '@/lib/motion';
 import { usePremium } from '@/lib/usePremium';
 import { localDateString } from '@/lib/useTimeline';
@@ -42,7 +42,7 @@ export function JourneyCard() {
       <View style={styles.head}>
         <Text accessibilityRole="header" style={styles.top} numberOfLines={1}>
           <Text style={styles.gold}>Your first week</Text>
-          {`  ·  ${dayOf(index, total)}`}
+          {`  ·  ${dayOf(index, total)}${doneSuffix(v.doneCount)}`}
         </Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Hide the first week card" onPress={dismiss} style={styles.close} hitSlop={8}>
           <Text style={styles.closeText}>✕</Text>
@@ -78,9 +78,9 @@ export function JourneyCard() {
               onPress={() => setPicked(i)}
               style={styles.pillHit}
             >
-              <View style={[styles.pill, s.done && styles.pillDone, current && styles.pillCurrent]}>
-                <Text style={[styles.pillText, s.done && styles.pillTextDone, current && styles.pillTextCurrent]}>
-                  {s.done ? '✓' : String(i + 1)}
+              <View style={[styles.pill, current && styles.pillCurrent]}>
+                <Text style={[styles.pillText, current && styles.pillTextCurrent]}>
+                  {current && s.done ? '✓' : String(i + 1)}
                 </Text>
               </View>
             </Pressable>
@@ -107,10 +107,8 @@ const styles = StyleSheet.create({
   pills: { flexDirection: 'row', gap: space.sm },
   pillHit: { flex: 1, height: 48, justifyContent: 'center' },
   pill: { height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
-  // Done: a gold outline with a gold tick. Current: the one solid gold pill. Moving to another day hands the solid fill over.
-  pillDone: { borderColor: colors.gold },
+  // Only the day you are on is lit, and only the lit pill can show a tick. Every other pill is dim with its number.
   pillCurrent: { backgroundColor: colors.gold, borderColor: colors.gold },
   pillText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
-  pillTextDone: { color: colors.gold },
   pillTextCurrent: { color: colors.obsidian },
 });

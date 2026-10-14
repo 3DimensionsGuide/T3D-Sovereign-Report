@@ -102,3 +102,8 @@ export function dayOf(index: number, total: number): string {
 export function stepSpoken(index: number, total: number, step: { label: string; detail: string; cta: string; done: boolean }): string {
   return `${dayOf(index, total)}${step.done ? ', done' : ''}. ${step.label}. ${step.detail} ${step.cta}.`;
 }
+
+/** The tail of the top line once something is done, such as "  ·  2 done". Empty until then. */
+export function doneSuffix(doneCount: number): string {
+  return doneCount > 0 ? `  ·  ${doneCount} done` : '';
+}
