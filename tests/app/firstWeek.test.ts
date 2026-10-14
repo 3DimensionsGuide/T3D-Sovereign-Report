@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { JOURNEY_DAYS, SHOWN, dayNumber, doneNote, journeyTitle, journeyView, type JourneyInput } from '../../mobile/src/lib/journey';
+import { JOURNEY_DAYS, JOURNEY_PURPOSE, SHOWN, STEPS, dayNumber, doneNote, journeyHeading, journeyView, stepStatus, type JourneyInput } from '../../mobile/src/lib/journey';
 import { REMINDER_LINES, reminderLine } from '../../mobile/src/lib/reminderLines';
 
 const base: JourneyInput = { startedOn: '2026-10-13', today: '2026-10-13', dismissed: false, premium: false, visited: {}, decisions: 0, people: 0 };
@@ -50,15 +50,28 @@ test('the card goes away when dismissed and after two weeks', () => {
   assert.equal(JOURNEY_DAYS, 14);
 });
 
-test('the title and the bar follow the step you are on, not the calendar', () => {
-  assert.equal(journeyTitle(0, 5), 'Day 1 of 5');
-  assert.equal(journeyTitle(1, 5), 'Day 2 of 5');
-  assert.equal(journeyTitle(2, 3), 'Day 3 of 3');
-  assert.equal(doneNote(0), '');
-  assert.equal(doneNote(2), '2 done');
+test('the card says what it is for, in plain words', () => {
+  assert.equal(journeyHeading(5), 'Five small steps to get to know your chart');
+  assert.equal(journeyHeading(3), 'Three small steps to get to know your chart');
+  assert.match(JOURNEY_PURPOSE, /One a day is plenty/);
+  assert.match(JOURNEY_PURPOSE, /ticks off/);
+  assert.equal(stepStatus(1, false), 'Day 2 · Not done yet');
+  assert.equal(stepStatus(0, true), 'Day 1 · Done');
+  assert.equal(doneNote(2, 5), '2 of 5 done');
+});
+
+test('each step has a button that names where it goes', () => {
+  for (const s of STEPS) assert.ok(s.cta.length > 4 && /^(Open|Start)/.test(s.cta), s.key);
+  assert.deepEqual(STEPS.map((s) => s.cta), ['Open My Chart', 'Open Readings', 'Open Timeline', 'Start a decision', 'Open My Tribe']);
+});
+
+test('the card shows numbered days with a tick when done, the chosen step, and a button to open it', () => {
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
-  assert.match(card, /journeyTitle\(index, v\.all\.length\)/);
-  assert.match(card, /\(index \+ 1\) \/ v\.all\.length/);
+  assert.match(card, /s\.done \? '✓' : String\(i \+ 1\)/);
+  assert.match(card, /accessibilityRole="tab"/);
+  assert.match(card, /journeyHeading\(v\.all\.length\)/);
+  assert.match(card, /stepStatus\(index, step\.done\)/);
+  assert.match(card, /router\.push\(step\.route/);
 });
 
 test('the reminder has seven different wordings and none says anything about the day', () => {
@@ -97,9 +110,6 @@ test('every step can be paged back to, and the card opens on the first step not 
   assert.equal(v.all[0]!.done, true);
   assert.equal(journeyView({ ...base, visited: { chart: true, readings: true, timeline: true } }).firstOpen, 0);
   const card = readFileSync('mobile/src/components/JourneyCard.tsx', 'utf8');
-  assert.match(card, /accessibilityLabel="Previous step"/);
-  assert.match(card, /accessibilityLabel="Next step"/);
-  assert.match(card, /step\.done \? '✓  '/);
 });
 
 test('"Show the welcome note again" brings the first-week card back too', () => {

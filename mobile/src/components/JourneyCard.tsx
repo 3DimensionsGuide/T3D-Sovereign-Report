@@ -2,108 +2,109 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { router, type Href } from 'expo-router';
 import { Glass } from '@/components/Glass';
+import { GoldButton } from '@/components/GoldButton';
 import { Pressable } from '@/components/Pressable';
-import { doneNote, journeyTitle, journeyView } from '@/lib/journey';
+import { JOURNEY_PURPOSE, doneNote, journeyHeading, journeyView, stepStatus } from '@/lib/journey';
 import { usePremium } from '@/lib/usePremium';
 import { localDateString } from '@/lib/useTimeline';
 import { useJourneyStore } from '@/store/useJourneyStore';
 import { usePartnerStore } from '@/store/usePartnerStore';
 import { usePracticeStore } from '@/store/usePracticeStore';
-import { colors, fonts, radius, space, TOUCH } from '@/theme/tokens';
+import { colors, fonts, radius, space } from '@/theme/tokens';
 
-/** On Today: up to three things worth trying in the first week, each opening the right tab. Calm, never a quiz. */
+/**
+ * On Today, below the signal: a short guided plan for getting to know the app, one step a day.
+ * A row of numbered days (a tick when done), the step for the chosen day, and a button that opens it.
+ */
 export function JourneyCard() {
   const { startedOn, visited, dismissed, start, dismiss } = useJourneyStore();
   const premium = usePremium();
   const decisions = usePracticeStore((s) => s.decisions.length);
   const people = usePartnerStore((s) => s.people.length);
   const today = localDateString();
+  const [picked, setPicked] = useState<number | null>(null);
 
   useEffect(() => { start(today); }, [start, today]);
 
   const v = journeyView({ startedOn: startedOn ?? today, today, dismissed, premium, visited, decisions, people });
   if (!v.show) return null;
 
-  // The person can page back and forth through the steps; it opens on the first one not done yet.
-  const [picked, setPicked] = useState<number | null>(null);
+  // It opens on the first step not done yet; tapping a day shows that day's step.
   const index = Math.min(Math.max(picked ?? v.firstOpen, 0), v.all.length - 1);
   const step = v.all[index]!;
-  const go = (delta: number) => setPicked(Math.min(Math.max(index + delta, 0), v.all.length - 1));
 
   return (
     <Glass style={styles.card}>
       <View style={styles.head}>
-        <Text accessibilityRole="header" style={styles.title}>{journeyTitle(index, v.all.length)}</Text>
+        <Text style={styles.eyebrow}>Your first week</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Hide the first week card" onPress={dismiss} style={styles.close} hitSlop={8}>
           <Text style={styles.closeText}>✕</Text>
         </Pressable>
       </View>
-      <View
-        accessible
-        accessibilityRole="progressbar"
-        accessibilityLabel={`Day ${index + 1} of ${v.all.length} of your first week${v.doneCount > 0 ? `, ${v.doneCount} done` : ''}`}
-        accessibilityValue={{ min: 1, max: v.all.length, now: index + 1 }}
-        style={styles.progressRow}
-      >
-        <View style={styles.track}>
-          <View style={[styles.fill, { width: `${((index + 1) / v.all.length) * 100}%` }]} />
-        </View>
-        <Text style={styles.count}>{doneNote(v.doneCount)}</Text>
+      <Text accessibilityRole="header" style={styles.title}>{journeyHeading(v.all.length)}</Text>
+      <Text style={styles.small}>{JOURNEY_PURPOSE}</Text>
+
+      <View style={styles.days} accessibilityRole="tablist">
+        {v.all.map((s, i) => {
+          const current = i === index;
+          return (
+            <Pressable
+              key={s.key}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: current }}
+              accessibilityLabel={`Day ${i + 1}, ${s.label}, ${s.done ? 'done' : 'not done yet'}`}
+              onPress={() => setPicked(i)}
+              style={[styles.day, s.done && styles.dayDone, current && styles.dayCurrent]}
+            >
+              <Text style={[styles.dayText, s.done && styles.dayTextDone, current && !s.done && styles.dayTextCurrent]}>
+                {s.done ? '✓' : String(i + 1)}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
-      <View style={styles.pager}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Previous step"
-          accessibilityState={{ disabled: index === 0 }}
-          disabled={index === 0}
-          onPress={() => go(-1)}
-          style={[styles.arrow, index === 0 && styles.arrowOff]}
-        >
-          <Text style={styles.chev}>‹</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Step ${index + 1} of ${v.all.length}${step.done ? ', done' : ''}. ${step.label}. ${step.detail}`}
+
+      <View style={styles.panel}>
+        <View style={styles.statusRow}>
+          <Text style={[styles.status, step.done && styles.statusDone]}>{stepStatus(index, step.done)}</Text>
+          <Text style={styles.count}>{doneNote(v.doneCount, v.all.length)}</Text>
+        </View>
+        <Text style={styles.stepTitle}>{step.label}</Text>
+        <Text style={styles.small}>{step.detail}</Text>
+        <GoldButton
+          label={step.done ? `${step.cta} again` : step.cta}
+          variant={step.done ? 'ghost' : 'gold'}
           onPress={() => router.push(step.route as Href)}
-          style={styles.step}
-        >
-          <Text style={styles.stepLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
-            {step.done ? '✓  ' : ''}{step.label}
-          </Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Next step"
-          accessibilityState={{ disabled: index === v.all.length - 1 }}
-          disabled={index === v.all.length - 1}
-          onPress={() => go(1)}
-          style={[styles.arrow, index === v.all.length - 1 && styles.arrowOff]}
-        >
-          <Text style={styles.chev}>›</Text>
-        </Pressable>
+        />
       </View>
     </Glass>
   );
 }
 
+const DAY = 48;
+
 const styles = StyleSheet.create({
-  card: { borderColor: colors.goldEdge, paddingVertical: space.md, paddingHorizontal: space.lg, gap: space.sm },
-  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
-  title: { flex: 1, fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.parchment },
-  close: { width: TOUCH, height: 40, alignItems: 'flex-end', justifyContent: 'center' },
+  card: { borderColor: colors.goldEdge, padding: space.lg, gap: space.md },
+  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  eyebrow: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.gold },
+  close: { width: 52, height: 40, alignItems: 'flex-end', justifyContent: 'center' },
   closeText: { fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.parchmentMuted },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  track: { flex: 1, height: 6, borderRadius: 3, backgroundColor: colors.hairline, overflow: 'hidden' },
-  fill: { height: 6, borderRadius: 3, backgroundColor: colors.gold },
-  count: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
-  pager: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
-  arrow: { width: 44, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
-  arrowOff: { opacity: 0.35 },
-  step: {
-    flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.md,
-    borderRadius: radius.md, borderWidth: 1, borderColor: colors.line,
-  },
-  stepLabel: { fontFamily: fonts.bodyMedium, fontSize: 15, color: colors.parchment },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 22, lineHeight: 30, color: colors.parchment },
   small: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
-  chev: { fontFamily: fonts.body, fontSize: 24, color: colors.parchmentMuted },
+  days: { flexDirection: 'row', justifyContent: 'space-between' },
+  day: {
+    width: DAY, height: DAY, borderRadius: DAY / 2, borderWidth: 1, borderColor: colors.line,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  dayDone: { backgroundColor: colors.gold, borderColor: colors.gold },
+  dayCurrent: { borderWidth: 2, borderColor: colors.gold },
+  dayText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.parchmentMuted },
+  dayTextDone: { color: colors.obsidian },
+  dayTextCurrent: { color: colors.gold },
+  panel: { backgroundColor: colors.surfaceRaised, borderRadius: radius.md, padding: space.md, gap: space.sm },
+  statusRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
+  status: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.parchmentMuted },
+  statusDone: { color: colors.gold },
+  count: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchmentMuted },
+  stepTitle: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 20, lineHeight: 27, color: colors.parchment },
 });

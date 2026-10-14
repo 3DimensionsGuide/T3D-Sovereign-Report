@@ -13,16 +13,18 @@ export interface StepDef {
   detail: string;
   /** Where the step takes you. */
   route: '/chart' | '/readings' | '/timeline' | '/practice';
+  /** The button that opens it. */
+  cta: string;
   /** Needs Premium to open. */
   premium: boolean;
 }
 
 export const STEPS: readonly StepDef[] = [
-  { key: 'chart', label: 'Open My Chart and see your Triad', detail: 'Your Vehicle, Road and Stoplight in one picture.', route: '/chart', premium: false },
-  { key: 'readings', label: 'Read about your Vehicle', detail: 'How you are built, and how you decide best.', route: '/readings', premium: false },
-  { key: 'timeline', label: 'Look at the week ahead', detail: 'When the road is open, and when to slow down.', route: '/timeline', premium: false },
-  { key: 'practice', label: 'Run one decision through the three checks', detail: 'Use your Authority on something real.', route: '/practice', premium: true },
-  { key: 'tribe', label: 'Add someone to My Tribe', detail: 'See how you fit with a friend or someone you are seeing.', route: '/practice', premium: true },
+  { key: 'chart', cta: 'Open My Chart', label: 'Open My Chart and see your Triad', detail: 'Your Vehicle, Road and Stoplight in one picture.', route: '/chart', premium: false },
+  { key: 'readings', cta: 'Open Readings', label: 'Read about your Vehicle', detail: 'How you are built, and how you decide best.', route: '/readings', premium: false },
+  { key: 'timeline', cta: 'Open Timeline', label: 'Look at the week ahead', detail: 'When the road is open, and when to slow down.', route: '/timeline', premium: false },
+  { key: 'practice', cta: 'Start a decision', label: 'Run one decision through the three checks', detail: 'Use your Authority on something real.', route: '/practice', premium: true },
+  { key: 'tribe', cta: 'Open My Tribe', label: 'Add someone to My Tribe', detail: 'See how you fit with a friend or someone you are seeing.', route: '/practice', premium: true },
 ];
 
 /** The days the card stays after the first visit, even if steps are left. */
@@ -83,12 +85,23 @@ export function journeyView(i: JourneyInput): JourneyView {
   return { show, dayNumber: day, steps: allDone ? all : next, all, firstOpen, doneCount, total: all.length, allDone };
 }
 
-/** The heading: the step you are looking at, counted as a day of the plan. */
-export function journeyTitle(index: number, total: number): string {
-  return `Day ${index + 1} of ${total}`;
+const WORDS: Record<number, string> = { 1: 'One', 2: 'Two', 3: 'Three', 4: 'Four', 5: 'Five' };
+
+/** The card's heading: what it is, in a sentence. */
+export function journeyHeading(total: number): string {
+  const n = WORDS[total] ?? String(total);
+  return `${n} small ${total === 1 ? 'step' : 'steps'} to get to know your chart`;
 }
 
-/** The note beside the bar: how many steps are done, or nothing yet. */
-export function doneNote(doneCount: number): string {
-  return doneCount > 0 ? `${doneCount} done` : '';
+/** What the card is for and how to use it. */
+export const JOURNEY_PURPOSE = 'One a day is plenty. Tap a day to see its step, then open it. A step ticks off when you have done it.';
+
+/** The status of the step on show. */
+export function stepStatus(index: number, done: boolean): string {
+  return `Day ${index + 1} · ${done ? 'Done' : 'Not done yet'}`;
+}
+
+/** How many are done, written out. */
+export function doneNote(doneCount: number, total: number): string {
+  return `${doneCount} of ${total} done`;
 }
