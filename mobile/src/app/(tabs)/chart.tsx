@@ -82,7 +82,7 @@ export default function Chart() {
       {view === 'overview' ? (
         <>
       <FadeIn delay={80}>
-        <TriadPortrait chart={chart} onOpenLens={openLens} />
+        <TriadPortrait chart={chart} onOpenLens={openLens} live />
       </FadeIn>
 
       <FadeIn delay={100}>

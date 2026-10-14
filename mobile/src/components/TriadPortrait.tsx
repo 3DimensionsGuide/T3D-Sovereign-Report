@@ -1,9 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import { Pressable } from '@/components/Pressable';
 import Svg, { Circle, Defs, LinearGradient, Line, Polygon, Stop } from 'react-native-svg';
 import type { ChartResult } from '@/lib/api';
 import { LENS_COLOR, LENS_LABEL, LENS_TEXT, type LensName } from '@/components/Lens';
-import { lensTap } from '@/lib/haptics';
+import { TriadCircuit, fireSurge } from '@/components/TriadCircuit';
+import { lensTap, tap } from '@/lib/haptics';
+import { useReduceMotion } from '@/lib/motion';
+import { CORE, CORE_RING, CORNER_R, CORNER_S, CORNER_V } from '@/lib/triadCircuit';
 import { colors, fonts } from '@/theme/tokens';
 
 /**
@@ -11,9 +15,9 @@ import { colors, fonts } from '@/theme/tokens';
  * Drawn in a 100 x 100 box that scales to any width. Each corner carries its lens shape,
  * its name and one headline fact, written out so nothing depends on colour alone.
  */
-const V = { x: 50, y: 28 };
-const R = { x: 17, y: 66 };
-const S = { x: 83, y: 66 };
+const V = CORNER_V;
+const R = CORNER_R;
+const S = CORNER_S;
 const HEIGHT_UNITS = 100;
 const pct = (y: number) => `${(y / HEIGHT_UNITS) * 100}%` as const;
 
@@ -21,9 +25,13 @@ interface Props {
   chart: ChartResult;
   /** Each corner opens that lens's reading. */
   onOpenLens?: (lens: LensName) => void;
+  /** Draws the powered-on circuit version, with depth and moving sparks. Off for share images. */
+  live?: boolean;
 }
 
-export function TriadPortrait({ chart, onOpenLens }: Props) {
+export function TriadPortrait({ chart, onOpenLens, live = false }: Props) {
+  const reduce = useReduceMotion();
+  const surge = useSharedValue(0);
   const { humanDesign: hd, numerology: num, astrology: astro } = chart;
   const profileLines = hd.profile.match(/\d\/\d/)?.[0] ?? hd.profile;
   const vehicle = { head: hd.type, sub: `Profile ${profileLines}` };
@@ -42,7 +50,8 @@ export function TriadPortrait({ chart, onOpenLens }: Props) {
 
   return (
     <View style={styles.wrap}>
-      <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 100 ${HEIGHT_UNITS}`} preserveAspectRatio="xMidYMid meet">
+      {live ? <TriadCircuit reduce={reduce} surge={surge} /> : null}
+      {live ? null : <Svg style={StyleSheet.absoluteFill} viewBox={`0 0 100 ${HEIGHT_UNITS}`} preserveAspectRatio="xMidYMid meet">
         <Defs>
           <LinearGradient id="vr" gradientUnits="userSpaceOnUse" x1={V.x} y1={V.y} x2={R.x} y2={R.y}>
             <Stop offset="0" stopColor={LENS_COLOR.vehicle} />
@@ -71,7 +80,7 @@ export function TriadPortrait({ chart, onOpenLens }: Props) {
         {/* Stoplight: dot */}
         <Circle cx={S.x} cy={S.y} r={7.5} fill={LENS_COLOR.stoplight} fillOpacity={0.16} />
         <Circle cx={S.x} cy={S.y} r={4.2} fill={LENS_COLOR.stoplight} />
-      </Svg>
+      </Svg>}
 
       <Pressable {...open('vehicle', 'The Vehicle', vehicle)} style={[styles.corner, styles.top, { top: 0 }]}>
         <Text style={[styles.lens, { color: LENS_TEXT.vehicle }]}>{LENS_LABEL.vehicle}</Text>
@@ -88,7 +97,18 @@ export function TriadPortrait({ chart, onOpenLens }: Props) {
         <Text style={[styles.head, styles.alignRight]}>{stoplight.head}</Text>
         <Text style={[styles.sub, styles.alignRight]}>{stoplight.sub}</Text>
       </Pressable>
-      <Text importantForAccessibility="no" accessibilityElementsHidden style={[styles.centre, { top: pct(51) }]}>T3D</Text>
+      {live ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="T3D. Tap to send a pulse through the circuit"
+          onPress={() => { tap(); fireSurge(surge); }}
+          style={[styles.core, { top: pct(CORE.y - CORE_RING), height: `${((CORE_RING * 2) / HEIGHT_UNITS) * 100}%` }]}
+        >
+          <Text style={styles.coreText}>T3D</Text>
+        </Pressable>
+      ) : (
+        <Text importantForAccessibility="no" accessibilityElementsHidden style={[styles.centre, { top: pct(51) }]}>T3D</Text>
+      )}
     </View>
   );
 }
@@ -103,5 +123,7 @@ const styles = StyleSheet.create({
   head: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: colors.parchment },
   sub: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.parchmentMuted },
   alignRight: { textAlign: 'right' },
+  core: { position: 'absolute', left: '50%', width: '20%', marginLeft: '-10%', alignItems: 'center', justifyContent: 'center' },
+  coreText: { fontFamily: fonts.display, fontSize: 20, color: colors.gold },
   centre: { position: 'absolute', left: 0, right: 0, textAlign: 'center', fontFamily: fonts.display, fontSize: 22, color: colors.parchmentMuted },
 });
