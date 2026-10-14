@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { AccentView } from '@/components/AccentView';
+import { Disclosure } from '@/components/Disclosure';
 import type { RoadDay } from '@/lib/roadDay';
 import { cycleLine } from '@/lib/numberWords';
 import { colors, fonts, radius, space, themes } from '@/theme/tokens';
@@ -36,18 +37,22 @@ export function RoadToday({ day, dayLabel }: { day: RoadDay; dayLabel?: string |
           </View>
         ))}
       </View>
-      <Text style={styles.body}>
-        <Text style={styles.strong}>{'Lean in: '}</Text>
-        {m.leanIn}
-      </Text>
-      <Text style={styles.body}>
-        <Text style={styles.strong}>{'Watch for: '}</Text>
-        {m.watchFor}
-      </Text>
-      <View style={styles.divider} />
-      <Text style={styles.strong}>How it sits in your cycles</Text>
-      <Text style={styles.body}>{cycleLine('Year', day.year)}</Text>
-      <Text style={styles.body}>{cycleLine('Month', day.month)}</Text>
+      <Disclosure label="Show more">
+        <View style={styles.more}>
+          <Text style={styles.body}>
+            <Text style={styles.strong}>{'Lean in: '}</Text>
+            {m.leanIn}
+          </Text>
+          <Text style={styles.body}>
+            <Text style={styles.strong}>{'Watch for: '}</Text>
+            {m.watchFor}
+          </Text>
+          <View style={styles.divider} />
+          <Text style={styles.strong}>How it sits in your cycles</Text>
+          <Text style={styles.body}>{cycleLine('Year', day.year)}</Text>
+          <Text style={styles.body}>{cycleLine('Month', day.month)}</Text>
+        </View>
+      </Disclosure>
     </AccentView>
   );
 }
@@ -72,5 +77,6 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { borderRadius: 999, borderWidth: 1, borderColor: T.edge, paddingHorizontal: 12, paddingVertical: 6 },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.parchment },
+  more: { gap: 12 },
   divider: { height: 1, backgroundColor: colors.hairline },
 });
