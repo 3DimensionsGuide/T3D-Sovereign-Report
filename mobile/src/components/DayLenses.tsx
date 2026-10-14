@@ -1,5 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import { PremiumGate } from '@/components/PremiumGate';
+import { MoonToday } from '@/components/MoonToday';
 import { RoadToday } from '@/components/RoadToday';
 import { VehicleToday } from '@/components/VehicleToday';
 import { gateReadingForDay } from '@/lib/gateDay';
@@ -56,6 +57,26 @@ export function VehicleDayBlock({ data, selectedDay, premium }: Props) {
     );
   }
   return data.gateToday && data.gateToday.gates.length > 0 ? <VehicleToday data={data.gateToday} /> : null;
+}
+
+/** The Stoplight's reading of the selected day: the Moon's sign and house. Today is free; looking ahead is Premium. */
+export function StoplightDayBlock({ data, selectedDay, premium }: Props) {
+  const title = dayTitleOf(data.personal[selectedDay]?.date);
+  if (selectedDay > 0 && !premium) {
+    return (
+      <PremiumGate
+        title={`The Moon on ${title}`}
+        detail="Today's Moon reading is free. Look ahead with Premium: the Moon's sign, the house it moves through, and what the day favors."
+      />
+    );
+  }
+  const day = data.moonDays?.find((d) => d.dayIndex === selectedDay);
+  if (!day) {
+    return selectedDay > 0 ? (
+      <Text style={styles.sub}>Moon readings reach {data.moonDays ? data.moonDays.length - 1 : 14} days ahead. Pick a nearer day to read it.</Text>
+    ) : null;
+  }
+  return <MoonToday day={day} dayLabel={selectedDay > 0 ? title : null} />;
 }
 
 const styles = StyleSheet.create({

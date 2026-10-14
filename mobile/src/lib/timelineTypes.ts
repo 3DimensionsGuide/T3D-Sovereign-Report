@@ -136,6 +136,21 @@ export interface GateDay {
   moon?: MoonChannel[];
 }
 
+export interface MoonDaySegment {
+  sign: string;
+  house: number;
+  houseName: string;
+  houseTheme: string;
+  from: string | null;
+  until: string;
+  reading: { theme: string; shadow: string; guidance: string };
+}
+
+export interface MoonDay {
+  dayIndex: number;
+  segments: MoonDaySegment[];
+}
+
 export interface TimelineResult {
   from: string;
   to: string;
@@ -156,4 +171,6 @@ export interface TimelineResult {
   gateToday?: GateTodayResult;
   /** Gate readings for the days after today. Absent on older saved copies. */
   gateDays?: GateDay[];
+  /** The Moon's sign and house for today and the days ahead. Absent on older saved copies. */
+  moonDays?: MoonDay[];
 }

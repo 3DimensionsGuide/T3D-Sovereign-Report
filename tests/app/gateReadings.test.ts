@@ -27,7 +27,7 @@ test('the Vehicle card shows the gate reading and the cache was bumped for the n
   assert.match(ui, /g\.reading\.theme/);
   assert.match(ui, /g\.reading\.shadow/);
   assert.match(ui, /g\.reading\.guidance/);
-  assert.match(readFileSync('mobile/src/lib/useTimeline.ts', 'utf8'), /CACHE_VERSION = 6/);
+  assert.match(readFileSync('mobile/src/lib/useTimeline.ts', 'utf8'), /CACHE_VERSION = 7/);
 });
 
 import { gateReadingForDay } from '../../mobile/src/lib/gateDay';

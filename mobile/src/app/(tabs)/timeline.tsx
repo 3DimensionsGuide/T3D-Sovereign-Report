@@ -31,7 +31,7 @@ import { gateReadingForDay } from '@/lib/gateDay';
 import { usePremium } from '@/lib/usePremium';
 import { isEventLocked, isLaterMonthLocked } from '@/lib/timelineLock';
 import { PremiumGate } from '@/components/PremiumGate';
-import { RoadDayBlock, VehicleDayBlock } from '@/components/DayLenses';
+import { RoadDayBlock, StoplightDayBlock, VehicleDayBlock } from '@/components/DayLenses';
 
 const T = themes.timeline;
 
@@ -458,6 +458,10 @@ export default function Timeline() {
 
           {lens === 'all' ? (
             <FadeIn><VehicleDayBlock data={data} selectedDay={selectedDay} premium={premium} /></FadeIn>
+          ) : null}
+
+          {lens === 'all' || lens === 'stoplight' ? (
+            <FadeIn><StoplightDayBlock data={data} selectedDay={selectedDay} premium={premium} /></FadeIn>
           ) : null}
 
           {lens === 'all' || lens === 'road' ? <YearCard data={data} /> : null}

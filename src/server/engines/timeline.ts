@@ -41,6 +41,7 @@ import { CHALLENGE_THEMES, PINNACLE_THEMES } from '../../lib/report/section4/roa
 import { personalYearNumber } from '../../lib/numerology/personalYear';
 import { buildGateEvents, type GateVehicle } from '../../lib/app/gateEvents';
 import { meaning as dayNumberMeaning, type DayNumberMeaning } from './dayNumerology';
+import { buildMoonDay, type MoonDay } from '../../lib/app/moonDay';
 import { buildGateToday, GATE_DAYS_AHEAD, type GateDay, type GateTodayResult } from '../../lib/app/gateToday';
 
 // ─── PUBLIC TYPES ────────────────────────────────────────────────────────────
@@ -146,6 +147,8 @@ export interface TimelineResult {
   gateToday?: GateTodayResult;
   /** The Sun's gate(s) for each of the next days after today (index 0 is tomorrow), so a chosen future day has its own reading. */
   gateDays?: GateDay[];
+  /** The Moon's sign and house for today and the days ahead, for the Stoplight lens. */
+  moonDays?: MoonDay[];
 }
 
 export interface TimelineInput {
@@ -803,6 +806,11 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     personal.push({ date: iso, year: py, month: pm, day: pd });
   }
 
+  const moonDays: MoonDay[] = [];
+  for (let i = 0; i <= Math.min(GATE_DAYS_AHEAD, days - 1); i++) {
+    moonDays.push({ dayIndex: i, segments: buildMoonDay(startJd + i, natal.ascendant, (jd) => posAt('moon', jd).lon) });
+  }
+
   return {
     from: fromDate.toISOString(),
     to: jdToDate(endJd).toISOString(),
@@ -817,6 +825,7 @@ export function calculateTimeline(input: TimelineInput): TimelineResult {
     dayMeanings: DAY_MEANINGS,
     gateToday,
     gateDays,
+    moonDays,
   };
 }
 
