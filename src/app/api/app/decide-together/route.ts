@@ -19,13 +19,7 @@ import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
-import { buildDecideTogether, type TogetherPersonInput } from '@/lib/app/decideTogether';
-import { hdCertainty } from '@/server/engines/hdCertainty';
-import { calculateDayNumerology } from '@/server/engines/dayNumerology';
-import { calculateAstrology } from '@/server/engines/astrology';
-import { calculateLifePath } from '@/server/engines/numerology';
-import { buildConnections, buildNumberPair, buildSynastry, type GateKnowledge } from '@/lib/app/relationshipPieces';
-import { buildCenterEffects, buildHouseOverlays, type CenterKnowledge } from '@/lib/app/relationshipExtras';
+import { computeTogether } from '@/server/togetherCompute';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
@@ -93,110 +87,32 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    // You: the saved chart, re-checked across the day when your own birth time is unknown.
-    let you: TogetherPersonInput = {
-      label: 'You',
-      type: results?.humanDesign?.type ?? null,
-      authority: results?.humanDesign?.authority ?? null,
-      certainty: 'sure',
-      possibilities: [],
-    };
-    if (body.youTimeKnown === false) {
-      const pl = birth.place;
-      if (pl && isNum(pl.latitude, -90, 90) && isNum(pl.longitude, -180, 180) && typeof pl.timezone === 'string') {
-        const c = hdCertainty(
-          { birthDate: birth.date, latitude: pl.latitude, longitude: pl.longitude, timezone: pl.timezone },
-          null,
-        );
-        you = { label: 'You', type: c.type, authority: c.authority, certainty: c.certainty, possibilities: c.possibilities };
-      }
-    }
-
-    const label = cleanLabel(p.label);
-    const c = hdCertainty(
-      { birthDate: p.birthDate, latitude: p.latitude, longitude: p.longitude, timezone: p.timezone },
-      typeof p.birthTime === 'string' ? p.birthTime : null,
-    );
-    const partner: TogetherPersonInput = {
-      label,
-      type: c.type,
-      authority: c.authority,
-      certainty: c.certainty,
-      possibilities: c.possibilities,
-    };
-
-    const yourDay = calculateDayNumerology(birth.date, localDate).personal;
-    const theirDayFull = calculateDayNumerology(p.birthDate, localDate);
-    const theirDay = theirDayFull.personal;
-    const theirDayYear = theirDayFull.personalYear;
-    const text = (d: typeof yourDay) => (d.root ? `${d.number}/${d.root}` : String(d.number));
-
-    const data = buildDecideTogether(you, partner, {
-      youLabel: 'you',
-      youNumber: text(yourDay),
-      partnerLabel: label,
-      partnerNumber: text(theirDay),
-    });
-
-    // The other relationship pieces. Each is optional: if one cannot be built, the rest still return.
-    const youTimeKnown = body.youTimeKnown !== false;
-    const partnerTimeKnown = typeof p.birthTime === 'string';
-    const labels = { you: 'You', them: label };
-    const known = { you: youTimeKnown, them: partnerTimeKnown };
     const pl = birth.place;
-    const yourPlaceOk = !!pl && isNum(pl.latitude, -90, 90) && isNum(pl.longitude, -180, 180) && typeof pl.timezone === 'string';
+    const yourPlace = pl && isNum(pl.latitude, -90, 90) && isNum(pl.longitude, -180, 180) && typeof pl.timezone === 'string'
+      ? { latitude: pl.latitude, longitude: pl.longitude, timezone: pl.timezone }
+      : null;
+    const youTimeKnown = body.youTimeKnown !== false;
     const yourTime = youTimeKnown && typeof birth.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(birth.time) ? birth.time : null;
-    const toKnowledge = (g: { gatesAllDay: number[]; gatesAnyTime: number[] }): GateKnowledge => ({
-      sure: new Set(g.gatesAllDay),
-      possible: new Set(g.gatesAnyTime),
-    });
 
-    const toCenters = (g: { centersAllDay: string[]; centersAnyTime: string[] }): CenterKnowledge => ({
-      sure: new Set(g.centersAllDay),
-      possible: new Set(g.centersAnyTime),
-    });
-
-    let connections = null;
-    let centers = null;
-    let sky = null;
-    let houses = null;
-    if (yourPlaceOk && pl) {
-      const yourInput = { birthDate: birth.date, latitude: pl.latitude as number, longitude: pl.longitude as number, timezone: pl.timezone as string };
-      try {
-        const yours = hdCertainty(yourInput, yourTime);
-        connections = buildConnections(toKnowledge(yours), toKnowledge(c), labels, known);
-        centers = buildCenterEffects(toCenters(yours), toCenters(c), labels, known);
-      } catch {
-        connections = null;
-        centers = null;
-      }
-      try {
-        const yourSky = calculateAstrology({ ...yourInput, birthTime: yourTime ?? '12:00' }).tropical;
-        const theirSky = calculateAstrology({
-          birthDate: p.birthDate, birthTime: typeof p.birthTime === 'string' ? p.birthTime : '12:00',
-          latitude: p.latitude, longitude: p.longitude, timezone: p.timezone,
-        }).tropical;
-        sky = buildSynastry(yourSky, theirSky, labels, known);
-        houses = buildHouseOverlays(yourSky, theirSky, labels, known);
-      } catch {
-        sky = null;
-        houses = null;
-      }
-    }
-
-    let numbers = null;
-    try {
-      numbers = buildNumberPair(
-        { lifePath: calculateLifePath(birth.date), personalYear: calculateDayNumerology(birth.date, localDate).personalYear },
-        { lifePath: calculateLifePath(p.birthDate), personalYear: theirDayYear },
-        labels,
-      );
-    } catch {
-      numbers = null;
-    }
+    const data = computeTogether(
+      {
+        label: 'You',
+        birthDate: birth.date,
+        birthTime: yourTime,
+        place: yourPlace,
+        saved: { type: results?.humanDesign?.type ?? null, authority: results?.humanDesign?.authority ?? null },
+      },
+      {
+        label: cleanLabel(p.label),
+        birthDate: p.birthDate,
+        birthTime: typeof p.birthTime === 'string' ? p.birthTime : null,
+        place: { latitude: p.latitude, longitude: p.longitude, timezone: p.timezone },
+      },
+      localDate,
+    );
 
     return NextResponse.json(
-      { success: true, data: { ...data, connections, centers, numbers, sky, houses } },
+      { success: true, data },
       { status: 200, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error: unknown) {

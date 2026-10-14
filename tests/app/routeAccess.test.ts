@@ -13,10 +13,11 @@ import { join } from 'node:path';
 
 const ROOT = join(process.cwd(), 'src/app/api/app');
 const PUBLIC_ROUTES = new Set(['place-check', 'preview', 'event']); // take no lead id; rate limited only
+const TOKEN_ROUTES = new Set(['invite']); // open with a signed invite token; checked by their own tests below
 const routes = readdirSync(ROOT, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(ROOT, d.name, 'route.ts')))
   .map((d) => ({ name: d.name, src: readFileSync(join(ROOT, d.name, 'route.ts'), 'utf8') }));
-const chartRoutes = routes.filter((r) => !PUBLIC_ROUTES.has(r.name));
+const chartRoutes = routes.filter((r) => !PUBLIC_ROUTES.has(r.name) && !TOKEN_ROUTES.has(r.name));
 
 test('the app routes exist', () => assert.ok(routes.length >= 14));
 
@@ -69,4 +70,21 @@ test('the first-launch preview saves nothing, logs nothing and enforces the age 
   const src = routes.find((r) => r.name === 'preview')!.src;
   assert.doesNotMatch(src, /@\/server\/db|\.insert\(|\.update\(|console\./);
   assert.match(src, /isUnderMinimumAge\(birthDate\)/);
+});
+
+test('the invite route checks the signed token before it reads anyone\'s chart', () => {
+  const src = routes.find((r) => r.name === 'invite')!.src;
+  const token = src.indexOf('checkInviteToken(body.token)');
+  assert.ok(token > -1, 'checks the token');
+  assert.ok(src.indexOf('loadLead(check.leadId)') > token, 'loads the sender only after the token check');
+  assert.match(src, /if \(check\.reason === 'invalid'\) await noteAccessFailure\(request\)/, 'a forged token counts as a failed guess');
+});
+
+test('the invite route pairs a viewer\'s lead id with their email, and never sends the sender\'s birth details back', () => {
+  const src = routes.find((r) => r.name === 'invite')!.src;
+  assert.match(src, /viewer\.email\.toLowerCase\(\)\.trim\(\) !== viewerEmail/);
+  assert.match(src, /lead\.email\.toLowerCase\(\)\.trim\(\) !== email/);
+  const preview = src.slice(src.indexOf("body.action === 'preview'"), src.indexOf('// ---- together ----'));
+  assert.doesNotMatch(preview, /birth|latitude|longitude|timezone|email/i);
+  assert.match(src, /isUnderMinimumAge\(y\.birthDate\)/, 'refuses a first look for an under-age birth date');
 });
