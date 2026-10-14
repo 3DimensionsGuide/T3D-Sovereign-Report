@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { AccentView } from '@/components/AccentView';
 import { FadeIn } from '@/components/FadeIn';
@@ -8,7 +8,7 @@ import { GoldButton } from '@/components/GoldButton';
 import { LockIcon } from '@/components/LockIcon';
 import { Pressable } from '@/components/Pressable';
 import { Screen } from '@/components/Screen';
-import { FREE_FEATURES, money, PREMIUM_FEATURES, PRICES, yearlySavingsPercent, type PremiumAccent } from '@/lib/premium';
+import { FREE_FEATURES, SUBSCRIPTIONS_OPEN, money, PREMIUM_FEATURES, PRICES, yearlySavingsPercent, type PremiumAccent } from '@/lib/premium';
 import { usePremium } from '@/lib/usePremium';
 import { useMeetTriadStore } from '@/store/useMeetTriadStore';
 import { colors, fonts, guidance, radius, space } from '@/theme/tokens';
@@ -26,6 +26,9 @@ export default function PremiumScreen() {
   const setPremium = useMeetTriadStore((s) => s.setPremium);
   const [plan, setPlan] = useState<Plan>('yearly');
   const save = yearlySavingsPercent();
+
+  // Version 1 is free for everyone: there is nothing to buy, so this screen is not shown.
+  if (!SUBSCRIPTIONS_OPEN) return <Redirect href="/today" />;
 
   return (
     <Screen room="ritual">

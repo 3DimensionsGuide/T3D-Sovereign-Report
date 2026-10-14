@@ -22,6 +22,7 @@ import { localDateString } from '@/lib/localDate';
 import { currentStop, decisionChecks, opensOn, STOPS, statusWord, stopStatus, TOTAL_DAYS, weekRecap, type StopStatus, type TriadStop } from '@/lib/meetTriad';
 import { loadLiveBundle, savedLiveBundle, type TodayBundle } from '@/lib/todayBundle';
 import { useLocalDate } from '@/lib/useLocalDate';
+import { usePremium } from '@/lib/usePremium';
 import { useMeetTriadHydrated, useMeetTriadStore } from '@/store/useMeetTriadStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
@@ -67,7 +68,8 @@ export default function MeetYourTriad() {
   const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
   const hydrated = useMeetTriadHydrated();
-  const { startedOn, done, premium, start, markDone, setPremium } = useMeetTriadStore();
+  const { startedOn, done, premium: previewOn, start, markDone, setPremium } = useMeetTriadStore();
+  const premium = usePremium();
   const liveDate = useLocalDate();
   const [openDay, setOpenDay] = useState<number | null>(null);
   const [bundle, setBundle] = useState<TodayBundle | null>(null);
@@ -111,7 +113,7 @@ export default function MeetYourTriad() {
 
   const began = startedOn ?? liveDate;
   // In a developer build, the Premium preview also opens every stop, so Days 4 to 7 can be checked on day one.
-  const clockDate = __DEV__ && premium ? opensOn(began, TOTAL_DAYS) : liveDate;
+  const clockDate = __DEV__ && previewOn ? opensOn(began, TOTAL_DAYS) : liveDate;
   const now = currentStop(began, clockDate);
   const statuses = useMemo(
     () => STOPS.map((s) => stopStatus(s, began, clockDate, done, premium)),
@@ -312,8 +314,8 @@ export default function MeetYourTriad() {
       })}
 
       {__DEV__ ? (
-        <Pressable accessibilityRole="switch" accessibilityState={{ checked: premium }} onPress={() => setPremium(!premium)} style={styles.dev}>
-          <Text style={styles.devText}>Developer only: preview as Premium, all stops open ({premium ? 'on' : 'off'})</Text>
+        <Pressable accessibilityRole="switch" accessibilityState={{ checked: previewOn }} onPress={() => setPremium(!previewOn)} style={styles.dev}>
+          <Text style={styles.devText}>Developer only: preview as Premium, all stops open ({previewOn ? 'on' : 'off'})</Text>
         </Pressable>
       ) : null}
     </Screen>

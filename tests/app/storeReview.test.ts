@@ -25,3 +25,18 @@ test('reflection-only wording appears on Premium, Method and About', () => {
 test('the developer Premium switch never ships in a release build', () => {
   assert.match(premium, /__DEV__ \? \(\s*<Pressable[^>]*accessibilityRole="switch"/);
 });
+
+const gate = readFileSync('mobile/src/lib/usePremium.ts', 'utf8');
+const lib = readFileSync('mobile/src/lib/premium.ts', 'utf8');
+const meet = readFileSync('mobile/src/app/meet-triad.tsx', 'utf8');
+
+test('version 1 is free for everyone: one switch opens every feature and hides the Premium screen', () => {
+  assert.match(lib, /export const SUBSCRIPTIONS_OPEN = false;/);
+  assert.match(gate, /return !SUBSCRIPTIONS_OPEN \|\| stored;/);
+  assert.match(premium, /if \(!SUBSCRIPTIONS_OPEN\) return <Redirect href="\/today" \/>;/);
+});
+
+test('Meet your Triad reads Premium from the shared hook, so no stop is locked while version 1 is free', () => {
+  assert.match(meet, /const premium = usePremium\(\);/);
+  assert.doesNotMatch(meet, /const \{[^}]*\bpremium,[^}]*\} = useMeetTriadStore/);
+});

@@ -36,3 +36,10 @@ export const FREE_FEATURES: readonly string[] = [
   'The “In your chart” line on every term',
   'Meet your Triad, days 1 to 3',
 ];
+
+/**
+ * Version 1 launches with every feature free. While this is false, usePremium() is true for everyone, no lock or
+ * "Premium" prompt is shown, and the Premium screen sends people back to Today. Turn it on only when real in-app
+ * purchases and a working Restore purchases exist (see docs/app-store-review-checklist.md).
+ */
+export const SUBSCRIPTIONS_OPEN = false;
