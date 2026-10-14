@@ -63,7 +63,7 @@ test('onboarding asks one question at a time, shows the calculation, and the wel
   assert.match(onboarding, /<CalculatingView /);
   assert.match(onboarding, /Calculate my chart/);
   assert.match(onboarding, /e\.g\. Los Angeles, California/);
-  assert.match(read('mobile/src/app/welcome.tsx'), /logo-t3d\.png/);
+  assert.match(read('mobile/src/app/welcome.tsx'), /logo-t3d-wordmark\.png/);
   assert.match(read('mobile/src/components/CalculatingView.tsx'), /isReduceMotionEnabled/);
 });
 
