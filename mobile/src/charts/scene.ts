@@ -1,7 +1,6 @@
 /**
  * A tiny, renderer-agnostic drawing description. The chart builders produce a
- * Scene (pure data); SceneView.tsx draws it with react-native-svg, and
- * toSvg.ts can turn it into a plain SVG string for previews and tests.
+ * Scene (pure data); SceneView.tsx draws it with react-native-svg.
  */
 /** 'symbol' = the phone's own system font (astrological glyphs aren't in our brand fonts). */
 export type SceneFont = 'display' | 'body' | 'bold' | 'symbol';
