@@ -60,9 +60,9 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
         <h1 style={{ ...display, fontSize: 'clamp(28px,6vw,38px)', lineHeight: 1.15 }}>This invite is no longer available</h1>
         <p style={{ ...body, marginTop: 14 }}>
           Invites last 30 days, and they stop working if the person who sent them removes their data.
-          Ask them for a new one, or take a free first look at your own chart.
+          Ask them for a new one, or start with your own chart.
         </p>
-        <div style={{ marginTop: 28 }}><a href="/" style={gold}>See your own free first look</a></div>
+        <div style={{ marginTop: 28 }}><a href="/" style={gold}>Start with your own chart</a></div>
       </main>
     );
   }
@@ -75,7 +75,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
         {who} invited you to see how your charts fit together
       </h1>
       <p style={body}>
-        Open the invite in the T3D app. Add your birth date and you will see how the two of you decide, connect and move
+        Open the invite in the T3D app. Add your birth date, time and place and you will see how the two of you decide, connect and move
         through time. You never need an account.
       </p>
 

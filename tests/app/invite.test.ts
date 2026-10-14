@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { completeNudge, inviteMessage, tokenFromLink } from '../../mobile/src/lib/invite';
+import { inviteMessage, tokenFromLink } from '../../mobile/src/lib/invite';
 
 const read = (p: string) => readFileSync(p, 'utf8');
 const TOKEN = `42.1.1893456000.${'a1'.repeat(32)}`;
@@ -20,12 +20,6 @@ test('a token is found in a link and nowhere else', () => {
   assert.equal(tokenFromLink('42.1.99.short'), null);
 });
 
-test('the nudge asks for what is still missing, and stops once there is nothing left to add', () => {
-  assert.match(completeNudge({ time: false, place: false })!.title, /time and place/);
-  assert.equal(completeNudge({ time: false, place: true })!.title, 'Add your birth time');
-  assert.equal(completeNudge({ time: true, place: true }), null);
-});
-
 test('the server and the app agree on which screens are counted, including the invite screen', () => {
   const quoted = (src: string) => src.match(/'[a-z-]+'/g)!.sort();
   const app = quoted(/new Set\(\[([\s\S]*?)\]\)/.exec(read('mobile/src/lib/track.ts'))![1]);
@@ -40,4 +34,13 @@ test('an invite never puts birth details in a link or stores them on the phone',
   const card = read('mobile/src/components/InviteCard.tsx');
   assert.doesNotMatch(card, /birthDate|latitude|longitude/);
   assert.match(screen, /router\.push\(\{ pathname: '\/onboarding', params: \{ birthDate:/);
+});
+
+test('someone without a chart must give birth date and place; the time may be marked unknown, as in onboarding', () => {
+  const route = read('src/app/api/app/invite/route.ts');
+  assert.match(route, /if \(!place \|\|/, 'the server refuses a missing place');
+  const screen = read('mobile/src/app/invite/[token].tsx');
+  assert.match(screen, /I do not know my birth time/);
+  assert.match(screen, /requestPlaceCheck/);
+  assert.doesNotMatch(screen, /UNLOCK THE COMPLETE READING|firstLook\(null, null\)/);
 });

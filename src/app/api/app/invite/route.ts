@@ -15,9 +15,9 @@
  *
  *  together { token, localDate, youTimeKnown?, you: { leadId, email } | { birthDate, birthTime, place } }
  *           The "you and them" reading. "you" is the person who opened the link: either their saved chart,
- *           or just a birth date (a first look, time and place optional). Their details are used to
- *           calculate and then discarded: nothing is written to the database or to the logs, and the
- *           sender's birth details are never sent back.
+ *           or their birth date and birth place (required) with a birth time (null when they do not know it).
+ *           Their details are used to calculate and then discarded: nothing is written to the database or
+ *           to the logs, and the sender's birth details are never sent back.
  *           -> the same data as /api/app/decide-together
  *
  * A link stops working when it expires or when the sender deletes their data.
@@ -185,7 +185,8 @@ export async function POST(request: Request): Promise<NextResponse> {
           saved: { type: viewer.results?.humanDesign?.type ?? null, authority: viewer.results?.humanDesign?.authority ?? null },
         };
       } else {
-        // A first look from a birth date alone; time and place are optional and make it more exact.
+        // Someone without a chart gives their birth date and place (both required); the birth time may be
+        // null when they do not know it, exactly as when they make a chart.
         if (!isDate(y.birthDate) || y.birthDate < '1900-01-01' || y.birthDate > localDate) {
           return NextResponse.json(BAD_YOU, { status: 400 });
         }
@@ -197,14 +198,13 @@ export async function POST(request: Request): Promise<NextResponse> {
           && typeof pl.timezone === 'string' && DateTime.local().setZone(pl.timezone).isValid
           ? { latitude: pl.latitude, longitude: pl.longitude, timezone: pl.timezone }
           : null;
-        if (y.birthTime !== null && y.birthTime !== undefined && !isTime(y.birthTime)) {
+        if (!place || (y.birthTime !== null && y.birthTime !== undefined && !isTime(y.birthTime))) {
           return NextResponse.json(BAD_YOU, { status: 400 });
         }
         you = {
           label: 'You',
           birthDate: y.birthDate,
-          // A time only means something with a place to put it in.
-          birthTime: place && isTime(y.birthTime) ? y.birthTime : null,
+          birthTime: isTime(y.birthTime) ? y.birthTime : null,
           place,
         };
       }

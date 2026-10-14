@@ -16,7 +16,6 @@ import {
   ChartRequestError, requestInviteTogether, requestInvitePreview, requestPlaceCheck,
   type InvitePreview, type InviteViewer, type PlaceCandidate,
 } from '@/lib/api';
-import { completeNudge } from '@/lib/invite';
 import type { DecideTogether } from '@/lib/togetherTypes';
 import { localDateString } from '@/lib/useTimeline';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -25,8 +24,6 @@ import { colors, fonts, radius, space } from '@/theme/tokens';
 const pad = (n: number) => String(n).padStart(2, '0');
 const dateString = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const timeString = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
-type Place = { latitude: number; longitude: number; timezone: string };
 
 /**
  * Where an invite link lands. Someone with a chart sees the reading at once; someone without one adds a birth date
@@ -47,15 +44,12 @@ export default function InviteScreen() {
 
   const [birthDate, setBirthDate] = useState(new Date(1990, 0, 1, 12, 0));
   const [pickingDate, setPickingDate] = useState(false);
-  const [adding, setAdding] = useState(false);
   const [timeKnown, setTimeKnown] = useState(true);
   const [birthTime, setBirthTime] = useState(new Date(2000, 0, 1, 12, 0));
   const [pickingTime, setPickingTime] = useState(false);
   const [placeText, setPlaceText] = useState('');
   const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
   const [chosen, setChosen] = useState(0);
-  const [place, setPlace] = useState<Place | null>(null);
-  const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof token !== 'string') return;
@@ -80,8 +74,18 @@ export default function InviteScreen() {
   }, [token, profile]);
 
   const hasChart = !!chart && !!profile;
-  const firstLook = (t: string | null, p: Place | null): InviteViewer => ({ birthDate: dateString(birthDate), birthTime: t, place: p });
-  const onShow = () => void run(hasChart ? { leadId: chart.leadId, email: profile.email.trim() } : firstLook(null, null));
+  const onShow = () => {
+    if (hasChart) return void run({ leadId: chart.leadId, email: profile.email.trim() });
+    // Someone without a chart: birth date, birth place and (unless unknown) birth time, all required.
+    const c = candidates?.[chosen];
+    if (!c) return void onCheckPlace();
+    const viewer: InviteViewer = {
+      birthDate: dateString(birthDate),
+      birthTime: timeKnown ? timeString(birthTime) : null,
+      place: { latitude: c.latitude, longitude: c.longitude, timezone: c.timezone },
+    };
+    void run(viewer);
+  };
 
   async function onCheckPlace() {
     setError(null);
@@ -100,20 +104,7 @@ export default function InviteScreen() {
     }
   }
 
-  function onSharpen() {
-    const c = candidates?.[chosen];
-    if (!c) return;
-    const p: Place = { latitude: c.latitude, longitude: c.longitude, timezone: c.timezone };
-    const t = timeKnown ? timeString(birthTime) : null;
-    setPlace(p);
-    setTime(t);
-    setAdding(false);
-    setCandidates(null);
-    void run(firstLook(t, p));
-  }
-
   const who = preview?.firstName ?? 'A friend';
-  const nudge = !hasChart && data ? completeNudge({ time: time !== null || (place !== null && !timeKnown), place: place !== null }) : null;
 
   if (gone) {
     return (
@@ -156,7 +147,10 @@ export default function InviteScreen() {
 
       {!data && !hasChart ? (
         <View style={styles.card}>
-          <Text style={styles.body}>Add your birth date and see the two of you side by side. It is not saved.</Text>
+          <Text style={styles.body}>
+            To read the two of you accurately, add the date, time and place you were born. They are used once to build this view
+            and are not saved.
+          </Text>
           <View style={styles.pickerRow}>
             <Text style={styles.pickerLabel}>Your birth date</Text>
             <Pressable
@@ -173,9 +167,56 @@ export default function InviteScreen() {
           {pickingDate ? (
             <View style={{ gap: space.sm }}>
               <DateTimePicker value={birthDate} mode="date" display="spinner" themeVariant="dark" maximumDate={today}
-                minimumDate={new Date(1900, 0, 1)} onValueChange={(_e: unknown, v: Date) => setBirthDate(v)} accessibilityLabel="Your birth date" />
+                minimumDate={new Date(1900, 0, 1)} onValueChange={(_e: unknown, v: Date) => { setBirthDate(v); setCandidates(null); }} accessibilityLabel="Your birth date" />
               <GoldButton label="Use this date" onPress={() => setPickingDate(false)} />
             </View>
+          ) : null}
+          {timeKnown ? (
+            <View style={styles.pickerRow}>
+              <Text style={styles.pickerLabel}>Your birth time</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Your birth time, ${timeString(birthTime)}. Change`}
+                onPress={() => setPickingTime((v) => !v)} style={styles.chooseBtn}>
+                <Text style={styles.chooseText}>{birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</Text>
+              </Pressable>
+            </View>
+          ) : null}
+          {timeKnown && pickingTime ? (
+            <View style={{ gap: space.sm }}>
+              <DateTimePicker value={birthTime} mode="time" display="spinner" themeVariant="dark"
+                onValueChange={(_e: unknown, v: Date) => setBirthTime(v)} accessibilityLabel="Your birth time" />
+              <GoldButton label="Use this time" onPress={() => setPickingTime(false)} />
+            </View>
+          ) : null}
+          <View style={styles.pickerRow}>
+            <Text style={styles.pickerLabel}>I do not know my birth time</Text>
+            <Switch value={!timeKnown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: colors.switchOff, true: colors.gold }}
+              ios_backgroundColor="#6B6B73" accessibilityLabel="I do not know my birth time" />
+          </View>
+          {!timeKnown ? (
+            <Text style={styles.small}>Without a birth time your Moon, Rising sign and exact Human Design cannot be pinned down, so the reading will say where it depends.</Text>
+          ) : null}
+          <Field label="Birth place (city, country)" value={placeText} onChangeText={(t) => { setPlaceText(t); setCandidates(null); }}
+            autoCapitalize="words" placeholder="e.g. Austin, United States" />
+          {candidates ? (
+            <>
+              <Text style={styles.small}>Is this where you were born? A wrong match changes your Human Design.</Text>
+              {candidates.map((c, i) => (
+                <Pressable
+                  key={`${c.label}-${c.latitude}`}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: i === chosen }}
+                  accessibilityLabel={`${c.label}, time zone ${c.timezone}`}
+                  onPress={() => setChosen(i)}
+                  style={[styles.placeRow, i === chosen && { borderColor: colors.gold }]}
+                >
+                  <Text style={styles.mark}>{i === chosen ? '◉' : '○'}</Text>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={styles.placeLabel}>{c.label}</Text>
+                    <Text style={styles.small}>{c.timezone}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </>
           ) : null}
         </View>
       ) : null}
@@ -183,78 +224,12 @@ export default function InviteScreen() {
       {!data ? (
         <View style={styles.actions}>
           {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-          <GoldButton label="See us together" onPress={onShow} loading={busy} />
+          <GoldButton label={hasChart || candidates ? 'See us together' : 'Check my birth place'} onPress={onShow} loading={busy} />
           <GoldButton label="Not now" variant="ghost" onPress={() => router.replace(hasChart ? '/today' : '/')} />
         </View>
       ) : (
         <View style={{ gap: space.md }}>
           <TogetherReading data={data} partnerLabel={data.people[1].label} />
-
-          {nudge ? (
-            <View style={[styles.card, { borderColor: colors.gold }]}>
-              <Text style={styles.eyebrow}>UNLOCK THE COMPLETE READING</Text>
-              <Text accessibilityRole="header" style={styles.title}>{nudge.title}</Text>
-              <Text style={styles.body}>{nudge.body}</Text>
-              {adding ? (
-                <View style={{ gap: space.md }}>
-                  {!candidates ? (
-                    <>
-                      <View style={styles.pickerRow}>
-                        <Text style={styles.pickerLabel}>Birth time unknown</Text>
-                        <Switch value={!timeKnown} onValueChange={(v) => setTimeKnown(!v)} trackColor={{ false: colors.switchOff, true: colors.gold }}
-                          ios_backgroundColor="#6B6B73" accessibilityLabel="Birth time unknown" />
-                      </View>
-                      {timeKnown ? (
-                        <>
-                          <View style={styles.pickerRow}>
-                            <Text style={styles.pickerLabel}>Your birth time</Text>
-                            <Pressable accessibilityRole="button" accessibilityLabel={`Your birth time, ${timeString(birthTime)}. Change`}
-                              onPress={() => setPickingTime((v) => !v)} style={styles.chooseBtn}>
-                              <Text style={styles.chooseText}>{birthTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</Text>
-                            </Pressable>
-                          </View>
-                          {pickingTime ? (
-                            <View style={{ gap: space.sm }}>
-                              <DateTimePicker value={birthTime} mode="time" display="spinner" themeVariant="dark"
-                                onValueChange={(_e: unknown, v: Date) => setBirthTime(v)} accessibilityLabel="Your birth time" />
-                              <GoldButton label="Use this time" onPress={() => setPickingTime(false)} />
-                            </View>
-                          ) : null}
-                        </>
-                      ) : null}
-                      <Field label="Birth place (city, country)" value={placeText} onChangeText={setPlaceText} autoCapitalize="words" placeholder="e.g. Austin, United States" />
-                      {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{'⚠  '}{error}</Text> : null}
-                      <GoldButton label="Check my birth place" onPress={() => void onCheckPlace()} loading={busy} />
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.small}>Is this where you were born? A wrong match changes your Human Design.</Text>
-                      {candidates.map((c, i) => (
-                        <Pressable
-                          key={`${c.label}-${c.latitude}`}
-                          accessibilityRole="radio"
-                          accessibilityState={{ selected: i === chosen }}
-                          accessibilityLabel={`${c.label}, time zone ${c.timezone}`}
-                          onPress={() => setChosen(i)}
-                          style={[styles.placeRow, i === chosen && { borderColor: colors.gold }]}
-                        >
-                          <Text style={styles.mark}>{i === chosen ? '◉' : '○'}</Text>
-                          <View style={{ flex: 1, gap: 2 }}>
-                            <Text style={styles.placeLabel}>{c.label}</Text>
-                            <Text style={styles.small}>{c.timezone}</Text>
-                          </View>
-                        </Pressable>
-                      ))}
-                      <GoldButton label="Sharpen the reading" onPress={onSharpen} loading={busy} />
-                      <GoldButton label="Change details" variant="ghost" onPress={() => setCandidates(null)} />
-                    </>
-                  )}
-                </View>
-              ) : (
-                <GoldButton label="Add my details" onPress={() => setAdding(true)} />
-              )}
-            </View>
-          ) : null}
 
           {!hasChart ? (
             <View style={styles.card}>
