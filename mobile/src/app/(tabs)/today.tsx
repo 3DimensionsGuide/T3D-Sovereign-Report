@@ -394,7 +394,7 @@ export default function Today() {
 
           <Fold id="today-sky" lens="stoplight" title="The sky today" hint="The Moon, the planets and the transits to your chart">
           <FadeIn delay={80}>
-            <SkyTodayCard today={today} />
+            <SkyTodayCard today={today} onSelectTransit={setSelectedHit} />
           </FadeIn>
 
           <FadeIn delay={240}>

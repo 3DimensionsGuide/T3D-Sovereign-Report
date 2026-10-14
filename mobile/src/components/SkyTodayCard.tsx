@@ -3,8 +3,11 @@ import { AccentView } from '@/components/AccentView';
 import { Disclosure } from '@/components/Disclosure';
 import { Term } from '@/components/Explain';
 import { MoonIcon } from '@/components/MoonIcon';
+import { useState } from 'react';
 import { SkyRing } from '@/components/SkyRing';
-import type { TodayResult } from '@/lib/api';
+import { PlanetSheet } from '@/components/PlanetSheet';
+import type { RingMark } from '@/lib/skyRing';
+import type { DailyTransitHit, TodayResult } from '@/lib/api';
 import { bodyName, contactSentence, houseTheme, ordinal, phaseMeaning } from '@/lib/skyText';
 import { houseId, planetId } from '@/lib/termIds';
 import { colors, fonts, space } from '@/theme/tokens';
@@ -14,7 +17,8 @@ import { colors, fonts, space } from '@/theme/tokens';
  * house it moves through; the Sun and any retrograde planets follow in a line each. The Moon's coming
  * and just-passed contacts sit behind a tap.
  */
-export function SkyTodayCard({ today }: { today: TodayResult }) {
+export function SkyTodayCard({ today, onSelectTransit }: { today: TodayResult; onSelectTransit?: (hit: DailyTransitHit) => void }) {
+  const [picked, setPicked] = useState<RingMark | null>(null);
   const { moon, sun } = today;
   const hasMore = !!(moon.nextApplying || moon.lastSeparating);
   return (
@@ -39,7 +43,7 @@ export function SkyTodayCard({ today }: { today: TodayResult }) {
 
       {today.positions && today.positions.length ? (
         <Disclosure label="Where everything is now" defaultOpen>
-          <SkyRing positions={today.positions} />
+          <SkyRing positions={today.positions} onPick={setPicked} />
         </Disclosure>
       ) : null}
 
@@ -77,6 +81,7 @@ export function SkyTodayCard({ today }: { today: TodayResult }) {
           ) : null}
         </Disclosure>
       ) : null}
+      <PlanetSheet mark={picked} today={today} onClose={() => setPicked(null)} onSelectTransit={onSelectTransit} />
     </AccentView>
   );
 }

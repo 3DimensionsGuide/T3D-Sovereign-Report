@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import type { SkyPosition } from '@/lib/api';
-import { buildSkyRing } from '@/lib/skyRing';
+import { Pressable } from '@/components/Pressable';
+import { buildSkyRing, type RingMark } from '@/lib/skyRing';
 import { SIGN_GLYPH } from '@/lib/signGlyphs';
 import { colors, fonts, space } from '@/theme/tokens';
 
@@ -12,7 +13,7 @@ const SIZE = 280;
  * Where the Sun, Moon and planets are right now, on the zodiac. The glyphs are only the picture: every body is
  * also written out in the list underneath, with its sign and whether it is retrograde.
  */
-export function SkyRing({ positions }: { positions: readonly SkyPosition[] }) {
+export function SkyRing({ positions, onPick }: { positions: readonly SkyPosition[]; onPick?: (mark: RingMark) => void }) {
   const ring = useMemo(() => buildSkyRing(positions, SIZE), [positions]);
   if (!positions.length) return null;
   return (
@@ -45,15 +46,28 @@ export function SkyRing({ positions }: { positions: readonly SkyPosition[] }) {
               {m.glyph}
             </SvgText>
           ))}
+          {onPick ? ring.marks.map((m) => (
+            <Circle key={`h-${m.body}`} cx={m.x} cy={m.y} r={13} fill="transparent" onPress={() => onPick(m)} />
+          )) : null}
         </Svg>
       </View>
+      <Text style={styles.hint}>Tap a planet to read more about it.</Text>
       <View style={styles.list}>
         {ring.marks.map((m) => (
-          <Text key={m.body} style={styles.row}>
-            <Text style={styles.glyph}>{m.glyph}  </Text>
-            <Text style={styles.strong}>{m.name}</Text>
-            {` in ${m.sign}, ${m.degree}°${m.retrograde ? ' · retrograde ℞' : ''}`}
-          </Text>
+          <Pressable
+            key={m.body}
+            accessibilityRole="button"
+            accessibilityLabel={`${m.name} in ${m.sign}, ${m.degree} degrees${m.retrograde ? ', retrograde' : ''}. Opens more about it.`}
+            onPress={() => onPick?.(m)}
+            style={({ pressed }) => [styles.rowBtn, pressed && { opacity: 0.8 }]}
+          >
+            <Text style={styles.row}>
+              <Text style={styles.glyph}>{m.glyph}  </Text>
+              <Text style={styles.strong}>{m.name}</Text>
+              {` in ${m.sign}, ${m.degree}°${m.retrograde ? ' · retrograde ℞' : ''}`}
+            </Text>
+            <Text style={styles.chev}>›</Text>
+          </Pressable>
         ))}
       </View>
     </View>
@@ -63,8 +77,11 @@ export function SkyRing({ positions }: { positions: readonly SkyPosition[] }) {
 const styles = StyleSheet.create({
   wrap: { gap: space.md },
   figure: { alignItems: 'center' },
-  list: { gap: 4 },
-  row: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
+  list: { gap: 2 },
+  hint: { fontFamily: fonts.body, fontSize: 13, color: colors.parchmentMuted, textAlign: 'center' },
+  rowBtn: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
+  chev: { fontFamily: fonts.bodyBold, fontSize: 22, color: colors.gold },
+  row: { flex: 1, fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
   glyph: { fontFamily: fonts.bodyBold, color: colors.parchment },
   strong: { fontFamily: fonts.bodyBold, color: colors.parchment },
 });

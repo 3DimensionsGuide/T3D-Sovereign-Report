@@ -18,6 +18,7 @@ const NAMES: Record<SkyPosition['body'], string> = {
 };
 const SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'] as const;
 
+export const SIGN_NAMES = SIGNS;
 export const signAt = (longitude: number): string => SIGNS[Math.floor((((longitude % 360) + 360) % 360) / 30)]!;
 
 export interface RingMark {
@@ -26,6 +27,7 @@ export interface RingMark {
   name: string;
   sign: string;
   retrograde: boolean;
+  longitude: number;
   /** Degrees into the sign, whole numbers. */
   degree: number;
   x: number;
@@ -71,7 +73,7 @@ export function buildSkyRing(positions: readonly SkyPosition[], size = 280): Sky
     const [x, y] = wheelPoint(p.longitude, ringR - 40 - tier * 22, c);
     marks.push({
       body: p.body, glyph: BODY_GLYPH[p.body] + TEXT, name: NAMES[p.body], sign: signAt(p.longitude),
-      retrograde: p.retrograde, degree: Math.floor(((p.longitude % 30) + 30) % 30), x, y, tier,
+      retrograde: p.retrograde, longitude: p.longitude, degree: Math.floor(((p.longitude % 30) + 30) % 30), x, y, tier,
     });
   }
   const parts = marks.map((m) => `${m.name} in ${m.sign}${m.retrograde ? ' retrograde' : ''}`);
