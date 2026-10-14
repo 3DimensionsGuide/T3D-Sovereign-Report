@@ -191,7 +191,7 @@ test('Today is condensed: frame before the Road strip, one sky card, collapsed d
   const today = read('mobile/src/app/(tabs)/today.tsx');
   assert.ok(today.indexOf('<SignalLamp') < today.indexOf('<TriadTodayCard'), 'lamp first');
   assert.ok(today.indexOf('<TriadTodayCard') < today.indexOf('<RoadStrip'), 'the frame comes before the Road strip');
-  assert.match(today, /<SkyTodayCard today=\{today\} \/>/);
+  assert.match(today, /<SkyTodayCard today=\{today\} onSelectTransit=\{setSelectedHit\} \/>/);
   assert.doesNotMatch(today, /THE MOON|THE SUN/, 'Moon and Sun are one card');
   assert.match(today, /TRANSITS_SHOWN/);
   assert.match(today, /Show all \$\{today\.transits\.length\}/);
