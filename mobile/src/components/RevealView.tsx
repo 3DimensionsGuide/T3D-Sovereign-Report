@@ -31,7 +31,7 @@ export function RevealView({ chart, birthTimeKnown, firstName, onContinue, onSha
     <View style={styles.wrap}>
       <FadeIn>
         <View style={styles.head}>
-          <TriadSeal size={72} />
+          <TriadSeal size={56} />
           <Text accessibilityRole="header" style={styles.title}>
             {firstName ? `${firstName}, this is your Triad` : 'This is your Triad'}
           </Text>
@@ -65,16 +65,16 @@ export function RevealView({ chart, birthTimeKnown, firstName, onContinue, onSha
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: space.md, paddingTop: space.lg },
-  head: { alignItems: 'center', gap: space.md, paddingBottom: space.sm },
-  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 36, color: colors.parchment, textAlign: 'center' },
+  wrap: { gap: space.sm, paddingTop: space.xs },
+  head: { alignItems: 'center', gap: space.sm, paddingBottom: space.xs },
+  title: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 24, lineHeight: 32, color: colors.parchment, textAlign: 'center' },
   card: {
     backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.hairline,
-    padding: space.lg, gap: 6,
+    paddingVertical: space.md, paddingHorizontal: space.lg, gap: 2,
   },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   label: { fontFamily: fonts.bodyBold, fontSize: 15 },
-  hero: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 34, lineHeight: 42, color: colors.parchment },
-  line: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.parchmentMuted },
-  actions: { gap: space.sm, paddingTop: space.sm },
+  hero: { fontFamily: fonts.display, fontVariant: ['lining-nums'], fontSize: 28, lineHeight: 34, color: colors.parchment },
+  line: { fontFamily: fonts.body, fontSize: 15, lineHeight: 20, color: colors.parchmentMuted },
+  actions: { gap: space.sm, paddingTop: space.xs },
 });
