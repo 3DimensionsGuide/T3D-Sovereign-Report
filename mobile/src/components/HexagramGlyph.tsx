@@ -1,4 +1,4 @@
-import Svg, { Rect } from 'react-native-svg';
+import Svg, { G, Rect } from 'react-native-svg';
 import { hexagramLines } from '@/lib/hexagram';
 import { colors } from '@/theme/tokens';
 
@@ -34,10 +34,10 @@ export function HexagramGlyph({ gate, size = 22, color = colors.vehicle }: Props
         return solid ? (
           <Rect key={i} x={0} y={y} width={width} height={barH} rx={1} fill={color} />
         ) : (
-          <>
-            <Rect key={`${i}a`} x={0} y={y} width={half} height={barH} rx={1} fill={color} />
-            <Rect key={`${i}b`} x={half + gapW} y={y} width={half} height={barH} rx={1} fill={color} />
-          </>
+          <G key={i}>
+            <Rect x={0} y={y} width={half} height={barH} rx={1} fill={color} />
+            <Rect x={half + gapW} y={y} width={half} height={barH} rx={1} fill={color} />
+          </G>
         );
       })}
     </Svg>
