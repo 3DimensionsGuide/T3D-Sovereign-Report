@@ -49,7 +49,7 @@ export default function ReportPage() {
   return (
     <>
       <Nav />
-      <main style={{ position: 'relative', zIndex: 1, minHeight: '70vh' }}>
+      <main id="main" tabIndex={-1} style={{ position: 'relative', zIndex: 1, minHeight: '70vh' }}>
         <Suspense fallback={<ReportLoadingFallback />}>
           <ReportClient />
         </Suspense>

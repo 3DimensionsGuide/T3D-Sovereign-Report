@@ -32,6 +32,7 @@ function shouldPlayVideo(): boolean {
 export default function VideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [play, setPlay] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     setPlay(shouldPlayVideo());
@@ -50,6 +51,7 @@ export default function VideoBackground() {
         // Not ready yet: the events below try again.
       });
     };
+    if (paused) { video.pause(); return; }
     attemptPlay();
     video.addEventListener('loadedmetadata', attemptPlay);
     video.addEventListener('canplay', attemptPlay);
@@ -57,7 +59,7 @@ export default function VideoBackground() {
       video.removeEventListener('loadedmetadata', attemptPlay);
       video.removeEventListener('canplay', attemptPlay);
     };
-  }, [play]);
+  }, [play, paused]);
 
   const fill = {
     position: 'fixed' as const,
@@ -90,6 +92,13 @@ export default function VideoBackground() {
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={POSTER} alt="" aria-hidden width={1280} height={720} fetchPriority="low" decoding="async" style={fill} />
+      )}
+
+      {play && (
+        <button type="button" className="bg-pause" aria-pressed={paused} onClick={() => setPaused((v) => !v)}>
+          <span aria-hidden>{paused ? '▶' : '❚❚'}</span>
+          {paused ? 'Play background' : 'Pause background'}
+        </button>
       )}
 
       {/* Dark overlay keeps content readable over the background */}

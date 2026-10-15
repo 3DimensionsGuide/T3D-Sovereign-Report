@@ -296,7 +296,7 @@ function CheckoutPageInner() {
   return (
     <>
       <Nav />
-      <main style={{ position: 'relative', zIndex: 1 }}>
+      <main id="main" tabIndex={-1} style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
           maxWidth: 1100,
           margin: '0 auto',

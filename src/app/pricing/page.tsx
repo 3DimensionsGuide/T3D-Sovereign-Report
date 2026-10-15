@@ -56,12 +56,14 @@ export default async function PricingPage() {
   return (
     <>
       <Nav />
-      <main style={{ position: 'relative', zIndex: 1 }}>
+      <main id="main" tabIndex={-1} style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
           maxWidth: 1200,
           margin: '0 auto',
           padding: 'clamp(56px,9vh,120px) clamp(20px,4vw,48px) clamp(80px,10vh,140px)',
         }}>
+
+          <hr className="t3d-triad-rule" aria-hidden style={{ marginBottom: 'clamp(32px,5vh,48px)', maxWidth: 680 }} />
 
           {/* ── Page header ──────────────────────────────────────────────── */}
           <div style={{ maxWidth: 680, marginBottom: 'clamp(48px,7vh,80px)' }}>
@@ -199,22 +201,34 @@ export default async function PricingPage() {
             ))}
           </div>
 
-          {/* ── Explainer: how the tiers relate ─────────────────────────── */}
-          <div style={{
-            marginTop: 'clamp(56px,7vh,80px)',
-            paddingTop: 'clamp(32px,4vh,44px)',
-            borderTop: '1px solid var(--card-border)',
-            maxWidth: 680,
-          }}>
-            <p className="t3d-label" style={{ color: 'var(--emerald)', marginBottom: 14 }}>
-              [HOW THE TIERS FIT TOGETHER]
-            </p>
-            <p className="t3d-body" style={{ fontSize: 15 }}>
+          {/* ── Which one is right for you ──────────────────────────────── */}
+          <section
+            aria-labelledby="choose-heading"
+            style={{ marginTop: 'clamp(56px,7vh,80px)', paddingTop: 'clamp(32px,4vh,44px)', borderTop: '1px solid var(--card-border)', maxWidth: 680 }}
+          >
+            <h2 id="choose-heading" className="t3d-h2" style={{ fontSize: 'clamp(22px,3vw,28px)', marginBottom: 20 }}>
+              Which one is right for you?
+            </h2>
+            <dl style={{ display: 'grid', gap: 18, margin: 0 }}>
+              <div>
+                <dt style={{ color: 'var(--parchment)', fontWeight: 500 }}>New to all of this</dt>
+                <dd className="t3d-body" style={{ margin: 0 }}>Start with the Base Report. It covers all three systems in a clear first read.</dd>
+              </div>
+              <div>
+                <dt style={{ color: 'var(--parchment)', fontWeight: 500 }}>Want the full detail</dt>
+                <dd className="t3d-body" style={{ margin: 0 }}>The Advanced Report goes through every gate, every Pinnacle and your live transits.</dd>
+              </div>
+              <div>
+                <dt style={{ color: 'var(--parchment)', fontWeight: 500 }}>Want both, in one download</dt>
+                <dd className="t3d-body" style={{ margin: 0 }}>The Sovereign Report is the Base and Advanced Reports together.</dd>
+              </div>
+            </dl>
+            <p className="t3d-body" style={{ fontSize: 15, marginTop: 24 }}>
               Already have the Base Report? The Advanced Report completes it into
               the full Sovereign Report for $53 — the same $97 total either way,
               whether you buy everything now or go deeper later.
             </p>
-          </div>
+          </section>
 
         </div>
       </main>

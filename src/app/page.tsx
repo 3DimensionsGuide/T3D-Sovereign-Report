@@ -43,7 +43,7 @@ export default function HomePage() {
       </Suspense>
       <Nav />
 
-      <main style={{ position: 'relative', zIndex: 10, paddingTop: isMobile ? 220 : 0 }}>
+      <main id="main" tabIndex={-1} style={{ position: 'relative', zIndex: 10, paddingTop: isMobile ? 220 : 0 }}>
 
         {/* ═══════════════════════════════════════════════════════════════════
             SECTION 1 — HERO

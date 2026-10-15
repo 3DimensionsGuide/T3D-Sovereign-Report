@@ -21,7 +21,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Nav />
-      <main style={{ paddingTop: 120, paddingBottom: 80 }}>
+      <main id="main" tabIndex={-1} style={{ paddingTop: 120, paddingBottom: 80 }}>
         <div style={S.wrap}>
           <h1 style={S.h1}>Privacy Policy</h1>
           <p style={S.meta}>Last updated: October 2026 · The 3 Dimensions (T3D) · 3dimensions.guide</p>
