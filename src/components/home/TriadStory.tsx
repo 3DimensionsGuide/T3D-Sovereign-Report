@@ -8,7 +8,8 @@
  * Scene 1 builds an illustrative bodygraph centre by centre.
  * Scene 2 draws a winding road toward a rising horizon, with four pinnacle markers switching on.
  * Scene 3 turns a zodiac wheel until a moving planet meets a natal point, then the signal goes red, amber, green.
- * Mobile / reduced motion: the same content as static stacked scenes, with every drawing fully built.
+ * Phones: the same pinned scroll story, stacked (drawing above, words below) and sized to the screen height.
+ * Reduce Motion: the same content as static stacked scenes, with every drawing fully built.
  * Only transform, opacity and SVG paint (stroke and fill) are animated; nothing that moves layout.
  */
 
@@ -215,17 +216,17 @@ function SignalDrawing({ build, dim }: { build: number; dim: number }) {
   );
 }
 
-function SceneText({ scene, index }: { scene: Scene; index: number }) {
+function SceneText({ scene, index, compact = false }: { scene: Scene; index: number; compact?: boolean }) {
   return (
     <>
-      <p className="t3d-label" style={{ color: scene.color, marginBottom: 14 }}>
+      <p className="t3d-label" style={{ color: scene.color, marginBottom: compact ? 8 : 14 }}>
         Lens {index + 1} of 3: {scene.label}
       </p>
-      <h3 className="t3d-h2" style={{ marginBottom: 16 }}>{scene.headline}</h3>
-      <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(20px,2vw,26px)', color: scene.color, marginBottom: 14 }}>
+      <h3 className="t3d-h2" style={{ marginBottom: compact ? 8 : 16, ...(compact ? { fontSize: 'clamp(22px,6.4vw,28px)' } : {}) }}>{scene.headline}</h3>
+      <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: compact ? 17 : 'clamp(20px,2vw,26px)', color: scene.color, marginBottom: compact ? 8 : 14 }}>
         {scene.system}
       </p>
-      <p className="t3d-body" style={{ maxWidth: 480 }}>{scene.body}</p>
+      <p className="t3d-body" style={{ maxWidth: 480, ...(compact ? { fontSize: 14.5, lineHeight: 1.55 } : {}) }}>{scene.body}</p>
     </>
   );
 }
@@ -246,7 +247,7 @@ export default function TriadStory() {
     return () => { mqMobile.removeEventListener('change', sync); mqReduce.removeEventListener('change', sync); };
   }, []);
 
-  const static_ = isMobile || reduced;
+  const static_ = reduced;
 
   useEffect(() => {
     if (static_) return;
@@ -272,12 +273,12 @@ export default function TriadStory() {
   }, [static_]);
 
   const cta = (
-    <Link href="/#calculator" className="t3d-cta" style={{ width: 'auto', display: 'inline-flex', padding: '16px 40px', marginTop: 32 }}>
+    <Link href="/#calculator" className="t3d-cta" style={{ width: 'auto', display: 'inline-flex', padding: isMobile ? '14px 28px' : '16px 40px', marginTop: isMobile ? 16 : 32 }}>
       BEGIN CALCULATION
     </Link>
   );
 
-  // ── Static layout: phones and reduced-motion ───────────────────────────────
+  // ── Static layout: Reduce Motion only ───────────────────────────────
   if (static_) {
     return (
       <section id="system" aria-labelledby="triad-heading" style={{ padding: 'clamp(48px,8vh,96px) clamp(20px,4vw,64px)', background: 'var(--base)', position: 'relative' }}>
@@ -305,15 +306,15 @@ export default function TriadStory() {
   const scene = SCENES[active];
 
   return (
-    <section id="system" ref={sectionRef} aria-labelledby="triad-heading" style={{ height: '340vh', position: 'relative' }}>
+    <section id="system" ref={sectionRef} aria-labelledby="triad-heading" style={{ height: isMobile ? '320svh' : '340vh', position: 'relative' }}>
       <div style={{
-        position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
+        position: 'sticky', top: 0, height: isMobile ? '100svh' : '100vh', overflow: 'hidden',
         background: `radial-gradient(90% 80% at 25% 50%, ${active === 0 ? 'rgba(229,169,60,0.10)' : active === 1 ? 'rgba(31,138,77,0.12)' : 'rgba(217,83,83,0.10)'} 0%, var(--base) 70%)`,
         transition: 'background 0.6s var(--ease)',
-        display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center',
-        padding: '80px clamp(24px,5vw,80px) 40px', gap: 'clamp(24px,4vw,64px)',
+        display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gridTemplateRows: isMobile ? 'auto 1fr' : undefined, alignItems: 'center',
+        padding: isMobile ? '72px 20px 20px' : '80px clamp(24px,5vw,80px) 40px', gap: isMobile ? 14 : 'clamp(24px,4vw,64px)',
       }}>
-        <div style={{ position: 'relative', width: '100%', maxWidth: 'min(360px, calc((100vh - 140px) * 300 / 445))', justifySelf: 'center', aspectRatio: '300 / 445' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: isMobile ? 'max(125px, min(300px, calc((100svh - 460px) * 300 / 445)))' : 'min(360px, calc((100vh - 140px) * 300 / 445))', justifySelf: 'center', aspectRatio: '300 / 445' }}>
           <div aria-hidden={active !== 0} style={{ position: 'absolute', inset: 0 }}>
             <Bodygraph build={vehicleBuild} dim={dimFor(0)} />
           </div>
@@ -326,11 +327,11 @@ export default function TriadStory() {
         </div>
 
         <div>
-          <h2 id="triad-heading" className="t3d-label" style={{ marginBottom: 28 }}>One journey, three lenses</h2>
+          <h2 id="triad-heading" className="t3d-label" style={{ marginBottom: isMobile ? 12 : 28 }}>One journey, three lenses</h2>
           <div aria-live="polite" key={scene.key} style={{ animation: 'sceneIn 0.5s var(--ease) both' }}>
-            <SceneText scene={scene} index={active} />
+            <SceneText scene={scene} index={active} compact={isMobile} />
           </div>
-          <div role="presentation" style={{ display: 'flex', gap: 8, marginTop: 36 }}>
+          <div role="presentation" style={{ display: isMobile && progress > 0.6 ? 'none' : 'flex', gap: 8, marginTop: isMobile ? 18 : 36 }}>
             {SCENES.map((s, i) => (
               <span key={s.key} style={{ width: 48, height: 3, background: i <= active ? s.color : 'var(--step-off)', transition: 'background 0.4s var(--ease)' }} />
             ))}

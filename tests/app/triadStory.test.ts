@@ -18,7 +18,7 @@ test('each drawing is driven by its own slice of the scroll', () => {
   assert.match(src, /signalBuild = clamp01\(\(progress - 0\.67\) \/ 0\.26\)/);
 });
 
-test('phones and reduced motion show every drawing fully built', () => {
+test('reduced motion shows every drawing fully built', () => {
   assert.match(src, /<Bodygraph build=\{1\} dim=\{1\} \/> : i === 1 \? <RoadDrawing build=\{1\} dim=\{1\} \/> : <SignalDrawing build=\{1\} dim=\{1\} \/>/);
 });
 
@@ -32,4 +32,10 @@ test('the signal light uses the app\'s three words in order: Pause, Slow, Go', (
 
 test('no layout properties are animated in the scroll story', () => {
   assert.doesNotMatch(src, /transition:[^;'`]*\b(width|height|margin|padding|top|left)\b/);
+});
+
+test('phones get the pinned scroll story too, stacked and sized to the screen', () => {
+  assert.match(src, /const static_ = reduced;/);
+  assert.match(src, /isMobile \? '320svh'/);
+  assert.match(src, /gridTemplateColumns: isMobile \? '1fr' : '1fr 1fr'/);
 });
