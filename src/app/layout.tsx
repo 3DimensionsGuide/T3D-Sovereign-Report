@@ -13,8 +13,49 @@ export const metadata: Metadata = {
     template: '%s | The 3 Dimensions',
   },
   description:
-    'T3D draws Human Design, Numerology, and Astrology into one sovereign navigation system.',
+    'Enter your birth details and see your Human Design Type, Life Path number and birth chart. T3D reads Human Design, Numerology and Astrology together, so you can decide with more clarity.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://3dimensions.guide'),
+  applicationName: 'The 3 Dimensions',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: 'The 3 Dimensions',
+    title: 'The 3 Dimensions: your vehicle, your road, your timing',
+    description:
+      'Human Design, Numerology and Astrology, calculated from your birth details and read together. Free to start.',
+    url: '/',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'The 3 Dimensions: your vehicle, your road, your timing',
+    description:
+      'Human Design, Numerology and Astrology, calculated from your birth details and read together. Free to start.',
+  },
+};
+
+// Plain facts about the site for search engines. Nothing here is a claim about results.
+const JSON_LD = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://3dimensions.guide/#organization',
+      name: 'The 3 Dimensions',
+      alternateName: 'T3D',
+      url: 'https://3dimensions.guide',
+      logo: 'https://3dimensions.guide/logos/T3D_seal.png',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://3dimensions.guide/#website',
+      url: 'https://3dimensions.guide',
+      name: 'The 3 Dimensions',
+      description: 'Human Design, Numerology and Astrology, calculated from your birth details and read together.',
+      publisher: { '@id': 'https://3dimensions.guide/#organization' },
+      inLanguage: 'en',
+    },
+  ],
 };
 
 export const viewport: Viewport = {
@@ -40,6 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
   <VideoBackground />
         <RefBeacon />
         {children}

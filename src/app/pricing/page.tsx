@@ -32,7 +32,8 @@ import { PRODUCT_DISPLAY, PRODUCT_ORDER } from '@/lib/products/catalog';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Pricing — The 3 Dimensions',
+  title: 'Pricing',
+  alternates: { canonical: '/pricing' },
   description: 'Choose your depth: the Base Report, the Advanced Report, or the complete Sovereign Report.',
 };
 

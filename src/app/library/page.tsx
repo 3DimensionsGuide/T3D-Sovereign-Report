@@ -2,7 +2,8 @@ import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
 
 export const metadata = {
-  title: 'Field Library — T3D Sovereign Report',
+  title: 'Field Library',
+  robots: { index: false, follow: false },
   description: 'Reference material for the systems behind your Sovereign Report.',
 };
 

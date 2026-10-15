@@ -40,6 +40,11 @@ function ReportLoadingFallback() {
   );
 }
 
+export const metadata = {
+  title: 'Your report',
+  robots: { index: false, follow: false },
+};
+
 export default function ReportPage() {
   return (
     <>

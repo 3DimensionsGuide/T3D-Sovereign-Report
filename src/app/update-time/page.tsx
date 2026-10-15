@@ -2,7 +2,8 @@ import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
 
 export const metadata = {
-  title: 'Update Your Birth Time — T3D Sovereign Report',
+  title: 'Update your birth time',
+  robots: { index: false, follow: false },
   description: 'Request an updated report with a confirmed birth time.',
 };
 

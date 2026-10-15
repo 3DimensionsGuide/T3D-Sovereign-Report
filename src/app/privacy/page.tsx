@@ -2,7 +2,8 @@ import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
 
 export const metadata = {
-  title: 'Privacy Policy — T3D',
+  title: 'Privacy Policy',
+  alternates: { canonical: '/privacy' },
   description: 'How T3D collects, uses, and protects your data on the website and in the app.',
 };
 
