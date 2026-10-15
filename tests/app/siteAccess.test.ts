@@ -16,11 +16,8 @@ test('keyboard focus is a clear two-pixel outline', () => {
   assert.match(read('src/app/globals.css'), /:focus-visible \{ outline: 2px solid var\(--parchment\)/);
 });
 
-test('the moving background can be paused with a large button', () => {
-  const src = read('src/components/VideoBackground.tsx');
-  assert.match(src, /aria-pressed=\{paused\}/);
-  assert.match(src, /Pause background/);
-  assert.match(read('src/app/globals.css'), /\.bg-pause \{[^}]*min-height: 48px/);
+test('there is no pause button over the background', () => {
+  assert.doesNotMatch(read('src/components/VideoBackground.tsx'), /bg-pause|Pause background/);
 });
 
 test('pricing helps people choose and keeps its facts plain', () => {

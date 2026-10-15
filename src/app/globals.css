@@ -377,15 +377,3 @@ main:focus { outline: none; }
   height: 3px; border: 0; margin: 0;
   background: linear-gradient(to right, var(--amber) 0 33.33%, var(--emerald) 33.33% 66.66%, var(--crimson) 66.66% 100%);
 }
-
-/* Pause control for the moving background (WCAG 2.2.2). */
-.bg-pause {
-  position: fixed; left: 16px; bottom: 16px; z-index: 60;
-  min-height: 48px; min-width: 48px; padding: 0 16px;
-  display: inline-flex; align-items: center; gap: 10px;
-  background: rgba(13,13,14,0.85); color: var(--parchment);
-  border: 1px solid var(--parchment-40); cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 13px;
-  transition: border-color 0.2s ease;
-}
-.bg-pause:hover { border-color: var(--parchment); }
