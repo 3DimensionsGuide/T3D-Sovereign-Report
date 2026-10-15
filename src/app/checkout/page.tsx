@@ -84,24 +84,24 @@ interface ProductInfo {
 //   'sovereign-report'          — T3D's hero product: both of the above,
 //                                  bundled as the complete framework
 const BASE_INCLUDES = [
-  { label: '[VEHICLE]',   text: 'Human Design — your Type, Strategy, Authority, and Profile, plus the centers that shape how you make decisions.' },
-  { label: '[ROAD]',      text: 'Numerology — your Life Path, current Pinnacle, Challenges, and (with your full name) your complete name-based blueprint.' },
-  { label: '[STOPLIGHT]', text: 'Dual-Zodiac Astrology — your Tropical and Sidereal Big Three, read together as two complementary lenses on the same chart.' },
-  { label: '[SYNTHESIS]', text: 'A synthesis written specifically for your exact configuration, plus a printable Sovereign Navigation Card for quick reference.' },
+  { label: 'The Vehicle',   text: 'Human Design — your Type, Strategy, Authority, and Profile, plus the centers that shape how you make decisions.' },
+  { label: 'The Road',      text: 'Numerology — your Life Path, current Pinnacle, Challenges, and (with your full name) your complete name-based blueprint.' },
+  { label: 'The Stoplight', text: 'Dual-Zodiac Astrology — your Tropical and Sidereal Big Three, read together as two complementary lenses on the same chart.' },
+  { label: 'Synthesis', text: 'A synthesis written specifically for your exact configuration, plus a printable Sovereign Navigation Card for quick reference.' },
 ] as const;
 
 const ADVANCED_INCLUDES = [
-  { label: '[VEHICLE]',     text: 'The Vehicle, deepened — every active gate and channel, your bridges, your full circuitry, your Incarnation Cross, and your Godhead, Light & Shadow.' },
-  { label: '[ROAD]',        text: 'The Road, deepened — your Hidden Passion and Karmic Lessons, plus all Four Pinnacles and Four Challenges across your whole life, not just your current season.' },
-  { label: '[STOPLIGHT]',   text: 'The Stoplight, deepened — Mercury, Venus, Mars, Jupiter, and Saturn by sign; Uranus, Neptune, and Pluto by house; plus your live, currently-active transits.' },
-  { label: '[INTEGRATION]', text: 'The Integration — how all three systems stack into one decision hierarchy, where people usually get the order wrong, and a synthesis written for your exact configuration.' },
+  { label: 'The Vehicle',     text: 'The Vehicle, deepened — every active gate and channel, your bridges, your full circuitry, your Incarnation Cross, and your Godhead, Light & Shadow.' },
+  { label: 'The Road',        text: 'The Road, deepened — your Hidden Passion and Karmic Lessons, plus all Four Pinnacles and Four Challenges across your whole life, not just your current season.' },
+  { label: 'The Stoplight',   text: 'The Stoplight, deepened — Mercury, Venus, Mars, Jupiter, and Saturn by sign; Uranus, Neptune, and Pluto by house; plus your live, currently-active transits.' },
+  { label: 'Integration', text: 'The Integration — how all three systems stack into one decision hierarchy, where people usually get the order wrong, and a synthesis written for your exact configuration.' },
 ] as const;
 
 const COMPLETE_INCLUDES = [
-  { label: '[BASE]',     text: 'The full Base Report — all three systems, Human Design, Numerology, and Astrology, woven into one navigation guide.' },
-  { label: '[ADVANCED]', text: 'The full Advanced Report — every gate and channel, all Four Pinnacles and Challenges, every personal and outer planet, plus your live transits.' },
-  { label: '[FORMAT]',   text: 'Both complete reports, delivered together as one download — nothing held back, nothing to unlock later.' },
-  { label: '[VALUE]',    text: 'The same $97 as buying both separately ($44 + $53) — priced as one purchase because this is the version most people actually want.' },
+  { label: 'Base Report',     text: 'The full Base Report — all three systems, Human Design, Numerology, and Astrology, woven into one navigation guide.' },
+  { label: 'Advanced Report', text: 'The full Advanced Report — every gate and channel, all Four Pinnacles and Challenges, every personal and outer planet, plus your live transits.' },
+  { label: 'Delivery',   text: 'Both complete reports, delivered together as one download — nothing held back, nothing to unlock later.' },
+  { label: 'Price',    text: 'The same $97 as buying both separately ($44 + $53) — priced as one purchase because this is the version most people actually want.' },
 ] as const;
 
 interface IncludeItem { label: string; text: string; }
@@ -306,7 +306,7 @@ function CheckoutPageInner() {
           {/* Page header */}
           <div style={{ marginBottom: 'clamp(32px,5vh,52px)' }}>
             <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 12 }}>
-              [CHECKOUT] — {productName.toUpperCase()}
+              Checkout: {productName}
             </p>
             <h1 className="t3d-h2">
               {HEADLINE_BY_SLUG[productSlug] ?? `Unlock your ${productName}.`}
@@ -380,7 +380,7 @@ function CheckoutPageInner() {
               </fieldset>
 
               <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 20 }}>
-                [ORDER.SUMMARY]
+                Your order
               </p>
 
               {/* Price row */}
@@ -470,7 +470,7 @@ function CheckoutPageInner() {
             {/* RIGHT — Stripe payment form */}
             <div>
               <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 20 }}>
-                [PAYMENT.SECURE]
+                Secure payment
               </p>
 
               <div style={{

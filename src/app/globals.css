@@ -74,6 +74,8 @@
 /* ── Base Reset ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+/* Jump links stop below the 64px sticky navigation bar instead of under it. */
+section[id] { scroll-margin-top: 64px; }
 
 body {
   background: radial-gradient(120% 70% at 50% 0%, var(--amethyst) 0%, var(--base) 60%) fixed no-repeat, var(--base);

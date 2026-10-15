@@ -272,7 +272,7 @@ export default function TriadStory() {
   }, [static_]);
 
   const cta = (
-    <Link href="/calculator" className="t3d-cta" style={{ width: 'auto', display: 'inline-flex', padding: '16px 40px', marginTop: 32 }}>
+    <Link href="/#calculator" className="t3d-cta" style={{ width: 'auto', display: 'inline-flex', padding: '16px 40px', marginTop: 32 }}>
       BEGIN CALCULATION
     </Link>
   );

@@ -27,10 +27,10 @@ export default function Footer() {
         {/* Links */}
         <div style={{ padding: 'clamp(24px,4vh,40px)', borderRight: '1px solid var(--grid)' }}>
           <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--parchment-faint)', letterSpacing: '0.16em', display: 'block', marginBottom: 16 }}>
-            [NAVIGATION]
+            Explore
           </span>
           {[
-            { href: '/calculator', label: 'Calculator'   },
+            { href: '/#calculator', label: 'Free calculator' },
             { href: '/report',     label: 'Full Report'  },
             { href: '/privacy',    label: 'Privacy'      },
           ].map((l) => (
@@ -51,12 +51,11 @@ export default function Footer() {
         {/* Copyright */}
         <div style={{ padding: 'clamp(24px,4vh,40px)' }}>
           <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--parchment-faint)', letterSpacing: '0.16em', display: 'block', marginBottom: 16 }}>
-            [SYSTEM.STATUS]
+            The 3 Dimensions
           </span>
           <p className="font-mono" style={{ fontSize: '0.62rem', color: 'var(--parchment-faint)', letterSpacing: '0.08em', lineHeight: 1.7 }}>
             3dimensions.guide<br />
-            © {new Date().getFullYear()} T3D Studio<br />
-            ALL SYSTEMS OPERATIONAL
+            © {new Date().getFullYear()} T3D Studio
           </p>
         </div>
       </div>

@@ -101,7 +101,7 @@ export default function ReportClient() {
       {!leadId ? (
         <>
           <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 16 }}>
-            [REPORT] — NOT FOUND
+            Report not found
           </p>
           <h1 className="t3d-h2" style={{ marginBottom: 20 }}>
             We couldn&apos;t find your report session.
@@ -119,7 +119,7 @@ export default function ReportClient() {
       ) : paymentLikelyFailed ? (
         <>
           <p className="t3d-label" style={{ color: 'var(--crimson-hi, #B91C1C)', marginBottom: 16 }}>
-            [PAYMENT] — NOT COMPLETED
+            Payment not completed
           </p>
           <h1 className="t3d-h2" style={{ marginBottom: 20 }}>
             Your payment didn&apos;t go through.
@@ -134,7 +134,7 @@ export default function ReportClient() {
       ) : (
         <>
           <p className="t3d-label" style={{ color: 'var(--emerald)', marginBottom: 16 }}>
-            [PAYMENT] — CONFIRMED
+            Payment confirmed
           </p>
           <h1 className="t3d-h2" style={{ marginBottom: 20 }}>
             Your {productName} is ready.

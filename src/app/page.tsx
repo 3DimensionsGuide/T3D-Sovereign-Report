@@ -125,7 +125,7 @@ export default function HomePage() {
               }}
             >
               <span style={{ width: 6, height: 6, background: 'var(--crimson)', display: 'block', flexShrink: 0 }} aria-hidden />
-              SOVEREIGN NAVIGATION SYSTEM — ONLINE
+              Human Design, Numerology and Astrology
             </p>
 
             {/* Brand seal — responsive sizing */}
@@ -176,16 +176,16 @@ export default function HomePage() {
               animation: 'rise 0.8s var(--ease) 0.45s both',
             }}>
               Three ancient systems. One precision instrument.<br />
-              Your sovereign navigation profile — free, in 60 seconds.
+              Enter your birth details and see your Human Design Type, Life Path and birth chart. Free, in about a minute.
             </p>
 
             {/* UPGRADE 5 — Primary CTA: crimson, zero radius, ALL CAPS, 11px DM Sans */}
             <div style={{ animation: 'rise 0.8s var(--ease) 0.55s both', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: isMobile ? '100%' : 320, margin: isMobile ? '0 auto' : '0' }}>
-              <Link href="/calculator" className="t3d-cta">
+              <Link href="/#calculator" className="t3d-cta">
                 CALCULATE MY PROFILE
               </Link>
-              <a href="#system" className="t3d-ghost">
-                EXPLORE THE SYSTEM
+              <a href="#framework" className="t3d-ghost">
+                SEE HOW IT WORKS
               </a>
             </div>
 
@@ -249,13 +249,13 @@ export default function HomePage() {
               {/* Section label */}
               <div style={{ marginBottom: 24 }}>
                 <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 10 }}>
-                  MODULE 02 — SOVEREIGN CALCULATOR
+                  Free calculator
                 </p>
                 <h2 className="t3d-h2" style={{ fontSize: 'clamp(22px,2.5vw,36px)', marginBottom: 8 }}>
                   Discover your profile.
                 </h2>
                 <p className="t3d-body" style={{ fontSize: 14 }}>
-                  Free · Instant · No credit card required.
+                  Free, instant, no credit card required.
                 </p>
               </div>
 
@@ -285,7 +285,7 @@ export default function HomePage() {
               gap: 16,
             }}>
               <p className="t3d-label" style={{ color: 'var(--parchment-40)' }}>
-                [VIDEO.INTRO] — WHAT IS T3D?
+                Watch: what is T3D?
               </p>
               <div style={{
                 border: '1px solid var(--card-border)',
@@ -306,8 +306,8 @@ export default function HomePage() {
                 </video>
               </div>
               <p className="t3d-body" style={{ fontSize: 13, color: 'var(--parchment-40)' }}>
-                Watch to understand the system — then enter your birth details
-                on the left to see your three dimensions instantly.
+                Watch a short introduction, then enter your birth details in the calculator
+                to see your three dimensions.
               </p>
             </div>
 

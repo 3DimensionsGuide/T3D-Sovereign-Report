@@ -65,7 +65,7 @@ export default async function PricingPage() {
           {/* ── Page header ──────────────────────────────────────────────── */}
           <div style={{ maxWidth: 680, marginBottom: 'clamp(48px,7vh,80px)' }}>
             <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 16 }}>
-              [PRICING] — THREE WAYS IN
+              Pricing: three ways in
             </p>
             <h1 style={{
               fontFamily: "'Playfair Display', Georgia, serif",

@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  // One calculator: the one on the homepage. Old links to /calculator land there.
+  async redirects() {
+    return [{ source: '/calculator', destination: '/#calculator', permanent: true }];
+  },
   async headers() {
     return [
       {
