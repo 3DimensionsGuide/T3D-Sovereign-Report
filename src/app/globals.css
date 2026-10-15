@@ -377,3 +377,27 @@ main:focus { outline: none; }
   height: 3px; border: 0; margin: 0;
   background: linear-gradient(to right, var(--amber) 0 33.33%, var(--emerald) 33.33% 66.66%, var(--crimson) 66.66% 100%);
 }
+
+/* Homepage hero and calculator: the phone layout lives in CSS so the first paint is already right (no jump after load). */
+.hero-section {
+  min-height: 100vh; min-height: 100svh;
+  padding: var(--hero-pt) clamp(20px,4vw,64px) var(--hero-pb);
+  display: flex; align-items: center;
+}
+.hero-col { width: 60%; position: relative; z-index: 11; text-align: left; }
+.hero-label { margin-bottom: 32px; justify-content: flex-start; }
+.hero-seal { margin-bottom: 40px; justify-content: flex-start; }
+.hero-seal-img { max-width: min(420px, 70vw); }
+.hero-actions { max-width: 320px; margin: 0; }
+.calc-section { height: 150vh; position: relative; }
+.calc-grid { position: sticky; top: 8vh; display: grid; grid-template-columns: 45% 1fr; gap: 0; height: 84vh; }
+@media (max-width: 767px) {
+  .hero-section { padding-top: 96px; padding-bottom: 64px; }
+  .hero-col { width: 100%; text-align: center; }
+  .hero-label { margin-bottom: 20px; justify-content: center; }
+  .hero-seal { margin-bottom: 24px; justify-content: center; }
+  .hero-seal-img { max-width: min(240px, 62vw); }
+  .hero-actions { max-width: 100%; margin: 0 auto; }
+  .calc-section { height: auto; }
+  .calc-grid { position: relative; top: auto; grid-template-columns: 1fr; height: auto; }
+}

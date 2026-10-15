@@ -166,7 +166,9 @@ const WHEEL = { cx: 150, cy: 125, r: 100 };
 const NATAL_ANGLE = 60; // degrees clockwise from the top
 const wheelPoint = (deg: number, radius: number) => {
   const a = (deg * Math.PI) / 180;
-  return { x: WHEEL.cx + radius * Math.sin(a), y: WHEEL.cy - radius * Math.cos(a) };
+  // Rounded so the server and the browser print identical numbers (full-precision trig differs in the last digit).
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+  return { x: r2(WHEEL.cx + radius * Math.sin(a)), y: r2(WHEEL.cy - radius * Math.cos(a)) };
 };
 const LAMPS: readonly { cy: number; color: string; label: string }[] = [
   { cy: 297, color: 'var(--signal-red)', label: 'Pause' },
@@ -312,9 +314,9 @@ export default function TriadStory() {
         background: `radial-gradient(90% 80% at 25% 50%, ${active === 0 ? 'rgba(229,169,60,0.10)' : active === 1 ? 'rgba(31,138,77,0.12)' : 'rgba(217,83,83,0.10)'} 0%, var(--base) 70%)`,
         transition: 'background 0.6s var(--ease)',
         display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gridTemplateRows: isMobile ? 'auto 1fr' : undefined, alignItems: 'center',
-        padding: isMobile ? '72px 20px 20px' : '80px clamp(24px,5vw,80px) 40px', gap: isMobile ? 14 : 'clamp(24px,4vw,64px)',
+        padding: isMobile ? '72px 20px 76px' : '80px clamp(24px,5vw,80px) 40px', gap: isMobile ? 14 : 'clamp(24px,4vw,64px)',
       }}>
-        <div style={{ position: 'relative', width: '100%', maxWidth: isMobile ? 'max(125px, min(300px, calc((100svh - 460px) * 300 / 445)))' : 'min(360px, calc((100vh - 140px) * 300 / 445))', justifySelf: 'center', aspectRatio: '300 / 445' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: isMobile ? 'max(125px, min(300px, calc((100svh - 430px) * 300 / 445)))' : 'min(360px, calc((100vh - 140px) * 300 / 445))', justifySelf: 'center', aspectRatio: '300 / 445' }}>
           <div aria-hidden={active !== 0} style={{ position: 'absolute', inset: 0 }}>
             <Bodygraph build={vehicleBuild} dim={dimFor(0)} />
           </div>

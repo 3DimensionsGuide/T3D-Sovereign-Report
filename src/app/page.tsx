@@ -43,42 +43,25 @@ export default function HomePage() {
       </Suspense>
       <Nav />
 
-      <main id="main" tabIndex={-1} style={{ position: 'relative', zIndex: 10, paddingTop: isMobile ? 220 : 0 }}>
+      <main id="main" tabIndex={-1} style={{ position: 'relative', zIndex: 10, }}>
 
         {/* ═══════════════════════════════════════════════════════════════════
             SECTION 1 — HERO
             UPGRADE 2: padding-top 160px / padding-bottom 200px
             UPGRADE 3: Asymmetric 60/40 split — content left, compass right
             ═══════════════════════════════════════════════════════════════════ */}
-        <section
-          id="hero"
-          style={{
-            minHeight: '100vh',
-            paddingTop:    isMobile ? 48 : 'var(--hero-pt)',
-            paddingBottom: isMobile ? 64 : 'var(--hero-pb)',
-            paddingLeft:  'clamp(20px,4vw,64px)',
-            paddingRight: 'clamp(20px,4vw,64px)',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
+        <section id="hero" className="hero-section">
           {/*
            * UPGRADE 3 — Left column (60% width)
            * Content is purely left-aligned — headline NOT centered per spec
            */}
-          <div style={{
-            width: isMobile ? '100%' : '60%',
-            position: 'relative', zIndex: 11,
-            textAlign: isMobile ? 'center' : 'left',
-          }}>
+          <div className="hero-col">
 
             {/* System status label */}
             <p
-              className="t3d-label"
+              className="t3d-label hero-label"
               style={{
                 color: 'var(--parchment-40)',
-                marginBottom: isMobile ? 20 : 32,
-                justifyContent: isMobile ? 'center' : 'flex-start',
                 display: 'flex', alignItems: 'center', gap: 10,
                 animation: 'rise 0.6s var(--ease) 0.1s both',
               }}
@@ -88,21 +71,14 @@ export default function HomePage() {
             </p>
 
             {/* Brand seal — responsive sizing */}
-            <div style={{
-              marginBottom: isMobile ? 24 : 40,
-              animation: 'rise 0.7s var(--ease) 0.2s both',
-              display: 'flex',
-              justifyContent: isMobile ? 'center' : 'flex-start',
-            }}>
+            <div className="hero-seal" style={{ animation: 'rise 0.7s var(--ease) 0.2s both', display: 'flex' }}>
               <Image
                 src="/logos/T3D_seal_translucent.png"
                 alt="The 3 Dimensions — Align Your Vehicle. Follow Your Road. Obey The Signals."
                 width={420} height={420}
                 priority
-                style={{
-                  maxWidth: isMobile ? 'min(220px,60vw)' : 'min(420px,70vw)',
-                  height: 'auto',
-                }}
+                className="hero-seal-img"
+                style={{ height: 'auto' }}
               />
             </div>
 
@@ -139,7 +115,7 @@ export default function HomePage() {
             </p>
 
             {/* UPGRADE 5 — Primary CTA: crimson, zero radius, ALL CAPS, 11px DM Sans */}
-            <div style={{ animation: 'rise 0.8s var(--ease) 0.55s both', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: isMobile ? '100%' : 320, margin: isMobile ? '0 auto' : '0' }}>
+            <div className="hero-actions" style={{ animation: 'rise 0.8s var(--ease) 0.55s both', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <Link href="/#calculator" className="t3d-cta">
                 CALCULATE MY PROFILE
               </Link>
@@ -176,19 +152,9 @@ export default function HomePage() {
             ═══════════════════════════════════════════════════════════════════ */}
         <section
           id="calculator"
-          style={{
-            height: isMobile ? 'auto' : '150vh',
-            position: 'relative',
-          }}
+          className="calc-section"
         >
-          <div style={{
-            position: isMobile ? 'relative' : 'sticky',
-            top: isMobile ? 'auto' : '8vh',
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : '45% 1fr',
-            gap: 0,
-            height: isMobile ? 'auto' : '84vh',
-          }}>
+          <div className="calc-grid">
 
             {/* LEFT — Calculator panel */}
             <div style={{

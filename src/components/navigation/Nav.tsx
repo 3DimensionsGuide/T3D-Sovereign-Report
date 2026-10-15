@@ -110,7 +110,7 @@ export default function Nav() {
           <Link
             href="/"
             aria-label="The 3 Dimensions — home"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', minHeight: 48 }}
             onClick={closeMenu}
           >
             <Image
