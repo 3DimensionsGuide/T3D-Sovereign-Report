@@ -401,3 +401,8 @@ main:focus { outline: none; }
   .calc-section { height: auto; }
   .calc-grid { position: relative; top: auto; grid-template-columns: 1fr; height: auto; }
 }
+.hero-intro-link {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; color: var(--parchment-70); font-size: 14px; text-decoration: underline; text-underline-offset: 4px;
+}
+.hero-intro-link:hover { color: var(--parchment); }

@@ -36,6 +36,16 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  // The sticky phone button hides while the calculator is on screen, so it never sits on top of the form's own button.
+  const [calcInView, setCalcInView] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById('calculator');
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setCalcInView(e.isIntersecting), { rootMargin: '0px 0px -56px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <>
       <Suspense fallback={null}>
@@ -122,6 +132,9 @@ export default function HomePage() {
               <a href="#framework" className="t3d-ghost">
                 SEE HOW IT WORKS
               </a>
+              <a href="#intro" className="hero-intro-link">
+                <span aria-hidden>▶</span> Watch the 3-minute intro
+              </a>
             </div>
 
           </div>
@@ -188,7 +201,7 @@ export default function HomePage() {
             </div>
 
             {/* RIGHT — Concept video */}
-            <div style={{
+            <div id="intro" style={{ scrollMarginTop: 72,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -210,6 +223,7 @@ export default function HomePage() {
                   controls
                   playsInline
                   preload="metadata"
+                  poster="/videos/launchvideo-poster.jpg"
                   style={{
                     width: '100%',
                     display: 'block',
@@ -246,7 +260,7 @@ export default function HomePage() {
       <Footer />
 
       {/* Mobile sticky CTA — fixed bottom with safe area padding */}
-      {isMobile && !results && (
+      {isMobile && !results && !calcInView && (
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',

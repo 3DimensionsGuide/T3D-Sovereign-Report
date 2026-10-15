@@ -292,6 +292,17 @@ export default function CalculatorForm() {
     setTouched(t => ({ ...t, [field]: true }));
     validate(field, data);
   }
+  // For dropdowns: mark touched and check the NEW value, not the one from before the pick,
+  // so a valid choice never flashes a "Select..." error.
+  function pick<K extends FKey>(field: K, value: FormState[K]) {
+    setTouched(t => ({ ...t, [field]: true }));
+    setData(prev => {
+      const next = { ...prev, [field]: value };
+      validate(field, next);
+      if ((field === 'birthMonth' || field === 'birthDay') && touched.birthYear) validate('birthYear', next);
+      return next;
+    });
+  }
 
   // Google Places autocomplete
   const initAC = useCallback(() => {
@@ -470,18 +481,18 @@ export default function CalculatorForm() {
                   <USelect id="birthMonth" name="birthMonth" placeholder="Month" value={data.birthMonth}
                     error={errors.birthMonth} touched={touched.birthMonth}
                     options={MONTHS.map((m,i) => ({ value:String(i+1).padStart(2,'0'), label:m }))}
-                    onChange={v => { set('birthMonth',v); touch('birthMonth'); }} onBlur={() => touch('birthMonth')} />
+                    onChange={v => pick('birthMonth',v)} onBlur={() => touch('birthMonth')} />
                 </Field>
                 <Field label="" error={errors.birthDay} touched={touched.birthDay}>
                   <USelect id="birthDay" name="birthDay" placeholder="Day" value={data.birthDay}
                     error={errors.birthDay} touched={touched.birthDay} options={dayOpts}
-                    onChange={v => { set('birthDay',v); touch('birthDay'); }} onBlur={() => touch('birthDay')} />
+                    onChange={v => pick('birthDay',v)} onBlur={() => touch('birthDay')} />
                 </Field>
                 <Field label="" error={errors.birthYear} touched={touched.birthYear}>
                   <USelect id="birthYear" name="birthYear" placeholder="Year" value={data.birthYear}
                     error={errors.birthYear} touched={touched.birthYear}
                     options={YEARS.map(y => ({ value:y, label:y }))}
-                    onChange={v => { set('birthYear',v); touch('birthYear'); }} onBlur={() => touch('birthYear')} />
+                    onChange={v => pick('birthYear',v)} onBlur={() => touch('birthYear')} />
                 </Field>
               </div>
             </fieldset>
