@@ -15,6 +15,7 @@ const COLUMNS: readonly { heading: string; links: readonly { href: string; label
   {
     heading: 'Help',
     links: [
+      { href: '/#faq', label: 'Questions' },
       { href: `mailto:${CONTACT_EMAIL}`, label: 'Contact us', external: true },
       { href: '/privacy', label: 'Privacy policy' },
     ],

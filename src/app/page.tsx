@@ -22,6 +22,8 @@ import CalculatorForm from '@/components/calculator/CalculatorForm';
 import ProductSelectionSync from '@/components/ProductSelectionSync';
 import FrameworkIntro from '@/components/home/FrameworkIntro';
 import TriadStory from '@/components/home/TriadStory';
+import WhatsInside from '@/components/home/WhatsInside';
+import FAQ from '@/components/home/FAQ';
 
 // ─── SCROLL HOOK ──────────────────────────────────────────────────────────────
 function useScroll() {
@@ -314,7 +316,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* UPGRADE 2 — Final divider before footer */}
+        <div className="t3d-divider" />
+
+        <WhatsInside />
+
+        <div className="t3d-divider" />
+
+        <FAQ />
+
         <div className="t3d-divider" />
 
 

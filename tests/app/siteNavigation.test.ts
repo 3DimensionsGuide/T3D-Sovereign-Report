@@ -39,5 +39,5 @@ test('the homepage sections the bar watches exist', async () => {
   const sources: string[] = [];
   for await (const f of glob('src/**/*.tsx')) sources.push(read(f));
   const all = sources.join('\n');
-  for (const id of ['framework', 'system', 'calculator']) assert.match(all, new RegExp(`id="${id}"`), id);
+  for (const id of ['framework', 'system', 'calculator', 'inside', 'faq']) assert.match(all, new RegExp(`id="${id}"`), id);
 });

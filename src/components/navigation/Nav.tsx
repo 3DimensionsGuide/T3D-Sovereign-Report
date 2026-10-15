@@ -20,10 +20,11 @@ const NAV_LINKS = [
   { href: '/#framework',  label: 'How it works', id: 'framework'  },
   { href: '/pricing',     label: 'Pricing',      id: 'pricing'    },
   { href: '/#calculator', label: 'Calculator',   id: 'calculator' },
+  { href: '/#faq',        label: 'FAQ',          id: 'faq'        },
 ] as const;
 
 // Sections of the homepage, in order. The scroll story belongs to "How it works".
-const HOME_SECTIONS = ['framework', 'system', 'calculator'] as const;
+const HOME_SECTIONS = ['framework', 'system', 'calculator', 'inside', 'faq'] as const;
 
 export default function Nav() {
   const pathname = usePathname();
@@ -62,7 +63,7 @@ export default function Nav() {
     return () => io.disconnect();
   }, [pathname]);
 
-  const isCurrent = (id: string) => (id === 'pricing' ? pathname === '/pricing' : pathname === '/' && section === id);
+  const isCurrent = (id: string) => (id === 'pricing' ? pathname === '/pricing' : pathname === '/' && (section === id || (id === 'calculator' && section === 'inside')));
 
   // ── Lock body scroll when menu open ───────────────────────────────────────
   useEffect(() => {

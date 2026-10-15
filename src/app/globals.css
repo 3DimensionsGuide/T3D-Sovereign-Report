@@ -343,3 +343,30 @@ body {
   .t3d-cta:hover        { background: var(--crimson); color: var(--parchment); }
   .t3d-ghost:hover      { border-color: var(--card-border); color: var(--parchment-70); }
 }
+
+/* FAQ accordion: the whole row is the button, 48px tall, with a plus that turns into a minus. */
+.faq-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 14px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-summary::-webkit-details-marker { display: none; }
+.faq-summary:focus-visible { outline: 2px solid var(--parchment); outline-offset: 4px; }
+.faq-mark { position: relative; width: 16px; height: 16px; flex-shrink: 0; }
+.faq-mark::before, .faq-mark::after {
+  content: '';
+  position: absolute;
+  background: var(--parchment-70);
+  top: 50%; left: 0; width: 100%; height: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.faq-mark::after { transform: rotate(90deg); }
+.faq-item[open] .faq-mark::after { transform: rotate(0deg); opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .faq-mark::before, .faq-mark::after { transition: none; }
+}
