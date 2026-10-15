@@ -10,12 +10,11 @@
  *   UPGRADE 4 — Sharp card borders, zero radius, no shadows
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Nav from '@/components/navigation/Nav';
 import Footer from '@/components/navigation/Footer';
-import type { SovereignCompassHandle } from '@/components/SovereignCompassCanvas';
 import { Suspense } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
@@ -25,41 +24,8 @@ import TriadStory from '@/components/home/TriadStory';
 import WhatsInside from '@/components/home/WhatsInside';
 import FAQ from '@/components/home/FAQ';
 
-// ─── SCROLL HOOK ──────────────────────────────────────────────────────────────
-function useScroll() {
-  const [progress, setProgress] = useState(0);
-  const rafRef  = useRef<number | null>(null);
-  const ticking = useRef(false);
-
-  useEffect(() => {
-    function update() {
-      const p = Math.min(Math.max(
-        window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1),
-        0), 1);
-      setProgress(p);
-      ticking.current = false;
-    }
-    function onScroll() {
-      if (!ticking.current) {
-        rafRef.current = requestAnimationFrame(update);
-        ticking.current = true;
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    update();
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  return progress;
-}
-
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const scrollProgress = useScroll();
-  const compassRef     = useRef<SovereignCompassHandle>(null);
   const { results }    = useT3DStore();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -68,15 +34,6 @@ export default function HomePage() {
     check();
     window.addEventListener('resize', check, { passive: true });
     return () => window.removeEventListener('resize', check);
-  }, []);
-
-  // Trigger results transition on compass
-  useEffect(() => {
-    if (results) compassRef.current?.triggerResultsTransition();
-  }, [results]);
-
-  const handleCalculate = useCallback(() => {
-    compassRef.current?.triggerCalculation();
   }, []);
 
   return (
@@ -192,11 +149,6 @@ export default function HomePage() {
             </div>
 
           </div>
-          {/*
-           * Right column (40%) — compass occupies this space naturally
-           * since SovereignCompassCanvas is fixed and right-positioned
-           * in the hero scroll range. No additional markup needed.
-           */}
         </section>
 
         {/* UPGRADE 2 — Section divider */}
@@ -264,12 +216,7 @@ export default function HomePage() {
               <div className="t3d-divider" style={{ marginBottom: 28 }} />
 
               {/* Calculator form */}
-              <div onClick={(e) => {
-                const target = e.target as HTMLElement;
-                if (target.tagName === 'BUTTON' && target.textContent?.includes('CALCULATE')) {
-                  compassRef.current?.triggerCalculation();
-                }
-              }}>
+              <div>
                 <CalculatorForm />
               </div>
             </div>
