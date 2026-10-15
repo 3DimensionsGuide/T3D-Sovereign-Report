@@ -311,6 +311,16 @@ export function longitudeToGate(longitude: number): { gate: number; line: number
   return { gate, line };
 }
 
+/**
+ * True when a longitude sits within `within` degrees of a gate boundary. A birth date with no time of day
+ * can land on either side of the boundary, so callers use this to say the birth time will confirm the gate.
+ */
+export function isNearGateEdge(longitude: number, within = 1): boolean {
+  const adjusted = ((longitude - MANDALA_START_LON) % 360 + 360) % 360;
+  const pos = adjusted % DEGREES_PER_GATE;
+  return pos < within || pos > DEGREES_PER_GATE - within;
+}
+
 // ─── DESIGN EPOCH — 88° SUN ARC ───────────────────────────────────────────────
 
 /**

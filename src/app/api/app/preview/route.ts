@@ -11,6 +11,7 @@
 
 import { NextResponse } from 'next/server';
 import { calculateAstrology } from '@/server/engines/astrology';
+import { isNearGateEdge, longitudeToGate } from '@/server/engines/human_design';
 import { calculateLifePath } from '@/server/engines/numerology';
 import { buildBirthPreview } from '@/lib/app/preview';
 import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
@@ -40,7 +41,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     const sky = calculateAstrology({
       birthDate, birthTime: '12:00', latitude: 0, longitude: 0, timezone: 'UTC',
     });
-    const preview = buildBirthPreview(calculateLifePath(birthDate), sky.tropical.sun.longitude);
+    const sunLongitude = sky.tropical.sun.longitude;
+    const preview = buildBirthPreview(calculateLifePath(birthDate), sunLongitude, {
+      gate: longitudeToGate(sunLongitude).gate,
+      nearEdge: isNearGateEdge(sunLongitude),
+    });
     if (!preview) {
       return NextResponse.json({ success: false, error: 'We could not build a preview. Please try again.' }, { status: 500 });
     }

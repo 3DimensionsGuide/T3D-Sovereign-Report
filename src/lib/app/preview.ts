@@ -6,6 +6,7 @@
  */
 
 import { LIFE_PATH_CONTENT } from '@/lib/report/section4/road-content';
+import { GATE_KEYNOTES } from '@/lib/report/section3/gate-content';
 import { SIGN_ELEMENT, SUN_SIGN_CONTENT } from '@/lib/report/section5/astro-content';
 
 const SIGNS = [
@@ -16,9 +17,16 @@ const SIGNS = [
 export interface BirthPreview {
   lifePath: { number: number; name: string; direction: string; plain: string };
   sun: { sign: string; element: string; orientation: string; cusp: boolean };
+  /** The Human Design gate the Sun was in, which a birth date alone can show. Type, Strategy and Authority need the birth time. */
+  vehicle: { gate: number; name: string; meaning: string; center: string; cusp: boolean } | null;
   /** What the full chart adds, so the visitor sees what is waiting. */
   locked: string[];
 }
+
+const CENTER_NAME: Record<string, string> = {
+  head: 'Head', ajna: 'Ajna', throat: 'Throat', g_center: 'G', heart: 'Heart',
+  solar_plexus: 'Solar Plexus', sacral: 'Sacral', spleen: 'Spleen', root: 'Root',
+};
 
 export const PREVIEW_LOCKED = [
   'Your Human Design Type, Strategy and Authority',
@@ -33,7 +41,10 @@ function lifePathEntry(n: number) {
   return LIFE_PATH_CONTENT[n] ?? LIFE_PATH_CONTENT[({ 11: 2, 22: 4, 33: 6 } as Record<number, number>)[n] ?? n] ?? null;
 }
 
-export function buildBirthPreview(lifePathNumber: number, sunLongitude: number): BirthPreview | null {
+/** The Sun's gate as the route works it out (the engine needs the ephemeris, so this file only receives the answer). */
+export interface SunGate { gate: number; nearEdge: boolean }
+
+export function buildBirthPreview(lifePathNumber: number, sunLongitude: number, sunGate?: SunGate): BirthPreview | null {
   const entry = lifePathEntry(lifePathNumber);
   const norm = ((sunLongitude % 360) + 360) % 360;
   const sign = SIGNS[Math.floor(norm / 30)] ?? 'Aries';
@@ -49,6 +60,19 @@ export function buildBirthPreview(lifePathNumber: number, sunLongitude: number):
       // The Sun moves about one degree a day, and a date has no time of day.
       cusp: degree < 1 || degree > 29,
     },
+    vehicle: vehicleFor(sunGate),
     locked: PREVIEW_LOCKED,
+  };
+}
+
+function vehicleFor(sunGate: SunGate | undefined): BirthPreview['vehicle'] {
+  const key = sunGate ? GATE_KEYNOTES[sunGate.gate] : undefined;
+  if (!sunGate || !key) return null;
+  return {
+    gate: sunGate.gate,
+    name: key.ichingName,
+    meaning: key.coreMeaning,
+    center: `${CENTER_NAME[key.center] ?? ''} Center`.trim(),
+    cusp: sunGate.nearEdge,
   };
 }

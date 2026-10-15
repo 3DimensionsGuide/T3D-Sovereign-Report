@@ -115,8 +115,26 @@ export default function Welcome() {
             </AccentView>
 
             <AccentView style={[styles.card, { borderLeftColor: colors.vehicle }]}>
-              <LensLabel lens="vehicle">The Vehicle · waiting for your details</LensLabel>
-              <Text accessibilityRole="header" style={styles.cardTitle}>Your full chart adds</Text>
+              {preview.vehicle ? (
+                <>
+                  <LensLabel lens="vehicle">The Vehicle · Sun in Gate {preview.vehicle.gate}</LensLabel>
+                  <Text accessibilityRole="header" style={styles.cardTitle}>Gate {preview.vehicle.gate}, {preview.vehicle.name}</Text>
+                  <Text style={styles.body}>{preview.vehicle.meaning}</Text>
+                  <Text style={styles.body}>This gate sits in your {preview.vehicle.center}. It is one piece of your design.</Text>
+                  {preview.vehicle.cusp ? (
+                    <Text style={styles.note}>
+                      Your birth date falls on the day the Sun changes gates, so your birth time and place
+                      will confirm this one.
+                    </Text>
+                  ) : null}
+                  <Text style={styles.body}>Your full chart adds:</Text>
+                </>
+              ) : (
+                <>
+                  <LensLabel lens="vehicle">The Vehicle · waiting for your details</LensLabel>
+                  <Text accessibilityRole="header" style={styles.cardTitle}>Your full chart adds</Text>
+                </>
+              )}
               {preview.locked.map((line) => (
                 <Text key={line} style={styles.body}>◇  {line}</Text>
               ))}
