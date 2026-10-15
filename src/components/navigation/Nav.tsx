@@ -15,17 +15,22 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
+// `id` is the page section (or page) a link points at, so the bar can show where you are.
 const NAV_LINKS = [
-  { href: '/#system',    label: 'The System'  },
-  { href: '/pricing',    label: 'Pricing'     },
-  { href: '/#calculator', label: 'Calculator' },
-];
+  { href: '/#framework',  label: 'How it works', id: 'framework'  },
+  { href: '/pricing',     label: 'Pricing',      id: 'pricing'    },
+  { href: '/#calculator', label: 'Calculator',   id: 'calculator' },
+] as const;
+
+// Sections of the homepage, in order. The scroll story belongs to "How it works".
+const HOME_SECTIONS = ['framework', 'system', 'calculator'] as const;
 
 export default function Nav() {
   const pathname = usePathname();
   const [scrolled,  setScrolled]  = useState(false);
   const [isMobile,  setIsMobile]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
+  const [section,   setSection]   = useState<string | null>(null);
 
   // ── Scroll detection ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -41,6 +46,23 @@ export default function Nav() {
     window.addEventListener('resize', check, { passive: true });
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // ── Which homepage section is on screen (for the current-link marker) ─────
+  useEffect(() => {
+    if (pathname !== '/') { setSection(null); return; }
+    const els = HOME_SECTIONS.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null);
+    if (!els.length || typeof IntersectionObserver === 'undefined') return;
+    const seen = new Set<string>();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) { if (e.isIntersecting) seen.add(e.target.id); else seen.delete(e.target.id); }
+      const first = HOME_SECTIONS.find((id) => seen.has(id)) ?? null;
+      setSection(first === 'system' ? 'framework' : first);
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [pathname]);
+
+  const isCurrent = (id: string) => (id === 'pricing' ? pathname === '/pricing' : pathname === '/' && section === id);
 
   // ── Lock body scroll when menu open ───────────────────────────────────────
   useEffect(() => {
@@ -118,26 +140,30 @@ export default function Nav() {
           {/* ── Desktop links ─────────────────────────────────────────────── */}
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              {NAV_LINKS.map((l) => (
+              {NAV_LINKS.map((l) => {
+                const current = isCurrent(l.id);
+                return (
                 <Link
                   key={l.href}
                   href={l.href}
+                  aria-current={current ? (l.id === 'pricing' ? 'page' : 'location') : undefined}
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: '0.78rem', fontWeight: 500,
                     letterSpacing: '0.12em', textTransform: 'uppercase',
-                    color: 'var(--parchment-40)',
+                    color: current ? 'var(--parchment)' : 'var(--parchment-40)',
                     padding: '8px 14px',
                     textDecoration: 'none',
-                    borderBottom: '1px solid transparent',
-                    transition: 'color 0.2s var(--ease)',
+                    borderBottom: `1px solid ${current ? 'var(--crimson)' : 'transparent'}`,
+                    transition: 'color 0.2s var(--ease), border-color 0.2s var(--ease)',
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--parchment)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--parchment-40)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = current ? 'var(--parchment)' : 'var(--parchment-40)'; }}
                 >
                   {l.label}
                 </Link>
-              ))}
+                );
+              })}
 
               <Link
                 href="/#calculator"
@@ -220,11 +246,14 @@ export default function Nav() {
         >
           {/* Links */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {NAV_LINKS.map((l, i) => (
+            {NAV_LINKS.map((l, i) => {
+              const current = isCurrent(l.id);
+              return (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={closeMenu}
+                aria-current={current ? (l.id === 'pricing' ? 'page' : 'location') : undefined}
                 style={{
                   fontFamily: "'Playfair Display', serif",
                   fontSize: 'clamp(2rem,8vw,3rem)',
@@ -241,9 +270,10 @@ export default function Nav() {
                 }}
               >
                 {l.label}
-                <span style={{ color: 'var(--parchment-40)', fontSize: '1.2rem' }}>→</span>
+                <span aria-hidden="true" style={{ color: current ? 'var(--signal-red)' : 'var(--parchment-40)', fontSize: '1.2rem' }}>{current ? '●' : '→'}</span>
               </Link>
-            ))}
+              );
+            })}
           </div>
 
           {/* Bottom — CTA + system label */}
