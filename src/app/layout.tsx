@@ -3,6 +3,8 @@
  * Fonts: Playfair Display (display) + DM Sans (body/UI)
  */
 import type { Metadata, Viewport } from 'next';
+// The engine's stylesheet first, so our own design system overrides it where they overlap.
+import '@/vendor/scrollcraft/scrollcraft.css';
 import './globals.css';
 import VideoBackground from '@/components/VideoBackground';
 import RefBeacon from '@/components/RefBeacon';

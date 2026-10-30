@@ -150,7 +150,7 @@ export default function ResultsDashboard() {
       }}>
         <div>
           <p className="t3d-label" style={{ color: 'var(--parchment-40)', marginBottom: 10 }}>
-            SOVEREIGN PROFILE — CALCULATION COMPLETE
+            SOVEREIGN PROFILE: CALCULATION COMPLETE
           </p>
           <h2 style={{
             fontFamily: "'Playfair Display', Georgia, serif",

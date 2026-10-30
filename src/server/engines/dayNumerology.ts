@@ -154,13 +154,20 @@ function blendSentence(universal: number, personal: number): string {
 }
 
 /** localDate is the person's calendar date, YYYY-MM-DD. birthDate likewise. */
-export function calculateDayNumerology(birthDate: string, localDate: string): DayNumerology {
+/**
+ * The Universal Day for a calendar date. It needs no birth data, which is what lets a
+ * public surface show a real number without asking anybody for anything.
+ */
+export function universalDayNumber(localDate: string): number {
   const [y, m, d] = localDate.split('-').map(Number) as [number, number, number];
-
   const universalYear = reduceKeepMasters(digitSum(y));
-  const universalDay = reduceKeepMasters(
-    reduceKeepMasters(m) + reduceKeepMasters(d) + universalYear,
-  );
+  return reduceKeepMasters(reduceKeepMasters(m) + reduceKeepMasters(d) + universalYear);
+}
+
+export function calculateDayNumerology(birthDate: string, localDate: string): DayNumerology {
+  const [, m, d] = localDate.split('-').map(Number) as [number, number, number];
+
+  const universalDay = universalDayNumber(localDate);
   const personalYear = personalYearNumber(birthDate, localDate);
   const personalMonth = reduceKeepMasters(personalYear + m);
   const personalDay = reduceKeepMasters(personalMonth + d);

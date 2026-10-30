@@ -451,12 +451,12 @@ export default function CalculatorForm() {
             </Field>
 
             <p className="t3d-label" style={{ color:'var(--parchment-40)', marginTop:-12 }}>
-              Include middle name only if on your birth certificate — it affects numerology.
+              Include your middle name only if it is on your birth certificate, because it affects the numerology.
             </p>
 
             {/* UPGRADE 5 — CTA: crimson, zero radius, 11px DM Sans ALL CAPS */}
             <button type="button" onClick={advance} className="t3d-cta" style={{ marginTop:8 }}>
-              CONTINUE — BIRTH DATA
+              CONTINUE TO BIRTH DATA
             </button>
           </div>
         )}

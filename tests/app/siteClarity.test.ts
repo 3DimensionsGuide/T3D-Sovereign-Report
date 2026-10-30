@@ -3,18 +3,18 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
 const read = (p: string) => readFileSync(p, 'utf8');
-const home = read('src/app/page.tsx');
+const home = read('src/components/home/HomeView.tsx');
 const footer = read('src/components/navigation/Footer.tsx');
 const nav = read('src/components/navigation/Nav.tsx');
-const story = read('src/components/home/TriadStory.tsx');
+const instrument = read('src/components/home/Instrument.tsx');
 const config = read('next.config.ts');
 
 test('every Calculate button leads to the same calculator on the homepage', () => {
-  for (const [name, src] of [['home', home], ['footer', footer], ['nav', nav], ['story', story]] as const) {
+  for (const [name, src] of [['home', home], ['footer', footer], ['nav', nav], ['instrument', instrument]] as const) {
     assert.doesNotMatch(src, /href="\/calculator"|href: '\/calculator'/, name);
   }
   assert.match(home, /<Link href="\/#calculator" className="t3d-cta">\s*CALCULATE MY PROFILE/);
-  assert.match(story, /href="\/#calculator"/);
+  assert.match(instrument, /href="\/#calculator"/);
   assert.match(config, /source: '\/calculator', destination: '\/#calculator', permanent: true/);
   assert.equal(existsSync('src/app/calculator/page.tsx'), false);
 });
@@ -26,7 +26,7 @@ test('the hero says in one plain line what you get and what it costs', () => {
 });
 
 test('no system-style labels are left on visitor-facing pages', () => {
-  for (const f of ['src/app/page.tsx', 'src/components/navigation/Footer.tsx', 'src/app/checkout/page.tsx', 'src/app/report/ReportClient.tsx', 'src/app/pricing/page.tsx']) {
+  for (const f of ['src/components/home/HomeView.tsx', 'src/components/navigation/Footer.tsx', 'src/app/checkout/page.tsx', 'src/app/report/ReportClient.tsx', 'src/app/pricing/page.tsx']) {
     const src = read(f);
     assert.doesNotMatch(src, /\[[A-Z][A-Z_.]{3,}\]/, f);
     assert.doesNotMatch(src, /MODULE 02|ALL SYSTEMS OPERATIONAL|SYSTEM\.STATUS/, f);
