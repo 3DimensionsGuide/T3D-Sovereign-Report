@@ -109,7 +109,7 @@ export default function Nav() {
           {/* ── Brand ─────────────────────────────────────────────────────── */}
           <Link
             href="/"
-            aria-label="The 3 Dimensions, home"
+            aria-label="The 3 Dimensions — home"
             style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', minHeight: 48 }}
             onClick={closeMenu}
           >
@@ -171,7 +171,7 @@ export default function Nav() {
                 className="t3d-cta"
                 style={{ marginLeft: 12, width: 'auto', padding: '10px 20px', minHeight: 40 }}
               >
-                CALCULATE MY PROFILE
+                CALCULATE FREE
               </Link>
             </div>
           )}
@@ -289,7 +289,7 @@ export default function Nav() {
               className="t3d-cta"
               style={{ marginBottom: 24 }}
             >
-              CALCULATE MY PROFILE (FREE)
+              CALCULATE MY PROFILE — FREE
             </Link>
             <p style={{
               fontFamily: "'DM Sans', sans-serif",

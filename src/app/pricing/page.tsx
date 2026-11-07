@@ -82,7 +82,7 @@ export default async function PricingPage() {
               Choose your depth.
             </h1>
             <p className="t3d-body" style={{ fontSize: 16 }}>
-              Every tier is built from your exact birth data: the Vehicle, the Road
+              Every tier is built from your exact birth data — the Vehicle, the Road,
               and the Stoplight, read at the depth you want. Start with the entry
               point, go deeper on your own terms, or get the complete framework
               from the start.
@@ -225,7 +225,7 @@ export default async function PricingPage() {
             </dl>
             <p className="t3d-body" style={{ fontSize: 15, marginTop: 24 }}>
               Already have the Base Report? The Advanced Report completes it into
-              the full Sovereign Report for $53, the same $97 total either way,
+              the full Sovereign Report for $53 — the same $97 total either way,
               whether you buy everything now or go deeper later.
             </p>
           </section>

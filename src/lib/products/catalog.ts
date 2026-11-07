@@ -37,7 +37,7 @@ export const PRODUCT_DISPLAY: Record<string, ProductDisplay> = {
     name:       'Base Report',
     priceLabel: '$44',
     eyebrow:    'Where to start',
-    tagline:    'Human Design, Numerology and Astrology, woven into one navigation guide built from your exact birth data.',
+    tagline:    'Human Design, Numerology, and Astrology — woven into one navigation guide built from your exact birth data.',
     ctaLabel:   'START WITH THE BASE REPORT',
     includes: [
       { label: 'Vehicle',    text: 'Your Type, Strategy, Authority, and Profile' },
@@ -51,7 +51,7 @@ export const PRODUCT_DISPLAY: Record<string, ProductDisplay> = {
     name:       'Advanced Report',
     priceLabel: '$53',
     eyebrow:    'Go deeper',
-    tagline:    'The same three systems, read at full depth instead of summary: every gate, every Pinnacle, every live transit.',
+    tagline:    'The same three systems, read at full depth instead of summary — every gate, every Pinnacle, every live transit.',
     ctaLabel:   'GO DEEPER WITH THE ADVANCED REPORT',
     includes: [
       { label: 'Vehicle',      text: 'Every gate, channel, bridge, and your full circuitry' },
@@ -65,11 +65,11 @@ export const PRODUCT_DISPLAY: Record<string, ProductDisplay> = {
     name:       'Sovereign Report',
     priceLabel: '$97',
     eyebrow:    'The complete set',
-    tagline:    'The Base Report and the Advanced Report together. Nothing held back, nothing to unlock later.',
+    tagline:    'The Base Report and the Advanced Report together — nothing held back, nothing to unlock later.',
     ctaLabel:   'GET THE COMPLETE SOVEREIGN REPORT',
     includes: [
-      { label: 'Base',      text: 'The full Base Report: all three systems, woven into one guide' },
-      { label: 'Advanced',  text: 'The full Advanced Report: every gate, every Pinnacle, every transit' },
+      { label: 'Base',      text: 'The full Base Report — all three systems, woven into one guide' },
+      { label: 'Advanced',  text: 'The full Advanced Report — every gate, every Pinnacle, every transit' },
       { label: 'Format',    text: 'Both reports delivered together as one download' },
       { label: 'Value',     text: 'The same $97 as buying both separately ($44 + $53)' },
     ],

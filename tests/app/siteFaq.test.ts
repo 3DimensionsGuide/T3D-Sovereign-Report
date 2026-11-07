@@ -30,7 +30,7 @@ test('the FAQ uses real disclosure elements and keeps keyboard focus visible', (
 });
 
 test('both new sections are on the homepage and in the navigation', () => {
-  assert.match(read('src/components/home/HomeView.tsx'), /<WhatsInside \/>[\s\S]*<FAQ \/>/);
+  assert.match(read('src/app/page.tsx'), /<WhatsInside \/>[\s\S]*<FAQ \/>/);
   assert.match(read('src/components/navigation/Nav.tsx'), /href: '\/#faq',\s+label: 'FAQ'/);
   assert.match(read('src/components/navigation/Footer.tsx'), /'\/#faq'/);
 });

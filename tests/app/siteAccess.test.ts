@@ -7,7 +7,7 @@ const read = (p: string) => readFileSync(p, 'utf8');
 test('every page has a skip link target and the link comes first', () => {
   assert.match(read('src/app/layout.tsx'), /<body[^>]*>\s*<a href="#main" className="skip-link">Skip to main content<\/a>/);
   for (const f of ['page', 'pricing/page', 'privacy/page', 'checkout/page', 'library/page', 'report/page', 'update-time/page']) {
-    const src = read(f === 'page' ? 'src/components/home/HomeView.tsx' : `src/app/${f}.tsx`);
+    const src = read(f === 'page' ? 'src/app/page.tsx' : `src/app/${f}.tsx`);
     assert.match(src, /<main id="main" tabIndex=\{-1\}/, f);
   }
 });

@@ -17,9 +17,9 @@ test('the unused 3D compass and its libraries are gone', () => {
   assert.ok(!existsSync('src/components/SovereignCompassCanvas.tsx'));
   const pkg = read('package.json');
   assert.doesNotMatch(pkg, /splinetool/);
-  assert.doesNotMatch(read('src/components/home/HomeView.tsx'), /compassRef|useScroll|SovereignCompass/);
+  assert.doesNotMatch(read('src/app/page.tsx'), /compassRef|useScroll|SovereignCompass/);
 });
 
 test('the intro video waits for a tap and loads only its first frame', () => {
-  assert.match(read('src/components/home/HomeView.tsx'), /preload="metadata"/);
+  assert.match(read('src/app/page.tsx'), /preload="metadata"/);
 });
