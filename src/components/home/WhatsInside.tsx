@@ -20,6 +20,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PRODUCT_DISPLAY, PRODUCT_ORDER } from '@/lib/products/catalog';
 
 type Page = {
   src: string;
@@ -75,6 +76,13 @@ const PAGES: readonly Page[] = [
   },
 ];
 
+/** One clause each. The pricing page carries the full copy; this is the arrival, not the catalogue. */
+const DEPTH: Record<string, string> = {
+  'base-report': 'All three systems, woven into one guide.',
+  'advanced-sovereign-report': 'The same three at full depth: every gate, every Pinnacle, every transit.',
+  'sovereign-report': 'Both of them together, for what the two cost separately.',
+};
+
 const TINT: Record<Page['lens'], string> = {
   vehicle: 'var(--amber)',
   road: '#4FBF7F',
@@ -89,14 +97,21 @@ export default function WhatsInside() {
   const [progress, setProgress] = useState(0);
   const [pinned, setPinned] = useState(false);
 
-  // Pinning is the enhancement, not the content. Anything that cannot or should not pin
-  // keeps the rail as a plain swipeable strip, which is why this starts false.
+  // Pinning is the enhancement, not the content, which is why this starts false.
+  // It is only worth doing with a mouse on a wide screen. On a touch screen the rail is
+  // swiped directly, which is the native gesture and cannot stutter: scroll events arrive
+  // in bursts during a touch scroll, so a rail driven from them always chases the finger.
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setPinned(!mq.matches);
+    const ok = window.matchMedia('(min-width: 901px) and (pointer: fine)');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setPinned(ok.matches && !reduce.matches);
     sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
+    ok.addEventListener('change', sync);
+    reduce.addEventListener('change', sync);
+    return () => {
+      ok.removeEventListener('change', sync);
+      reduce.removeEventListener('change', sync);
+    };
   }, []);
 
   useEffect(() => {
@@ -175,9 +190,12 @@ export default function WhatsInside() {
             alt={page.alt}
             width={1020}
             height={1320}
-            sizes="(max-width: 640px) 70vw, 32vw"
+            sizes="(max-width: 900px) 82vw, 34vw"
             className="inside-page__img"
-            loading={i < 2 ? 'eager' : 'lazy'}
+            /* All six load up front. They come to 240 KB in total, and lazy loading
+               inside a clipped rail means a card arrives blank as it travels in. */
+            loading="eager"
+            priority={i < 2}
           />
           <figcaption className="inside-page__cap">
             <span className="inside-page__title" style={{ color: TINT[page.lens] }}>{page.title}</span>
@@ -189,15 +207,36 @@ export default function WhatsInside() {
   );
 
   const close = (
-    <footer style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(32px,5vh,56px) clamp(20px,4vw,64px) clamp(56px,10vh,120px)' }}>
-      <p className="t3d-body" style={{ maxWidth: 640 }}>
-        The pages here are from the Advanced Report. Whichever depth you choose, it arrives as a
-        PDF you download straight after paying, and a copy is emailed to you.{' '}
-        <Link href="/pricing" style={{ color: 'var(--parchment)', textDecoration: 'underline', textUnderlineOffset: 4 }}>
-          See the three reports side by side
-        </Link>
-        .
+    <footer className="inside-close">
+      <p className="t3d-label" style={{ marginBottom: 18 }}>Three depths</p>
+      <h3 className="inside-close__h">Pick how far in you want to go.</h3>
+      <p className="t3d-body" style={{ maxWidth: 620, marginBottom: 'clamp(28px,4vh,44px)' }}>
+        Every report is built from the one birth moment you enter in the calculator. What changes
+        between them is how deep the reading goes, not how carefully it was worked out.
       </p>
+
+      <dl className="inside-tiers">
+        {PRODUCT_ORDER.map((slug) => {
+          const p = PRODUCT_DISPLAY[slug];
+          if (!p) return null;
+          return (
+            <div key={slug} className="inside-tier">
+              <dt className="inside-tier__name">{p.name}</dt>
+              <dd className="inside-tier__price">{p.priceLabel}</dd>
+              <dd className="inside-tier__what">{DEPTH[slug]}</dd>
+            </div>
+          );
+        })}
+      </dl>
+
+      <div className="inside-actions">
+        <Link href="/pricing" className="t3d-cta inside-cta">SEE THE THREE REPORTS</Link>
+        <p className="inside-close__note">
+          Each one is a PDF you download the moment you pay, and a copy is emailed to you.
+          The calculator is free, and it is the place to start:{' '}
+          <Link href="/#calculator" className="inside-close__link">run it first</Link>.
+        </p>
+      </div>
     </footer>
   );
 
