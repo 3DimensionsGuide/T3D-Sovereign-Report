@@ -20,11 +20,15 @@ export async function savedLiveBundle(leadId: number, localDate: string): Promis
   return saved?.value ?? null;
 }
 
-/** Loads today's sky, numerology and triad from the server and saves them. Throws if the sky cannot load. */
-export async function loadLiveBundle(leadId: number, email: string, localDate: string): Promise<TodayBundle> {
-  const dayNumP = requestDayNumerology(leadId, email, localDate).catch(() => null);
-  const triadP = requestTriadToday(leadId, email, localDate).catch(() => null);
-  const today = await requestToday(leadId, email);
+/**
+ * Loads today's sky, numerology and triad from the server and saves them. Throws if the sky cannot
+ * load. The lead id is only here to name the saved copy — the requests themselves travel on the
+ * app's session token.
+ */
+export async function loadLiveBundle(leadId: number, localDate: string): Promise<TodayBundle> {
+  const dayNumP = requestDayNumerology(localDate).catch(() => null);
+  const triadP = requestTriadToday(localDate).catch(() => null);
+  const today = await requestToday();
   const [dayNum, triad] = await Promise.all([dayNumP, triadP]);
   const bundle: TodayBundle = { today, dayNum, triad };
   await setCached<TodayBundle>(liveBundleKey(leadId, localDate), { value: bundle, savedAt: Date.now() });

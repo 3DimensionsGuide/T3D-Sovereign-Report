@@ -3,33 +3,27 @@
  * The Timeline for the T3D app: sky events against the person's natal chart,
  * their annual profection (Lord of the Year) and their numerology cycles.
  *
- * Body: { leadId: number, email: string, localDate: "YYYY-MM-DD",
- *         tzOffsetMinutes: number, days?: number }
+ * Body: { localDate: "YYYY-MM-DD", tzOffsetMinutes: number, days?: number }
  *
- * Same access rule as the other app routes: the lead id must be paired with
- * the email on that lead; a wrong id and a wrong email get the identical 404.
+ * Auth: an Authorization: Bearer header carrying the app's session token. See
+ * src/server/appAuth.ts — there is no email address in any app request any more.
+ *
  * Formulas stay on the server; only the finished timeline is returned.
  */
 
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
-import { db } from '@/server/db';
-import { leads } from '@/server/db/schema';
 import { calculateTimeline } from '@/server/engines/timeline';
 import { buildYearAhead } from '@/lib/app/yearAhead';
 import type { NatalSkyPoints } from '@/server/engines/dailySky';
 import type { AstrologyResult, NumerologyCycle } from '@/server/engines/types';
-import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
+import { limitRequest } from '@/server/rateLimit';
+import { authenticateApp } from '@/server/appAuth';
 
 interface TimelineRequest {
-  leadId?: unknown;
-  email?: unknown;
   localDate?: unknown;
   tzOffsetMinutes?: unknown;
   days?: unknown;
 }
-
-const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 
 const REMINDER =
   'Planetary transits are weather, not commands. Make your decisions through your Human Design Strategy and Inner Authority.';
@@ -50,6 +44,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   const limited = await limitRequest(request, 'app');
   if (limited) return limited;
   try {
+    const auth = await authenticateApp(request);
+    if (!auth.ok) return auth.response;
+    const lead = auth.lead;
+
     let body: TimelineRequest;
     try {
       body = (await request.json()) as TimelineRequest;
@@ -57,18 +55,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const leadId = Number(body.leadId);
-    const email = typeof body.email === 'string' ? body.email.toLowerCase().trim() : '';
     const localDate = typeof body.localDate === 'string' ? body.localDate : '';
     const tzOffsetMinutes = Number(body.tzOffsetMinutes);
     const days = body.days === undefined ? 60 : Number(body.days);
 
-    if (!Number.isInteger(leadId) || leadId < 1 || !email.includes('@')) {
-      return NextResponse.json(
-        { success: false, error: 'leadId and a valid email are required' },
-        { status: 400 },
-      );
-    }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(localDate) || Number.isNaN(Date.parse(localDate))) {
       return NextResponse.json({ success: false, error: 'localDate must be YYYY-MM-DD' }, { status: 400 });
     }
@@ -77,13 +67,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     if (!Number.isFinite(days)) {
       return NextResponse.json({ success: false, error: 'days must be a number' }, { status: 400 });
-    }
-
-    const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
-    const lead = rows[0];
-    if (!lead || lead.email.toLowerCase().trim() !== email) {
-      await noteAccessFailure(request);
-      return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 
     const results = lead.results as unknown as {

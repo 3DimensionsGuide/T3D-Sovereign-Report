@@ -74,7 +74,7 @@ export async function limitRequest(request: Request, bucket: BucketName): Promis
   }
 }
 
-/** Call when a leadId and email pair did not match. Repeated misses block the caller from the app routes for a while. */
+/** Call when an app session token was forged or malformed. Repeated misses block the caller from the app routes for a while. */
 export async function noteAccessFailure(request: Request): Promise<void> {
   try {
     await recordGuess(getStore(), clientId(request.headers));

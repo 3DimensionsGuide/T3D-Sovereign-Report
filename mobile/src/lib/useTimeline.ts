@@ -13,12 +13,12 @@ export { localDateString };
 const CACHE_VERSION = 7;
 
 /** The next stretch of days. One copy per chart per day, kept on the phone, and it moves to the new day by itself. */
-export function useTimeline(leadId: number | undefined, email: string | undefined, days = 60) {
+export function useTimeline(leadId: number | undefined, days = 60) {
   const day = useLocalDate();
   return useCachedLoad<TimelineResult>({
-    key: leadId && email ? `timeline|v${CACHE_VERSION}|${leadId}|${day}|${days}` : null,
+    key: leadId ? `timeline|v${CACHE_VERSION}|${leadId}|${day}|${days}` : null,
     fetcher: () =>
-      requestTimeline(leadId as number, email as string, {
+      requestTimeline({
         localDate: localDateString(),
         tzOffsetMinutes: new Date().getTimezoneOffset(),
         days,

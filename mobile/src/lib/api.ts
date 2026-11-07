@@ -11,6 +11,8 @@ import type { DayNumerology } from '@/lib/dayNumerologyTypes';
 import type { NumerologyDetail } from '@/lib/numerologyTypes';
 import type { TimelineResult } from '@/lib/timelineTypes';
 import type { VehicleDetail } from '@/lib/vehicleTypes';
+import { authHeader, clearSessionToken, setSessionToken } from '@/lib/session';
+import { useT3DStore } from '@/store/useT3DStore';
 /**
  * Talks to the T3D website's secure calculation endpoint.
  *
@@ -93,6 +95,8 @@ interface ApiSuccess {
   success: true;
   leadId: number;
   optInCode?: OptInCodeStatus;
+  /** The app asks for this with wantSession; it is what proves who the app is from here on. */
+  sessionToken?: string;
   data: Omit<ChartResult, 'leadId'>;
 }
 
@@ -115,6 +119,9 @@ export async function requestChart(profile: BirthProfile): Promise<{ chart: Char
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        // Asks the server for a session token. It only ever mints one for the row this request
+        // writes, which is why the app never has to send an email address to read its own chart.
+        wantSession: true,
         firstName: profile.firstName.trim(),
         middleName: profile.middleName?.trim() || undefined,
         lastName: profile.lastName.trim(),
@@ -149,6 +156,8 @@ export async function requestChart(profile: BirthProfile): Promise<{ chart: Char
   if (!payload.success) {
     throw new ChartRequestError(payload.error || 'The calculation failed. Please try again.');
   }
+  // Saved before anything else: every request after this one depends on it.
+  if (payload.sessionToken) await setSessionToken(payload.sessionToken);
   return { chart: { leadId: payload.leadId, ...payload.data }, optInCode: payload.optInCode ?? 'not-requested' };
 }
 
@@ -221,17 +230,69 @@ export interface TodayResult {
   reminder: string;
 }
 
-/** `at` reads the sky for another day (an ISO date-time); leave it out for right now. */
-export async function requestToday(leadId: number, email: string, at?: string): Promise<TodayResult> {
+// ─── SIGNING IN ──────────────────────────────────────────────────────────────
+
+/**
+ * Signs in again using the birth details already saved on this phone.
+ *
+ * The app's session token is the only thing it sends to prove who it is, and it has a life of its
+ * own: it expires, and deleting your data ends it immediately. When the server answers an app
+ * request with `reauth`, this recalculates the same chart, which hands back a fresh token — the
+ * server only ever mints one for the row the request just wrote, so nothing here can reach anyone
+ * else's chart.
+ *
+ * Only one of these runs at a time. Several screens loading at once all wait on the same request
+ * instead of each spending one of the hour's recalculations.
+ */
+let signingIn: Promise<boolean> | null = null;
+
+async function doSignIn(): Promise<boolean> {
+  const profile = useT3DStore.getState().profile;
+  if (!profile) {
+    // Nothing saved to sign in with: the person goes back through onboarding.
+    await clearSessionToken();
+    return false;
+  }
+  try {
+    await requestChart(profile);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function signIn(): Promise<boolean> {
+  if (!signingIn) {
+    signingIn = doSignIn().finally(() => {
+      signingIn = null;
+    });
+  }
+  return signingIn;
+}
+
+// ─── ONE WAY IN AND OUT ──────────────────────────────────────────────────────
+
+interface AppReply<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  /** The server's signal that the session has to be refreshed, not that something went wrong. */
+  reauth?: boolean;
+}
+
+async function send<T>(path: string, body: Record<string, unknown>, signed: boolean): Promise<AppReply<T>> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}/api/app/today`, {
+    response = await fetch(`${API_BASE_URL}${path}`, {
       method: 'POST',
       signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email, ...(at ? { at } : {}) }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(signed ? await authHeader() : {}),
+      },
+      body: JSON.stringify(body),
     });
   } catch {
     throw new ChartRequestError(
@@ -241,48 +302,46 @@ export async function requestToday(leadId: number, email: string, at?: string): 
     clearTimeout(timer);
   }
 
-  let payload: { success: true; data: TodayResult } | ApiFailure;
   try {
-    payload = (await response.json()) as { success: true; data: TodayResult } | ApiFailure;
+    return (await response.json()) as AppReply<T>;
   } catch {
     throw new ChartRequestError('The server sent back something unexpected. Please try again.');
   }
-  if (!payload.success) {
-    throw new ChartRequestError(payload.error || 'Could not load today. Please try again.');
+}
+
+/**
+ * Every signed app request goes through here: it carries the session token, and if the server says
+ * the session has expired it signs in once and tries again. The person sees nothing of that — only
+ * a failure that survives the retry becomes an error on screen.
+ */
+async function postApp<T>(path: string, body: Record<string, unknown>, failure: string): Promise<T> {
+  let reply = await send<T>(path, body, true);
+
+  if (!reply.success && reply.reauth === true && (await signIn())) {
+    reply = await send<T>(path, body, true);
   }
-  return payload.data;
+
+  if (!reply.success) throw new ChartRequestError(reply.error || failure);
+  return reply.data as T;
+}
+
+/** For the three routes that need no session: the first-launch preview, a place lookup, an invite. */
+async function postPublic<T>(path: string, body: Record<string, unknown>, failure: string): Promise<T> {
+  const reply = await send<T>(path, body, false);
+  if (!reply.success) throw new ChartRequestError(reply.error || failure);
+  return reply.data as T;
+}
+
+// ─── THE APP'S SCREENS ───────────────────────────────────────────────────────
+
+/** `at` reads the sky for another day (an ISO date-time); leave it out for right now. */
+export function requestToday(at?: string): Promise<TodayResult> {
+  return postApp<TodayResult>('/api/app/today', at ? { at } : {}, 'Could not load today. Please try again.');
 }
 
 /** The picture-ready data for the natal wheel and the bodygraph. */
-export async function requestChartData(leadId: number, email: string): Promise<ChartDrawingData> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/app/chart-data`, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email }),
-    });
-  } catch {
-    throw new ChartRequestError(
-      'Could not reach the T3D server. Check your internet connection and try again.',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  let payload: { success: true; data: ChartDrawingData } | ApiFailure;
-  try {
-    payload = (await response.json()) as { success: true; data: ChartDrawingData } | ApiFailure;
-  } catch {
-    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
-  }
-  if (!payload.success) {
-    throw new ChartRequestError(payload.error || 'Could not load your charts. Please try again.');
-  }
-  return payload.data;
+export function requestChartData(): Promise<ChartDrawingData> {
+  return postApp<ChartDrawingData>('/api/app/chart-data', {}, 'Could not load your charts. Please try again.');
 }
 
 export interface TimelineOptions {
@@ -294,189 +353,53 @@ export interface TimelineOptions {
 }
 
 /** Sky events, profection and numerology cycles for the Timeline tab. */
-export async function requestTimeline(
-  leadId: number,
-  email: string,
-  options: TimelineOptions,
-): Promise<TimelineResult> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/app/timeline`, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email, ...options }),
-    });
-  } catch {
-    throw new ChartRequestError(
-      'Could not reach the T3D server. Check your internet connection and try again.',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  let payload: { success: true; data: TimelineResult } | ApiFailure;
-  try {
-    payload = (await response.json()) as { success: true; data: TimelineResult } | ApiFailure;
-  } catch {
-    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
-  }
-  if (!payload.success) {
-    throw new ChartRequestError(payload.error || 'Could not load your timeline. Please try again.');
-  }
-  return payload.data;
+export function requestTimeline(options: TimelineOptions): Promise<TimelineResult> {
+  return postApp<TimelineResult>('/api/app/timeline', { ...options }, 'Could not load your timeline. Please try again.');
 }
 
 /** Full Numerology (The Road) interpretations for the Numerology tab. */
-export async function requestNumerology(leadId: number, email: string): Promise<NumerologyDetail> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/app/numerology`, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email }),
-    });
-  } catch {
-    throw new ChartRequestError(
-      'Could not reach the T3D server. Check your internet connection and try again.',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  let payload: { success: true; data: NumerologyDetail } | ApiFailure;
-  try {
-    payload = (await response.json()) as { success: true; data: NumerologyDetail } | ApiFailure;
-  } catch {
-    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
-  }
-  if (!payload.success) {
-    throw new ChartRequestError(payload.error || 'Could not load your numerology. Please try again.');
-  }
-  return payload.data;
+export function requestNumerology(): Promise<NumerologyDetail> {
+  return postApp<NumerologyDetail>('/api/app/numerology', {}, 'Could not load your numerology. Please try again.');
 }
 
 /** Universal Day and Personal Day numerology for the Today screen. */
-export async function requestDayNumerology(
-  leadId: number,
-  email: string,
-  localDate: string,
-): Promise<DayNumerology> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/app/day-numerology`, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email, localDate }),
-    });
-  } catch {
-    throw new ChartRequestError(
-      'Could not reach the T3D server. Check your internet connection and try again.',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  let payload: { success: true; data: DayNumerology } | ApiFailure;
-  try {
-    payload = (await response.json()) as { success: true; data: DayNumerology } | ApiFailure;
-  } catch {
-    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
-  }
-  if (!payload.success) {
-    throw new ChartRequestError(payload.error || 'Could not load today’s numerology. Please try again.');
-  }
-  return payload.data;
+export function requestDayNumerology(localDate: string): Promise<DayNumerology> {
+  return postApp<DayNumerology>(
+    '/api/app/day-numerology',
+    { localDate },
+    'Could not load today’s numerology. Please try again.',
+  );
 }
 
 /** Full Vehicle (Human Design) interpretations for the Readings tab. */
-export async function requestVehicle(leadId: number, email: string): Promise<VehicleDetail> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}/api/app/vehicle`, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, email }),
-    });
-  } catch {
-    throw new ChartRequestError(
-      'Could not reach the T3D server. Check your internet connection and try again.',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  let payload: { success: true; data: VehicleDetail } | ApiFailure;
-  try {
-    payload = (await response.json()) as { success: true; data: VehicleDetail } | ApiFailure;
-  } catch {
-    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
-  }
-  if (!payload.success) {
-    throw new ChartRequestError(payload.error || 'Could not load your Human Design. Please try again.');
-  }
-  return payload.data;
+export function requestVehicle(): Promise<VehicleDetail> {
+  return postApp<VehicleDetail>('/api/app/vehicle', {}, 'Could not load your Human Design. Please try again.');
 }
 
-
-async function postApp<T>(path: string, body: Record<string, unknown>, failure: string): Promise<T> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-  } catch {
-    throw new ChartRequestError(
-      'Could not reach the T3D server. Check your internet connection and try again.',
-    );
-  } finally {
-    clearTimeout(timer);
-  }
-
-  let payload: { success: true; data: T } | ApiFailure;
-  try {
-    payload = (await response.json()) as { success: true; data: T } | ApiFailure;
-  } catch {
-    throw new ChartRequestError('The server sent back something unexpected. Please try again.');
-  }
-  if (!payload.success) throw new ChartRequestError(payload.error || failure);
-  return payload.data;
-}
-
-/** Emails a fresh 6-digit code for the optional insights list. */
+/**
+ * Emails a fresh 6-digit code for the optional insights list.
+ *
+ * This and the next one are not app-data requests: they prove the person controls that email
+ * address, so the lead id and the address are the point rather than a credential, and they do not
+ * use the session token.
+ */
 export function requestOptInCode(leadId: number, email: string): Promise<void> {
-  return postApp<void>('/api/email-optin/send', { leadId, email }, 'We could not send the code. Please try again.');
+  return postPublic<void>('/api/email-optin/send', { leadId, email }, 'We could not send the code. Please try again.');
 }
 
 /** Checks the emailed code. Only a correct code records the opt-in. */
 export function confirmOptInCode(leadId: number, email: string, code: string): Promise<void> {
-  return postApp<void>('/api/email-optin/confirm', { leadId, email, code }, 'That code did not work. Please try again.');
+  return postPublic<void>('/api/email-optin/confirm', { leadId, email, code }, 'That code did not work. Please try again.');
 }
 
 /** One glossary entry ("tap any term"), with an "In your chart" line. */
-export function requestExplain(leadId: number, email: string, id: string, premium = false): Promise<ExplainEntry> {
-  return postApp<ExplainEntry>('/api/app/explain', { leadId, email, id, premium }, 'Could not load that explanation.');
+export function requestExplain(id: string, premium = false): Promise<ExplainEntry> {
+  return postApp<ExplainEntry>('/api/app/explain', { id, premium }, 'Could not load that explanation.');
 }
 
 /** Every glossary term, for the searchable Glossary screen. */
-export async function requestGlossary(leadId: number, email: string): Promise<GlossaryItem[]> {
-  const data = await postApp<{ entries: GlossaryItem[] }>('/api/app/glossary', { leadId, email }, 'Could not load the glossary.');
+export async function requestGlossary(): Promise<GlossaryItem[]> {
+  const data = await postApp<{ entries: GlossaryItem[] }>('/api/app/glossary', {}, 'Could not load the glossary.');
   return data.entries;
 }
 
@@ -490,72 +413,63 @@ export interface TransitCardRequest {
   applying: boolean;
 }
 
-export function requestTransitCard(
-  leadId: number,
-  email: string,
-  hit: TransitCardRequest,
-): Promise<TransitCardData> {
+export function requestTransitCard(hit: TransitCardRequest): Promise<TransitCardData> {
   return postApp<TransitCardData>(
     '/api/app/transit-card',
-    { leadId, email, ...hit },
+    { ...hit },
     'Could not load that transit. Please try again.',
   );
 }
 
-export function requestStoplight(
-  leadId: number,
-  email: string,
-  birthTimeKnown: boolean,
-): Promise<StoplightDetail> {
+export function requestStoplight(birthTimeKnown: boolean): Promise<StoplightDetail> {
   return postApp<StoplightDetail>(
     '/api/app/stoplight',
-    { leadId, email, birthTimeKnown },
+    { birthTimeKnown },
     'Could not load your astrology reading. Please try again.',
   );
 }
 
-export function requestTriadToday(
-  leadId: number,
-  email: string,
-  localDate: string,
-  at?: string,
-): Promise<TriadToday> {
+export function requestTriadToday(localDate: string, at?: string): Promise<TriadToday> {
   return postApp<TriadToday>(
     '/api/app/triad-today',
-    { leadId, email, localDate, ...(at ? { at, isToday: false } : {}) },
+    { localDate, ...(at ? { at, isToday: false } : {}) },
     'Could not build today’s reading. Please try again.',
   );
 }
 
-/** First-launch preview from a birth date alone. Nothing is saved. */
+/** First-launch preview from a birth date alone. Nothing is saved, and no session is needed. */
 export function requestBirthPreview(birthDate: string): Promise<BirthPreview> {
-  return postApp<BirthPreview>(
+  return postPublic<BirthPreview>(
     '/api/app/preview',
     { birthDate },
     'Could not build your preview. Please try again.',
   );
 }
 
-/** Deletes everything saved on the server for this person's email. */
-export function requestDeleteMyData(leadId: number, email: string): Promise<{ removed: number; blanked: number }> {
-  return postApp<{ removed: number; blanked: number }>(
+/**
+ * Deletes everything saved on the server for this person, and forgets the session token on this
+ * phone. The server ends the session at its end too, so a token that is somehow still around
+ * stops working at the same moment.
+ */
+export async function requestDeleteMyData(): Promise<{ removed: number; blanked: number }> {
+  const result = await postApp<{ removed: number; blanked: number }>(
     '/api/app/delete-data',
-    { leadId, email, confirm: true },
+    { confirm: true },
     'Could not delete your data. Please try again.',
   );
+  await clearSessionToken();
+  return result;
 }
 
-export function requestPractice(leadId: number, email: string, localDate: string): Promise<PracticeData> {
+export function requestPractice(localDate: string): Promise<PracticeData> {
   return postApp<PracticeData>(
     '/api/app/practice',
-    { leadId, email, localDate },
+    { localDate },
     'Could not load your practice. Please try again.',
   );
 }
 
 export function requestDecideTogether(
-  leadId: number,
-  email: string,
   localDate: string,
   youTimeKnown: boolean,
   partner: PartnerProfile,
@@ -563,8 +477,6 @@ export function requestDecideTogether(
   return postApp<DecideTogether>(
     '/api/app/decide-together',
     {
-      leadId,
-      email,
       localDate,
       youTimeKnown,
       partner: {
@@ -588,12 +500,13 @@ export interface PlaceCandidate {
   utcOffset: string | null;
 }
 
+/** Looking up a birth city happens during onboarding, before there is a session. */
 export async function requestPlaceCheck(
   city: string,
   country: string,
   birthDate: string,
 ): Promise<PlaceCandidate[]> {
-  const data = await postApp<{ candidates: PlaceCandidate[] }>(
+  const data = await postPublic<{ candidates: PlaceCandidate[] }>(
     '/api/app/place-check',
     { city, country, birthDate },
     'Could not look up that place. Please try again.',
@@ -609,32 +522,39 @@ export interface InvitePreview {
   sunSign: string | null;
 }
 
-/** Makes a signed 30-day invite link for the person with this chart. */
+/** Makes a signed 30-day invite link for the person whose session this is. */
 export function requestInviteCreate(
-  leadId: number, email: string, showName: boolean, timeKnown: boolean,
+  showName: boolean,
+  timeKnown: boolean,
 ): Promise<{ token: string; url: string }> {
   return postApp<{ token: string; url: string }>(
     '/api/app/invite',
-    { action: 'create', leadId, email, showName, timeKnown },
+    { action: 'create', showName, timeKnown },
     'We could not make the invite. Please try again.',
   );
 }
 
+/** Whoever opens an invite link has no session of their own, so this one is unsigned. */
 export function requestInvitePreview(token: string): Promise<InvitePreview> {
-  return postApp<InvitePreview>('/api/app/invite', { action: 'preview', token }, 'This invite is no longer available.');
+  return postPublic<InvitePreview>('/api/app/invite', { action: 'preview', token }, 'This invite is no longer available.');
 }
 
-/** Who is opening the invite: someone with a saved chart, or just a birth date (time and place are optional). */
+/**
+ * Who is opening the invite. `{ saved: true }` means "use my own saved chart", which travels on the
+ * session token rather than in the body; anyone else gives a birth date, with the time and place
+ * optional.
+ */
 export type InviteViewer =
-  | { leadId: number; email: string }
+  | { saved: true }
   | { birthDate: string; birthTime: string | null; place: { latitude: number; longitude: number; timezone: string } | null };
 
 export function requestInviteTogether(
   token: string, localDate: string, you: InviteViewer, youTimeKnown = true,
 ): Promise<DecideTogether> {
-  return postApp<DecideTogether>(
-    '/api/app/invite',
-    { action: 'together', token, localDate, youTimeKnown, you },
-    'Could not build your reading. Please try again.',
-  );
+  const body = { action: 'together', token, localDate, youTimeKnown, you };
+  const failure = 'Could not build your reading. Please try again.';
+  // Someone reading the invite on their own chart is signed in; someone who typed a birth date is not.
+  return 'saved' in you
+    ? postApp<DecideTogether>('/api/app/invite', body, failure)
+    : postPublic<DecideTogether>('/api/app/invite', body, failure);
 }

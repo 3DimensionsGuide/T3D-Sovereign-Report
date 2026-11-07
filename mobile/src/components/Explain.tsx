@@ -83,7 +83,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
     setEntry(null);
-    requestExplain(leadId, email, currentId, premium)
+    requestExplain(currentId, premium)
       .then((e) => {
         cache.set(key, e);
         if (active) setEntry(e);

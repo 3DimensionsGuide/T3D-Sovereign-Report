@@ -9,8 +9,7 @@ import { PinnedBar } from './PinnedBar';
 /** A small bodygraph pinned to the top of the Vehicle reading. It lights the center whose card was opened last, and names whichever card was opened last. */
 export function StickyMiniBody({ focusId, openCard }: { focusId: string | null; openCard: string | null }) {
   const chart = useT3DStore((s) => s.chart);
-  const profile = useT3DStore((s) => s.profile);
-  const hd = useChartData(chart?.leadId, profile?.email.trim()).data?.humanDesign;
+  const hd = useChartData(chart?.leadId).data?.humanDesign;
   if (!hd) return null;
   const defined = focusId ? hd.definedCenters.includes(focusId) : false;
   return (

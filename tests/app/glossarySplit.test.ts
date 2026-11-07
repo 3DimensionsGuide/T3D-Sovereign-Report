@@ -30,5 +30,5 @@ test('the explain route reads premium from the request, and the app asks per Pre
   assert.match(read('src/app/api/app/explain/route.ts'), /gateEntry\(entry, body\.premium === true\)/);
   const ex = read('mobile/src/components/Explain.tsx');
   assert.match(ex, /\$\{premium \? 'p' : 'f'\}/);
-  assert.match(ex, /requestExplain\(leadId, email, currentId, premium\)/);
+  assert.match(ex, /requestExplain\(currentId, premium\)/);
 });

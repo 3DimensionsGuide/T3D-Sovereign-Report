@@ -19,6 +19,7 @@ import { calculateHumanDesign } from '@/server/engines/human_design';
 import { resolveGeoAndTimezone } from '@/server/geocoding';
 import type { T3DCalculatorInput } from '@/server/engines/types';
 import { limitRequest } from '@/server/rateLimit';
+import { makeAppSessionToken } from '@/server/appTokens';
 import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
@@ -130,16 +131,18 @@ export async function POST(
     });
 
     let leadId: number | undefined;
+    let sessionEpoch = 1;
     if (existing) {
-      await db.update(leads).set({
+      const updated = await db.update(leads).set({
         firstName:  body.firstName.trim(),
         lastName:   body.lastName.trim(),
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
         updatedAt:  new Date(),
-      }).where(eq(leads.id, existing.id));
+      }).where(eq(leads.id, existing.id)).returning({ id: leads.id, sessionEpoch: leads.sessionEpoch });
       leadId = existing.id;
+      sessionEpoch = updated[0]?.sessionEpoch ?? 1;
     } else {
       const inserted = await db.insert(leads).values({
         email,
@@ -148,10 +151,21 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
-      }).returning({ id: leads.id });
+      }).returning({ id: leads.id, sessionEpoch: leads.sessionEpoch });
       leadId = inserted[0]?.id;
+      sessionEpoch = inserted[0]?.sessionEpoch ?? 1;
     }
     if (!leadId) throw new Error('Database write returned no ID.');
+
+    // 5a. A session token for the T3D app, which asks for one with wantSession.
+    //
+    //     This is the only place a token is ever made, and it is only ever made for the row this
+    //     request just wrote — so there is no endpoint anywhere that will trade an email address
+    //     for someone else's chart. An app that has lost its token recalculates from the birth
+    //     details it already holds, which lands here and gets a fresh one.
+    //
+    //     The website's own calculator does not ask for a token and so is not sent one.
+    const sessionToken = body.wantSession === true ? makeAppSessionToken(leadId, sessionEpoch) : null;
 
     // 5b. Marketing opt-in is only recorded after the person types back an emailed code.
     //     Ticking the box here just sends the code.
@@ -166,6 +180,7 @@ export async function POST(
       success: true,
       leadId,
       optInCode,
+      ...(sessionToken ? { sessionToken } : {}),
       data: {
         astrology: {
           tropicalSun:       astrologyResults.tropical.sun,

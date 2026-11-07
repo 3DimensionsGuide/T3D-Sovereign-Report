@@ -20,8 +20,7 @@ import { colors, fonts, space } from '@/theme/tokens';
 export function BodygraphChip({ today }: { today?: TodayResult | null }) {
   const router = useRouter();
   const chart = useT3DStore((s) => s.chart);
-  const profile = useT3DStore((s) => s.profile);
-  const hd = useChartData(chart?.leadId, profile?.email.trim()).data?.humanDesign;
+  const hd = useChartData(chart?.leadId).data?.humanDesign;
 
   const chip = useMemo(
     () => (hd ? buildBodygraphChip(hd.definedCenters, today?.gates, hd.gates.map((g) => g.gate)) : null),

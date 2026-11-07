@@ -2,34 +2,34 @@
  * POST /api/app/explain
  * One glossary entry ("tap any term"), with a personal "In your chart" line.
  *
- * Body: { leadId: number, email: string, id: string, premium?: boolean }
+ * Body: { id: string, premium?: boolean }
  *   id examples: "astro:planet:saturn", "hd:gate:41", "num:7"
  *
- * Same access rule as the other app routes.
+ * Auth: an Authorization: Bearer header carrying the app's session token. See
+ * src/server/appAuth.ts — there is no email address in any app request any more.
  */
 
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
-import { db } from '@/server/db';
-import { leads } from '@/server/db/schema';
 import { buildEntry, gateEntry, type ChartContext } from '@/lib/app/glossary';
-import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
+import { limitRequest } from '@/server/rateLimit';
+import { authenticateApp } from '@/server/appAuth';
 
 interface ExplainRequest {
-  leadId?: unknown;
-  email?: unknown;
   id?: unknown;
   /** Whether the person has Premium. Without it the long explanation is not sent. */
   premium?: unknown;
 }
 
-const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 const ID_PATTERN = /^[A-Za-z0-9:_\-/ .]{1,64}$/;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const limited = await limitRequest(request, 'app');
   if (limited) return limited;
   try {
+    const auth = await authenticateApp(request);
+    if (!auth.ok) return auth.response;
+    const lead = auth.lead;
+
     let body: ExplainRequest;
     try {
       body = (await request.json()) as ExplainRequest;
@@ -37,18 +37,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const leadId = Number(body.leadId);
-    const email = typeof body.email === 'string' ? body.email.toLowerCase().trim() : '';
     const id = typeof body.id === 'string' ? body.id : '';
-    if (!Number.isInteger(leadId) || leadId < 1 || !email.includes('@') || !ID_PATTERN.test(id)) {
-      return NextResponse.json({ success: false, error: 'leadId, a valid email and an id are required' }, { status: 400 });
-    }
-
-    const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
-    const lead = rows[0];
-    if (!lead || lead.email.toLowerCase().trim() !== email) {
-      await noteAccessFailure(request);
-      return NextResponse.json(NOT_FOUND, { status: 404 });
+    if (!ID_PATTERN.test(id)) {
+      return NextResponse.json({ success: false, error: 'An id is required' }, { status: 400 });
     }
 
     const results = lead.results as unknown as {

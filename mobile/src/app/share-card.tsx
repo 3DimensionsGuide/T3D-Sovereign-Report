@@ -69,9 +69,9 @@ export default function ShareCard() {
   const [screen, setScreen] = useState<WallpaperVariant>('lock');
   const [lens, setLens] = useState<Lens>('vehicle');
   const tall = (kind === 'profile' || kind === 'sigil') && shape === 'story';
-  const triad = useTriadToday(chart?.leadId, profile?.email.trim());
+  const triad = useTriadToday(chart?.leadId);
   // The Birth Number comes from the server's numerology reading, so the day of birth never leaves it.
-  const numerology = useNumerology(chart?.leadId, profile?.email.trim());
+  const numerology = useNumerology(chart?.leadId);
   const birthNumber = numerology.data?.birthday?.number ?? null;
   const [withName, setWithName] = useState(false);
   const [withInvite, setWithInvite] = useState(false);
@@ -86,7 +86,7 @@ export default function ShareCard() {
    */
   async function messageFor(label: string, plain: string): Promise<string> {
     if (!withInvite || !chart || !profile) return plain;
-    const { url } = await requestInviteCreate(chart.leadId, profile.email.trim(), withName && profile.firstName.trim().length > 0, profile.birthTimeKnown !== false);
+    const { url } = await requestInviteCreate(withName && profile.firstName.trim().length > 0, profile.birthTimeKnown !== false);
     return cardInviteMessage(label, url);
   }
 

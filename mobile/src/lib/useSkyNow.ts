@@ -8,12 +8,12 @@ const HOUR_MS = 60 * 60 * 1000;
  * Where the planets are right now, for the wheel's "Now" ring. Saved on the phone for an hour.
  * `data` stays null when the server is older than the app and sends no positions, so the toggle stays hidden.
  */
-export function useSkyNow(leadId: number | undefined, email: string | undefined) {
+export function useSkyNow(leadId: number | undefined) {
   const day = useLocalDate();
   const result = useCachedLoad<{ positions: SkyPosition[] | null }>({
-    key: leadId && email ? `skynow|${leadId}|${day}` : null,
+    key: leadId ? `skynow|${leadId}|${day}` : null,
     fetcher: async () => {
-      const today = await requestToday(leadId as number, email as string);
+      const today = await requestToday();
       return { positions: today.positions && today.positions.length ? today.positions : null };
     },
     maxAgeMs: HOUR_MS,

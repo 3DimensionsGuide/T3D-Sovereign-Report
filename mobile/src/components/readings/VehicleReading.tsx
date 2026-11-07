@@ -220,9 +220,8 @@ function VehicleBody({ data, onFocusCenter }: { data: VehicleDetail; onFocusCent
 }
 
 export function VehicleReading({ onRefreshReady, onFocusCenter }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void; onFocusCenter?: (id: string, open: boolean) => void }) {
-  const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry, offline, savedAt, refresh } = useVehicle(chart?.leadId, profile?.email.trim());
+  const { data, error, loading, retry, offline, savedAt, refresh } = useVehicle(chart?.leadId);
 
   useEffect(() => {
     onRefreshReady?.({ run: refresh });

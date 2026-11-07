@@ -22,7 +22,7 @@ export interface BucketRule {
 export const BUCKETS = {
   /** Reading routes used by the app. */
   app: { limit: 120, windowSec: 60 },
-  /** Wrong leadId and email pairs. Past this, the caller is blocked from the app routes. */
+  /** Forged or malformed app session tokens. Past this, the caller is blocked from the app routes. */
   authFail: { limit: 15, windowSec: 15 * 60 },
   /** Creating a chart (writes a database row and looks up the place). */
   calculate: { limit: 10, windowSec: 60 * 60 },
@@ -98,12 +98,12 @@ export async function checkLimit(store: CounterStore, bucket: BucketName, id: st
   return count <= rule.limit ? { allowed: true, retryAfterSec: 0 } : { allowed: false, retryAfterSec: rule.windowSec };
 }
 
-/** True when this caller has made too many wrong leadId and email guesses recently. */
+/** True when this caller has offered too many bad app session tokens recently. */
 export async function isBlockedForGuessing(store: CounterStore, id: string): Promise<boolean> {
   return (await store.peek(keyFor('authFail', id))) >= BUCKETS.authFail.limit;
 }
 
-/** Records one wrong leadId and email pair for this caller. */
+/** Records one bad app session token from this caller. */
 export async function recordGuess(store: CounterStore, id: string): Promise<void> {
   await store.hit(keyFor('authFail', id), BUCKETS.authFail.windowSec);
 }

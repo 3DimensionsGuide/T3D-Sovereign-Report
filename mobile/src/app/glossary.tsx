@@ -66,8 +66,8 @@ export default function Glossary() {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<LensName | 'all' | 'yours'>('all');
-  const drawing = useChartData(chart?.leadId, profile?.email.trim());
-  const numerology = useNumerology(chart?.leadId, profile?.email.trim());
+  const drawing = useChartData(chart?.leadId);
+  const numerology = useNumerology(chart?.leadId);
   const yours = useMemo(
     () => (chart ? yourTermIds(chart, drawing.data, numerology.data) : new Set<string>()),
     [chart, drawing.data, numerology.data],
@@ -80,7 +80,7 @@ export default function Glossary() {
     setLoading(true);
     setError(null);
     try {
-      const list = await requestGlossary(chart.leadId, profile.email.trim());
+      const list = await requestGlossary();
       cached = { leadId: chart.leadId, items: list };
       setItems(list);
     } catch (err) {

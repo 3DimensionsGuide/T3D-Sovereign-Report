@@ -79,7 +79,7 @@ export default function InviteScreen() {
   const sawReading = !!data;
   useEffect(() => { if (sawReading) trackAction('invite_viewed'); }, [sawReading]);
   const onShow = () => {
-    if (hasChart) return void run({ leadId: chart.leadId, email: profile.email.trim() });
+    if (hasChart) return void run({ saved: true });
     // Someone without a chart: birth date, birth place and (unless unknown) birth time, all required.
     const c = candidates?.[chosen];
     if (!c) return void onCheckPlace();

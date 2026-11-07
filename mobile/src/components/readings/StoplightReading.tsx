@@ -247,7 +247,6 @@ export function StoplightReading({ onRefreshReady }: { onRefreshReady?: (r: { ru
   const chart = useT3DStore((s) => s.chart);
   const { data, error, loading, retry, offline, savedAt, refresh } = useStoplight(
     chart?.leadId,
-    profile?.email.trim(),
     profile?.birthTimeKnown !== false,
   );
 

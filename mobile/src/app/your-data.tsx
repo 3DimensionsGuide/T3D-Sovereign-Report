@@ -9,6 +9,7 @@ import { BackupCard } from '@/components/BackupCard';
 import { GoldButton } from '@/components/GoldButton';
 import { feedbackUrl } from '@/lib/feedback';
 import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
+import { clearSessionToken } from '@/lib/session';
 import { clearReminder } from '@/lib/reminder';
 import { clearAllCached } from '@/lib/persistentCache';
 import { crashReportingOn, sendTestCrashReport } from '@/lib/sentry';
@@ -50,7 +51,6 @@ const SECTIONS: Section[] = [
 ];
 
 export default function YourData() {
-  const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,10 +59,12 @@ export default function YourData() {
     setError(null);
     setBusy(true);
     try {
-      if (chart?.leadId && profile?.email) {
-        await requestDeleteMyData(chart.leadId, profile.email);
+      if (chart?.leadId) {
+        await requestDeleteMyData();
       }
       // Only clear the phone after the server confirmed, so a failed attempt can be retried.
+      // The session token goes too, including when there was no server record to delete.
+      await clearSessionToken();
       useT3DStore.getState().reset();
       usePartnerStore.getState().clearPartner();
       usePracticeStore.getState().clearAll();

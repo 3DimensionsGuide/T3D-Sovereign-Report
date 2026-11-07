@@ -11,9 +11,8 @@ import { PinnedBar } from './PinnedBar';
 /** The four Pinnacles pinned to the top of the Road reading, with the card opened last named beside them. */
 export function StickyMiniRoad({ openCard }: { openCard: string | null }) {
   const chart = useT3DStore((s) => s.chart);
-  const profile = useT3DStore((s) => s.profile);
   const today = useLocalDate();
-  const { data } = useNumerology(chart?.leadId, profile?.email.trim());
+  const { data } = useNumerology(chart?.leadId);
   const pin = useMemo(() => {
     if (!data) return null;
     return roadPin(data.lifePath.display, buildRoadStrip(data.pinnacles, data.challenges, today, null));

@@ -14,6 +14,7 @@ export interface T3DCalculatorInput {
   birthPlace: BirthPlace;
   email: string;              // Required — lead capture + report delivery
   emailOptIn?: boolean;       // Optional — true only when the person ticked the marketing box
+  wantSession?: boolean;      // Optional — the T3D app asks for a session token back (src/server/appTokens.ts)
 }
 
 export interface BirthPlace {

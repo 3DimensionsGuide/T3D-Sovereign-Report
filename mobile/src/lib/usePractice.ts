@@ -5,11 +5,11 @@ import { FOREVER, useCachedLoad } from '@/lib/useCachedLoad';
 import { useLocalDate } from '@/lib/useLocalDate';
 
 /** One reading per chart per day. It loads the new day by itself when the date changes. */
-export function usePractice(leadId: number | undefined, email: string | undefined) {
+export function usePractice(leadId: number | undefined) {
   const day = useLocalDate();
   const result = useCachedLoad<PracticeData>({
-    key: leadId && email ? `practice|${leadId}|${day}` : null,
-    fetcher: () => requestPractice(leadId as number, email as string, localDateString()),
+    key: leadId ? `practice|${leadId}|${day}` : null,
+    fetcher: () => requestPractice(localDateString()),
     maxAgeMs: FOREVER,
   });
   return result;

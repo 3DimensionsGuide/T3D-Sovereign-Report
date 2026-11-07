@@ -1,10 +1,13 @@
 /**
- * Guards the access rule on every /api/app route that reads a saved chart:
- * leadId must pair with the lead's email, a wrong id and a wrong email must get
- * the identical 404, and each failure must be counted for guess-blocking.
+ * Guards the access rule on every /api/app route that reads a saved chart: the caller must carry a
+ * signed session token, the check must happen before anything else in the route, and every way of
+ * failing it must look the same from outside.
  *
- * These read the route source on purpose. They fail if someone adds or edits a
- * route and drops one of the rules.
+ * The check itself lives in src/server/appAuth.ts and is tested in tests/security/appAuth.test.ts.
+ * What these tests hold in place is that every route actually uses it, and uses it first.
+ *
+ * These read the route source on purpose. They fail if someone adds or edits a route and drops one
+ * of the rules.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -25,33 +28,56 @@ test('every app route is rate limited', () => {
   for (const r of routes) assert.match(r.src, /limitRequest\(request, '(app|place|preview|event)'\)/, r.name);
 });
 
-test('every chart route pairs the lead id with the email', () => {
+test('every chart route checks the session token, and nothing else identifies the caller', () => {
   for (const r of chartRoutes) {
-    assert.match(r.src, /eq\(leads\.id, leadId\)/, `${r.name}: looks up by id`);
-    assert.match(r.src, /lead\.email\.toLowerCase\(\)\.trim\(\) !== email/, `${r.name}: checks email`);
-    assert.match(r.src, /Number\.isInteger\(leadId\)/, `${r.name}: validates id`);
+    assert.match(r.src, /import \{ authenticateApp \} from '@\/server\/appAuth'/, `${r.name}: imports the check`);
+    assert.match(r.src, /const auth = await authenticateApp\(request\);/, `${r.name}: runs the check`);
+    assert.doesNotMatch(r.src, /body\.leadId|body\.email/, `${r.name}: still takes a credential from the body`);
   }
 });
 
-test('wrong id and wrong email share one 404 and both count as a failed guess', () => {
+test('the session check is the first thing every chart route does', () => {
   for (const r of chartRoutes) {
-    assert.match(r.src, /if \(!lead \|\| lead\.email[^)]*\)[^{]*\{\s*await noteAccessFailure\(request\);\s*return NextResponse\.json\(NOT_FOUND, \{ status: 404 \}\);/, r.name);
+    const auth = r.src.indexOf('await authenticateApp(request)');
+    const body = r.src.indexOf('await request.json()');
+    assert.ok(auth > -1, r.name);
+    // An unauthenticated caller never gets as far as having their body parsed.
+    if (body > -1) assert.ok(auth < body, `${r.name}: parses the body before checking the session`);
   }
 });
 
-test('the not-found message is identical across routes and reveals nothing', () => {
-  const msgs = new Set(chartRoutes.map((r) => /const NOT_FOUND = (\{[^;]+\});/.exec(r.src)?.[1]));
-  assert.equal(msgs.size, 1);
-  const only = [...msgs][0]!;
-  assert.ok(!/email|id /i.test(only.replace('We could not find that chart. Please recalculate it.', '')));
+test('every route hands back the access check\'s own answer, unchanged', () => {
+  for (const r of chartRoutes) {
+    assert.match(r.src, /if \(!auth\.ok\) return auth\.response;/, r.name);
+  }
+});
+
+test('one shared answer covers every way of failing, and it counts forged tokens as guesses', () => {
+  const auth = readFileSync(join(process.cwd(), 'src/server/appAuth.ts'), 'utf8');
+  // No token, a forged one, an expired one, a revoked one and a lead that is gone are one response.
+  assert.equal((auth.match(/response: unauthorized\(\)/g) ?? []).length, 2);
+  assert.match(auth, /lead\.sessionEpoch !== check\.epoch/);
+  assert.match(auth, /await noteAccessFailure\(request\)/);
+});
+
+test('there is one access-failure message, in one place, and it reveals nothing', () => {
+  for (const r of chartRoutes) {
+    assert.doesNotMatch(r.src, /const NOT_FOUND =/, `${r.name}: keeps its own access-failure message`);
+  }
+  const auth = readFileSync(join(process.cwd(), 'src/server/appAuth.ts'), 'utf8');
+  const message = /error: '([^']+)'/.exec(auth)?.[1];
+  assert.ok(message, 'appAuth states a message');
+  assert.doesNotMatch(message!, /email|lead|id\b|token/i, 'the message names nothing about the account');
 });
 
 test('no chart data is read before the access check', () => {
   for (const r of chartRoutes) {
-    const check = r.src.indexOf('lead.email.toLowerCase()');
-    const useOfResults = r.src.indexOf('lead.results');
+    const check = r.src.indexOf('if (!auth.ok) return auth.response;');
     assert.ok(check > -1, r.name);
-    if (useOfResults > -1) assert.ok(useOfResults > check, `${r.name}: results read after the check`);
+    for (const field of ['lead.results', 'lead.birthData', 'lead.firstName', 'lead.middleName', 'lead.lastName']) {
+      const use = r.src.indexOf(field);
+      if (use > -1) assert.ok(use > check, `${r.name}: ${field} read before the check`);
+    }
   }
 });
 
@@ -80,10 +106,13 @@ test('the invite route checks the signed token before it reads anyone\'s chart',
   assert.match(src, /if \(check\.reason === 'invalid'\) await noteAccessFailure\(request\)/, 'a forged token counts as a failed guess');
 });
 
-test('the invite route pairs a viewer\'s lead id with their email, and never sends the sender\'s birth details back', () => {
+test('the invite route reads a viewer\'s own chart only on their session token, and never sends the sender\'s birth details back', () => {
   const src = routes.find((r) => r.name === 'invite')!.src;
-  assert.match(src, /viewer\.email\.toLowerCase\(\)\.trim\(\) !== viewerEmail/);
-  assert.match(src, /lead\.email\.toLowerCase\(\)\.trim\(\) !== email/);
+  // "Use my saved chart" asks for nothing in the body; it is granted by the token or not at all.
+  assert.match(src, /if \(y\.saved === true\) \{[\s\S]{0,160}await authenticateApp\(request\)/);
+  assert.doesNotMatch(src, /y\.leadId|y\.email/, 'the viewer is still named in the body');
+  // Making a link needs the sender's own session.
+  assert.match(src, /body\.action === 'create'\) \{\s*const auth = await authenticateApp\(request\);/);
   const preview = src.slice(src.indexOf("body.action === 'preview'"), src.indexOf('// ---- together ----'));
   assert.doesNotMatch(preview, /birth|latitude|longitude|timezone|email/i);
   assert.match(src, /isUnderMinimumAge\(y\.birthDate\)/, 'refuses a first look for an under-age birth date');

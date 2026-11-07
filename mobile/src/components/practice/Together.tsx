@@ -499,7 +499,7 @@ function Reading({ member, onBack, onEdit }: { member: TribeMember; onBack: () =
     setError(null);
     setLoading(true);
     try {
-      setData(await requestDecideTogether(chart.leadId, profile.email.trim(), localDateString(), profile.birthTimeKnown !== false, partner));
+      setData(await requestDecideTogether(localDateString(), profile.birthTimeKnown !== false, partner));
     } catch (e) {
       setError(e instanceof ChartRequestError ? e.message : 'Something went wrong. Please try again.');
     } finally {

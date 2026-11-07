@@ -3,10 +3,10 @@ import type { VehicleDetail } from '@/lib/vehicleTypes';
 import { ONE_DAY_MS, useCachedLoad } from '@/lib/useCachedLoad';
 
 /** A saved copy opens instantly and works with no signal; it refreshes in the background after a day. */
-export function useVehicle(leadId: number | undefined, email: string | undefined) {
+export function useVehicle(leadId: number | undefined) {
   const result = useCachedLoad<VehicleDetail>({
-    key: leadId && email ? `vehicle|${leadId}` : null,
-    fetcher: () => requestVehicle(leadId as number, email as string),
+    key: leadId ? `vehicle|${leadId}` : null,
+    fetcher: () => requestVehicle(),
     maxAgeMs: ONE_DAY_MS,
   });
   return result;

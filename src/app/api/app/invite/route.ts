@@ -4,7 +4,7 @@
  *
  * Actions (the body's "action" field):
  *
- *  create   { leadId, email, showName, timeKnown }
+ *  create   { showName, timeKnown }   (needs the sender's Authorization: Bearer header)
  *           The sender makes a signed 30-day link. It carries no birth data.
  *           -> { token, url }
  *
@@ -13,9 +13,10 @@
  *           Type, Life Path and Sun sign. Never a birth date, time or place.
  *           -> { firstName, type, lifePath, sunSign }
  *
- *  together { token, localDate, youTimeKnown?, you: { leadId, email } | { birthDate, birthTime, place } }
- *           The "you and them" reading. "you" is the person who opened the link: either their saved chart,
- *           or their birth date and birth place (required) with a birth time (null when they do not know it).
+ *  together { token, localDate, youTimeKnown?, you: { saved: true } | { birthDate, birthTime, place } }
+ *           The "you and them" reading. "you" is the person who opened the link: either their own saved
+ *           chart ({ saved: true }, which needs their Authorization: Bearer header), or their birth date
+ *           and birth place (required) with a birth time (null when they do not know it).
  *           Their details are used to calculate and then discarded: nothing is written to the database or
  *           to the logs, and the sender's birth details are never sent back.
  *           -> the same data as /api/app/decide-together
@@ -30,11 +31,11 @@ import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { computeTogether, type TogetherSide } from '@/server/togetherCompute';
 import { checkInviteToken, makeInviteToken } from '@/server/inviteLinks';
+import { authenticateApp } from '@/server/appAuth';
 import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
 
 const GONE = { success: false, error: 'This invite is no longer available. Ask your friend for a new one.' };
-const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 const BAD_YOU = { success: false, error: 'Please check your birth details and try again.' };
 
 const isDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
@@ -86,17 +87,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     // ---- create ----
     if (body.action === 'create') {
-      const leadId = Number(body.leadId);
-      const email = typeof body.email === 'string' ? body.email.toLowerCase().trim() : '';
-      if (!Number.isInteger(leadId) || leadId < 1 || !email.includes('@')) {
-        return NextResponse.json({ success: false, error: 'leadId and a valid email are required' }, { status: 400 });
-      }
-      const lead = await loadLead(leadId);
-      if (!lead || lead.email.toLowerCase().trim() !== email) {
-        await noteAccessFailure(request);
-        return NextResponse.json(NOT_FOUND, { status: 404 });
-      }
-      const token = makeInviteToken(leadId, { showName: body.showName === true, timeKnown: body.timeKnown !== false });
+      const auth = await authenticateApp(request);
+      if (!auth.ok) return auth.response;
+      const token = makeInviteToken(auth.lead.id, { showName: body.showName === true, timeKnown: body.timeKnown !== false });
       if (!token) {
         return NextResponse.json({ success: false, error: 'Invites are not available right now.' }, { status: 503 });
       }
@@ -151,24 +144,20 @@ export async function POST(request: Request): Promise<NextResponse> {
       };
 
       const y = body.you as {
-        leadId?: unknown; email?: unknown; birthDate?: unknown; birthTime?: unknown;
+        saved?: unknown; birthDate?: unknown; birthTime?: unknown;
         place?: { latitude?: unknown; longitude?: unknown; timezone?: unknown } | null;
       } | undefined;
       if (!y || typeof y !== 'object') return NextResponse.json(BAD_YOU, { status: 400 });
 
       let you: TogetherSide;
-      if (y.leadId !== undefined) {
-        // The viewer already has a chart: use it, after the same email check every app route makes.
-        const viewerId = Number(y.leadId);
-        const viewerEmail = typeof y.email === 'string' ? y.email.toLowerCase().trim() : '';
-        if (!Number.isInteger(viewerId) || viewerId < 1 || !viewerEmail.includes('@')) {
-          return NextResponse.json({ success: false, error: 'leadId and a valid email are required' }, { status: 400 });
-        }
-        const viewer = await loadLead(viewerId);
-        if (!viewer || viewer.email.toLowerCase().trim() !== viewerEmail) {
-          await noteAccessFailure(request);
-          return NextResponse.json(NOT_FOUND, { status: 404 });
-        }
+      if (y.saved === true) {
+        // The viewer already has a chart of their own: use it, on their session token.
+        const auth = await authenticateApp(request);
+        if (!auth.ok) return auth.response;
+        const viewer = {
+          birth: auth.lead.birthData as LeadView['birth'],
+          results: auth.lead.results as unknown as LeadView['results'],
+        };
         const vb = viewer.birth;
         if (!vb?.date || !isDate(vb.date)) {
           return NextResponse.json({ success: false, error: 'This chart is missing data. Please recalculate it.' }, { status: 422 });

@@ -25,8 +25,7 @@ interface Props {
 export function RoadStrip({ date, personalYear }: Props) {
   const router = useRouter();
   const chart = useT3DStore((s) => s.chart);
-  const profile = useT3DStore((s) => s.profile);
-  const { data } = useNumerology(chart?.leadId, profile?.email.trim());
+  const { data } = useNumerology(chart?.leadId);
 
   const model = useMemo(
     () => (data ? buildRoadStrip(data.pinnacles, data.challenges, date, personalYear) : null),

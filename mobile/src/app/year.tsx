@@ -21,9 +21,8 @@ function dayLabel(isoDay: string): string {
 }
 
 export default function YearAheadScreen() {
-  const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
+  const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, 60);
   const premium = usePremium();
   const y = premium ? data?.yearAhead : undefined;
 

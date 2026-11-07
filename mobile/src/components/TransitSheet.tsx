@@ -39,7 +39,7 @@ export function TransitSheet({ hit, onClose }: { hit: DailyTransitHit | null; on
     let live = true;
     setCard(null);
     setError(null);
-    requestTransitCard(chart.leadId, profile.email, {
+    requestTransitCard({
       transiting: hit.transiting,
       natal: hit.natal,
       aspect: hit.aspect,

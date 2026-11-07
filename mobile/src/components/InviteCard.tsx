@@ -26,7 +26,7 @@ export function InviteCard() {
     setError(null);
     setBusy(true);
     try {
-      const { url } = await requestInviteCreate(chart.leadId, profile.email.trim(), showName, profile.birthTimeKnown !== false);
+      const { url } = await requestInviteCreate(showName, profile.birthTimeKnown !== false);
       const result = await Share.share({ message: inviteMessage(showName ? first : null, url) });
       if (result.action === Share.sharedAction) { success(); trackAction('invite_sent'); }
     } catch (e) {

@@ -177,14 +177,14 @@ export default function Today() {
     }
 
     // Numerology of the day and the triad load alongside the sky; if they fail the sky still shows.
-    const dayNumP = requestDayNumerology(chart.leadId, profile.email, localDate)
+    const dayNumP = requestDayNumerology(localDate)
       .then((d) => { if (stillCurrent()) setDayNum(d); return d; })
       .catch(() => null);
-    const triadP = requestTriadToday(chart.leadId, profile.email, localDate, at)
+    const triadP = requestTriadToday(localDate, at)
       .then((d) => { if (stillCurrent()) setTriad(d); return d; })
       .catch(() => null);
     try {
-      const result = await requestToday(chart.leadId, profile.email, at);
+      const result = await requestToday(at);
       if (!stillCurrent()) return;
       setToday(result);
       setOffline(false);

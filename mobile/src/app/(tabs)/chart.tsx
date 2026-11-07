@@ -47,8 +47,8 @@ export default function Chart() {
   useEffect(() => {
     if (requestedView === 'bodygraph' || requestedView === 'wheel') setView(requestedView);
   }, [requestedView, requestedAt]);
-  const drawing = useChartData(chart?.leadId, profile?.email.trim());
-  const skyNow = useSkyNow(chart?.leadId, profile?.email.trim());
+  const drawing = useChartData(chart?.leadId);
+  const skyNow = useSkyNow(chart?.leadId);
 
   const openLens = (lens: LensName) => {
     router.push({ pathname: '/readings', params: { lens, t: String(Date.now()) } } as unknown as Href);

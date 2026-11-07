@@ -13,9 +13,8 @@ import { colors, fonts } from '@/theme/tokens';
  */
 export function MiniRoad() {
   const chart = useT3DStore((s) => s.chart);
-  const profile = useT3DStore((s) => s.profile);
   const today = useLocalDate();
-  const { data } = useNumerology(chart?.leadId, profile?.email.trim());
+  const { data } = useNumerology(chart?.leadId);
   const road = useMemo(() => {
     const model = data ? buildRoadStrip(data.pinnacles, data.challenges, today, null) : null;
     return model ? buildMiniRoad(model) : null;

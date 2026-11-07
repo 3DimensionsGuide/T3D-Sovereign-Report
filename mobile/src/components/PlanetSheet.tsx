@@ -29,7 +29,7 @@ function useEntry(id: string | null): ExplainEntry | null {
     if (hit) { setEntry(hit); return; }
     let live = true;
     setEntry(null);
-    requestExplain(chart.leadId, profile.email.trim(), id, premium)
+    requestExplain(id, premium)
       .then((e) => { cache.set(key, e); if (live) setEntry(e); })
       .catch(() => undefined);
     return () => { live = false; };

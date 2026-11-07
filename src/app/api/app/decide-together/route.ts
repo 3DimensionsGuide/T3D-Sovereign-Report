@@ -3,11 +3,13 @@
  * Builds the "decide together" frame for you and one other person.
  *
  * Body: {
- *   leadId, email,               // your chart (same access rule as the other app routes)
  *   localDate: "YYYY-MM-DD",
  *   youTimeKnown?: boolean,
  *   partner: { label, birthDate, birthTime: "HH:MM" | null, latitude, longitude, timezone }
  * }
+ *
+ * Auth: an Authorization: Bearer header carrying the app's session token. See
+ * src/server/appAuth.ts — there is no email address in any app request any more.
  *
  * Also returns channel connections, a numerology pair and sky connections.
  * The other person's details are used to calculate and are then discarded:
@@ -15,14 +17,11 @@
  */
 
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
-import { db } from '@/server/db';
-import { leads } from '@/server/db/schema';
 import { computeTogether } from '@/server/togetherCompute';
-import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
+import { limitRequest } from '@/server/rateLimit';
+import { authenticateApp } from '@/server/appAuth';
 
-const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
 const BAD_PARTNER = { success: false, error: 'Please check the other person’s birth details and try again.' };
 
 const isDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
@@ -38,8 +37,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   const limited = await limitRequest(request, 'app');
   if (limited) return limited;
   try {
+    const auth = await authenticateApp(request);
+    if (!auth.ok) return auth.response;
+    const lead = auth.lead;
+
     let body: {
-      leadId?: unknown; email?: unknown; localDate?: unknown; youTimeKnown?: unknown;
+      localDate?: unknown; youTimeKnown?: unknown;
       partner?: { label?: unknown; birthDate?: unknown; birthTime?: unknown; latitude?: unknown; longitude?: unknown; timezone?: unknown };
     };
     try {
@@ -48,12 +51,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const leadId = Number(body.leadId);
-    const email = typeof body.email === 'string' ? body.email.toLowerCase().trim() : '';
     const localDate = body.localDate;
-    if (!Number.isInteger(leadId) || leadId < 1 || !email.includes('@')) {
-      return NextResponse.json({ success: false, error: 'leadId and a valid email are required' }, { status: 400 });
-    }
     if (!isDate(localDate)) {
       return NextResponse.json({ success: false, error: 'localDate must be YYYY-MM-DD' }, { status: 400 });
     }
@@ -66,13 +64,6 @@ export async function POST(request: Request): Promise<NextResponse> {
       typeof p.timezone !== 'string' || !DateTime.local().setZone(p.timezone).isValid
     ) {
       return NextResponse.json(BAD_PARTNER, { status: 400 });
-    }
-
-    const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
-    const lead = rows[0];
-    if (!lead || lead.email.toLowerCase().trim() !== email) {
-      await noteAccessFailure(request);
-      return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 
     const results = lead.results as unknown as { humanDesign?: { type?: string; authority?: string } } | null;

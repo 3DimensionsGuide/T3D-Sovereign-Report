@@ -2,51 +2,42 @@
  * POST /api/app/delete-data
  * "Delete my data" in the T3D app.
  *
- * Body: { leadId: number, email: string, confirm: true }
+ * Body: { confirm: true }
  *
  * Removes every saved record for that email. Records that an order points to
  * are kept only as a blanked shell, so payment history stays intact without any
  * personal details. Stripe and Resend keep their own records under their own
  * policies; the privacy page says so.
  *
- * Access check: the lead id must be paired with the email on that lead. A wrong
- * id and a wrong email get the identical 404, so ids can't be probed.
+ * Auth: an Authorization: Bearer header carrying the app's session token. See
+ * src/server/appAuth.ts — there is no email address in any app request any more.
  */
 
 import { NextResponse } from 'next/server';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads, orders } from '@/server/db/schema';
 import { blankedLead, planDeletion } from '@/server/dataDeletion';
-import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
-
-const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
+import { limitRequest } from '@/server/rateLimit';
+import { authenticateApp } from '@/server/appAuth';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const limited = await limitRequest(request, 'app');
   if (limited) return limited;
   try {
-    let body: { leadId?: unknown; email?: unknown; confirm?: unknown };
+    const auth = await authenticateApp(request);
+    if (!auth.ok) return auth.response;
+    const lead = auth.lead;
+
+    let body: { confirm?: unknown };
     try {
       body = (await request.json()) as typeof body;
     } catch {
       return NextResponse.json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const leadId = Number(body.leadId);
-    const email = typeof body.email === 'string' ? body.email.toLowerCase().trim() : '';
-    if (!Number.isInteger(leadId) || leadId < 1 || !email.includes('@')) {
-      return NextResponse.json({ success: false, error: 'leadId and a valid email are required' }, { status: 400 });
-    }
     if (body.confirm !== true) {
       return NextResponse.json({ success: false, error: 'Deleting needs confirmation.' }, { status: 400 });
-    }
-
-    const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
-    const lead = rows[0];
-    if (!lead || lead.email.toLowerCase().trim() !== email) {
-      await noteAccessFailure(request);
-      return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 
     const mine = await db.select({ id: leads.id }).from(leads).where(eq(leads.email, lead.email));
@@ -57,7 +48,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     const plan = planDeletion(ids, new Set(withOrders.map((o) => o.leadId)));
 
     for (const id of plan.blankIds) {
-      await db.update(leads).set({ ...blankedLead(id), updatedAt: new Date() }).where(eq(leads.id, id));
+      // Raising the session number ends every app session for this lead at once: the row has to
+      // stay because an order points at it, so without this a token handed out earlier would still
+      // be signed correctly and would open the blanked shell. A removed lead needs no such step —
+      // there is no row left to look up.
+      await db.update(leads).set({
+        ...blankedLead(id),
+        sessionEpoch: sql`${leads.sessionEpoch} + 1`,
+        updatedAt: new Date(),
+      }).where(eq(leads.id, id));
     }
     if (plan.removeIds.length) {
       await db.delete(leads).where(inArray(leads.id, plan.removeIds));

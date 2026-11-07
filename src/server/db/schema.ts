@@ -70,6 +70,11 @@ export const leads = pgTable(
     optInCodeAttempts:  integer('opt_in_code_attempts').default(0).notNull(),
     reportPurchased: boolean('report_purchased').default(false).notNull(),
 
+    // The lead's session number. Raising it makes every app session token already handed out for
+    // this lead stop working, which is how deleting your data revokes app access without keeping a
+    // list of live tokens anywhere. See src/server/appTokens.ts.
+    sessionEpoch: integer('session_epoch').default(1).notNull(),
+
     // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

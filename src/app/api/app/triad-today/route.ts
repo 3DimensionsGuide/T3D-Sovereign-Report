@@ -3,16 +3,13 @@
  * The daily Triad reading: one decision frame across the Vehicle, the Road
  * and the Stoplight.
  *
- * Body: { leadId: number, email: string, localDate: "YYYY-MM-DD", at?: ISO date-time }
+ * Body: { localDate: "YYYY-MM-DD", at?: ISO date-time }
  *
- * Same access rule as the other app routes (id must pair with the lead's
- * email; identical 404 otherwise).
+ * Auth: an Authorization: Bearer header carrying the app's session token. See
+ * src/server/appAuth.ts — there is no email address in any app request any more.
  */
 
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
-import { db } from '@/server/db';
-import { leads } from '@/server/db/schema';
 import { buildTriadToday } from '@/lib/app/triadToday';
 import { calculateDailySky, type NatalSkyPoints } from '@/server/engines/dailySky';
 import { calculateDayNumerology } from '@/server/engines/dayNumerology';
@@ -20,9 +17,8 @@ import { GATE_CENTER_MAP, UNIQUE_CHANNELS, longitudeToGate } from '@/server/engi
 import type { VehicleGateData } from '@/lib/app/signal';
 import type { AstrologyResult } from '@/server/engines/types';
 import { parseSkyInstant } from '@/lib/app/skyDate';
-import { limitRequest, noteAccessFailure } from '@/server/rateLimit';
-
-const NOT_FOUND = { success: false, error: 'We could not find that chart. Please recalculate it.' };
+import { limitRequest } from '@/server/rateLimit';
+import { authenticateApp } from '@/server/appAuth';
 
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
@@ -32,19 +28,18 @@ export async function POST(request: Request): Promise<NextResponse> {
   const limited = await limitRequest(request, 'app');
   if (limited) return limited;
   try {
-    let body: { leadId?: unknown; email?: unknown; localDate?: unknown; at?: unknown; isToday?: unknown };
+    const auth = await authenticateApp(request);
+    if (!auth.ok) return auth.response;
+    const lead = auth.lead;
+
+    let body: { localDate?: unknown; at?: unknown; isToday?: unknown };
     try {
       body = (await request.json()) as typeof body;
     } catch {
       return NextResponse.json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const leadId = Number(body.leadId);
-    const email = typeof body.email === 'string' ? body.email.toLowerCase().trim() : '';
     const localDate = typeof body.localDate === 'string' ? body.localDate : '';
-    if (!Number.isInteger(leadId) || leadId < 1 || !email.includes('@')) {
-      return NextResponse.json({ success: false, error: 'leadId and a valid email are required' }, { status: 400 });
-    }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(localDate) || Number.isNaN(Date.parse(localDate))) {
       return NextResponse.json({ success: false, error: 'localDate must be YYYY-MM-DD' }, { status: 400 });
     }
@@ -52,13 +47,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     const at = parseSkyInstant(body.at);
     if (!at) {
       return NextResponse.json({ success: false, error: 'That date is out of range.' }, { status: 400 });
-    }
-
-    const rows = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
-    const lead = rows[0];
-    if (!lead || lead.email.toLowerCase().trim() !== email) {
-      await noteAccessFailure(request);
-      return NextResponse.json(NOT_FOUND, { status: 404 });
     }
 
     const results = lead.results as unknown as {

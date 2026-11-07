@@ -298,10 +298,9 @@ function EventRow({ e, open, onToggle, locked, future }: { e: TimelineEvent; ope
 }
 
 export default function Timeline() {
-  const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
   const premium = usePremium();
-  const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, profile?.email.trim(), 60);
+  const { data, error, loading, refreshing, refresh, retry, offline, savedAt } = useTimeline(chart?.leadId, 60);
   const [filter, setFilter] = useState<Filter>('all');
   const [lens, setLens] = useState<TimelineLens>('all');
   const [openId, setOpenId] = useState<string | null>(null);

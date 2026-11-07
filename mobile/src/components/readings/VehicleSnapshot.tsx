@@ -12,8 +12,7 @@ const T = themes.readings;
 /** Your bodygraph at a glance, above the long reading. */
 export function VehicleSnapshot() {
   const chart = useT3DStore((s) => s.chart);
-  const profile = useT3DStore((s) => s.profile);
-  const hd = useChartData(chart?.leadId, profile?.email.trim()).data?.humanDesign;
+  const hd = useChartData(chart?.leadId).data?.humanDesign;
   const scene = useMemo(() => (hd ? buildBodygraphScene(hd) : null), [hd]);
   if (!hd || !scene) return null;
   const rows: [string, string][] = [

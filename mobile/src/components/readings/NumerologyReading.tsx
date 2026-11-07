@@ -105,9 +105,8 @@ function ChallengeBlock({ c }: { c: ChallengeCard }) {
 // ─── reading ────────────────────────────────────────────────────────────────
 
 export function NumerologyReading({ onRefreshReady }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void }) {
-  const profile = useT3DStore((s) => s.profile);
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry, offline, savedAt, refresh } = useNumerology(chart?.leadId, profile?.email.trim());
+  const { data, error, loading, retry, offline, savedAt, refresh } = useNumerology(chart?.leadId);
 
   useEffect(() => {
     onRefreshReady?.({ run: refresh });

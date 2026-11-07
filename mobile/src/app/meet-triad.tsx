@@ -102,7 +102,7 @@ export default function MeetYourTriad() {
     const saved = await savedLiveBundle(chart.leadId, liveDate);
     if (saved) setBundle(saved);
     try {
-      setBundle(await loadLiveBundle(chart.leadId, profile.email.trim(), liveDate));
+      setBundle(await loadLiveBundle(chart.leadId, liveDate));
     } catch {
       if (!saved) setFailed(true);
     }

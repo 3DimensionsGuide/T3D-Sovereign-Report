@@ -5,6 +5,10 @@
  * the order (payment records are held for accounting and refunds), so its
  * personal details are blanked in place instead: name, email, birth details and
  * results all go.
+ *
+ * A blanked row keeps its id, so the route also raises its session number
+ * (leads.session_epoch), which stops every app session token already handed out for it.
+ * See src/server/appTokens.ts.
  */
 
 export interface DeletionPlan {

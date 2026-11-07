@@ -10,8 +10,7 @@ import { useT3DStore } from '@/store/useT3DStore';
  */
 export function AlertSync() {
   const chart = useT3DStore((s) => s.chart);
-  const email = useT3DStore((s) => s.profile?.email.trim());
-  const timeline = useTimeline(chart?.leadId, email);
+  const timeline = useTimeline(chart?.leadId);
   const alerts = useReminderStore((s) => s.alerts);
   const hydrated = useReminderStore((s) => s.hydrated);
   const data = timeline.data;
