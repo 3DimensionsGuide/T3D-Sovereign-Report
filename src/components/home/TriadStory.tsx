@@ -21,8 +21,17 @@ type Scene = {
   label: string;
   system: string;
   headline: string;
+  /** What the system is, in plain words. Carried over from the framework cards this section replaced. */
+  what: string;
+  /** What T3D does with it. */
   body: string;
+  /** One line on what it is for. These three read as a set at the end of the section. */
+  payoff: string;
+  /** The lens colour, for the drawing and the progress marks. */
   color: string;
+  /** A lighter tint of the same colour, for text. Reaches 7:1 on the page ground; the
+      graphic colours do not, and small text in them was failing AAA. */
+  textColor: string;
 };
 
 const SCENES: readonly Scene[] = [
@@ -31,24 +40,33 @@ const SCENES: readonly Scene[] = [
     label: 'The Vehicle',
     system: 'Human Design',
     headline: 'Start with the machine you drive.',
-    body: 'Your energy type, strategy, authority and defined centers: the precision machinery beneath every decision.',
+    what: 'A map of how your energy is built, worked out from where the Sun, Moon and planets stood at your birth and again about three months before it.',
+    body: 'T3D reads your Type, Strategy and Authority, plus your defined centers: the precision machinery beneath every decision.',
+    payoff: 'tells you how you decide.',
     color: 'var(--amber)',
+    textColor: '#E5A93C',
   },
   {
     key: 'road',
     label: 'The Road',
     system: 'Numerology',
     headline: 'Then read the road ahead.',
-    body: 'Your life path, destiny and active pinnacle: the geometric trajectory your numbers have been tracing.',
+    what: 'The Pythagorean system, which turns your birth date and full name into numbers: Life Path, Destiny, Soul Urge, and the Pinnacles and Challenges of each life stage.',
+    body: 'T3D shows the stretch of road you are on now, and the Personal Day you are living today.',
+    payoff: 'tells you which chapter you are in.',
     color: 'var(--emerald)',
+    textColor: '#4FBF7F',
   },
   {
     key: 'stoplight',
     label: 'The Stoplight',
     system: 'Astrology',
     headline: 'Move when the signal says go.',
-    body: 'Your natal chart, current transits and timing gates: the sky\'s precise signal for when to move.',
+    what: 'Your birth chart, calculated from astronomical data (the Swiss Ephemeris), set against where the planets are right now.',
+    body: 'T3D treats the sky as weather. It compares today with your chart and reads it as Go, Slow or Pause.',
+    payoff: 'tells you whether today is open.',
     color: 'var(--signal-red)',
+    textColor: '#F58A87',
   },
 ] as const;
 
@@ -221,20 +239,57 @@ function SignalDrawing({ build, dim }: { build: number; dim: number }) {
 function SceneText({ scene, index, compact = false }: { scene: Scene; index: number; compact?: boolean }) {
   return (
     <>
-      <p className="t3d-label" style={{ color: scene.color, marginBottom: compact ? 8 : 14 }}>
+      <p className="t3d-label" style={{ color: scene.textColor, marginBottom: compact ? 8 : 14 }}>
         Lens {index + 1} of 3: {scene.label}
       </p>
       <h3 className="t3d-h2" style={{ marginBottom: compact ? 8 : 16, ...(compact ? { fontSize: 'clamp(22px,6.4vw,28px)' } : {}) }}>{scene.headline}</h3>
-      <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: compact ? 17 : 'clamp(20px,2vw,26px)', color: scene.color, marginBottom: compact ? 8 : 14 }}>
+      <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: compact ? 17 : 'clamp(20px,2vw,26px)', color: scene.textColor, marginBottom: compact ? 8 : 14 }}>
         {scene.system}
       </p>
-      <p className="t3d-body" style={{ maxWidth: 480, ...(compact ? { fontSize: 14.5, lineHeight: 1.55 } : {}) }}>{scene.body}</p>
+      <p className="t3d-body" style={{ maxWidth: 480, marginBottom: compact ? 10 : 14, ...(compact ? { fontSize: 13.5, lineHeight: 1.5 } : {}) }}>{scene.what}</p>
+      <p className="t3d-body" style={{ maxWidth: 480, color: 'var(--parchment)', ...(compact ? { fontSize: 14, lineHeight: 1.5 } : {}) }}>{scene.body}</p>
     </>
   );
 }
 
+/** The section header. The framework cards used to say this, above a second explanation of the same three lenses. */
+function Header() {
+  return (
+    <header style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(56px,10vh,120px) clamp(20px,4vw,64px) clamp(28px,5vh,56px)' }}>
+      <p className="t3d-label" style={{ marginBottom: 20 }}>The framework</p>
+      <h2 id="framework-heading" className="t3d-h2" style={{ maxWidth: '24ch', marginBottom: 24 }}>
+        Three ways of reading you. One way of using them.
+      </h2>
+      <p className="t3d-body" style={{ maxWidth: 640 }}>
+        Human Design, Numerology and Astrology each answer a different question about you. T3D calculates all three from
+        the same birth moment and puts them to work on one thing: the decision in front of you.
+      </p>
+    </header>
+  );
+}
+
+/** The resolution: the three lenses read as one set, then the honest limits, then the ask. */
+function Close({ cta }: { cta: React.ReactNode }) {
+  return (
+    <footer style={{ maxWidth: 1180, margin: '0 auto', padding: 'clamp(40px,7vh,80px) clamp(20px,4vw,64px) clamp(56px,10vh,120px)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 'clamp(16px,3vw,48px)' }}>
+        {SCENES.map((s) => (
+          <p key={s.key} style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(20px,2vw,26px)', lineHeight: 1.3, color: 'var(--parchment)', margin: 0 }}>
+            <span style={{ color: s.textColor }}>{s.label}</span> {s.payoff}
+          </p>
+        ))}
+      </div>
+      <p className="t3d-body" style={{ maxWidth: 640, marginTop: 'clamp(24px,4vh,40px)' }}>
+        Together they give you one clear read, so you act on purpose instead of by habit. These are interpretive traditions
+        for reflection. They do not predict events and are not medical, legal or financial advice.
+      </p>
+      {cta}
+    </footer>
+  );
+}
+
 export default function TriadStory() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -283,17 +338,19 @@ export default function TriadStory() {
   // ── Static layout: Reduce Motion only ───────────────────────────────
   if (static_) {
     return (
-      <section id="system" aria-labelledby="triad-heading" style={{ padding: 'clamp(48px,8vh,96px) clamp(20px,4vw,64px)', background: 'var(--base)', position: 'relative' }}>
-        <h2 id="triad-heading" className="t3d-h2" style={{ marginBottom: 40 }}>One journey, three lenses.</h2>
-        {SCENES.map((scene, i) => (
-          <article key={scene.key} className={`t3d-card flash-${scene.key}`} style={{ padding: 'clamp(20px,4vw,32px)', marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-              {i === 0 ? <Bodygraph build={1} dim={1} /> : i === 1 ? <RoadDrawing build={1} dim={1} /> : <SignalDrawing build={1} dim={1} />}
-            </div>
-            <SceneText scene={scene} index={i} />
-          </article>
-        ))}
-        {cta}
+      <section id="framework" aria-labelledby="framework-heading" style={{ background: 'var(--base)', position: 'relative' }}>
+        <Header />
+        <div id="system" style={{ maxWidth: 1180, margin: '0 auto', padding: '0 clamp(20px,4vw,64px)' }}>
+          {SCENES.map((scene, i) => (
+            <article key={scene.key} className={`t3d-card flash-${scene.key}`} style={{ padding: 'clamp(20px,4vw,32px)', marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                {i === 0 ? <Bodygraph build={1} dim={1} /> : i === 1 ? <RoadDrawing build={1} dim={1} /> : <SignalDrawing build={1} dim={1} />}
+              </div>
+              <SceneText scene={scene} index={i} />
+            </article>
+          ))}
+        </div>
+        <Close cta={cta} />
       </section>
     );
   }
@@ -308,7 +365,9 @@ export default function TriadStory() {
   const scene = SCENES[active];
 
   return (
-    <section id="system" ref={sectionRef} aria-labelledby="triad-heading" style={{ height: isMobile ? '320svh' : '340vh', position: 'relative' }}>
+    <section id="framework" aria-labelledby="framework-heading" style={{ background: 'var(--base)', position: 'relative' }}>
+      <Header />
+      <div id="system" ref={sectionRef} style={{ height: isMobile ? '320svh' : '340vh', position: 'relative' }}>
       <div style={{
         position: 'sticky', top: 0, height: isMobile ? '100svh' : '100vh', overflow: 'hidden',
         background: `radial-gradient(90% 80% at 25% 50%, ${active === 0 ? 'rgba(229,169,60,0.10)' : active === 1 ? 'rgba(31,138,77,0.12)' : 'rgba(217,83,83,0.10)'} 0%, var(--base) 70%)`,
@@ -329,18 +388,19 @@ export default function TriadStory() {
         </div>
 
         <div>
-          <h2 id="triad-heading" className="t3d-label" style={{ marginBottom: isMobile ? 12 : 28 }}>One journey, three lenses</h2>
+          <p className="t3d-label" style={{ marginBottom: isMobile ? 12 : 28 }}>One journey, three lenses</p>
           <div aria-live="polite" key={scene.key} style={{ animation: 'sceneIn 0.5s var(--ease) both' }}>
             <SceneText scene={scene} index={active} compact={isMobile} />
           </div>
-          <div role="presentation" style={{ display: isMobile && progress > 0.6 ? 'none' : 'flex', gap: 8, marginTop: isMobile ? 18 : 36 }}>
+          <div role="presentation" style={{ display: 'flex', gap: 8, marginTop: isMobile ? 18 : 36 }}>
             {SCENES.map((s, i) => (
               <span key={s.key} style={{ width: 48, height: 3, background: i <= active ? s.color : 'var(--step-off)', transition: 'background 0.4s var(--ease)' }} />
             ))}
           </div>
-          {progress > 0.6 && cta}
         </div>
       </div>
+      </div>
+      <Close cta={cta} />
     </section>
   );
 }

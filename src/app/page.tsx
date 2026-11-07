@@ -19,7 +19,6 @@ import { Suspense } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
 import ProductSelectionSync from '@/components/ProductSelectionSync';
-import FrameworkIntro from '@/components/home/FrameworkIntro';
 import TriadStory from '@/components/home/TriadStory';
 import WhatsInside from '@/components/home/WhatsInside';
 import FAQ from '@/components/home/FAQ';
@@ -148,10 +147,6 @@ export default function HomePage() {
             UPGRADE 2: Inherits base section spacing
             UPGRADE 4: Sharp card borders, zero radius
             ═══════════════════════════════════════════════════════════════════ */}
-        <FrameworkIntro />
-
-        <div className="t3d-divider" />
-
         <TriadStory />
 
         {/* UPGRADE 2 — Section divider */}
