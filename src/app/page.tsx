@@ -20,6 +20,7 @@ import { useT3DStore } from '@/store/useT3DStore';
 import CalculatorForm from '@/components/calculator/CalculatorForm';
 import ProductSelectionSync from '@/components/ProductSelectionSync';
 import TriadStory from '@/components/home/TriadStory';
+import HeroStage from '@/components/home/HeroStage';
 import WhatsInside from '@/components/home/WhatsInside';
 import FAQ from '@/components/home/FAQ';
 
@@ -60,81 +61,46 @@ export default function HomePage() {
             UPGRADE 3: Asymmetric 60/40 split — content left, compass right
             ═══════════════════════════════════════════════════════════════════ */}
         <section id="hero" className="hero-section">
-          {/*
-           * UPGRADE 3 — Left column (60% width)
-           * Content is purely left-aligned — headline NOT centered per spec
-           */}
-          <div className="hero-col">
+          <div className="hero-grid">
 
-            {/* System status label */}
-            <p
-              className="t3d-label hero-label"
-              style={{
-                color: 'var(--parchment-40)',
-                display: 'flex', alignItems: 'center', gap: 10,
-                animation: 'rise 0.6s var(--ease) 0.1s both',
-              }}
-            >
-              <span style={{ width: 6, height: 6, background: 'var(--crimson)', display: 'block', flexShrink: 0 }} aria-hidden />
-              Human Design, Numerology and Astrology
-            </p>
+            {/* The argument. Left on a desktop, below the subject on a phone. */}
+            <div className="hero-col">
 
-            {/* Brand seal — responsive sizing */}
-            <div className="hero-seal" style={{ animation: 'rise 0.7s var(--ease) 0.2s both', display: 'flex' }}>
-              <Image
-                src="/logos/T3D_seal_translucent.png"
-                alt="The 3 Dimensions — Align Your Vehicle. Follow Your Road. Obey The Signals."
-                width={420} height={420}
-                priority
-                className="hero-seal-img"
-                style={{ height: 'auto' }}
-              />
+              <p className="t3d-label hero-label" style={{ color: 'var(--parchment-40)', display: 'flex', alignItems: 'center', gap: 10, animation: 'rise 0.6s var(--ease) 0.1s both' }}>
+                <span style={{ width: 6, height: 6, background: 'var(--crimson)', display: 'block', flexShrink: 0 }} aria-hidden />
+                Human Design, Numerology and Astrology
+              </p>
+
+              <h1 className="t3d-h1 hero-h1" style={{ animation: 'rise 0.8s var(--ease) 0.3s both', marginBottom: 20 }}>
+                Know your<br />
+                <em style={{ color: 'var(--amber)', fontStyle: 'italic' }}>vehicle.</em><br />
+                Read your<br />
+                <em style={{ color: '#4FBF7F', fontStyle: 'italic' }}>road.</em><br />
+                Time every<br />
+                <em style={{ color: '#F58A87', fontStyle: 'italic' }}>move.</em>
+              </h1>
+
+              <p className="hero-sub" style={{ animation: 'rise 0.8s var(--ease) 0.45s both' }}>
+                Three ancient systems. One precision instrument.<br />
+                Enter your birth details and see your Human Design Type, Life Path and birth chart. Free, in about a minute.
+              </p>
+
+              <div className="hero-actions" style={{ animation: 'rise 0.8s var(--ease) 0.55s both', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <Link href="/#calculator" className="t3d-cta">
+                  CALCULATE MY PROFILE
+                </Link>
+                <a href="#framework" className="t3d-ghost">
+                  SEE HOW IT WORKS
+                </a>
+                <a href="#intro" className="hero-intro-link">
+                  <span aria-hidden>▶</span> Watch the 3-minute intro
+                </a>
+              </div>
+
             </div>
 
-            {/*
-             * UPGRADE 1 — H1: Playfair Display, weight 700, clamp(72px,10vw,140px)
-             *              line-height 0.9, tracking -0.03em, LEFT-ALIGNED
-             */}
-            <h1
-              className="t3d-h1"
-              style={{ animation: 'rise 0.8s var(--ease) 0.3s both', marginBottom: 24 }}
-            >
-              Know your<br />
-              <em style={{ color: 'var(--amber)', fontStyle: 'italic' }}>vehicle.</em><br />
-              Read your<br />
-              <em style={{ color: 'var(--emerald)', fontStyle: 'italic' }}>road.</em><br />
-              Time every<br />
-              <em style={{ color: 'var(--crimson)', fontStyle: 'italic' }}>move.</em>
-            </h1>
-
-            {/* Two-line subheadline in DM Sans italic (spec: "two-line subheadline") */}
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontStyle: 'italic',
-              fontWeight: 300,
-              fontSize: 'clamp(16px,1.8vw,20px)',
-              color: 'var(--parchment-40)',
-              lineHeight: 1.6,
-              maxWidth: '38ch',
-              marginBottom: 48,
-              animation: 'rise 0.8s var(--ease) 0.45s both',
-            }}>
-              Three ancient systems. One precision instrument.<br />
-              Enter your birth details and see your Human Design Type, Life Path and birth chart. Free, in about a minute.
-            </p>
-
-            {/* UPGRADE 5 — Primary CTA: crimson, zero radius, ALL CAPS, 11px DM Sans */}
-            <div className="hero-actions" style={{ animation: 'rise 0.8s var(--ease) 0.55s both', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Link href="/#calculator" className="t3d-cta">
-                CALCULATE MY PROFILE
-              </Link>
-              <a href="#framework" className="t3d-ghost">
-                SEE HOW IT WORKS
-              </a>
-              <a href="#intro" className="hero-intro-link">
-                <span aria-hidden>▶</span> Watch the 3-minute intro
-              </a>
-            </div>
+            {/* The subject, in five planes. Decorative: the seal's words are in the H1. */}
+            <HeroStage />
 
           </div>
         </section>

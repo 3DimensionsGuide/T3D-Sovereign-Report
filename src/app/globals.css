@@ -381,22 +381,28 @@ main:focus { outline: none; }
 /* Homepage hero and calculator: the phone layout lives in CSS so the first paint is already right (no jump after load). */
 .hero-section {
   min-height: 100vh; min-height: 100svh;
-  padding: var(--hero-pt) clamp(20px,4vw,64px) var(--hero-pb);
+  padding: 88px clamp(20px,4vw,64px);
   display: flex; align-items: center;
 }
-.hero-col { width: 60%; position: relative; z-index: 11; text-align: left; }
-.hero-label { margin-bottom: 32px; justify-content: flex-start; }
-.hero-seal { margin-bottom: 40px; justify-content: flex-start; }
-.hero-seal-img { max-width: min(420px, 70vw); }
+.hero-col { width: 100%; position: relative; z-index: 11; text-align: left; }
+.hero-label { margin-bottom: 28px; justify-content: flex-start; }
+/* The headline shares the first screen with the subject now, so it is set to the
+   column rather than to the viewport. The six-line stack is kept: it is the brand. */
+.hero-h1 { font-size: clamp(36px, 4.6vw, 68px); }
+.hero-sub {
+  font-family: 'DM Sans', sans-serif; font-style: italic; font-weight: 300;
+  font-size: clamp(15px, 1.5vw, 18px); color: var(--parchment-40);
+  line-height: 1.6; max-width: 40ch; margin: 0 0 26px;
+}
 .hero-actions { max-width: 320px; margin: 0; }
 .calc-section { height: 150vh; position: relative; }
 .calc-grid { position: sticky; top: 8vh; display: grid; grid-template-columns: 45% 1fr; gap: 0; height: 84vh; }
 @media (max-width: 767px) {
-  .hero-section { padding-top: 96px; padding-bottom: 64px; }
+  .hero-section { padding-top: 80px; padding-bottom: 48px; }
   .hero-col { width: 100%; text-align: center; }
-  .hero-label { margin-bottom: 20px; justify-content: center; }
-  .hero-seal { margin-bottom: 24px; justify-content: center; }
-  .hero-seal-img { max-width: min(240px, 62vw); }
+  .hero-label { margin-bottom: 18px; justify-content: center; }
+  .hero-h1 { font-size: clamp(34px, 9.6vw, 50px); }
+  .hero-sub { margin: 0 auto 26px; text-align: center; }
   .hero-actions { max-width: 100%; margin: 0 auto; }
   .calc-section { height: auto; }
   .calc-grid { position: relative; top: auto; grid-template-columns: 1fr; height: auto; }
@@ -471,4 +477,85 @@ main:focus { outline: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .inside-rail { transition: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Hero: five planes at five rates.
+   --sy is the page's scroll position and --mx/--my the eased pointer, both
+   written by HeroStage on one element. Each plane multiplies them by its own
+   rate, so depth is CSS arithmetic and a scroll tick restyles one node.
+   ══════════════════════════════════════════════════════════════════════════ */
+.hero-stage {
+  --sy: 0; --mx: 0; --my: 0;
+  position: relative;
+  width: 100%;
+  max-width: min(560px, 38vw);
+  aspect-ratio: 1;
+  justify-self: center;
+  animation: heroStage 1s var(--ease) 0.15s both;
+}
+.hero-plane {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  will-change: transform;
+}
+.hero-plane--glow {
+  /* Atmosphere, furthest back and slowest, so the subject separates from the
+     armillary sphere in the page's background video. */
+  background: radial-gradient(closest-side, rgba(13,13,14,0.94) 0%, rgba(13,13,14,0.74) 52%, rgba(13,13,14,0) 100%);
+  transform: translate3d(calc(var(--mx) * 4px), calc(var(--sy) * 0.04px + var(--my) * 4px), 0) scale(1.18);
+}
+.hero-plane--rings {
+  transform: translate3d(calc(var(--mx) * 8px), calc(var(--sy) * -0.08px + var(--my) * 8px), 0);
+}
+.hero-plane--arcs {
+  transform: translate3d(calc(var(--mx) * 14px), calc(var(--sy) * -0.14px + var(--my) * 14px), 0);
+}
+.hero-plane--seal {
+  display: grid; place-items: center;
+  transform: translate3d(calc(var(--mx) * 20px), calc(var(--sy) * -0.22px + var(--my) * 20px), 0);
+}
+.hero-plane--seal img {
+  width: 62%; height: auto;
+  filter: drop-shadow(0 26px 46px rgba(0,0,0,0.65));
+}
+.hero-plane--near {
+  /* Nearest: most travel, and blurred because close things are out of focus. */
+  transform: translate3d(calc(var(--mx) * 34px), calc(var(--sy) * -0.34px + var(--my) * 34px), 0) scale(1.06);
+  filter: blur(1.2px);
+}
+
+.hero-spin { transform-origin: 300px 300px; animation: heroSpin 220s linear infinite; }
+.hero-spin--back { animation-duration: 150s; animation-direction: reverse; }
+.hero-stage.is-still .hero-spin { animation-play-state: paused; }
+
+@keyframes heroSpin { to { transform: rotate(360deg); } }
+@keyframes heroStage {
+  from { opacity: 0; transform: scale(0.965); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* The hero becomes two columns: the argument on the left, the subject on the right. */
+.hero-grid {
+  width: 100%; max-width: 1320px; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center; gap: clamp(24px, 4vw, 72px);
+}
+
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: clamp(16px, 4vh, 36px); }
+  /* On a phone the subject sits above the headline rather than beside it, and the
+     near arc is pulled in so it cannot reach past the viewport. */
+  .hero-stage { max-width: min(300px, 62vw); order: -1; animation-delay: 0.05s; }
+  .hero-plane--near { transform: translate3d(calc(var(--sy) * -0.2px), 0, 0) scale(0.98); }
+  .hero-plane--seal img { width: 66%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The layers, the overlaps and the shadows stay. Only the movement goes. */
+  .hero-stage { animation: none; }
+  .hero-spin { animation: none; }
+  .hero-plane { transform: none !important; }
+  .hero-plane--glow { transform: scale(1.18) !important; }
+  .hero-plane--near { transform: scale(1.06) !important; }
 }
