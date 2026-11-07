@@ -608,3 +608,121 @@ main:focus { outline: none; }
   .hero-plane--glow { transform: scale(1.18) !important; }
   .hero-plane--near { transform: scale(1.06) !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Where this comes from: the primer, and a time axis drawn to scale.
+   --t is the section's draw progress, written by Origins on this element.
+   Bars are scaleX from their own left edge, so the axis fills rather than
+   anything travelling sideways: there is nothing for a touch scroll to chase.
+   ══════════════════════════════════════════════════════════════════════════ */
+.origins {
+  --t: 0;
+  background: var(--base);
+  padding: clamp(56px,10vh,120px) clamp(20px,4vw,64px) clamp(56px,10vh,120px);
+  position: relative;
+}
+.origins__head { max-width: 1180px; margin: 0 auto clamp(36px,6vh,64px); }
+
+.origins__axis { max-width: 1180px; margin: 0 auto clamp(44px,7vh,88px); }
+.origins__scale {
+  position: relative; height: 18px; margin-bottom: 10px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--parchment-40);
+}
+.origins__scale span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.origins__scale span:first-child { transform: none; }
+.origins__scale span:last-child { transform: translateX(-100%); }
+
+.origins__track { position: relative; height: 1px; background: var(--grid-line); margin-bottom: 34px; }
+.origins__mark {
+  position: absolute; top: -4px; width: 1px; height: 9px;
+  background: var(--parchment-40);
+  transform: scaleY(var(--t)); transform-origin: top;
+}
+.origins__marklabel {
+  position: absolute; top: 10px; transform: translateX(-50%);
+  font-size: 11px; line-height: 1.3; color: var(--parchment-40);
+  white-space: nowrap;
+  opacity: calc(var(--t) * var(--t));
+}
+
+.origins__row {
+  display: grid;
+  grid-template-columns: minmax(0, 170px) minmax(0, 1fr) minmax(0, 230px);
+  align-items: center; gap: 18px;
+  padding: 9px 0;
+}
+.origins__rowname, .origins__rowage { margin: 0; font-size: 13px; line-height: 1.4; }
+.origins__rowname { font-weight: 500; letter-spacing: 0.01em; }
+.origins__rowage { color: var(--parchment-40); }
+.origins__barwrap { position: relative; height: 10px; }
+.origins__bar {
+  position: absolute; top: 0; height: 100%;
+  transform: scaleX(var(--t)); transform-origin: left center;
+  will-change: transform;
+}
+.origins__caption {
+  margin: 18px 0 0; font-size: 12.5px; color: var(--parchment-40);
+  opacity: 0; transition: opacity 0.6s var(--ease);
+}
+.origins__caption.is-in { opacity: 1; }
+
+.origins__grid {
+  max-width: 1180px; margin: 0 auto;
+  display: grid; gap: clamp(16px,2.5vw,28px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+.origins__card {
+  border: 1px solid var(--card-border);
+  border-top-width: 3px; border-top-style: solid;
+  background: var(--card-bg);
+  padding: clamp(22px,2.6vw,32px);
+  display: flex; flex-direction: column;
+}
+.origins__lens {
+  margin: 0 0 10px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.origins__system {
+  margin: 0 0 14px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(22px,2.3vw,28px); font-weight: 400; line-height: 1.15;
+  color: var(--parchment);
+}
+.origins__what { margin: 0 0 20px; font-size: 15px; line-height: 1.6; color: var(--parchment); }
+.origins__facts { margin: 0; }
+.origins__facts dt {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--parchment-40);
+  padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--grid-line);
+}
+.origins__facts dd { margin: 6px 0 0; font-size: 14px; line-height: 1.6; color: var(--parchment-70); }
+.origins__note {
+  margin: auto 0 0; padding-top: 18px;
+  font-size: 13px; line-height: 1.55; color: var(--parchment-40); font-style: italic;
+}
+.origins__close {
+  max-width: 760px; margin: clamp(40px,6vh,72px) auto 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(19px,2vw,26px); font-weight: 400; line-height: 1.4;
+  color: var(--parchment);
+}
+
+@media (max-width: 760px) {
+  /* The axis keeps its scale; only the labels move out of the way. */
+  .origins__row { grid-template-columns: 1fr; gap: 6px; padding: 12px 0; }
+  .origins__rowage { font-size: 12px; }
+  .origins__barwrap { height: 8px; }
+  .origins__scale span:nth-child(3) { display: none; }
+  /* The marked date needs room a phone does not have, and the Astrology card says it anyway. */
+  .origins__marklabel { display: none; }
+  .origins__track { margin-bottom: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .origins__bar, .origins__mark { transform: none !important; }
+  .origins__caption { opacity: 1; transition: none; }
+}

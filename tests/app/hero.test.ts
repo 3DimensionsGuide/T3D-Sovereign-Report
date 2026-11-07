@@ -7,6 +7,12 @@ const stage = read('src/components/home/HeroStage.tsx');
 const page = read('src/app/page.tsx');
 const css = read('src/app/globals.css');
 
+/** Every `prefers-reduced-motion: reduce` block in the stylesheet, so a new section
+    adding one of its own cannot make another section's test look at the wrong block. */
+const reducedBlocks = (sheet: string) => sheet.split('@media (prefers-reduced-motion: reduce)').slice(1);
+const someReducedBlock = (sheet: string, re: RegExp) => reducedBlocks(sheet).some((b) => re.test(b));
+
+
 test('the hero is five planes, each travelling at its own rate', () => {
   for (const plane of ['hero-plane--glow', 'hero-plane--rings', 'hero-plane--arcs', 'hero-plane--seal', 'hero-plane--near']) {
     assert.ok(stage.includes(plane), plane);
@@ -36,9 +42,8 @@ test('the drawing prints the same numbers on the server and in the browser', () 
 });
 
 test('Reduce Motion keeps the composition and drops only the movement', () => {
-  const guard = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
-  assert.match(guard, /\.hero-plane \{ transform: none !important; \}/);
-  assert.match(guard, /\.hero-spin \{ animation: none; \}/);
+  assert.ok(someReducedBlock(css, /\.hero-plane \{ transform: none !important; \}/), 'planes frozen');
+  assert.ok(someReducedBlock(css, /\.hero-spin \{ animation: none; \}/), 'rotation stopped');
   assert.match(stage, /matchMedia\('\(prefers-reduced-motion: reduce\)'\)\.matches\) return;/);
 });
 

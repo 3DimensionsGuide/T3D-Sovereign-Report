@@ -21,6 +21,7 @@ import CalculatorForm from '@/components/calculator/CalculatorForm';
 import ProductSelectionSync from '@/components/ProductSelectionSync';
 import TriadStory from '@/components/home/TriadStory';
 import HeroStage from '@/components/home/HeroStage';
+import Origins from '@/components/home/Origins';
 import WhatsInside from '@/components/home/WhatsInside';
 import FAQ from '@/components/home/FAQ';
 
@@ -203,6 +204,12 @@ export default function HomePage() {
 
           </div>
         </section>
+
+        <div className="t3d-divider" />
+
+        {/* The primer, after the calculator: "where does this come from" is the question
+            someone asks once they have seen a result, and the answer earns the report. */}
+        <Origins />
 
         <div className="t3d-divider" />
 
