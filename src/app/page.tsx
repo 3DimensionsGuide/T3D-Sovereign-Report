@@ -119,6 +119,14 @@ export default function HomePage() {
         {/* UPGRADE 2 — Section divider */}
         <div className="t3d-divider" />
 
+        {/* The primer sits between the metaphors and the calculator, for anyone meeting
+            these traditions for the first time. The framework's own button skips past it
+            straight to the calculator for anyone who is already ready. */}
+        <Origins />
+
+        {/* Section divider */}
+        <div className="t3d-divider" />
+
         {/* ═══════════════════════════════════════════════════════════════════
             SECTION 3 — CALCULATOR + VIDEO SIDE BY SIDE
             Left: calculator panel (sticky on desktop)
@@ -204,12 +212,6 @@ export default function HomePage() {
 
           </div>
         </section>
-
-        <div className="t3d-divider" />
-
-        {/* The primer, after the calculator: "where does this come from" is the question
-            someone asks once they have seen a result, and the answer earns the report. */}
-        <Origins />
 
         <div className="t3d-divider" />
 

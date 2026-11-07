@@ -71,8 +71,8 @@ test('Reduce Motion gets the axis complete and still', () => {
   assert.ok(someReducedBlock(css, /\.origins__bar, \.origins__mark \{ transform: none !important; \}/), 'axis frozen complete');
 });
 
-test('it sits after the calculator, where the question actually gets asked', () => {
-  assert.ok(page.indexOf('<Origins />') > page.indexOf('id="calculator"'), 'after the calculator');
-  assert.ok(page.indexOf('<Origins />') < page.indexOf('<WhatsInside />'), 'before the report section');
+test('it sits between the framework and the calculator', () => {
+  assert.ok(page.indexOf('<Origins />') > page.indexOf('<TriadStory />'), 'after the framework');
+  assert.ok(page.indexOf('<Origins />') < page.indexOf('id="calculator"'), 'before the calculator');
   assert.match(src, /id="origins"/);
 });

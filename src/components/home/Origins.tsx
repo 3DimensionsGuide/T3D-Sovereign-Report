@@ -4,9 +4,10 @@
  * Origins — the primer for someone who has never met any of this before.
  *
  * What each system is, where it actually came from, what it was traditionally used for,
- * and why it became the metaphor it did in T3D. It sits after the calculator, because the
- * question "where does this come from" arrives once somebody has seen a result, and the
- * honest answer is what earns the report that follows.
+ * and why it became the metaphor it did in T3D. It sits between the framework and the
+ * calculator: the metaphors have just been introduced, so this is where a newcomer wants
+ * to know whether any of it is real. The framework's own button jumps straight to the
+ * calculator, so anyone who is already convinced can skip it.
  *
  * The device is a time axis the three traditions are drawn onto, filling as the section
  * passes. It carries the argument by itself: astrology runs the whole width, numerology
