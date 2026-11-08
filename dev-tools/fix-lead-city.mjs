@@ -19,7 +19,6 @@
 
 import nextEnv from '@next/env';
 import postgres from 'postgres';
-import { resolveGeoAndTimezone } from '../src/server/geocoding.ts';
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
@@ -79,6 +78,9 @@ try {
 
   // Refuse to write a spelling that cannot be found, so one typo is not swapped for another.
   console.log('Checking that the new spelling resolves...');
+  // Imported here rather than at the top: the geocoder reaches the database module, which reads
+  // DATABASE_URL as it loads, and a static import would run before loadEnvConfig had set it.
+  const { resolveGeoAndTimezone } = await import('../src/server/geocoding.ts');
   let geo;
   try {
     geo = await resolveGeoAndTimezone(city, country, lead.birth_data?.date ?? '2000-01-01');
