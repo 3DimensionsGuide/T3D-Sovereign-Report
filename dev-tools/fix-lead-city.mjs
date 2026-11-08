@@ -100,7 +100,8 @@ try {
   console.log(`  now:  ${place.city}, ${place.country}`);
   console.log(`  to:   ${city}, ${country}\n`);
 
-  if (place.city === city && place.country === country) {
+  const clean = (v) => typeof v === 'string' && !v.startsWith('"') && !v.endsWith('"');
+  if (place.city === city && place.country === country && clean(place.city) && clean(place.country)) {
     console.log('Already reads that way. Nothing to do.');
     process.exit(0);
   }
@@ -129,12 +130,16 @@ try {
     process.exit(0);
   }
 
+  // Built in JavaScript and handed over as one JSON value. jsonb_set with a hand-encoded string
+  // went through the driver's own JSON encoding as well, and the value arrived with its quote
+  // characters embedded in it.
+  const updated = {
+    ...lead.birth_data,
+    place: { ...place, city, country },
+  };
   await client`
     UPDATE leads
-    SET birth_data = jsonb_set(
-          jsonb_set(birth_data, '{place,city}', ${JSON.stringify(city)}::jsonb),
-          '{place,country}', ${JSON.stringify(country)}::jsonb
-        ),
+    SET birth_data = ${client.json(updated)},
         updated_at = now()
     WHERE id = ${id}
   `;
