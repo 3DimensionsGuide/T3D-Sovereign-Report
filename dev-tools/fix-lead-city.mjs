@@ -28,14 +28,43 @@ function arg(name) {
   return i > -1 ? process.argv[i + 1] : undefined;
 }
 
+const list = process.argv.includes('--list');
 const id = Number(arg('id'));
 const newCity = arg('city');
 const newCountry = arg('country');
 const write = process.argv.includes('--write');
 
-if (!Number.isInteger(id) || id < 1 || (!newCity && !newCountry)) {
-  console.error('Usage: node --import tsx dev-tools/fix-lead-city.mjs --id <n> [--city "Name"] [--country "Name"] [--write]');
+if (list ? !newCity : (!Number.isInteger(id) || id < 1 || (!newCity && !newCountry))) {
+  console.error('Usage:');
+  console.error('  --list --city "Name" [--country "Name"]        every place GeoNames offers for that spelling');
+  console.error('  --id <n> --city "Name" [--country "Name"]      what correcting lead <n> would do');
+  console.error('  ...the same again with --write                 actually correct it');
   process.exit(1);
+}
+
+// --list asks GeoNames only, so it needs no database at all.
+if (list) {
+  const { lookupPlaceCandidates } = await import('../src/server/geocoding.ts');
+  const country = newCountry ?? '';
+  console.log(`Places GeoNames offers for "${newCity}${country ? `, ${country}` : ''}":\n`);
+  let candidates;
+  try {
+    candidates = await lookupPlaceCandidates(newCity, country);
+  } catch (error) {
+    console.error(`  lookup failed: ${error instanceof Error ? error.message : 'unknown'}`);
+    process.exit(1);
+  }
+  if (candidates.length === 0) {
+    console.log('  none. Try another spelling, or add a state or region to --country.');
+    process.exit(0);
+  }
+  for (const [i, c] of candidates.entries()) {
+    console.log(`  ${i + 1}. ${c.label}`);
+    console.log(`     ${c.latitude}, ${c.longitude}  [${c.timezone}]`);
+  }
+  console.log('\nThe first is the one a correction would use, because that is what the');
+  console.log('calculator picks too. If it is not the right place, narrow --country.');
+  process.exit(0);
 }
 
 const url = process.env.DATABASE_URL;
