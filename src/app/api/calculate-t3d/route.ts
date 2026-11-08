@@ -20,6 +20,7 @@ import { resolveGeoAndTimezone, PLACE_LOOKUP_UNAVAILABLE, PLACE_NOT_FOUND } from
 import type { T3DCalculatorInput } from '@/server/engines/types';
 import { limitRequest } from '@/server/rateLimit';
 import { makeAppSessionToken } from '@/server/appTokens';
+import { ENGINE_VERSION } from '@/server/engines/version';
 import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
@@ -139,6 +140,7 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
+        engineVersion: ENGINE_VERSION,
         updatedAt:  new Date(),
       }).where(eq(leads.id, existing.id)).returning({ id: leads.id, sessionEpoch: leads.sessionEpoch });
       leadId = existing.id;
@@ -151,6 +153,7 @@ export async function POST(
         middleName: body.middleName?.trim() ?? null,
         birthData,
         results,
+        engineVersion: ENGINE_VERSION,
       }).returning({ id: leads.id, sessionEpoch: leads.sessionEpoch });
       leadId = inserted[0]?.id;
       sessionEpoch = inserted[0]?.sessionEpoch ?? 1;

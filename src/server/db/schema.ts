@@ -71,6 +71,11 @@ export const leads = pgTable(
     optInCodeAttempts:  integer('opt_in_code_attempts').default(0).notNull(),
     reportPurchased: boolean('report_purchased').default(false).notNull(),
 
+    // Which version of the calculation engines produced `results`. Null means the chart was
+    // written before versions were recorded — not known to be wrong, but not verified either.
+    // See src/server/engines/version.ts.
+    engineVersion: text('engine_version'),
+
     // The lead's session number. Raising it makes every app session token already handed out for
     // this lead stop working, which is how deleting your data revokes app access without keeping a
     // list of live tokens anywhere. See src/server/appTokens.ts.

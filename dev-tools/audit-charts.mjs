@@ -1,7 +1,7 @@
 /**
- * Looks for stored charts that two bugs fixed today may have left wrong.
+ * Looks for stored charts that may be wrong, or that nothing has verified.
  *
- *   node --import tsx dev-tools/audit-birth-places.mjs
+ *   node --import tsx dev-tools/audit-charts.mjs
  *
  * Reads only. It changes nothing, and it prints a summary rather than a dump.
  *
@@ -18,11 +18,17 @@
  *
  * Both findings are repaired the same way: GET /api/admin/recompute-human-design with
  * relocate=true for the affected lead.
+ *
+ * 3. Charts calculated by an engine that is no longer current.
+ *    Not a fault, and not a list of wrong charts — a list of ones nobody has checked since the
+ *    formulas moved. Null means older than 2026-11-07, when versions started being recorded.
+ *    ?scan=true on the admin route says which of them actually come out differently now.
  */
 
 import nextEnv from '@next/env';
 import postgres from 'postgres';
 import { resolveLocalInstant } from '../src/server/localInstant.ts';
+import { ENGINE_VERSION } from '../src/server/engines/version.ts';
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
@@ -52,12 +58,13 @@ const client = postgres(url, { max: 1, onnotice: () => {} });
 
 try {
   const leads = await client`
-    SELECT id, email, birth_data, created_at
+    SELECT id, email, birth_data, created_at, engine_version
     FROM leads
     ORDER BY id
   `;
   console.log(`Checked ${leads.length} lead${leads.length === 1 ? '' : 's'}.\n`);
 
+  const byEngine = new Map();
   const ambiguous = [];
   const nonexistent = [];
   const fallbackPlace = [];
@@ -72,6 +79,9 @@ try {
     const city = place.city ?? '';
     const country = place.country ?? '';
     const who = { id: lead.id, email: lead.email, when: `${date} ${time}`, where: `${city}, ${country}`, tz };
+
+    const version = lead.engine_version ?? null;
+    byEngine.set(version, (byEngine.get(version) ?? 0) + 1);
 
     // 2. The old New York fallback, which is only a finding when the city is not New York.
     if (
@@ -114,6 +124,20 @@ try {
     'The birth place was never looked up. These charts are wrong. Recalculate with relocate=true.');
   report('Could not be checked', unreadable,
     'Birth data missing or malformed; worth a look by hand.');
+
+  console.log(`Engines (current is ${ENGINE_VERSION}):`);
+  for (const [version, count] of [...byEngine].sort()) {
+    const label = version ?? 'none recorded (written before 2026-11-07)';
+    const mark = version === ENGINE_VERSION ? 'current  ' : 'unverified';
+    console.log(`  ${mark}  ${String(count).padStart(4)}  ${label}`);
+  }
+  const stale = leads.length - (byEngine.get(ENGINE_VERSION) ?? 0);
+  if (stale > 0) {
+    console.log(`\n  ${stale} chart${stale === 1 ? '' : 's'} predate the current engines. To see which of them`);
+    console.log('  actually come out differently now, and not merely which are old:');
+    console.log('    /api/admin/recompute-human-design?scan=true&secret=$ADMIN_RECOMPUTE_SECRET');
+  }
+  console.log();
 
   const problems = ambiguous.length + fallbackPlace.length;
   console.log(problems === 0

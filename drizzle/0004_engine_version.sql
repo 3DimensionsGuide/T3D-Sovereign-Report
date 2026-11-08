@@ -1,0 +1,11 @@
+-- Which version of the calculation engines produced a chart. See src/server/engines/version.ts.
+--
+-- Null on every row that already exists, which is correct: those were written before versions
+-- were recorded, so they are unverified rather than known-good. Nothing is backfilled, because
+-- guessing a version for them would be the very claim this column exists to stop anyone making.
+--
+-- Run once against the database:
+--   node dev-tools/run-sql.mjs drizzle/0004_engine_version.sql
+--
+-- Safe to run more than once.
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS engine_version text;

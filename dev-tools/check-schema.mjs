@@ -94,6 +94,24 @@ try {
   }
   if (extras.length) console.log(`\n  In the database but not in the schema: ${extras.join(', ')}`);
 
+  // Which migration files this database says it has had. A file that has never run here is the
+  // usual reason for anything above, and the usual reason a route fails on one machine only.
+  try {
+    const ran = new Set((await client`SELECT name FROM _migrations`).map((r) => r.name));
+    const { readdirSync } = await import('node:fs');
+    const onDisk = readdirSync('drizzle').filter((f) => f.endsWith('.sql')).sort();
+    const never = onDisk.filter((f) => !ran.has(f));
+    console.log(`\n  Migrations: ${ran.size} of ${onDisk.length} recorded as run here.`);
+    if (never.length) {
+      console.log(`  Never run against this database:`);
+      for (const f of never) console.log(`    ${f}`);
+      console.log('  (one may have been applied by hand before records were kept — running it again is safe)');
+    }
+  } catch {
+    console.log('\n  Migrations: no _migrations table yet. It appears the first time');
+    console.log('  dev-tools/run-sql.mjs applies a file to this database.');
+  }
+
   console.log(problems === 0
     ? '\nThe database matches the schema.'
     : `\n${problems} table${problems === 1 ? '' : 's'} behind. See drizzle/ for the migration that adds them.`);

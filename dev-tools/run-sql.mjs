@@ -8,8 +8,13 @@
  * .env.local exactly as Next.js reads it, so there is no chance of pointing at the wrong database.
  *
  * It shows the host and database it is about to touch before it touches it, prints the statements
- * it ran, and exits non-zero if anything failed. It does not track which migrations have been
- * applied — the .sql files are written so that running one twice is harmless.
+ * it ran, and exits non-zero if anything failed.
+ *
+ * Each file that runs cleanly is recorded in a _migrations table, so each database says for itself
+ * what it has had. That table is the point: three confusing failures in one day came from the two
+ * databases having drifted since October with nothing anywhere saying so. The .sql files are still
+ * written to be safe to run twice, and this still runs one that has already been recorded — it
+ * just tells you it has, rather than leaving you to remember.
  */
 
 import { readFileSync } from 'node:fs';
@@ -51,14 +56,31 @@ if (statements.length === 0) {
 }
 
 const client = postgres(url, { max: 1, onnotice: () => {} });
+const name = file.split('/').pop();
 
 try {
+  await client`
+    CREATE TABLE IF NOT EXISTS _migrations (
+      name     text PRIMARY KEY,
+      ran_at   timestamptz NOT NULL DEFAULT now()
+    )
+  `;
+  const already = await client`SELECT ran_at FROM _migrations WHERE name = ${name}`;
+  if (already.length > 0) {
+    console.log(`Already recorded as run on ${already[0].ran_at.toISOString().slice(0, 16).replace('T', ' ')}.`);
+    console.log('Running it again anyway — these files are written to be safe twice over.\n');
+  }
+
   for (const statement of statements) {
     const oneLine = statement.replace(/\s+/g, ' ');
     process.stdout.write(`  ${oneLine.slice(0, 100)}${oneLine.length > 100 ? '…' : ''}\n`);
     await client.unsafe(statement);
   }
-  console.log(`\nDone. ${statements.length} statement${statements.length === 1 ? '' : 's'} ran without error.`);
+  await client`
+    INSERT INTO _migrations (name) VALUES (${name})
+    ON CONFLICT (name) DO UPDATE SET ran_at = now()
+  `;
+  console.log(`\nDone. ${statements.length} statement${statements.length === 1 ? '' : 's'} ran without error, and recorded as "${name}".`);
 } catch (error) {
   console.error(`\nFailed: ${error instanceof Error ? error.message : String(error)}`);
   console.error('Nothing after the failing statement was run.');
