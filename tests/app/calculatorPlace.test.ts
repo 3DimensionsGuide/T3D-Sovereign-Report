@@ -28,7 +28,33 @@ const code = form.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 test('calculator: a place picked from the list is not looked up again', () => {
   // placeAt is only ever set from Google's own geometry, so its presence means "already certain".
-  assert.match(code, /if \(currentStep === 2 && !data\.placeAt && !placeOptions && !placeNote\)/);
+  assert.match(code, /if \(!data\.placeAt && !placeNote\) \{\s*void confirmPlace\(\);/);
+});
+
+test('calculator: the suggestions include places that are not cities', () => {
+  // (cities) leaves out anywhere that is not incorporated, which is where a great many people
+  // are born. Typing "Harbor City" was answered with "Harbor Springs MI" — a different place
+  // two thousand miles off, offered as the suggestion.
+  assert.match(code, /types: \['\(regions\)'\]/);
+  assert.ok(!/types: \['\(cities\)'\]/.test(code), 'the city-only filter is back');
+});
+
+test('calculator: a dead end and a warning are told apart', () => {
+  // A place nobody can find, or one the person says is none of the options, has to change before
+  // going on. A lookup that is merely down is ours to fix and must not stop them.
+  assert.match(code, /if \(placeOptions \|\| placeBlocked\) return;/);
+  assert.match(code, /CHANGE THE PLACE ABOVE/);
+  assert.match(code, /CONTINUE ANYWAY/);
+  const fail = code.slice(code.indexOf('async function confirmPlace'), code.indexOf('} finally {'));
+  assert.match(fail, /setPlaceBlocked\(true\);/,  'a place that cannot be found should block');
+  assert.match(fail, /setPlaceBlocked\(false\);/, 'a lookup that is down should not');
+});
+
+test('calculator: being unable to find a place says what usually fixes it', () => {
+  assert.match(form, /add the state or region, or try the nearest larger town/);
+  assert.match(form, /Add the state, province or region below/);
+  // The state field reaches the lookup, so that advice actually works.
+  assert.match(code, /city: \[data\.city, data\.state\]\.filter\(Boolean\)\.join\(', '\)\.trim\(\)/);
 });
 
 test('calculator: a picked place is stated back, not left to be assumed', () => {
@@ -53,7 +79,7 @@ test('calculator: the offset is shown, which is what makes a wrong place obvious
 test('calculator: Continue cannot step past the question it just asked', () => {
   // With a list on screen the only ways on are picking one or editing the city. Without this,
   // pressing Continue twice walked straight through the confirmation.
-  assert.match(code, /disabled=\{placeBusy \|\| !!placeOptions\}/);
+  assert.match(code, /disabled=\{placeBusy \|\| !!placeOptions \|\| placeBlocked\}/);
   assert.match(code, /CHOOSE A PLACE ABOVE/);
 });
 
@@ -64,6 +90,7 @@ test('calculator: editing the city starts the question over', () => {
   assert.match(setter, /next\.placeAt = null;/);
   assert.match(setter, /setPlaceOptions\(null\);/);
   assert.match(setter, /setPlaceNote\(null\);/);
+  assert.match(setter, /setPlaceBlocked\(false\);/);
 });
 
 test('calculator: choosing a place writes the name it actually belongs to', () => {

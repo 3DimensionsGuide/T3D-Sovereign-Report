@@ -298,6 +298,15 @@ export default function CalculatorForm() {
   const [placeOptions, setPlaceOptions] = useState<PlaceOption[] | null>(null);
   const [placeBusy,    setPlaceBusy]    = useState(false);
   const [placeNote,    setPlaceNote]    = useState<string | null>(null);
+  /**
+   * Whether that note is a dead end or just a warning.
+   *
+   * A place nobody can find, or one the person says is none of the options, has to be changed
+   * before going on — sending it anyway only fails later, further from the field that fixes it.
+   * A lookup that is merely unavailable is different: that is our problem, not theirs, and must
+   * not stop them.
+   */
+  const [placeBlocked, setPlaceBlocked] = useState(false);
 
   const validate = useCallback((field: FKey, state: FormState) => {
     const msg = validateField(field, state);
@@ -315,6 +324,7 @@ export default function CalculatorForm() {
         // The answer belonged to the old spelling, so it is no longer an answer.
         setPlaceOptions(null);
         setPlaceNote(null);
+        setPlaceBlocked(false);
       }
       if (touched[field]) validate(field, next);
       if ((field === 'birthMonth' || field === 'birthDay') && touched.birthYear) validate('birthYear', next);
@@ -345,7 +355,13 @@ export default function CalculatorForm() {
       // geometry is the whole point: it is where the place is. Taking only the name and letting
       // the server search for it again is how a birth in Harbor City, California became one in
       // Benton Harbor, Michigan.
-      types: ['(cities)'], fields: ['address_components','name','geometry.location'],
+      //
+      // (regions) rather than (cities), because a great many people are born somewhere that is
+      // not an incorporated city. Harbor City is a district of Los Angeles, as are Brooklyn and
+      // Hollywood of theirs, and the city filter leaves all of them out — then offers the nearest
+      // city-shaped name instead. Typing "Harbor City" was answered with "Harbor Springs MI", a
+      // genuinely different place two thousand miles away, presented as the suggestion.
+      types: ['(regions)'], fields: ['address_components','name','geometry.location'],
     });
     ac.addListener('place_changed', () => {
       const place = ac.getPlace();
@@ -395,9 +411,14 @@ export default function CalculatorForm() {
     }
     // A city typed by hand has to be pinned to a real place before going on. One picked from
     // Google's list already carries its coordinates, and a failed lookup must not trap anyone.
-    if (currentStep === 2 && !data.placeAt && !placeOptions && !placeNote) {
-      void confirmPlace();
-      return;
+    if (currentStep === 2) {
+      // A list on screen, or a place that has to be changed: the way on is through the field,
+      // not through this button.
+      if (placeOptions || placeBlocked) return;
+      if (!data.placeAt && !placeNote) {
+        void confirmPlace();
+        return;
+      }
     }
 
     setDir('fwd'); setAnimKey(k => k+1); setCurrentStep(currentStep + 1);
@@ -424,6 +445,7 @@ export default function CalculatorForm() {
     setErrors(e => ({ ...e, city: undefined, country: undefined }));
     setPlaceOptions(null);
     setPlaceNote(null);
+    setPlaceBlocked(false);
     setDir('fwd'); setAnimKey(k => k+1); setCurrentStep(currentStep + 1);
   }
 
@@ -456,10 +478,16 @@ export default function CalculatorForm() {
         setPlaceOptions(json.data.candidates as PlaceOption[]);
       } else {
         setPlaceOptions(null);
-        setPlaceNote(json.error ?? 'We could not find that place. Check the spelling, or add the state or region.');
+        setPlaceBlocked(true);
+        setPlaceNote(
+          (json.error as string | undefined)
+          ?? 'We could not find that place. Check the spelling, add the state or region, or try the nearest larger town.',
+        );
       }
     } catch {
+      // Ours to fix, not theirs to work around.
       setPlaceOptions(null);
+      setPlaceBlocked(false);
       setPlaceNote('We could not check that place just now. You can continue, and we will try again when your chart is calculated.');
     } finally {
       setPlaceBusy(false);
@@ -710,7 +738,14 @@ export default function CalculatorForm() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => { setPlaceOptions(null); cityRef.current?.focus(); }}
+                    onClick={() => {
+                      setPlaceOptions(null);
+                      setPlaceBlocked(true);
+                      // Almost always the state or region is what narrows it: "Harbor City" alone
+                      // finds three wrong places, and with "California" it finds the right one.
+                      setPlaceNote('Add the state, province or region below, then press Continue again.');
+                      cityRef.current?.focus();
+                    }}
                     style={{
                       marginTop:12, minHeight:44, padding:'8px 2px', background:'none', border:'none',
                       color:'var(--parchment-70)', font:'inherit', fontSize:13,
@@ -733,10 +768,11 @@ export default function CalculatorForm() {
               {/* While a list is on screen the only ways on are picking one or editing the city,
                   so Continue cannot become a way of skipping the question it just asked. */}
               <button type="button" onClick={advance} className="t3d-cta"
-                disabled={placeBusy || !!placeOptions}
-                style={placeOptions ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}>
+                disabled={placeBusy || !!placeOptions || placeBlocked}
+                style={placeOptions || placeBlocked ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}>
                 {placeBusy ? 'CHECKING THE PLACE…'
                   : placeOptions ? 'CHOOSE A PLACE ABOVE'
+                  : placeBlocked ? 'CHANGE THE PLACE ABOVE'
                   : placeNote ? 'CONTINUE ANYWAY'
                   : 'CONTINUE'}
               </button>
