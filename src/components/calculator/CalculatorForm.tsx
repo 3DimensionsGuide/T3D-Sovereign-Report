@@ -356,18 +356,32 @@ export default function CalculatorForm() {
       // the server search for it again is how a birth in Harbor City, California became one in
       // Benton Harbor, Michigan.
       //
-      // (regions) rather than (cities), because a great many people are born somewhere that is
-      // not an incorporated city. Harbor City is a district of Los Angeles, as are Brooklyn and
-      // Hollywood of theirs, and the city filter leaves all of them out — then offers the nearest
-      // city-shaped name instead. Typing "Harbor City" was answered with "Harbor Springs MI", a
-      // genuinely different place two thousand miles away, presented as the suggestion.
-      types: ['(regions)'], fields: ['address_components','name','geometry.location'],
+      // 'geocode' rather than '(cities)' or '(regions)', because a great many people are born
+      // somewhere that is neither. Harbor City is a neighborhood of Los Angeles, as are Brooklyn
+      // and Hollywood of theirs, and both of those filters leave neighborhoods out — then offer
+      // the nearest name that does fit. Typing "Harbor City" was answered with "Harbor Springs
+      // MI" and "Havneby, Denmark": two real places, neither of them the one being typed, and
+      // nothing to say so.
+      //
+      // 'geocode' covers everywhere with a position rather than everywhere of a certain rank, and
+      // excludes businesses. What it cannot do is guarantee the place is listed at all, which is
+      // why nothing here depends on it: a city that cannot be picked is typed, and confirmPlace()
+      // asks GeoNames, which does know Harbor City, California.
+      types: ['geocode'], fields: ['address_components','name','geometry.location'],
     });
     ac.addListener('place_changed', () => {
       const place = ac.getPlace();
-      const city    = place.name ?? '';
-      const country = place.address_components?.find((c: any) => c.types.includes('country'))?.long_name ?? '';
-      const stateComp = place.address_components?.find((c: any) => c.types.includes('administrative_area_level_1'))?.long_name ?? '';
+      const comp = (type: string): string | undefined =>
+        place.address_components?.find((c: any) => c.types.includes(type))?.long_name;
+
+      // The most specific real place name, rather than whatever the suggestion was called.
+      // 'geocode' also offers roads and landmarks — "Harbor Boulevard Guest Drop-off & Pick-up"
+      // came back for "Harbor"— and picking one must not write that into somebody's report as
+      // their birthplace. Its components still name the neighbourhood or town it stands in, so
+      // the coordinates stay exactly where they were and only the label is made sensible.
+      const city = comp('neighborhood') ?? comp('sublocality') ?? comp('locality') ?? place.name ?? '';
+      const country = comp('country') ?? '';
+      const stateComp = comp('administrative_area_level_1') ?? '';
       const lat = place.geometry?.location?.lat?.();
       const lng = place.geometry?.location?.lng?.();
       const placeAt = typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng)

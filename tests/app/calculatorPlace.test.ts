@@ -35,8 +35,9 @@ test('calculator: the suggestions include places that are not cities', () => {
   // (cities) leaves out anywhere that is not incorporated, which is where a great many people
   // are born. Typing "Harbor City" was answered with "Harbor Springs MI" — a different place
   // two thousand miles off, offered as the suggestion.
-  assert.match(code, /types: \['\(regions\)'\]/);
-  assert.ok(!/types: \['\(cities\)'\]/.test(code), 'the city-only filter is back');
+  assert.match(code, /types: \['geocode'\]/);
+  assert.ok(!/types: \['\(cities\)'\]/.test(code),  'the city-only filter is back');
+  assert.ok(!/types: \['\(regions\)'\]/.test(code), 'regions leaves neighborhoods out too');
 });
 
 test('calculator: a dead end and a warning are told apart', () => {
@@ -55,6 +56,12 @@ test('calculator: being unable to find a place says what usually fixes it', () =
   assert.match(form, /Add the state, province or region below/);
   // The state field reaches the lookup, so that advice actually works.
   assert.match(code, /city: \[data\.city, data\.state\]\.filter\(Boolean\)\.join\(', '\)\.trim\(\)/);
+});
+
+test('calculator: a picked road or landmark is stored as the place it stands in', () => {
+  // 'geocode' reaches neighborhoods, which is the point, but it also offers roads and landmarks.
+  // Their components still name the town, so the coordinates stay put and only the label changes.
+  assert.match(code, /comp\('neighborhood'\) \?\? comp\('sublocality'\) \?\? comp\('locality'\) \?\? place\.name/);
 });
 
 test('calculator: a picked place is stated back, not left to be assumed', () => {
