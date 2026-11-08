@@ -44,6 +44,16 @@ interface FormState {
   emailOptIn:  boolean;
 }
 
+/** One place the lookup offers back, for a city that was typed rather than picked. */
+interface PlaceOption {
+  label:     string;
+  latitude:  number;
+  longitude: number;
+  timezone:  string;
+  /** "UTC−8" at the birth date, which is what makes a wrong place obvious on sight. */
+  utcOffset: string | null;
+}
+
 type FKey    = keyof FormState;
 type Errors  = Partial<Record<FKey, string>>;
 type Touched = Partial<Record<FKey, boolean>>;
@@ -284,6 +294,11 @@ export default function CalculatorForm() {
   const cityRef    = useRef<HTMLInputElement>(null);
   const placesInit = useRef(false);
 
+  // Confirming a city that was typed rather than picked from Google's list. See confirmPlace().
+  const [placeOptions, setPlaceOptions] = useState<PlaceOption[] | null>(null);
+  const [placeBusy,    setPlaceBusy]    = useState(false);
+  const [placeNote,    setPlaceNote]    = useState<string | null>(null);
+
   const validate = useCallback((field: FKey, state: FormState) => {
     const msg = validateField(field, state);
     setErrors(e => ({ ...e, [field]: msg || undefined }));
@@ -295,7 +310,12 @@ export default function CalculatorForm() {
       // Editing the place by hand abandons the coordinates that came with the picked one. They
       // belong to a place that is no longer what the box says, and sending them would calculate
       // a chart for somewhere the person did not type.
-      if (field === 'city' || field === 'state' || field === 'country') next.placeAt = null;
+      if (field === 'city' || field === 'state' || field === 'country') {
+        next.placeAt = null;
+        // The answer belonged to the old spelling, so it is no longer an answer.
+        setPlaceOptions(null);
+        setPlaceNote(null);
+      }
       if (touched[field]) validate(field, next);
       if ((field === 'birthMonth' || field === 'birthDay') && touched.birthYear) validate('birthYear', next);
       return next;
@@ -373,10 +393,78 @@ export default function CalculatorForm() {
       setTouched(p => ({ ...p, ...t }));
       return;
     }
+    // A city typed by hand has to be pinned to a real place before going on. One picked from
+    // Google's list already carries its coordinates, and a failed lookup must not trap anyone.
+    if (currentStep === 2 && !data.placeAt && !placeOptions && !placeNote) {
+      void confirmPlace();
+      return;
+    }
+
     setDir('fwd'); setAnimKey(k => k+1); setCurrentStep(currentStep + 1);
   }
 
   function goBack() { setDir('back'); setAnimKey(k => k+1); setCurrentStep(currentStep - 1); }
+
+  /**
+   * Takes the place the person picked from the list.
+   *
+   * The name is rewritten from the chosen place rather than left as typed, so the report says
+   * where they were actually born: "Habor City" becomes "Harbor City, California". Written in one
+   * go, because set() drops the coordinates whenever the place fields are edited.
+   */
+  function choosePlace(option: PlaceOption) {
+    const parts = option.label.split(',').map(x => x.trim()).filter(Boolean);
+    const country = parts.length > 1 ? parts[parts.length - 1]! : data.country;
+    const city    = parts[0] ?? data.city;
+    const state   = parts.length > 2 ? parts.slice(1, -1).join(', ') : '';
+    setData(prev => ({
+      ...prev, city, state, country,
+      placeAt: { latitude: option.latitude, longitude: option.longitude },
+    }));
+    setErrors(e => ({ ...e, city: undefined, country: undefined }));
+    setPlaceOptions(null);
+    setPlaceNote(null);
+    setDir('fwd'); setAnimKey(k => k+1); setCurrentStep(currentStep + 1);
+  }
+
+  /**
+   * Finds out which place a typed city means, before anything is calculated.
+   *
+   * Only runs when the city was typed by hand: a place picked from Google's list already carries
+   * its coordinates, and there is nothing to be uncertain about. This is the path that used to
+   * guess in silence — "Harbor City, United States" resolving to Benton Harbor, Michigan, with
+   * nobody told.
+   *
+   * If the lookup itself is unavailable, the person is not blocked. The server no longer invents
+   * a place when it cannot find one, so the worst that happens is a clear failure at the end
+   * rather than a wrong chart.
+   */
+  async function confirmPlace(): Promise<void> {
+    setPlaceBusy(true);
+    setPlaceNote(null);
+    try {
+      const res = await fetch('/api/app/place-check', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          city: [data.city, data.state].filter(Boolean).join(', ').trim(),
+          country: data.country.trim(),
+          birthDate: buildDate(data.birthMonth, data.birthDay, data.birthYear),
+        }),
+      });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data?.candidates) && json.data.candidates.length > 0) {
+        setPlaceOptions(json.data.candidates as PlaceOption[]);
+      } else {
+        setPlaceOptions(null);
+        setPlaceNote(json.error ?? 'We could not find that place. Check the spelling, or add the state or region.');
+      }
+    } catch {
+      setPlaceOptions(null);
+      setPlaceNote('We could not check that place just now. You can continue, and we will try again when your chart is calculated.');
+    } finally {
+      setPlaceBusy(false);
+    }
+  }
 
   async function submit() {
     const errs = Object.fromEntries(
@@ -574,9 +662,84 @@ export default function CalculatorForm() {
               </Field>
             </div>
 
+            {/* Which place was meant. Only ever shown for a city typed by hand — one picked from
+                Google's list arrives with its coordinates and needs no confirming. */}
+            <div aria-live="polite">
+              {data.placeAt && !placeOptions ? (
+                <p style={{ margin:'4px 0 0', fontSize:13, lineHeight:1.5, color:'var(--parchment-70)' }}>
+                  <span aria-hidden="true" style={{ color:'var(--emerald)', marginRight:6 }}>✓</span>
+                  Using the exact location of {[data.city, data.state, data.country].filter(Boolean).join(', ')}.
+                </p>
+              ) : null}
+
+              {placeOptions ? (
+                <div style={{
+                  marginTop:4, padding:'16px 18px', borderRadius:10,
+                  border:'1px solid var(--grid-line)', background:'rgba(255,255,255,0.02)',
+                }}>
+                  <p id="place-pick-label" style={{ margin:'0 0 4px', fontSize:14, color:'var(--parchment)' }}>
+                    {placeOptions.length === 1 ? 'Is this the right place?' : 'Which one were you born in?'}
+                  </p>
+                  <p style={{ margin:'0 0 14px', fontSize:13, lineHeight:1.5, color:'var(--parchment-70)' }}>
+                    The time zone decides your rising sign and your Human Design, so this has to be the right one.
+                  </p>
+                  <div role="group" aria-labelledby="place-pick-label" style={{ display:'grid', gap:8 }}>
+                    {placeOptions.map(option => (
+                      <button
+                        key={option.label}
+                        type="button"
+                        onClick={() => choosePlace(option)}
+                        style={{
+                          display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
+                          minHeight:48, padding:'10px 14px', textAlign:'left', cursor:'pointer',
+                          borderRadius:8, border:'1px solid var(--grid-line)',
+                          background:'transparent', color:'var(--parchment)', font:'inherit', fontSize:14,
+                          transition:'border-color 0.18s var(--ease), background 0.18s var(--ease)',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--amber)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--grid-line)'; }}
+                      >
+                        <span>{option.label}</span>
+                        {option.utcOffset ? (
+                          <span style={{ fontSize:13, color:'var(--parchment-40)', whiteSpace:'nowrap' }}>
+                            {option.utcOffset}
+                          </span>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setPlaceOptions(null); cityRef.current?.focus(); }}
+                    style={{
+                      marginTop:12, minHeight:44, padding:'8px 2px', background:'none', border:'none',
+                      color:'var(--parchment-70)', font:'inherit', fontSize:13,
+                      textDecoration:'underline', textUnderlineOffset:3, cursor:'pointer',
+                    }}>
+                    None of these — let me edit the city
+                  </button>
+                </div>
+              ) : null}
+
+              {placeNote ? (
+                <p style={{ margin:'8px 0 0', fontSize:13, lineHeight:1.5, color:'var(--signal-red)' }}>
+                  {placeNote}
+                </p>
+              ) : null}
+            </div>
+
             <div className="calc-2col" style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12, marginTop:8 }}>
               <button type="button" onClick={goBack} className="t3d-ghost">← BACK</button>
-              <button type="button" onClick={advance} className="t3d-cta">CONTINUE</button>
+              {/* While a list is on screen the only ways on are picking one or editing the city,
+                  so Continue cannot become a way of skipping the question it just asked. */}
+              <button type="button" onClick={advance} className="t3d-cta"
+                disabled={placeBusy || !!placeOptions}
+                style={placeOptions ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}>
+                {placeBusy ? 'CHECKING THE PLACE…'
+                  : placeOptions ? 'CHOOSE A PLACE ABOVE'
+                  : placeNote ? 'CONTINUE ANYWAY'
+                  : 'CONTINUE'}
+              </button>
             </div>
           </div>
         )}

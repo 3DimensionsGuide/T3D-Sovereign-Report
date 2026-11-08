@@ -223,7 +223,9 @@ test('calculator: the autocomplete asks Google where the place is', () => {
 
 test('calculator: editing the place by hand abandons the picked coordinates', () => {
   // Otherwise a chart is calculated for the place that was picked, not the one now in the box.
-  assert.match(form, /if \(field === 'city' \|\| field === 'state' \|\| field === 'country'\) next\.placeAt = null;/);
+  // What else that branch clears is tests/app/calculatorPlace.test.ts's business; here it only
+  // has to be true that editing a place field drops the coordinates.
+  assert.match(form, /if \(field === 'city' \|\| field === 'state' \|\| field === 'country'\)[\s\S]{0,120}next\.placeAt = null;/);
   assert.match(form, /placeAt: null/);
 });
 
