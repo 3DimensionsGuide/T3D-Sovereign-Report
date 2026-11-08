@@ -71,15 +71,25 @@ try {
     FROM leads
     ORDER BY id
   `;
-  console.log(`Checked ${leads.length} lead${leads.length === 1 ? '' : 's'}.\n`);
+  // Printed after the loop, once the blanked ones have been counted.
 
   const byEngine = new Map();
+  const say = () => console.log(
+    `Checked ${leads.length - blanked} lead${leads.length - blanked === 1 ? '' : 's'}` +
+    (blanked ? `, and skipped ${blanked} already deleted.` : '.') + '\n');
+  let blanked = 0;
   const ambiguous = [];
   const nonexistent = [];
   const fallbackPlace = [];
   const unreadable = [];
 
   for (const lead of leads) {
+    // Already emptied by a deletion: it keeps placeholder birth data that every check below would
+    // happily read as a real birth. Counted, not examined.
+    if (typeof lead.email === 'string' && lead.email.endsWith('@deleted.invalid')) {
+      blanked++;
+      continue;
+    }
     const bd = lead.birth_data ?? {};
     const place = bd.place ?? {};
     const date = bd.date;
@@ -115,6 +125,8 @@ try {
     }
   }
 
+  say();
+
   const report = (title, rows, note) => {
     console.log(`${title}: ${rows.length}`);
     if (rows.length === 0) return;
@@ -140,7 +152,7 @@ try {
     const mark = version === ENGINE_VERSION ? 'current  ' : 'unverified';
     console.log(`  ${mark}  ${String(count).padStart(4)}  ${label}`);
   }
-  const stale = leads.length - (byEngine.get(ENGINE_VERSION) ?? 0);
+  const stale = (leads.length - blanked) - (byEngine.get(ENGINE_VERSION) ?? 0);
   if (stale > 0) {
     console.log(`\n  ${stale} chart${stale === 1 ? '' : 's'} predate the current engines. To see which of them`);
     console.log('  actually come out differently now, and not merely which are old:');

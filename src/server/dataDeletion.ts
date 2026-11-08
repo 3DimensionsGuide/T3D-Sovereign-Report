@@ -23,6 +23,19 @@ export function planDeletion(leadIds: number[], idsWithOrders: ReadonlySet<numbe
   return { removeIds, blankIds };
 }
 
+/**
+ * True for a record already emptied by a deletion.
+ *
+ * Such a row keeps its id and its order, and carries placeholder birth data: 1 January of year 1,
+ * midnight, at 0,0. That is still a valid birth moment as far as the engines are concerned, so
+ * anything that recalculates charts in bulk will happily produce one for it and report it as
+ * differing from the empty result stored — which is true, and meaningless. Tools that sweep the
+ * leads table should skip these rather than count them.
+ */
+export function isBlankedLead(lead: { email?: string | null }): boolean {
+  return typeof lead.email === 'string' && lead.email.endsWith('@deleted.invalid');
+}
+
 /** Values written over a record that has to stay because an order points to it. */
 export function blankedLead(id: number) {
   return {

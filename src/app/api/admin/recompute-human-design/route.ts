@@ -78,6 +78,7 @@ import { calculateHumanDesign } from '@/server/engines/human_design';
 import { calculateAstrology } from '@/server/engines/astrology';
 import { resolveGeoAndTimezone } from '@/server/geocoding';
 import { limitRequest } from '@/server/rateLimit';
+import { isBlankedLead } from '@/server/dataDeletion';
 
 type BirthData = {
   date: string;
@@ -285,7 +286,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     const MEANINGFUL = ['type', 'authority', 'profile', 'strategy', 'notSelf', 'incarnationCross', 'definedCenters', 'undefinedCenters', 'activeChannels'];
     const affected: Record<string, unknown>[] = [];
     let errors = 0;
+    let blanked = 0;
     for (const row of all) {
+      // A deleted record still holds placeholder birth data, which the engines will cheerfully
+      // turn into a chart. Comparing that against the empty result stored reports a difference
+      // for every field, every time, for every deleted row — noise that buries a real finding.
+      if (isBlankedLead(row)) { blanked++; continue; }
       const bd = row.birthData as BirthData;
       const stored = ((row.results ?? {}) as HumanDesignResults).humanDesign ?? {};
       if (!bd?.date || !bd?.time || !bd?.place) { errors++; continue; }
@@ -305,7 +311,15 @@ export async function GET(request: Request): Promise<NextResponse> {
         }
       } catch { errors++; }
     }
-    return NextResponse.json({ mode: 'scan', totalLeads: all.length, affectedCount: affected.length, errors, affected });
+    return NextResponse.json({
+      mode: 'scan',
+      totalLeads: all.length,
+      checked: all.length - blanked,
+      blanked,
+      affectedCount: affected.length,
+      errors,
+      affected,
+    });
   }
 
   const emailParam = url.searchParams.get('email');
