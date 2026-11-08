@@ -28,7 +28,7 @@ import type {
   HouseData,
   ZodiacSign,
 } from './types';
-import { DateTime } from 'luxon';
+import { resolveLocalInstant } from '@/server/localInstant';
 import fs from 'fs';
 
 // ─── SWISSEPH IMPORT & CONSTANTS ─────────────────────────────────────────────
@@ -161,19 +161,18 @@ function initEphemeris(): void {
  * Convert a local birth date + time + IANA timezone to a Julian Day Number (UT).
  *
  * Flow: Local Time → UTC (via IANA timezone) → Julian Day Number
+ *
+ * The first step is the delicate one, because twice a year a wall-clock reading names either two
+ * moments or none. src/server/localInstant.ts settles that from the zone's own rules rather than
+ * from the offset in force today, so a chart does not move when the clocks do.
  */
 export function localToJulianDay(
   dateStr: string,  // YYYY-MM-DD
   timeStr: string,  // HH:MM
   timezone: string, // IANA e.g. "America/Los_Angeles"
 ): number {
-  // Parse as local datetime in the given timezone, then convert to UTC
-  const localDt = DateTime.fromISO(`${dateStr}T${timeStr}:00`, { zone: timezone });
-  if (!localDt.isValid) {
-    throw new Error(`Invalid date/time/timezone: ${dateStr} ${timeStr} ${timezone} — ${localDt.invalidReason}`);
-  }
+  const { utc } = resolveLocalInstant(dateStr, timeStr, timezone);
 
-  const utc = localDt.toUTC();
   // Swiss Ephemeris expects hour as decimal
   const hourDecimal = utc.hour + utc.minute / 60 + utc.second / 3600;
 

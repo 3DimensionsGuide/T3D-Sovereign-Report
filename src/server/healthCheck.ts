@@ -9,6 +9,11 @@
  * The reference charts are synthetic (no real people). The expected values below come
  * from tests/golden/snapshot.json. If that snapshot is ever refreshed on purpose,
  * refresh these too (tests/app/health.test.ts fails until you do).
+ *
+ * One of them is a daylight-saving edge on purpose. A birth in the repeated hour of a clock change
+ * is the case that quietly moved when the offset was left to be guessed, and three ordinary charts
+ * all agreed while it was broken — so production reported itself healthy. See
+ * src/server/localInstant.ts and tests/app/localInstant.test.ts.
  */
 
 import { calculateAstrology } from '@/server/engines/astrology';
@@ -49,6 +54,14 @@ export const REFERENCES: readonly Reference[] = [
     timezone: 'Europe/London', firstName: 'John', lastName: 'Henry',
     sun: 279.935, moon: 139.188, ascendant: 186.98, northNode: 249.959,
     type: 'Manifestor', authority: 'Splenic', profile: '1/3', lifePath: 6,
+  },
+  {
+    // The clocks went back from 2:00 to 1:00 that night, so this 1:30 AM happened twice. Astro.com
+    // and Jovian Archive both read it as the first one; tests/golden/verification.json records both.
+    id: 'nyc-ambiguous-2005', birthDate: '2005-10-30', birthTime: '01:30', latitude: 40.7128, longitude: -74.006,
+    timezone: 'America/New_York', firstName: 'Omar', lastName: 'Henry',
+    sun: 216.892, moon: 183.718, ascendant: 146.159, northNode: 13.588,
+    type: 'Manifesting Generator', authority: 'Emotional', profile: '6/2', lifePath: 11,
   },
   {
     id: 'sydney-leapday-2000', birthDate: '2000-02-29', birthTime: '12:00', latitude: -33.8688, longitude: 151.2093,
