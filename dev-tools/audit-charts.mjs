@@ -33,9 +33,18 @@ import { ENGINE_VERSION } from '../src/server/engines/version.ts';
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
 
-const url = process.env.DATABASE_URL;
+// --prod reads NEON_DATABASE_URL from .env.local instead, so the production connection string is
+// pasted once and never again. Only the read-only tools accept it. run-sql.mjs deliberately does
+// not: writing to production should stay deliberate and slightly awkward.
+const useProd = process.argv.includes('--prod');
+const url = useProd ? process.env.NEON_DATABASE_URL : process.env.DATABASE_URL;
 if (!url) {
-  console.error('DATABASE_URL is not set. Check .env.local.');
+  if (useProd) {
+    console.error('NEON_DATABASE_URL is not set in .env.local.');
+    console.error('Add it as one line: NEON_DATABASE_URL=postgresql://...  (Neon console, green Connect button)');
+  } else {
+    console.error('DATABASE_URL is not set. Check .env.local.');
+  }
   process.exit(1);
 }
 
