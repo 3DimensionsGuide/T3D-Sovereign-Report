@@ -37,7 +37,15 @@ if (!url) {
 const FALLBACK_LAT = 40.7128;
 const FALLBACK_LNG = -74.006;
 
-const where = new URL(url);
+let where;
+try {
+  where = new URL(url);
+} catch {
+  console.error(`DATABASE_URL is not a connection string: ${url}`);
+  console.error('It should look like postgresql://user:password@host/database');
+  console.error('If that is a placeholder in angle brackets, replace the whole thing, brackets included.');
+  process.exit(1);
+}
 console.log(`Database: ${where.hostname}:${where.port || 5432}/${where.pathname.replace('/', '')}\n`);
 
 const client = postgres(url, { max: 1, onnotice: () => {} });
