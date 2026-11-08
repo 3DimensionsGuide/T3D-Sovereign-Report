@@ -16,7 +16,7 @@ import { issueOptInCode } from '@/server/optInCode';
 import { calculateNumerology }  from '@/server/engines/numerology';
 import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
-import { resolveGeoAndTimezone } from '@/server/geocoding';
+import { resolveGeoAndTimezone, PLACE_LOOKUP_UNAVAILABLE, PLACE_NOT_FOUND } from '@/server/geocoding';
 import type { T3DCalculatorInput } from '@/server/engines/types';
 import { limitRequest } from '@/server/rateLimit';
 import { makeAppSessionToken } from '@/server/appTokens';
@@ -57,20 +57,20 @@ export async function POST(
     }
 
     // 3. Resolve coordinates — use provided values or geocode
-    let latitude  = body.birthPlace.latitude;
-    let longitude = body.birthPlace.longitude;
-    let timezone  = body.birthPlace.timezone;
+    //
+    //    Tested for being a number rather than for being truthy: longitude 0 runs through Greenwich
+    //    and latitude 0 along the equator, and a falsy test threw away a place the person had
+    //    already confirmed and looked it up again, possibly landing somewhere else.
+    const place = body.birthPlace;
+    const confirmed =
+      typeof place.latitude === 'number' && Number.isFinite(place.latitude) &&
+      typeof place.longitude === 'number' && Number.isFinite(place.longitude) &&
+      typeof place.timezone === 'string' && place.timezone.trim().length > 0
+        ? { latitude: place.latitude, longitude: place.longitude, timezone: place.timezone }
+        : null;
 
-    if (!latitude || !longitude || !timezone) {
-      const geo = await resolveGeoAndTimezone(
-        body.birthPlace.city,
-        body.birthPlace.country,
-        body.birthDate,
-      );
-      latitude  = geo.latitude;
-      longitude = geo.longitude;
-      timezone  = geo.timezone;
-    }
+    const { latitude, longitude, timezone } =
+      confirmed ?? (await resolveGeoAndTimezone(place.city, place.country, body.birthDate));
 
     const birthTime = body.birthTime?.trim() || '12:00';
 
@@ -210,6 +210,23 @@ export async function POST(
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown server error';
+
+    // A birth place that could not be resolved is the person's problem to fix or ours, not a
+    // calculation that failed. Either way it must never become a chart: the whole point of these
+    // two is that no coordinates are invented when the real ones are unknown.
+    if (message === PLACE_NOT_FOUND) {
+      return NextResponse.json({
+        success: false,
+        error: 'We could not find that birth place. Please check the city and country and try again.',
+      }, { status: 400 });
+    }
+    if (message === PLACE_LOOKUP_UNAVAILABLE) {
+      return NextResponse.json({
+        success: false,
+        error: 'We could not look up birth places just now. Please try again in a few minutes.',
+      }, { status: 503 });
+    }
+
     console.error('[T3D Calculation Error]', error);
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }

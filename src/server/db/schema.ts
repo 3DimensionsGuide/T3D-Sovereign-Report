@@ -18,6 +18,7 @@ import {
   timestamp,
   jsonb,
   boolean,
+  doublePrecision,
   index,
   uniqueIndex,
   primaryKey,
@@ -171,6 +172,45 @@ export const orders = pgTable(
 export type Order    = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 
+
+// ─── PLACES TABLE ────────────────────────────────────────────────────────────
+//
+// Birth places already looked up. Somewhere's coordinates and time zone do not change, so a place
+// is asked about once and read from here afterwards. GeoNames' free tier has hourly and daily
+// credit ceilings and no fallback provider behind it, and before this every single chart spent one
+// — which would have run out first at exactly the moment traffic arrived.
+//
+// Nothing here is personal: a row is a city name and where it is. Several people born in the same
+// city share one row, and a row says nothing about who asked.
+
+export const places = pgTable(
+  'places',
+  {
+    id: serial('id').primaryKey(),
+
+    // The question that was asked, folded to one form: "city|country", lower case, spacing
+    // collapsed. See placeCacheKey() in src/server/geocoding.ts.
+    query: text('query').notNull(),
+
+    // What GeoNames called it, for example "Paris, Île-de-France, France". Shown nowhere yet; kept
+    // so a surprising cache entry can be recognised without re-querying.
+    label: text('label').notNull(),
+
+    latitude:  doublePrecision('latitude').notNull(),
+    longitude: doublePrecision('longitude').notNull(),
+    // IANA identifier, for example "America/New_York".
+    timezone:  text('timezone').notNull(),
+
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    queryIdx: uniqueIndex('places_query_idx').on(table.query),
+  }),
+);
+
+export type Place    = typeof places.$inferSelect;
+export type NewPlace = typeof places.$inferInsert;
 
 // ─── APP EVENTS TABLE ────────────────────────────────────────────────────────
 // Anonymous daily counts of which app screens were opened. One row per day and
