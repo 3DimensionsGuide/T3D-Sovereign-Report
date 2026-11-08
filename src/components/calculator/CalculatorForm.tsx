@@ -31,6 +31,15 @@ interface FormState {
   city:        string;
   state:       string;
   country:     string;
+  /**
+   * Where the picked place actually is, when one was picked from Google's list.
+   *
+   * Google knows this exactly; without it the server has to search for the name in a different
+   * database, and "Harbor City, United States" finds Benton Harbor, Michigan. Null whenever the
+   * city was typed by hand, or edited after being picked, or Google could not load — the only
+   * cases that still need searching for.
+   */
+  placeAt:     { latitude: number; longitude: number } | null;
   email:       string;
   emailOptIn:  boolean;
 }
@@ -57,7 +66,7 @@ const INIT: FormState = {
   firstName: '', middleName: '', lastName: '',
   birthMonth: '', birthDay: '', birthYear: '',
   birthHour: '', birthMinute: '00', birthPeriod: 'AM',
-  city: '', state: '', country: '',
+  city: '', state: '', country: '', placeAt: null,
   email: '', emailOptIn: false,
 };
 
@@ -283,6 +292,10 @@ export default function CalculatorForm() {
   function set<K extends FKey>(field: K, value: FormState[K]) {
     setData(prev => {
       const next = { ...prev, [field]: value };
+      // Editing the place by hand abandons the coordinates that came with the picked one. They
+      // belong to a place that is no longer what the box says, and sending them would calculate
+      // a chart for somewhere the person did not type.
+      if (field === 'city' || field === 'state' || field === 'country') next.placeAt = null;
       if (touched[field]) validate(field, next);
       if ((field === 'birthMonth' || field === 'birthDay') && touched.birthYear) validate('birthYear', next);
       return next;
@@ -309,15 +322,23 @@ export default function CalculatorForm() {
     if (placesInit.current || !cityRef.current || !window.google?.maps?.places) return;
     placesInit.current = true;
     const ac = new window.google.maps.places.Autocomplete(cityRef.current, {
-      types: ['(cities)'], fields: ['address_components','name'],
+      // geometry is the whole point: it is where the place is. Taking only the name and letting
+      // the server search for it again is how a birth in Harbor City, California became one in
+      // Benton Harbor, Michigan.
+      types: ['(cities)'], fields: ['address_components','name','geometry.location'],
     });
     ac.addListener('place_changed', () => {
       const place = ac.getPlace();
       const city    = place.name ?? '';
       const country = place.address_components?.find((c: any) => c.types.includes('country'))?.long_name ?? '';
       const stateComp = place.address_components?.find((c: any) => c.types.includes('administrative_area_level_1'))?.long_name ?? '';
+      const lat = place.geometry?.location?.lat?.();
+      const lng = place.geometry?.location?.lng?.();
+      const placeAt = typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng)
+        ? { latitude: lat, longitude: lng }
+        : null;
       setData(prev => {
-        const next = { ...prev, city, state: stateComp, country };
+        const next = { ...prev, city, state: stateComp, country, placeAt };
         validate('city', next); validate('country', next);
         return next;
       });
@@ -380,6 +401,9 @@ export default function CalculatorForm() {
           birthPlace: {
             city: [data.city, data.state].filter(Boolean).join(', '),
             country: data.country.trim(),
+            // Present whenever the place came from Google's list. The server then has nothing to
+            // search for: it reads the time zone off the coordinates, which only ever have one.
+            ...(data.placeAt ?? {}),
           },
         }),
       });

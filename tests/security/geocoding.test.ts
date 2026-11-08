@@ -131,9 +131,11 @@ test('geocoding: the cache table is in the schema and in a migration, and they a
 test('geocoding: a chart costs one GeoNames call, not two', () => {
   const resolve = geocoding.slice(geocoding.indexOf('async function geocodeFromGeoNames'), geocoding.indexOf('export async function resolveGeoAndTimezone'));
   assert.equal((resolve.match(/await fetch\(/g) ?? []).length, 1, 'more than one call per lookup');
-  // style=FULL carries the time zone back with the coordinates, so timezoneJSON is not needed.
-  assert.ok(!geocoding.includes('timezoneJSON'), 'the second GeoNames endpoint is back');
-  assert.ok(read('src/server/geocoding.ts').includes('timezoneJSON'), 'the note explaining why it went should stay');
+  // style=FULL carries the time zone back with the coordinates, so searching for a place by name
+  // needs no second call. timezoneJSON still exists in this file, for resolveTimezoneAt — asking
+  // what zone a known point is in is a different question, and not one that can be got wrong.
+  assert.ok(!resolve.includes('timezoneJSON'), 'the name search is calling the second endpoint again');
+  assert.match(geocoding, /export async function resolveTimezoneAt/);
   assert.match(resolve, /searchParams\.set\('style', 'FULL'\)/);
 });
 
@@ -145,9 +147,13 @@ test('geocoding: a search is restricted to populated places', () => {
 
 test('geocoding: a slow lookup gives up rather than holding a calculation open', () => {
   assert.match(geocoding, /const LOOKUP_TIMEOUT_MS = \d+/);
-  assert.equal((geocoding.match(/new AbortController\(\)/g) ?? []).length, 2);
-  assert.equal((geocoding.match(/signal: controller\.signal/g) ?? []).length, 2);
-  assert.equal((geocoding.match(/clearTimeout\(timer\)/g) ?? []).length, 2);
+  // Three places reach GeoNames: a name search, the candidates list, and a zone for a point.
+  // Every one of them has to be able to give up.
+  const reaches = (geocoding.match(/await fetch\(/g) ?? []).length;
+  assert.equal(reaches, 3);
+  for (const guard of [/new AbortController\(\)/g, /signal: controller\.signal/g, /clearTimeout\(timer\)/g]) {
+    assert.equal((geocoding.match(guard) ?? []).length, reaches, String(guard));
+  }
 });
 
 // ─── a place the person already confirmed is not looked up again ─────────────
@@ -158,5 +164,69 @@ test('calculate: coordinates are tested for being numbers, not for being truthy'
   assert.ok(!/if \(!latitude \|\| !longitude \|\| !timezone\)/.test(calculate), 'the falsy test is back');
   assert.match(calculate, /typeof place\.latitude === 'number' && Number\.isFinite\(place\.latitude\)/);
   assert.match(calculate, /typeof place\.longitude === 'number' && Number\.isFinite\(place\.longitude\)/);
-  assert.match(calculate, /confirmed \?\? \(await resolveGeoAndTimezone\(/);
+  assert.match(calculate, /const haveCoordinates =/);
+  assert.match(calculate, /: await resolveGeoAndTimezone\(place\.city, place\.country, body\.birthDate\)/);
+});
+
+// ─── when the browser already knows where the place is ──────────────────────
+//
+// The website's autocomplete asked Google for the place's name and threw away its coordinates,
+// then had the server search for that name in a different database. Google knew exactly where
+// "Harbor City, California" was; GeoNames, given the string "Harbor City, United States",
+// answered Benton Harbor, Michigan. The coordinates are now kept, and a point on the Earth has
+// exactly one time zone, so nothing is searched for by name at all.
+
+const form = code('src/components/calculator/CalculatorForm.tsx');
+
+test('geocoding: a time zone is refused for coordinates that are not on the Earth', async () => {
+  const { resolveTimezoneAt, PLACE_NOT_FOUND } = await geocodingModule();
+  const impossible: [number, number][] = [
+    [91, 0], [-91, 0], [0, 181], [0, -181], [NaN, 0], [0, NaN], [Infinity, 0],
+  ];
+  for (const [lat, lng] of impossible) {
+    await assert.rejects(
+      () => resolveTimezoneAt(lat, lng),
+      (e: Error) => e.message === PLACE_NOT_FOUND,
+      `${lat}, ${lng}`,
+    );
+  }
+});
+
+test('geocoding: a time zone lookup needs an account too, and never invents one', async () => {
+  const { resolveTimezoneAt, PLACE_LOOKUP_UNAVAILABLE } = await geocodingModule();
+  await withoutGeoNames(async () => {
+    await assert.rejects(
+      () => resolveTimezoneAt(33.79002, -118.29785),
+      (e: Error) => e.message === PLACE_LOOKUP_UNAVAILABLE,
+    );
+  });
+});
+
+test('geocoding: a coordinate cache key cannot collide with a place name', () => {
+  // Place names are "city|country"; coordinates are "@lat,lng". Nothing a person can type into
+  // the city box produces a key beginning with @ followed by two numbers.
+  assert.match(geocoding, /const key = `@\$\{round\(latitude\)\},\$\{round\(longitude\)\}`/);
+  assert.match(geocoding, /Math\.round\(n \* 1000\) \/ 1000/);
+});
+
+test('calculate: coordinates are used when present, and the name only when they are not', () => {
+  // The zone comes off the coordinates when the browser did not send one.
+  assert.match(calculate, /timezone: haveZone \? place\.timezone! : await resolveTimezoneAt\(place\.latitude!, place\.longitude!\)/);
+  // Searching by name is the last resort, not the default.
+  assert.match(calculate, /: await resolveGeoAndTimezone\(place\.city, place\.country, body\.birthDate\)/);
+});
+
+test('calculator: the autocomplete asks Google where the place is', () => {
+  assert.match(form, /fields: \['address_components','name','geometry\.location'\]/);
+  assert.match(form, /place\.geometry\?\.location\?\.lat\?\.\(\)/);
+});
+
+test('calculator: editing the place by hand abandons the picked coordinates', () => {
+  // Otherwise a chart is calculated for the place that was picked, not the one now in the box.
+  assert.match(form, /if \(field === 'city' \|\| field === 'state' \|\| field === 'country'\) next\.placeAt = null;/);
+  assert.match(form, /placeAt: null/);
+});
+
+test('calculator: the coordinates are sent with the birth place', () => {
+  assert.match(form, /\.\.\.\(data\.placeAt \?\? \{\}\)/);
 });

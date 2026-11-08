@@ -176,6 +176,69 @@ export async function resolveGeoAndTimezone(
   return geo;
 }
 
+/**
+ * The IANA time zone at one coordinate.
+ *
+ * Separate from resolveGeoAndTimezone because it answers a different question. That one searches
+ * for a place by name, which is the step that can land on the wrong Harbor City. This one is given
+ * a point on the Earth, and a point is not ambiguous — it has exactly one time zone, and no
+ * spelling can change which.
+ *
+ * Used when the browser already knows where the place is. The website's calculator reads the
+ * coordinates straight off the place the person picked from Google's own list, so the only thing
+ * still missing is the zone, and nothing needs to be searched for by name at all.
+ *
+ * Cached in the same table, under a key no place name can collide with. Coordinates are rounded to
+ * three decimals, about a hundred metres, which is far finer than any time zone boundary and
+ * coarse enough that two people born in the same town share a row.
+ *
+ * @throws PLACE_LOOKUP_UNAVAILABLE no account configured, or GeoNames could not be reached.
+ */
+export async function resolveTimezoneAt(latitude: number, longitude: number): Promise<string> {
+  if (!Number.isFinite(latitude) || Math.abs(latitude) > 90) throw new Error(PLACE_NOT_FOUND);
+  if (!Number.isFinite(longitude) || Math.abs(longitude) > 180) throw new Error(PLACE_NOT_FOUND);
+
+  const round = (n: number) => Math.round(n * 1000) / 1000;
+  const key = `@${round(latitude)},${round(longitude)}`;
+
+  const cached = await readCachedPlace(key);
+  if (cached) return cached.timezone;
+
+  const username = process.env.GEONAMES_USERNAME;
+  if (!username) {
+    console.error('[T3D Geocoding] No GEONAMES_USERNAME is set, so time zones cannot be looked up.');
+    throw new Error(PLACE_LOOKUP_UNAVAILABLE);
+  }
+
+  const url = new URL('https://secure.geonames.org/timezoneJSON');
+  url.searchParams.set('lat', String(latitude));
+  url.searchParams.set('lng', String(longitude));
+  url.searchParams.set('username', username);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
+  let data: { timezoneId?: string; status?: { message: string } };
+  try {
+    const res = await fetch(url.toString(), { cache: 'no-store', signal: controller.signal });
+    data = await res.json() as typeof data;
+  } catch (error: unknown) {
+    console.error('[T3D Geocoding] GeoNames could not be reached for a time zone:', error instanceof Error ? error.message : 'unknown');
+    throw new Error(PLACE_LOOKUP_UNAVAILABLE);
+  } finally {
+    clearTimeout(timer);
+  }
+
+  if (data.status || !data.timezoneId) {
+    console.error('[T3D Geocoding] GeoNames returned no time zone:', data.status?.message ?? 'no timezoneId');
+    throw new Error(PLACE_LOOKUP_UNAVAILABLE);
+  }
+
+  await cachePlace(key, `${round(latitude)}, ${round(longitude)}`, {
+    latitude: round(latitude), longitude: round(longitude), timezone: data.timezoneId,
+  });
+  return data.timezoneId;
+}
+
 // ─── PLACE CANDIDATES (for the app's "confirm your birth place" step) ─────────
 
 export interface PlaceCandidate {

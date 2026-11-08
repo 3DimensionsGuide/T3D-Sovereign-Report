@@ -16,7 +16,7 @@ import { issueOptInCode } from '@/server/optInCode';
 import { calculateNumerology }  from '@/server/engines/numerology';
 import { calculateAstrology }   from '@/server/engines/astrology';
 import { calculateHumanDesign } from '@/server/engines/human_design';
-import { resolveGeoAndTimezone, PLACE_LOOKUP_UNAVAILABLE, PLACE_NOT_FOUND } from '@/server/geocoding';
+import { resolveGeoAndTimezone, resolveTimezoneAt, PLACE_LOOKUP_UNAVAILABLE, PLACE_NOT_FOUND } from '@/server/geocoding';
 import type { T3DCalculatorInput } from '@/server/engines/types';
 import { limitRequest } from '@/server/rateLimit';
 import { makeAppSessionToken } from '@/server/appTokens';
@@ -62,16 +62,31 @@ export async function POST(
     //    Tested for being a number rather than for being truthy: longitude 0 runs through Greenwich
     //    and latitude 0 along the equator, and a falsy test threw away a place the person had
     //    already confirmed and looked it up again, possibly landing somewhere else.
+    //    Three ways a place arrives, in order of how much is already known:
+    //
+    //      coordinates and zone   the app's confirm-your-place step, which sends all three
+    //      coordinates only       the website, reading them off the place the person picked from
+    //                             Google's own list; only the zone is still to find, and a point
+    //                             has exactly one, so nothing is searched for by name
+    //      a name only            typed by hand, or Google unavailable. The only path that has to
+    //                             guess which place was meant, and the one that can guess wrong.
+    //
+    //    Coordinates are tested for being finite numbers rather than for being truthy: longitude 0
+    //    runs through Greenwich and latitude 0 along the equator, and a falsy test threw away a
+    //    place the person had already confirmed.
     const place = body.birthPlace;
-    const confirmed =
+    const haveCoordinates =
       typeof place.latitude === 'number' && Number.isFinite(place.latitude) &&
-      typeof place.longitude === 'number' && Number.isFinite(place.longitude) &&
-      typeof place.timezone === 'string' && place.timezone.trim().length > 0
-        ? { latitude: place.latitude, longitude: place.longitude, timezone: place.timezone }
-        : null;
+      typeof place.longitude === 'number' && Number.isFinite(place.longitude);
+    const haveZone = typeof place.timezone === 'string' && place.timezone.trim().length > 0;
 
-    const { latitude, longitude, timezone } =
-      confirmed ?? (await resolveGeoAndTimezone(place.city, place.country, body.birthDate));
+    const { latitude, longitude, timezone } = haveCoordinates
+      ? {
+          latitude: place.latitude!,
+          longitude: place.longitude!,
+          timezone: haveZone ? place.timezone! : await resolveTimezoneAt(place.latitude!, place.longitude!),
+        }
+      : await resolveGeoAndTimezone(place.city, place.country, body.birthDate);
 
     const birthTime = body.birthTime?.trim() || '12:00';
 
