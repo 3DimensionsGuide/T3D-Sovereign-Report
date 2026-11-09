@@ -1,8 +1,8 @@
 import { toast } from '@/lib/toast';
 import { warn } from '@/lib/haptics';
 import { ErrorLine } from '@/components/ErrorLine';
-import { useState } from 'react';
-import { StyleSheet, Switch, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, StyleSheet, Switch, Text, View } from 'react-native';
 import { Pressable } from '@/components/Pressable';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -23,6 +23,13 @@ import { useCoachStore } from '@/store/useCoachStore';
 import { useJourneyStore } from '@/store/useJourneyStore';
 import { useT3DStore } from '@/store/useT3DStore';
 import { colors, fonts, radius, space, guidance } from '@/theme/tokens';
+
+const TITLES = ['What is your name?', 'When were you born?', 'Where were you born?'];
+const LEDES = [
+  'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can. Not everyone has a middle name; include yours if you have one.',
+  'Your birth date and time set your Life Path, Sun sign, Rising sign and Human Design.',
+  'City and state, then the country. The place gives us the coordinates and time zone for the exact moment you were born.',
+];
 
 const pad = (n: number) => String(n).padStart(2, '0');
 /** Local-time formatting (avoids the off-by-one-day bug of toISOString). */
@@ -77,6 +84,33 @@ export default function Onboarding() {
   const [candidates, setCandidates] = useState<PlaceCandidate[] | null>(null);
   const [chosen, setChosen] = useState(0);
   const [shake, setShake] = useState(0);
+  /**
+   * Onboarding swaps six screens in place — three wizard steps, the place check, the
+   * calculation, the reveal, the email ask and the code — without ever navigating. Nothing
+   * tells a screen reader that the screen changed, so a VoiceOver user was left on a stale
+   * focus with no idea the page under them had become a different one. This says so.
+   */
+  const stage = codeStep ? 'code'
+    : askEmail ? 'email'
+    : revealing ? 'reveal'
+    : calculating ? 'calculating'
+    : candidates ? 'place'
+    : `step-${step}`;
+  const stageHeading = codeStep ? 'Check your email.'
+    : askEmail ? 'Where can we reach you?'
+    : revealing ? 'Your chart is ready.'
+    : calculating ? 'Calculating your chart.'
+    : candidates ? 'Is this where you were born?'
+    : `${TITLES[step]} Step ${step + 1} of 3.`;
+  const spoken = useRef(stage);
+  useEffect(() => {
+    // Not on first render: the screen reader reads a screen it has just arrived at anyway,
+    // and announcing over that talks across it.
+    if (spoken.current === stage) return;
+    spoken.current = stage;
+    AccessibilityInfo.announceForAccessibility(stageHeading);
+  }, [stage, stageHeading]);
+
   const onDateChange = (_event: unknown, value: Date) => setBirthDate(value);
   const onTimeChange = (_event: unknown, value: Date) => setBirthTime(value);
 
@@ -427,13 +461,6 @@ export default function Onboarding() {
       </Screen>
     );
   }
-
-  const TITLES = ['What is your name?', 'When were you born?', 'Where were you born?'];
-  const LEDES = [
-    'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can. Not everyone has a middle name; include yours if you have one.',
-    'Your birth date and time set your Life Path, Sun sign, Rising sign and Human Design.',
-    'City and state, then the country. The place gives us the coordinates and time zone for the exact moment you were born.',
-  ];
 
   return (
     <Screen>

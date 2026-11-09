@@ -10,7 +10,8 @@ interface Props extends Omit<TextInputProps, 'style'> {
   error?: string;
   /** Change this number to shake the field again when the same error happens twice. */
   shakeSignal?: number;
-  /** Plain line under the field saying why it is asked. */
+  /** Plain line under the field saying why it is asked. Shown under the input, and spoken
+   *  with it as an accessibility hint — a reason only sighted people get is half a reason. */
   why?: string;
 }
 
@@ -24,6 +25,7 @@ export function Field({ label, error, why, shakeSignal = 0, ...inputProps }: Pro
       <Animated.View style={shake}>
       <TextInput
         accessibilityLabel={label}
+        accessibilityHint={why}
         placeholderTextColor="rgba(245,245,243,0.45)"
         selectionColor={colors.gold}
         keyboardAppearance="dark"
