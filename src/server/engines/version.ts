@@ -45,6 +45,11 @@ export const ENGINE_VERSION = '2026.11.07';
 export const ENGINE_SOURCES: readonly string[] = [
   'src/server/engines/astrology.ts',
   'src/server/engines/human_design.ts',
+  // The Rave Mandala — which gate a longitude falls in. It moved out of human_design.ts so that
+  // wanting a gate number does not mean loading the ephemeris, and it is listed here in its own
+  // right: a change to the gate ordering is as capable of changing a stored number as anything
+  // else in this list.
+  'src/server/engines/mandala.ts',
   'src/server/engines/numerology.ts',
   'src/server/localInstant.ts',
 ];
@@ -54,7 +59,7 @@ export const ENGINE_SOURCES: readonly string[] = [
  * they change. Not a security measure — a tripwire, so an engine cannot be edited without somebody
  * deciding whether the version should move.
  */
-export const ENGINE_FINGERPRINT = '6f2f65daeb485aff';
+export const ENGINE_FINGERPRINT = 'b400fb8cc940cac6';
 
 /**
  * True when this chart was calculated by the engines running now.

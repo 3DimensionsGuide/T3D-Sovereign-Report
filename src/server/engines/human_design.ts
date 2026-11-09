@@ -25,28 +25,15 @@ import type {
   ActiveChannel,
 } from './types';
 import { localToJulianDay, getPlanetPositionsAtJD } from './astrology';
+import {
+  DEGREES_PER_GATE,
+  DEGREES_PER_LINE,
+  GATE_SEQUENCE,
+  MANDALA_START_LON,
+  isNearGateEdge,
+  longitudeToGate,
+} from './mandala';
 
-// ─── RAVE MANDALA — GATE SEQUENCE ─────────────────────────────────────────────
-//
-// 64 gates in the order they appear around the wheel starting at 0° Aquarius
-// (300° tropical longitude), progressing in the direction of increasing longitude.
-// Source: Jovian Archive Rave Mandala mapping.
-
-const GATE_SEQUENCE: readonly number[] = [
-  41, 19, 13, 49, 30, 55, 37, 63, 22, 36, 25, 17, 21, 51, 42,  3,
-  27, 24,  2, 23,  8, 20, 16, 35, 45, 12, 15, 52, 39, 53, 62, 56,
-  31, 33,  7,  4, 29, 59, 40, 64, 47,  6, 46, 18, 48, 57, 32, 50,
-  28, 44,  1, 43, 14, 34,  9,  5, 26, 11, 10, 58, 38, 54, 61, 60,
-] as const;
-
-/** Starting longitude of gate 41 — 2°00' Aquarius (302° tropical) — canonical Rave Mandala start point. */
-const MANDALA_START_LON = 302.0;
-
-/** Degrees per gate segment */
-const DEGREES_PER_GATE = 360 / 64; // 5.625°
-
-/** Degrees per gate line */
-const DEGREES_PER_LINE = DEGREES_PER_GATE / 6; // 0.9375°
 
 // ─── GATE → CENTER MAP ───────────────────────────────────────────────────────
 
@@ -293,33 +280,6 @@ function getIncarnationCross(
 
 // ─── GATE CALCULATION ────────────────────────────────────────────────────────
 
-/**
- * Convert an ecliptic longitude to a Human Design gate number and line.
- *
- * Formula (per spec):
- *   adjusted = (longitude − MANDALA_START_LON + 360) mod 360
- *   gateIndex = floor(adjusted / 5.625)
- *   gate      = GATE_SEQUENCE[gateIndex]
- *   line      = floor((adjusted mod 5.625) / 0.9375) + 1
- */
-export function longitudeToGate(longitude: number): { gate: number; line: number } {
-  const adjusted = ((longitude - MANDALA_START_LON) % 360 + 360) % 360;
-  const gateIndex = Math.floor(adjusted / DEGREES_PER_GATE);
-  const gate = GATE_SEQUENCE[Math.min(gateIndex, 63)];
-  const posInGate = adjusted - gateIndex * DEGREES_PER_GATE;
-  const line = Math.min(Math.floor(posInGate / DEGREES_PER_LINE) + 1, 6);
-  return { gate, line };
-}
-
-/**
- * True when a longitude sits within `within` degrees of a gate boundary. A birth date with no time of day
- * can land on either side of the boundary, so callers use this to say the birth time will confirm the gate.
- */
-export function isNearGateEdge(longitude: number, within = 1): boolean {
-  const adjusted = ((longitude - MANDALA_START_LON) % 360 + 360) % 360;
-  const pos = adjusted % DEGREES_PER_GATE;
-  return pos < within || pos > DEGREES_PER_GATE - within;
-}
 
 // ─── DESIGN EPOCH — 88° SUN ARC ───────────────────────────────────────────────
 
@@ -676,4 +636,15 @@ export function calculateHumanDesign(input: HumanDesignInput): HumanDesignResult
 }
 
 // ─── NAMED EXPORTS FOR TESTING ────────────────────────────────────────────────
-export { GATE_SEQUENCE, GATE_CENTER_MAP, UNIQUE_CHANNELS, MANDALA_START_LON, DEGREES_PER_GATE };
+export {
+  GATE_CENTER_MAP,
+  UNIQUE_CHANNELS,
+  // Re-exported from ./mandala, which holds them so that wanting a gate number does not
+  // mean loading the ephemeris. Importing them from here stays correct.
+  DEGREES_PER_GATE,
+  DEGREES_PER_LINE,
+  GATE_SEQUENCE,
+  MANDALA_START_LON,
+  isNearGateEdge,
+  longitudeToGate,
+};
