@@ -8,7 +8,8 @@ import type { BigThreeLens, NatalAspects, NodesReading, StoplightDetail, Stoplig
 import { ElementBalance, StoplightCompare } from '@/components/readings/StoplightCompare';
 import { TimeLordBar } from '@/components/readings/TimeLordBar';
 import { periodQuote } from '@/lib/timeLordBar';
-import { AspectIcon } from '@/components/AspectIcon';
+import { AspectIcon, feelSignal } from '@/components/AspectIcon';
+import { SIGNAL_COLOR } from '@/components/Lens';
 import { houseLabel, HOUSE_NAMES } from '@/lib/houseNames';
 import { PremiumGate } from '@/components/PremiumGate';
 import { usePremium } from '@/lib/usePremium';
@@ -18,8 +19,19 @@ import { useT3DStore } from '@/store/useT3DStore';
 import { colors, space } from '@/theme/tokens';
 
 /** Accordion in the Stoplight's crimson. */
-function Accordion(props: Omit<ComponentProps<typeof BaseAccordion>, 'accent'>) {
-  return <BaseAccordion accent={colors.stoplight} {...props} />;
+/**
+ * The Stoplight's accordions wear the lens colour, which is right for a planet, a node or an
+ * element: the section is the Stoplight and the red says so.
+ *
+ * Aspects are the exception, and they pass their own. Their whole subject is whether two planets
+ * flow or grate, and a red ring on every one of them said "stoplight" where the row needed to say
+ * "this one is easy" or "this one is work". The lens keeps its colour everywhere else on the
+ * screen — the eyebrows, the titles, every other card.
+ */
+function Accordion(
+  { accent, ...rest }: Omit<ComponentProps<typeof BaseAccordion>, 'accent'> & { accent?: string },
+) {
+  return <BaseAccordion accent={accent ?? colors.stoplight} {...rest} />;
 }
 
 const PLANET_GLYPH: Record<string, string> = {
@@ -99,6 +111,7 @@ function AspectsSection({ aspects }: { aspects: NatalAspects }) {
       {aspects.items.map((a) => (
         <Accordion
           key={a.line}
+          accent={SIGNAL_COLOR[feelSignal(a.feel)]}
           badge={<AspectIcon feel={a.feel} />}
           title={a.line}
           subtitle={`${FEEL_WORD[a.feel] ?? a.feel} · ${a.orb.toFixed(1)}° from exact${a.tight ? ' · very tight' : ''}`}
