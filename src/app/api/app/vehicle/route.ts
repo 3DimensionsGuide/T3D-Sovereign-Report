@@ -4,7 +4,11 @@
  * Type, Authority, Profile, Definition, Centers, Circuits, Gates,
  * Incarnation Cross, Godhead and Variables, taken from the T3D reports.
  *
- * Body: none.
+ * Body: { birthTimeKnown?: boolean }
+ *
+ * Absent means known, so an older app that sends nothing reads exactly as it did before. When it
+ * is false the chart was built on the noon fallback, and the parts of it a birth time would have
+ * settled say so rather than being stated flat.
  *
  * Auth: an Authorization: Bearer header carrying the app's session token. See
  * src/server/appAuth.ts — there is no email address in any app request any more.
@@ -34,6 +38,8 @@ import {
   findChannelCircuit,
 } from '@/lib/report/section3/gate-content';
 import { GODHEAD_MECHANISM, findGodheadByGate } from '@/lib/report/section3/godhead-content';
+import { activationCertainty, alsoReads, profileReading } from '@/lib/app/chartCertainty';
+import { timeUnknownNote } from '@/lib/app/timeCertainty';
 import { limitRequest } from '@/server/rateLimit';
 import { authenticateApp } from '@/server/appAuth';
 import {
@@ -99,6 +105,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     const auth = await authenticateApp(request);
     if (!auth.ok) return auth.response;
     const lead = auth.lead;
+
+    let body: { birthTimeKnown?: unknown };
+    try {
+      body = (await request.json()) as typeof body;
+    } catch {
+      // This route took no body until the birth-time flag; an app that sends none is not an error.
+      body = {};
+    }
+    const birthTimeKnown = body.birthTimeKnown !== false;
 
     const hd = (lead.results as unknown as { humanDesign?: Record<string, unknown> } | null)?.humanDesign;
     if (
@@ -172,8 +187,21 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     // ── Profile ─────────────────────────────────────────────────────────────
     const pc = PROFILE_CONTENT[profileValue] ?? null;
+    // Both halves of a Profile are Sun lines, and the Sun crosses more than one whole line a day,
+    // so with no birth time this is one of a short list rather than a single value.
+    const profileCertainty = profileReading(activeGates, profileValue, birthTimeKnown);
     const profile = pc
-      ? { value: pc.profile, role: pc.role, socialPattern: pc.socialPattern, visibility: pc.visibility, plain: pc.plain }
+      ? {
+          value: pc.profile,
+          role: pc.role,
+          socialPattern: pc.socialPattern,
+          visibility: pc.visibility,
+          plain: pc.plain,
+          certain: profileCertainty.certain,
+          options: profileCertainty.options,
+          /** "4/1 or 4/2" when there are exactly two; null when there is nothing to add inline. */
+          reads: alsoReads(profileCertainty),
+        }
       : null;
 
     // ── Definition and bridges ──────────────────────────────────────────────
@@ -248,15 +276,22 @@ export async function POST(request: Request): Promise<NextResponse> {
         if (x.epoch !== y.epoch) return x.epoch === 'personality' ? -1 : 1;
         return PLANET_ORDER.indexOf(x.planet) - PLANET_ORDER.indexOf(y.planet);
       })
-      .map((g) => ({
-        gate: g.gate,
-        line: g.line,
-        planet: PLANET_LABEL[g.planet] ?? g.planet,
-        epoch: g.epoch === 'personality' ? 'personality' : 'design',
-        center: centerName(g.center),
-        ichingName: GATE_KEYNOTES[g.gate]?.ichingName ?? '',
-        coreMeaning: GATE_KEYNOTES[g.gate]?.coreMeaning ?? '',
-      }));
+      .map((g) => {
+        // Omitted entirely when the birth time is known, so a chart with one is byte for byte
+        // the payload it was before any of this.
+        const c = activationCertainty(g, birthTimeKnown);
+        const uncertain = !c.gate.certain || !c.line.certain;
+        return {
+          gate: g.gate,
+          line: g.line,
+          planet: PLANET_LABEL[g.planet] ?? g.planet,
+          epoch: g.epoch === 'personality' ? 'personality' : 'design',
+          center: centerName(g.center),
+          ichingName: GATE_KEYNOTES[g.gate]?.ichingName ?? '',
+          coreMeaning: GATE_KEYNOTES[g.gate]?.coreMeaning ?? '',
+          ...(uncertain ? { certainty: c } : {}),
+        };
+      });
 
     // ── Incarnation Cross ───────────────────────────────────────────────────
     const family = calculateCrossFamily(profileValue);
@@ -317,6 +352,8 @@ export async function POST(request: Request): Promise<NextResponse> {
           typeName,
           authorityName,
           profileValue,
+          /** One sentence for a chart built on noon, or null. */
+          timeNote: timeUnknownNote(birthTimeKnown),
           type,
           authority,
           profile,

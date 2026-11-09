@@ -60,6 +60,11 @@ export default function Chart() {
   const risingNote = profile.birthTimeKnown
     ? null
     : 'Rising sign uses 12:00 noon because no birth time was entered.';
+  // Both halves of a Profile are Sun lines, and the Sun crosses into a new line about once a day,
+  // so noon cannot settle it. Unlike the Rising sign this is true of every birth, not only some.
+  const profileNote = profile.birthTimeKnown
+    ? null
+    : 'Profile uses 12:00 noon because no birth time was entered, so it is not settled. Your Vehicle reading says which it could be.';
 
   return (
     <Screen room="observatory" refreshing={drawing.refreshing} onRefresh={drawing.refresh}>
@@ -102,6 +107,7 @@ export default function Chart() {
           onOpen={() => openLens('vehicle')}
           openLabel="Read your Vehicle reading"
         />
+        {profileNote ? <Text style={styles.note}>{profileNote}</Text> : null}
       </FadeIn>
 
       <FadeIn delay={200}>

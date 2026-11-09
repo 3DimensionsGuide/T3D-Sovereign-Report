@@ -381,9 +381,19 @@ export function requestDayNumerology(localDate: string): Promise<DayNumerology> 
   );
 }
 
-/** Full Vehicle (Human Design) interpretations for the Readings tab. */
-export function requestVehicle(): Promise<VehicleDetail> {
-  return postApp<VehicleDetail>('/api/app/vehicle', {}, 'Could not load your Human Design. Please try again.');
+/**
+ * Full Vehicle (Human Design) interpretations for the Readings tab.
+ *
+ * birthTimeKnown rides along so the server can say which parts of the chart a birth time would
+ * have settled — the Profile above all, which is two Sun lines and so is never settled without
+ * one. The server treats it as known when absent, so nothing changes for a chart that has one.
+ */
+export function requestVehicle(birthTimeKnown: boolean): Promise<VehicleDetail> {
+  return postApp<VehicleDetail>(
+    '/api/app/vehicle',
+    { birthTimeKnown },
+    'Could not load your Human Design. Please try again.',
+  );
 }
 
 /**

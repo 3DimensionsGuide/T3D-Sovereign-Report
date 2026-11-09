@@ -101,8 +101,29 @@ function VehicleBody({ data, onFocusCenter }: { data: VehicleDetail; onFocusCent
 
       {data.profile ? (
         <>
-          <SectionTitle eyebrow="YOUR ROLE" title="Profile" note="The two lines that describe how you learn and how you meet the world." />
-          <Accordion badge={data.profile.value} title={`Profile ${data.profile.value}`} subtitle={data.profile.role}>
+          <SectionTitle
+            eyebrow="YOUR ROLE"
+            title="Profile"
+            note="The two lines that describe how you learn and how you meet the world."
+          />
+          {/* Two possibilities read inline — "4/1 or 4/2" is a real answer with an honest edge on
+              it. More than two would crowd the title, so those go in the block below instead. */}
+          <Accordion
+            badge={data.profile.value}
+            title={`Profile ${data.profile.reads ?? data.profile.value}`}
+            subtitle={data.profile.role}
+          >
+            {data.profile.certain === false ? (
+              <Block
+                label="WHY THIS ONE IS NOT SETTLED"
+                text={
+                  `Both halves of a Profile come from the Sun's line, and the Sun crosses into a new line about once a day. ` +
+                  `Without a birth time this chart was worked out from noon, so yours could be ` +
+                  `${listOptions(data.profile.options ?? [])}. ` +
+                  `A birth time settles it — you can add one from My Chart.`
+                }
+              />
+            ) : null}
             <Block label="IN PLAIN LANGUAGE" text={data.profile.plain} />
             <Block label="YOUR NATURAL ROLE" text={data.profile.role} />
             <Block label="HOW YOU LEARN FROM OTHERS" text={data.profile.socialPattern} />
@@ -219,9 +240,17 @@ function VehicleBody({ data, onFocusCenter }: { data: VehicleDetail; onFocusCent
   );
 }
 
+/** "4/1, 4/2 or 3/2" — a list that reads as a sentence rather than as data. */
+function listOptions(options: string[]): string {
+  if (options.length === 0) return 'another';
+  if (options.length === 1) return options[0]!;
+  return `${options.slice(0, -1).join(', ')} or ${options[options.length - 1]}`;
+}
+
 export function VehicleReading({ onRefreshReady, onFocusCenter }: { onRefreshReady?: (r: { run: () => Promise<void> } | null) => void; onFocusCenter?: (id: string, open: boolean) => void }) {
   const chart = useT3DStore((s) => s.chart);
-  const { data, error, loading, retry, offline, savedAt, refresh } = useVehicle(chart?.leadId);
+  const birthTimeKnown = useT3DStore((s) => s.profile?.birthTimeKnown) !== false;
+  const { data, error, loading, retry, offline, savedAt, refresh } = useVehicle(chart?.leadId, birthTimeKnown);
 
   useEffect(() => {
     onRefreshReady?.({ run: refresh });

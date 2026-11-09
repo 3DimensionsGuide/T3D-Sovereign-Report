@@ -21,12 +21,29 @@ export interface VehicleAuthority {
   reset: { title: string; instruction: string };
 }
 
+/** What a missing birth time leaves unsettled. Absent on anything a birth time cannot change. */
+export interface Certainty {
+  certain: boolean;
+  /** Empty when certain, and also when the band covers every value there is. */
+  alternatives: number[];
+}
+
 export interface VehicleProfile {
   value: string;
   role: string;
   socialPattern: string;
   visibility: string;
   plain: string;
+  /**
+   * False when no birth time was given. Both halves of a Profile are Sun lines and the Sun
+   * crosses more than one whole line a day, so without the time this is one of a short list.
+   * Optional because an older server does not send it.
+   */
+  certain?: boolean;
+  /** Every Profile the birth could produce, the calculated one first. */
+  options?: string[];
+  /** "4/1 or 4/2" when there are exactly two, null when the list is too long to read inline. */
+  reads?: string | null;
 }
 
 export interface BridgeGate {
@@ -69,6 +86,8 @@ export interface VehicleGate {
   center: string;
   ichingName: string;
   coreMeaning: string;
+  /** Only present when a birth time would have settled something here. */
+  certainty?: { gate: Certainty; line: Certainty };
 }
 
 export interface CrossGate {
@@ -86,6 +105,8 @@ export interface VehicleDetail {
   profileValue: string;
   type: VehicleType | null;
   authority: VehicleAuthority | null;
+  /** One sentence for a chart built on noon, or null. Absent from an older server. */
+  timeNote?: string | null;
   profile: VehicleProfile | null;
   definition: {
     type: string;

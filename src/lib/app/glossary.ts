@@ -336,6 +336,7 @@ add('hd:profile', 'Human Design', 'Profile', 'The two lines that describe your r
   'They fall into three geometries. Right Angle profiles live out a personal journey and are much the most common. Juxtaposition is a fixed fate and belongs to the 4/1 alone. Left Angle profiles are transpersonal — their lives turn on other people.',
   'Profile is the costume the purpose wears: how your life unfolds and how other people meet you, rather than what you are here to do.',
   'The 3rd line gets the worst press and deserves better. Trial and error is not failure repeated; it is the method by which anything gets found out to be true, and a 3rd line is the part of the system that does that work for everybody else.',
+  'Of everything in your chart, this is the piece that most needs a birth time. Both halves are Sun lines, and the Sun crosses into a new line roughly once a day — so a chart worked out from noon, as every chart without a birth time is, can narrow your Profile to a short list but never settle it. If yours is shown as more than one, that is why, and a birth time is the only thing that decides it.',
 ], ['hd:line', 'hd:cross']);
 add('hd:cross', 'Human Design', 'Incarnation Cross', 'The theme of your life’s purpose.', [
   'Four gates: your Sun and Earth in the conscious calculation and again in the unconscious one. Between them they account for the largest share of your imprint, which is why they are read as a theme for the whole life. There are 192 of them.',

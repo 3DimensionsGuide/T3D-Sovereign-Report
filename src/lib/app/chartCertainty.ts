@@ -9,7 +9,20 @@
 // From ./mandala rather than ./human_design: the ordering is arithmetic, and importing it
 // through the engine would pull the ephemeris binary in with it.
 import { longitudeToGate } from '@/server/engines/mandala';
-import type { GateActivation } from '@/server/engines/types';
+/**
+ * Activations arrive from stored JSON, so these are structural rather than the engine's
+ * GateActivation: a route that has just parsed a jsonb column holds `epoch: string`, and making
+ * it prove otherwise would only mean a cast at the call site saying the same thing less honestly.
+ */
+export interface ActivationInput {
+  planet: string;
+  longitude: number;
+}
+
+export interface SunInput extends ActivationInput {
+  epoch: string;
+  line: number;
+}
 import {
   gateCertainty,
   lineCertainty,
@@ -27,7 +40,7 @@ export interface ActivationCertainty {
 
 /** What a missing birth time does to one activation. */
 export function activationCertainty(
-  activation: Pick<GateActivation, 'planet' | 'longitude'>,
+  activation: ActivationInput,
   birthTimeKnown: boolean,
 ): ActivationCertainty {
   return {
@@ -57,7 +70,7 @@ export interface ProfileReading {
  * best single answer, and reordering it would make the chart look as though it had changed.
  */
 export function profileReading(
-  activations: readonly Pick<GateActivation, 'planet' | 'epoch' | 'longitude' | 'line'>[],
+  activations: readonly SunInput[],
   calculated: string,
   birthTimeKnown: boolean,
 ): ProfileReading {
@@ -76,7 +89,7 @@ export function profileReading(
     return { value: calculated, certain: false, options: [calculated] };
   }
 
-  const linesFor = (a: Pick<GateActivation, 'planet' | 'longitude' | 'line'>) => {
+  const linesFor = (a: SunInput) => {
     const c = lineCertainty(a.planet, a.longitude, false, lineAt);
     return [a.line, ...c.alternatives];
   };
