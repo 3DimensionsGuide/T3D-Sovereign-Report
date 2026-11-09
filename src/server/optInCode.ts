@@ -17,12 +17,15 @@ export type IssueResult = 'sent' | 'failed' | 'too-soon' | 'already-opted-in' | 
 /** Makes a new code for the lead, stores its hash, and emails it. */
 export async function issueOptInCode(leadId: number, email: string): Promise<IssueResult> {
   const [lead] = await db.select().from(leads).where(eq(leads.id, leadId));
-  if (!lead || lead.email.toLowerCase() !== email.trim().toLowerCase()) return 'not-found';
+  if (!lead) return 'not-found';
+  // Null for a lead that has not given an address yet, which can hold no pending code.
+  const stored = lead.email;
+  if (!stored || stored.toLowerCase() !== email.trim().toLowerCase()) return 'not-found';
   if (lead.emailOptIn) return 'already-opted-in';
   if (issuedTooRecently(lead.optInCodeExpiresAt)) return 'too-soon';
 
   const code = generateCode();
-  const hash = hashCode(lead.id, lead.email, code);
+  const hash = hashCode(lead.id, stored, code);
   if (!hash) return 'failed';
 
   await db.update(leads).set({
@@ -32,7 +35,7 @@ export async function issueOptInCode(leadId: number, email: string): Promise<Iss
   }).where(eq(leads.id, lead.id));
 
   try {
-    await sendOptInCodeEmail({ to: lead.email, firstName: lead.firstName, code });
+    await sendOptInCodeEmail({ to: stored, firstName: lead.firstName, code });
     return 'sent';
   } catch (error: unknown) {
     console.error('[OptIn] Could not send the code email:', error instanceof Error ? error.message : 'unknown');
@@ -45,12 +48,14 @@ export type ConfirmResult = CodeCheck | 'not-found' | 'already-opted-in';
 /** Checks a code. On a match, records consent with its time and source. */
 export async function confirmOptInCode(leadId: number, email: string, code: string): Promise<ConfirmResult> {
   const [lead] = await db.select().from(leads).where(eq(leads.id, leadId));
-  if (!lead || lead.email.toLowerCase() !== email.trim().toLowerCase()) return 'not-found';
+  if (!lead) return 'not-found';
+  const stored = lead.email;
+  if (!stored || stored.toLowerCase() !== email.trim().toLowerCase()) return 'not-found';
   if (lead.emailOptIn) return 'already-opted-in';
 
   const result = checkCode(
     { hash: lead.optInCodeHash, expiresAt: lead.optInCodeExpiresAt, attempts: lead.optInCodeAttempts },
-    lead.id, lead.email, code,
+    lead.id, stored, code,
   );
 
   if (result === 'ok') {

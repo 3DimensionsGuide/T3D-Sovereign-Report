@@ -23,6 +23,7 @@ import {
   uniqueIndex,
   primaryKey,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 // ─── LEADS TABLE ─────────────────────────────────────────────────────────────
 //
@@ -35,7 +36,10 @@ export const leads = pgTable(
     id: serial('id').primaryKey(),
 
     // Identity
-    email:     text('email').notNull(),
+    // Null until the person gives one. The app shows a chart first and attaches the address
+    // afterwards through POST /api/app/email, so the row has to be writable without it — the
+    // session token is only minted for the row a calculation writes. See drizzle/0005.
+    email:     text('email'),
     firstName: text('first_name').notNull(),
     lastName:  text('last_name').notNull(),
     middleName: text('middle_name'),
@@ -87,6 +91,9 @@ export const leads = pgTable(
   },
   (table) => ({
     emailIdx: index('leads_email_idx').on(table.email),
+    // Bounds the identity search for a lead with no address, which cannot narrow on the
+    // email index. Partial, on email IS NULL — see drizzle/0005.
+    anonIdx: index('leads_anon_idx').on(table.lastName).where(sql`${table.email} IS NULL`),
   }),
 );
 

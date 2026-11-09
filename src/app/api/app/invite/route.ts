@@ -51,7 +51,6 @@ function cleanFirstName(value: unknown): string | null {
 
 interface LeadView {
   firstName: string;
-  email: string;
   birth: { date?: string; time?: string; place?: { latitude?: number; longitude?: number; timezone?: string } } | null;
   results: {
     humanDesign?: { type?: string; authority?: string };
@@ -66,7 +65,6 @@ async function loadLead(id: number): Promise<LeadView | null> {
   if (!lead) return null;
   return {
     firstName: lead.firstName,
-    email: lead.email,
     birth: lead.birthData as LeadView['birth'],
     results: lead.results as unknown as LeadView['results'],
   };

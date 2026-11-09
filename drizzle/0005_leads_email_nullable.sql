@@ -1,0 +1,27 @@
+-- The app shows a chart before it asks for an email address.
+--
+-- Onboarding used to collect the email at step 2 of 4, before the person had seen anything,
+-- because a lead row could not exist without one. The row has to exist before the reveal:
+-- the app's session token is only ever minted for the row a calculation writes, so no row
+-- means no session and the app cannot read back its own chart.
+--
+-- So the address becomes optional on the row, and is attached afterwards through
+-- POST /api/app/email, which authenticates with that session token. The address stops being
+-- a lookup key, which is a tightening: there is no longer any request that trades an email
+-- address for a chart.
+--
+-- Nothing is backfilled and no existing row changes. Every row written so far has an address
+-- and keeps it. Null means the person has not given one, not that it was lost.
+--
+-- leads_anon_idx bounds the identity search for a lead with no address. A calculation finds
+-- an existing lead by narrowing on the indexed email first, which a null address cannot do;
+-- it narrows on the surname instead, so the scan stays proportional to people sharing one
+-- rather than to every anonymous lead ever written.
+--
+-- Run once against the database:
+--   node dev-tools/run-sql.mjs drizzle/0005_leads_email_nullable.sql
+--
+-- Safe to run more than once.
+ALTER TABLE leads ALTER COLUMN email DROP NOT NULL;
+
+CREATE INDEX IF NOT EXISTS leads_anon_idx ON leads (last_name) WHERE email IS NULL;

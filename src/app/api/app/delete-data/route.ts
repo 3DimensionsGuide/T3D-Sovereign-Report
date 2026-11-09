@@ -4,7 +4,8 @@
  *
  * Body: { confirm: true }
  *
- * Removes every saved record for that email. Records that an order points to
+ * Removes every saved record for that email, or just the one row when the person has
+ * not given an address. Records that an order points to
  * are kept only as a blanked shell, so payment history stays intact without any
  * personal details. Stripe and Resend keep their own records under their own
  * policies; the privacy page says so.
@@ -40,8 +41,12 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ success: false, error: 'Deleting needs confirmation.' }, { status: 400 });
     }
 
-    const mine = await db.select({ id: leads.id }).from(leads).where(eq(leads.email, lead.email));
-    const ids = mine.map((r) => r.id);
+    // One person can hold several leads under one address, and all of them go. With no
+    // address there is nothing to gather by: it is this row and only this row. Matching on
+    // a null would find none of them, so the id is used directly.
+    const ids = lead.email
+      ? (await db.select({ id: leads.id }).from(leads).where(eq(leads.email, lead.email))).map((r) => r.id)
+      : [lead.id];
     const withOrders = ids.length
       ? await db.select({ leadId: orders.leadId }).from(orders).where(inArray(orders.leadId, ids))
       : [];

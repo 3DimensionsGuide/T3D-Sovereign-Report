@@ -12,14 +12,18 @@
  * two months later. A query naming three columns by hand keeps working the whole time.
  *
  * This asks the schema what it expects and the database what it has, and names the difference.
- * It knows nothing about column types or indexes — only whether something is there at all, which
- * is the drift that actually breaks things.
+ * It knows nothing about column types or indexes, but it does check whether each column is
+ * nullable, because that drift breaks things just as quietly as a missing column and in a worse
+ * place: a column the schema thinks is optional and the database still has NOT NULL takes the
+ * insert down at the end of a flow, after the work is already done. drizzle/0005 drops a NOT NULL
+ * and nothing else here would have noticed it had not been applied.
  */
 
 import nextEnv from '@next/env';
 import postgres from 'postgres';
 import { getTableColumns, getTableName } from 'drizzle-orm';
 import * as schema from '../src/server/db/schema.ts';
+import { diffTable, describeNullability } from './schemaDiff.mjs';
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
@@ -54,7 +58,10 @@ for (const value of Object.values(schema)) {
   try {
     const name = getTableName(value);
     if (typeof name === 'string') {
-      expected.set(name, Object.values(getTableColumns(value)).map((c) => c.name).sort());
+      const cols = Object.values(getTableColumns(value))
+        .map((c) => ({ name: c.name, notNull: c.notNull === true }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      expected.set(name, cols);
     }
   } catch {
     // Not a table (a type, a helper); skip it.
@@ -65,42 +72,39 @@ const client = postgres(url, { max: 1, onnotice: () => {} });
 
 try {
   const rows = await client`
-    SELECT table_name, column_name
+    SELECT table_name, column_name, is_nullable
     FROM information_schema.columns
     WHERE table_schema = 'public'
   `;
   const actual = new Map();
   for (const r of rows) {
-    if (!actual.has(r.table_name)) actual.set(r.table_name, new Set());
-    actual.get(r.table_name).add(r.column_name);
+    if (!actual.has(r.table_name)) actual.set(r.table_name, new Map());
+    actual.get(r.table_name).set(r.column_name, { notNull: r.is_nullable === 'NO' });
   }
 
   let problems = 0;
+  const extras = [];
   for (const [table, columns] of [...expected].sort()) {
-    const have = actual.get(table);
-    if (!have) {
+    const diff = diffTable(columns, actual.get(table) ?? null);
+    extras.push(...diff.extras.map((c) => `${table}.${c}`));
+
+    if (diff.missingTable) {
       console.log(`  MISSING TABLE  ${table}`);
-      console.log(`                 wants: ${columns.join(', ')}\n`);
+      console.log(`                 wants: ${columns.map((c) => c.name).join(', ')}\n`);
       problems++;
       continue;
     }
-    const missing = columns.filter((c) => !have.has(c));
-    if (missing.length === 0) {
+    if (diff.missing.length === 0 && diff.nullability.length === 0) {
       console.log(`  ok             ${table}  (${columns.length} columns)`);
-    } else {
-      console.log(`  MISSING        ${table}: ${missing.join(', ')}`);
-      problems++;
+      continue;
     }
+    if (diff.missing.length) console.log(`  MISSING        ${table}: ${diff.missing.join(', ')}`);
+    for (const n of diff.nullability) console.log(`  NULLABILITY    ${describeNullability(table, n)}`);
+    problems++;
   }
 
-  // Columns the database has and the schema does not know about. Not a fault — an old column
-  // nobody removed — but worth seeing.
-  const extras = [];
-  for (const [table, columns] of expected) {
-    const have = actual.get(table);
-    if (!have) continue;
-    for (const c of have) if (!columns.includes(c)) extras.push(`${table}.${c}`);
-  }
+  // In the database and not in the schema: an old column nobody removed. Not a fault, but worth
+  // seeing, so it does not count toward `problems`.
   if (extras.length) console.log(`\n  In the database but not in the schema: ${extras.join(', ')}`);
 
   // Which migration files this database says it has had. A file that has never run here is the
@@ -123,7 +127,7 @@ try {
 
   console.log(problems === 0
     ? '\nThe database matches the schema.'
-    : `\n${problems} table${problems === 1 ? '' : 's'} behind. See drizzle/ for the migration that adds them.`);
+    : `\n${problems} table${problems === 1 ? '' : 's'} out of step. See drizzle/ for the migration that fixes it.`);
   if (problems > 0) process.exitCode = 1;
 } catch (error) {
   console.error(`Failed: ${error instanceof Error ? error.message : String(error)}`);
