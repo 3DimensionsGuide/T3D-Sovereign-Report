@@ -5,6 +5,8 @@
  * Nothing here promises a refund policy, an app release or a result; add those only when they are true.
  */
 
+import { SUPPORT_EMAIL } from '@/lib/contact';
+
 export const FAQ_ITEMS: readonly { q: string; a: string }[] = [
   {
     q: 'Is this a prediction?',
@@ -82,7 +84,7 @@ export default function FAQ() {
           Still have a question? Read the{' '}
           <a href="/privacy" style={{ color: 'var(--parchment)', textDecoration: 'underline', textUnderlineOffset: 4 }}>privacy policy</a>{' '}
           or email{' '}
-          <a href="mailto:privacy@3dimensions.guide" style={{ color: 'var(--parchment)', textDecoration: 'underline', textUnderlineOffset: 4 }}>privacy@3dimensions.guide</a>.
+          <a href={`mailto:${SUPPORT_EMAIL}`} style={{ color: 'var(--parchment)', textDecoration: 'underline', textUnderlineOffset: 4 }}>{SUPPORT_EMAIL}</a>.
         </p>
       </div>
     </section>

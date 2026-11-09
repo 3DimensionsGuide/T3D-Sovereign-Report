@@ -7,7 +7,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BackupCard } from '@/components/BackupCard';
 import { GoldButton } from '@/components/GoldButton';
-import { feedbackUrl } from '@/lib/feedback';
+import { feedbackUrl, FEEDBACK_EMAIL } from '@/lib/feedback';
 import { ChartRequestError, requestDeleteMyData } from '@/lib/api';
 import { clearSessionToken } from '@/lib/session';
 import { clearReminder } from '@/lib/reminder';
@@ -123,7 +123,7 @@ export default function YourData() {
             onPress={() => {
               const url = feedbackUrl(Constants.expoConfig?.version ?? '1.0.0', `${Platform.OS} ${String(Platform.Version)}`);
               Linking.openURL(url).catch(() => {
-                Alert.alert('Could not open Mail', 'Email privacy@3dimensions.guide and tell us what you noticed.');
+                Alert.alert('Could not open Mail', `Email ${FEEDBACK_EMAIL} and tell us what you noticed.`);
               });
             }}
           />

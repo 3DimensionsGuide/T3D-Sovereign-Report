@@ -11,6 +11,7 @@
  */
 
 import { NextResponse }   from 'next/server';
+import { SUPPORT_EMAIL } from '@/lib/contact';
 import { db }             from '@/server/db';
 import { leads }          from '@/server/db/schema';
 import { eq }              from 'drizzle-orm';
@@ -21,7 +22,7 @@ import { getGenerator } from '@/lib/products/registry';
 import type { Lead } from '@/server/db/schema';
 import { limitRequest } from '@/server/rateLimit';
 
-const LINK_PROBLEM = 'This download link is not valid or has expired. Use the link in your most recent report email, or email privacy@3dimensions.guide.';
+const LINK_PROBLEM = `This download link is not valid or has expired. Use the link in your most recent report email, or email ${SUPPORT_EMAIL}.`;
 
 export async function GET(request: Request) {
   const limited = await limitRequest(request, 'download');

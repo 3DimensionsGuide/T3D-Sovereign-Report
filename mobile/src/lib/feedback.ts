@@ -3,7 +3,12 @@
  * The only extra detail added is the app version and phone system version, so a bug is easier to find.
  * Nothing about the person's chart, birth details or answers is included, and nothing is sent by the app itself.
  */
-export const FEEDBACK_EMAIL = 'privacy@3dimensions.guide';
+/**
+ * Feedback is support, not a data request, so it goes to the support address. The website
+ * keeps the same split in src/lib/contact.ts; the app is a separate project and cannot
+ * import from it, so the two are kept in step by tests/app/contactEmail.test.ts.
+ */
+export const FEEDBACK_EMAIL = 'support@3dimensions.guide';
 
 export function feedbackUrl(appVersion: string, system: string): string {
   const subject = 'T3D feedback';

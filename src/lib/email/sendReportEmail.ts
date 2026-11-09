@@ -11,6 +11,8 @@
  * by the caller-supplied contentType rather than assuming PDF.
  */
 
+import { REPORT_FROM, SUPPORT_EMAIL } from '@/lib/contact';
+
 import { Resend } from 'resend';
 
 interface SendReportEmailInput {
@@ -39,7 +41,7 @@ export async function sendReportEmail({
   // instantiated at actual send time, never as a side effect of Next.js
   // importing this module during build-time page-data collection.
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const fromAddress = process.env.RESEND_FROM_EMAIL || 'T3D Studio <reports@3dimensions.guide>';
+  const fromAddress = process.env.RESEND_FROM_EMAIL || REPORT_FROM;
 
   // "It's attached to this email as a PDF" is wrong for the zip-bundle
   // Sovereign Report — generalize by what's actually attached.
@@ -75,7 +77,7 @@ export async function sendReportEmail({
         </div>
         <p style="font-size: 13px; line-height: 1.6; color: #888;">
           Questions? Just reply to this email, or reach us at
-          <a href="mailto:privacy@3dimensions.guide" style="color: #1F8A4D;">privacy@3dimensions.guide</a>.
+          <a href="mailto:${SUPPORT_EMAIL}" style="color: #1F8A4D;">${SUPPORT_EMAIL}</a>.
         </p>
       </div>
     </div>

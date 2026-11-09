@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-const CONTACT_EMAIL = 'privacy@3dimensions.guide';
+import { SUPPORT_EMAIL } from '@/lib/contact';
+
+const CONTACT_EMAIL = SUPPORT_EMAIL;
 
 const COLUMNS: readonly { heading: string; links: readonly { href: string; label: string; external?: boolean }[] }[] = [
   {

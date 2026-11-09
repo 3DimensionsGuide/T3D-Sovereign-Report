@@ -12,6 +12,7 @@
  */
 
 import { useState } from 'react';
+import { SUPPORT_EMAIL } from '@/lib/contact';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -166,8 +167,8 @@ export default function ReportClient() {
 
           <p className="t3d-label" style={{ color: 'var(--parchment-40)', fontSize: 11 }}>
             Having trouble? Email support at{' '}
-            <a href="mailto:privacy@3dimensions.guide" style={{ color: 'var(--emerald)' }}>
-              privacy@3dimensions.guide
+            <a href={`mailto:${SUPPORT_EMAIL}`} style={{ color: 'var(--emerald)' }}>
+              {SUPPORT_EMAIL}
             </a>
           </p>
 

@@ -1,4 +1,5 @@
 import Nav from '@/components/navigation/Nav';
+import { SUPPORT_EMAIL } from '@/lib/contact';
 import Footer from '@/components/navigation/Footer';
 
 export const metadata = {
@@ -122,7 +123,7 @@ export default function LibraryPage() {
             This page covers general methodology across all readers. If you&apos;d like the
             complete technical breakdown specific to your own chart — every gate, every house
             cusp, every aspect and its orb — email{' '}
-            <a href="mailto:privacy@3dimensions.guide" style={S.link}>privacy@3dimensions.guide</a>{' '}
+            <a href={`mailto:${SUPPORT_EMAIL}`} style={S.link}>{SUPPORT_EMAIL}</a>{' '}
             with the name and email used on your order, and we&apos;ll follow up directly.
           </p>
         </div>

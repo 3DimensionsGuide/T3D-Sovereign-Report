@@ -4,6 +4,8 @@
  * the person did not ask for it.
  */
 
+import { REPORT_FROM, SUPPORT_EMAIL } from '@/lib/contact';
+
 import { Resend } from 'resend';
 
 const escapeHtml = (s: string) =>
@@ -11,7 +13,7 @@ const escapeHtml = (s: string) =>
 
 export async function sendOptInCodeEmail(input: { to: string; firstName: string; code: string }): Promise<void> {
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const fromAddress = process.env.RESEND_FROM_EMAIL || 'T3D Studio <reports@3dimensions.guide>';
+  const fromAddress = process.env.RESEND_FROM_EMAIL || REPORT_FROM;
   const name = escapeHtml(input.firstName.trim() || 'there');
 
   const html = `
@@ -27,7 +29,7 @@ export async function sendOptInCodeEmail(input: { to: string; firstName: string;
       </p>
       <p style="font-size: 13px; line-height: 1.6; color: #888;">
         Questions? Reach us at
-        <a href="mailto:privacy@3dimensions.guide" style="color: #1F8A4D;">privacy@3dimensions.guide</a>.
+        <a href="mailto:${SUPPORT_EMAIL}" style="color: #1F8A4D;">${SUPPORT_EMAIL}</a>.
       </p>
     </div>`;
 

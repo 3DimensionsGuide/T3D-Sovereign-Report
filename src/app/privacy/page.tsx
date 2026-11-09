@@ -1,4 +1,5 @@
 import Nav from '@/components/navigation/Nav';
+import { PRIVACY_EMAIL } from '@/lib/contact';
 import Footer from '@/components/navigation/Footer';
 
 export const metadata = {
@@ -144,7 +145,7 @@ export default function PrivacyPage() {
             website, email:
           </p>
           <p style={S.p}>
-            <a href="mailto:privacy@3dimensions.guide" style={S.link}>privacy@3dimensions.guide</a>
+            <a href={`mailto:${PRIVACY_EMAIL}`} style={S.link}>{PRIVACY_EMAIL}</a>
           </p>
           <p style={S.p}>
             We will respond to deletion requests within a reasonable timeframe and confirm
@@ -176,7 +177,7 @@ export default function PrivacyPage() {
           <h2 style={S.h2}>Contact</h2>
           <p style={S.p}>
             Questions about this policy or your data can be sent to{' '}
-            <a href="mailto:privacy@3dimensions.guide" style={S.link}>privacy@3dimensions.guide</a>.
+            <a href={`mailto:${PRIVACY_EMAIL}`} style={S.link}>{PRIVACY_EMAIL}</a>.
           </p>
         </div>
       </main>

@@ -1,4 +1,5 @@
 import Nav from '@/components/navigation/Nav';
+import { SUPPORT_EMAIL } from '@/lib/contact';
 import Footer from '@/components/navigation/Footer';
 
 export const metadata = {
@@ -57,7 +58,7 @@ export default function UpdateTimePage() {
             report directly to the email on file — there&apos;s no charge for this correction.
           </p>
 
-          <a href="mailto:privacy@3dimensions.guide?subject=Birth%20Time%20Update%20Request" style={S.cta}>
+          <a href={`mailto:${SUPPORT_EMAIL}?subject=Birth%20Time%20Update%20Request`} style={S.cta}>
             Email Your Corrected Birth Time
           </a>
         </div>

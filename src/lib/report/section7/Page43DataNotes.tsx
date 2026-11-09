@@ -6,6 +6,8 @@
  * privacy and data-removal information.
  */
 
+import { PRIVACY_EMAIL } from '@/lib/contact';
+
 import React from 'react';
 import { DataQualityBlock, BirthTimeSensitivityBanner } from '../shared/BirthTimeSensitivity';
 import { Page, View, Text, StyleSheet } from '@react-pdf/renderer';
@@ -245,7 +247,7 @@ export default function Page43DataNotes({ data }: Props) {
                 Your birth data is used exclusively to generate this report and is retained only as described in the T3D Privacy Policy at 3dimensions.guide/privacy.
               </Text>
               <Text style={[S.smallText, { marginTop: 5 }]}>
-                To request removal of your data from T3D systems, email: privacy@3dimensions.guide
+                {`To request removal of your data from T3D systems, email: ${PRIVACY_EMAIL}`}
               </Text>
             </View>
           </View>

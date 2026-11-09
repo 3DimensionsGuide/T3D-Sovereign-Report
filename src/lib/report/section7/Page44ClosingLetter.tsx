@@ -8,6 +8,8 @@
  * No future offers in the printed report.
  */
 
+import { SUPPORT_EMAIL } from '@/lib/contact';
+
 import React from 'react';
 import path from 'path';
 import { Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
@@ -183,7 +185,7 @@ export default function Page44ClosingLetter({ data }: Props) {
       </View>
 
       <View style={S.bottomStamp} fixed>
-        <Text style={S.stampText}>T3D Base Report · 3dimensions.guide · privacy@3dimensions.guide</Text>
+        <Text style={S.stampText}>{`T3D Base Report · 3dimensions.guide · ${SUPPORT_EMAIL}`}</Text>
         <Text style={S.pageNum} render={({ pageNumber }) => pageNumber} />
       </View>
     </Page>
