@@ -20,6 +20,54 @@ test('a different name on the same email is a different lead', () => assert.equa
 test('a middle name makes it a different person', () => assert.equal(isSamePerson(row(), { ...who, middleName: 'Rose' }), false));
 test('a different email never matches', () => assert.equal(isSamePerson(row(), { ...who, email: 'c@d.com' }), false));
 
+/**
+ * An address can be absent on both sides. The app writes a lead before it asks for one, so for a
+ * whole first session the row has no address and neither does the identity being matched against
+ * it. The whole arrangement rests on two things being true at once: two addressless records for
+ * the same person match each other, so an app that lost its token recalculates onto its own lead
+ * instead of writing a second one; and an addressless record never matches one that has an
+ * address, so nobody is handed somebody else's chart.
+ */
+const anon = (over: Partial<StoredLead> = {}): StoredLead => row({ email: null, ...over });
+const { email: _dropped, ...withoutEmail } = who;
+const anonWho: LeadIdentity = withoutEmail;
+
+test('two addressless records for the same person match', () => {
+  assert.equal(isSamePerson(anon(), anonWho), true);
+  // Null, undefined and '' all mean the same thing here: nobody has given an address.
+  assert.equal(isSamePerson(anon(), { ...anonWho, email: null }), true);
+  assert.equal(isSamePerson(anon(), { ...anonWho, email: '' }), true);
+});
+
+test('an addressless record never matches one that has an address', () => {
+  // The dangerous direction: an app with no address must not be matched onto a lead that has one.
+  assert.equal(isSamePerson(row(), anonWho), false);
+  // And the reverse, so attaching an address cannot be undone by a later addressless calculation.
+  assert.equal(isSamePerson(anon(), who), false);
+});
+
+test('an addressless record still has to be the same person', () => {
+  assert.equal(isSamePerson(anon(), { ...anonWho, firstName: 'Bea' }), false);
+  assert.equal(isSamePerson(anon(), { ...anonWho, birthTime: '14:30' }), false);
+  assert.equal(isSamePerson(anon(), { ...anonWho, city: 'Dallas, Texas' }), false);
+  // Two different people who have both skipped the address are not one person.
+  assert.equal(isSamePerson(anon({ lastName: 'Kim' }), anonWho), false);
+});
+
+test('an app that lost its token recalculates onto its own anonymous lead', () => {
+  // What the route actually passes: every anonymous row sharing the surname, which is what
+  // leads_anon_idx narrows to. Only one of them is this person.
+  const rows = [anon({ id: 4, firstName: 'Bea' }), anon({ id: 5 }), anon({ id: 6, birthTime: '03:15' })];
+  assert.equal(findExistingLead(rows, anonWho)?.id, 5);
+});
+
+test('an anonymous lead is not reused once it has an address', () => {
+  // After attaching, the same birth details with no address find nothing — which is correct: the
+  // app sends the address it now holds, and a stranger with the same name and birthday gets a
+  // lead of their own rather than this one.
+  assert.equal(findExistingLead([row({ id: 5 })], anonWho), null);
+});
+
 test('the oldest matching lead is reused', () => {
   const rows = [row({ id: 7, createdAt: new Date('2026-03-01') }), row({ id: 2, createdAt: new Date('2026-02-01') }), row({ id: 9, firstName: 'Zed' })];
   assert.equal(findExistingLead(rows, who)?.id, 2);

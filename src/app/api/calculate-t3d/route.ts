@@ -21,29 +21,7 @@ import type { T3DCalculatorInput } from '@/server/engines/types';
 import { limitRequest } from '@/server/rateLimit';
 import { makeAppSessionToken } from '@/server/appTokens';
 import { ENGINE_VERSION } from '@/server/engines/version';
-import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
-
-// ─── VALIDATION ───────────────────────────────────────────────────────────────
-function validateInput(body: Partial<T3DCalculatorInput>): string | null {
-  if (!body.firstName?.trim())  return 'firstName is required';
-  if (!body.lastName?.trim())   return 'lastName is required';
-  // An address given has to be a real one whoever is asking. An address left out is only
-  // allowed for a caller that says one is coming later under a session token — the app,
-  // which shows the chart first. The website calculator sends no such flag, so a form that
-  // loses its email field fails here rather than writing a lead nobody can be reached at.
-  const given = body.email?.trim();
-  if (given) {
-    if (!given.includes('@')) return 'A valid email is required';
-  } else if (body.emailLater !== true) {
-    return 'A valid email is required';
-  }
-  if (!body.birthDate?.match(/^\d{4}-\d{2}-\d{2}$/))
-    return 'birthDate must be in YYYY-MM-DD format';
-  if (isUnderMinimumAge(body.birthDate)) return UNDER_AGE_MESSAGE;
-  if (!body.birthPlace?.city?.trim())    return 'birthPlace.city is required';
-  if (!body.birthPlace?.country?.trim()) return 'birthPlace.country is required';
-  return null;
-}
+import { validateInput } from '@/server/calculatorInput';
 
 // ─── ROUTE HANDLER ────────────────────────────────────────────────────────────
 export async function POST(
