@@ -168,38 +168,181 @@ for (const [key, name, angle, summary, body] of ASPECTS) {
 }
 
 // Astrology terms
-add('astro:ascendant', 'Astrology', 'Ascendant (Rising sign)', 'The sign rising on the eastern horizon at your birth.', ['Your Ascendant shows how you meet the world and how the world first meets you. It is also the starting point for the houses, so it needs an accurate birth time.', 'If no birth time was entered, the app uses 12:00 noon, and the Rising sign and houses are only approximate.'], ['astro:house:1', 'astro:wholesign']);
-add('astro:midheaven', 'Astrology', 'Midheaven', 'The highest point of your chart.', ['The Midheaven (MC) points to your public role and what you are known for. Like the Ascendant, it depends on your birth time.'], ['astro:house:10']);
-add('astro:retrograde', 'Astrology', 'Retrograde', 'A planet that appears to move backward.', ['From Earth, planets sometimes seem to slow, stop and move backward across the sky. This is an effect of perspective, and astrologers read it as a time to review and revisit rather than push forward.', 'A retrograde is not a malfunction. It changes the tempo of that planet’s themes.'], ['astro:planet:mercury']);
-add('astro:orb', 'Astrology', 'Orb', 'How far from exact an aspect is.', ['The orb is the gap, in degrees, between the actual angle and the perfect one. A smaller orb means a stronger contact.', 'T3D uses 1° or less for peak and 3° or less for active.'], ['astro:aspect:conjunction', 'astro:applying']);
-add('astro:applying', 'Astrology', 'Applying', 'An aspect that is getting closer to exact.', ['An applying aspect is still building toward its exact moment. It is often felt as anticipation or mounting pressure.'], ['astro:separating', 'astro:orb']);
-add('astro:separating', 'Astrology', 'Separating', 'An aspect that is moving away from exact.', ['A separating aspect has passed its exact moment and is fading. It is often felt as the aftermath: what the contact brought up is now settling.'], ['astro:applying', 'astro:orb']);
-add('astro:transit', 'Astrology', 'Transit', 'Where a planet is in the sky right now.', ['A transit is a planet’s current position compared against your birth chart. A transiting planet making an aspect to one of your natal planets is a transit contact.', 'T3D treats transits as weather: information about the conditions, never an instruction. You decide through your Strategy and Authority.'], ['astro:natal', 'astro:aspect:square']);
-add('astro:natal', 'Astrology', 'Natal Chart', 'The sky at the moment you were born.', ['Your natal chart is a snapshot of the planets at your birth time and place. It stays fixed. Everything that changes (transits, timelines) is read against it.'], ['astro:transit']);
-add('astro:tropical', 'Astrology', 'Tropical zodiac', 'The zodiac anchored to the seasons.', ['The tropical zodiac starts Aries at the spring equinox. It is the system most Western astrology uses, including most "sun sign" content.'], ['astro:sidereal']);
-add('astro:sidereal', 'Astrology', 'Sidereal zodiac', 'The zodiac anchored to the stars.', ['The sidereal zodiac is measured against the fixed stars. The two zodiacs have drifted about 24° apart, so many planets fall in a different sign. T3D shows both so you can see the two lenses.'], ['astro:tropical']);
-add('astro:wholesign', 'Astrology', 'Whole-Sign Houses', 'Each house is one full sign.', ['In the whole-sign system your rising sign is the 1st house, the next sign the 2nd, and so on. It is the oldest house system and the one T3D uses.'], ['astro:ascendant']);
-add('astro:phase', 'Astrology', 'Moon Phase', 'Where the Moon is in its monthly cycle.', ['A waxing Moon is growing toward full and is read as a time of building and beginning. A waning Moon is shrinking toward new and is read as a time of release and review.'], ['astro:planet:moon']);
-add('astro:eclipse', 'Astrology', 'Eclipse', 'A New or Full Moon on the Moon’s nodes.', ['Eclipses happen about twice a year in pairs and mark turning points. Their effect is read over the following weeks to months, especially when they touch your chart.'], ['astro:planet:northNode']);
-add('astro:ingress', 'Astrology', 'Ingress', 'A planet moving into a new sign.', ['An ingress is the moment a planet crosses into the next sign. The planet’s themes take on the style of the new sign until it moves on.'], ['astro:planet:sun']);
-add('astro:profection', 'Astrology', 'Lord of the Year', 'The planet in charge of your current year of life.', ['In annual profections you move one house forward each birthday, starting from the 1st house at birth. The planet that rules that house’s sign becomes the Lord of the Year, and its themes get emphasis from birthday to birthday.'], ['astro:wholesign', 'astro:house:1']);
-add('astro:season', 'Astrology', 'Slow Transit', 'A long contact from a slow planet.', ['A slow transit is a transit by a slow planet (Jupiter to Pluto) that stays within a few degrees of your chart point for weeks or months, sometimes in several passes.'], ['astro:transit', 'astro:orb']);
+add('astro:ascendant', 'Astrology', 'Ascendant (Rising sign)', 'The sign rising on the eastern horizon at your birth.', [
+  'The degree of the zodiac coming up over the eastern horizon at the moment and place you were born. It moves roughly one degree every four minutes, which makes it the most time-sensitive point in the whole chart.',
+  'It describes how you meet the world and how the world first meets you — the approach rather than the motive. Where the Sun is what you are becoming, the Ascendant is the door people come through to get to it.',
+  'It is also the structural anchor of the chart. In whole-sign houses the rising sign simply is your 1st house, so every house placement and every profection year is counted from here. Change the Ascendant and the entire house layout moves with it.',
+  'If no birth time was entered the app uses 12:00 noon, and the Rising sign and houses are only approximate. The planets are still reliable; the houses are the part that needs the time.',
+], ['astro:house:1', 'astro:wholesign']);
+add('astro:midheaven', 'Astrology', 'Midheaven', 'The highest point of your chart.', [
+  'The Midheaven, or MC, is the point where the ecliptic meets the meridian overhead — the highest the Sun gets on the day and at the place you were born. Like the Ascendant it depends entirely on your birth time.',
+  'It points to your public role: the thing you become known for, the direction your reputation grows in. Not what you want privately, and not your job title — what people see from a distance.',
+  'In whole-sign houses the MC is not pinned to the 10th house the way it is in other systems. It floats, landing wherever its degree falls, and is read as a sensitive point in whatever house that turns out to be. That is a feature of the system rather than an error in the chart.',
+], ['astro:house:10', 'astro:wholesign']);
+add('astro:retrograde', 'Astrology', 'Retrograde', 'A planet that appears to move backward.', [
+  'From where we stand, a planet sometimes seems to slow, stop and travel backward through the zodiac. It is an effect of perspective — Earth passing an outer planet, or being passed by one — and nothing out there actually reverses.',
+  'The practical consequence is duration. A retrograde stretches a transit out and takes it over the same degree three times: forward, back, then forward again. Something you thought was finished in the first pass returns in the second and is settled in the third.',
+  'The cadences are regular. Mercury goes retrograde for about three weeks, three times a year. Venus for about forty days every eighteen months. Mars for months at a stretch, once every two years.',
+  'It is not a malfunction and not a reason to stop. Retrograde periods are built for reviewing, correcting and consolidating; what they are poor at is launching something that needs to stay as launched.',
+], ['astro:planet:mercury', 'astro:transit']);
+add('astro:orb', 'Astrology', 'Orb', 'How far from exact an aspect is.', [
+  'An aspect is an exact angle — 90 degrees, 120 degrees — and planets are almost never exactly there. The orb is the gap in degrees between the angle as it actually stands and the perfect one. A smaller orb is a stronger contact.',
+  'T3D draws the line in two places: 1 degree or less counts as peak, and 3 degrees or less counts as active. Beyond 3 degrees the contact is not shown at all, which is why a transit can appear in the app for a few days and then disappear without anything having happened.',
+  'Those cut-offs are a deliberate choice rather than a universal rule. Wide orbs produce a chart where everything aspects everything and nothing stands out; a tight orb is what makes the peak days mean something.',
+], ['astro:aspect:conjunction', 'astro:applying']);
+add('astro:applying', 'Astrology', 'Applying', 'An aspect that is getting closer to exact.', [
+  'The faster of the two bodies is still closing the gap, so the orb is shrinking and the exact angle has not arrived yet.',
+  'This is the half of an aspect that is usually felt most: pressure building, something gathering, the sense of a thing about to happen. In traditional practice the applying side is the one that carries the event.',
+  'Which makes it the half worth planning around. An applying aspect gives you notice — the exact day is still ahead, and the app can tell you when it lands.',
+], ['astro:separating', 'astro:orb']);
+add('astro:separating', 'Astrology', 'Separating', 'An aspect that is moving away from exact.', [
+  'The exact angle has passed and the orb is widening again. The contact is fading rather than building.',
+  'It reads as aftermath: what the aspect brought up is now settling, being absorbed, becoming something you look back on rather than something pressing on you.',
+  'The distinction matters for timing more than for meaning. Two charts can show the same aspect at the same orb, and the one applying is still coming while the one separating has already done its work.',
+], ['astro:applying', 'astro:orb']);
+add('astro:transit', 'Astrology', 'Transit', 'Where a planet is in the sky right now.', [
+  'A planet’s position today, measured against your natal chart. When a transiting planet forms an aspect to one of your birth planets, or crosses into one of your houses, that is a transit contact.',
+  'Transits are the only moving part of astrology. Your natal chart never changes; everything that develops over a life is read as the current sky passing across that fixed picture.',
+  'T3D treats them as weather and nothing more. A transit describes the conditions you are moving through — the terrain, the pressure, what the environment is doing — and it never tells you what to do. The decision stays with your Strategy and Authority, inside the body that has to live with it.',
+  'The misunderstanding worth correcting is that a transit makes something happen. It does not act for you. It sets the background conditions in which your own choices take place, which is why the same transit is uneventful in one year and defining in another.',
+], ['astro:natal', 'astro:profection', 'hd:authority']);
+add('astro:natal', 'Astrology', 'Natal Chart', 'The sky at the moment you were born.', [
+  'The positions of the planets, the Ascendant and the houses, calculated for your exact birth time and place. It is a single frozen moment.',
+  'It never changes, and that is its whole function. Everything else in the system — transits, profections, the slow outer-planet chapters — only means anything because there is a fixed chart to read it against.',
+  'In T3D it sits alongside your Human Design bodygraph and your numerology core: three descriptions of the same birth moment, from three different angles. The natal chart is the one that tells you about timing and environment.',
+], ['astro:transit', 'astro:ascendant']);
+add('astro:tropical', 'Astrology', 'Tropical zodiac', 'The zodiac anchored to the seasons.', [
+  'The tropical zodiac puts 0 degrees of Aries at the spring equinox and divides the year from there. It is tied to the relationship between Earth and Sun, not to the constellations.',
+  'It is what almost all Western astrology uses, and it is what every "what is your sign" article means. If you have ever been told your Sun sign, it was a tropical one.',
+  'Because the equinox slowly drifts against the stars, the tropical signs no longer line up with the constellations they are named after. That is not an error. The system is measuring the seasonal year, and the seasonal year is what it has always measured.',
+], ['astro:sidereal']);
+add('astro:sidereal', 'Astrology', 'Sidereal zodiac', 'The zodiac anchored to the stars.', [
+  'The sidereal zodiac is measured from the fixed stars rather than the equinox. The offset between the two systems is called the ayanamsha, and T3D uses the Lahiri value, the standard in Indian astrology. It currently runs to about 24 degrees.',
+  'That is nearly a whole sign, so most people’s planets fall one sign earlier here than in the tropical chart. Seeing your Sun in a different sign is the system working, not a mistake.',
+  'T3D shows both rather than picking one, because the two are measuring different things: the tropical chart holds seasonal space and the sidereal chart holds stellar space. Being made to choose between them is a false choice, and having both is more information than having either.',
+], ['astro:tropical']);
+add('astro:wholesign', 'Astrology', 'Whole-Sign Houses', 'Each house is one full sign.', [
+  'Your rising sign becomes the whole of the 1st house, the next sign the whole of the 2nd, and so on round the chart. Every house is exactly one sign — no house is larger than another and no sign is split between two houses.',
+  'It is the oldest house system there is, and it is the one T3D uses throughout. The reason is the Stoplight: when a house boundary and a sign boundary are the same line, a transiting planet changes house at the exact moment it changes sign. The shift is unmistakable, the way a light changing colour is unmistakable.',
+  'Systems that cut houses by degree blur that. They can put a planet in one sign and two different houses depending on the method, which is fine for interpretation and useless for timing.',
+  'It also makes annual profections work cleanly, since a profection year advances by exactly one sign and therefore by exactly one house.',
+], ['astro:ascendant', 'astro:profection']);
+add('astro:phase', 'Astrology', 'Moon Phase', 'Where the Moon is in its monthly cycle.', [
+  'The angle between the transiting Sun and Moon over a cycle of roughly 29 and a half days. New Moon is the two of them together; Full Moon is them opposite; the quarters are the squares in between.',
+  'A waxing Moon is growing toward full and reads as building and beginning. A waning Moon is shrinking toward new and reads as releasing and reviewing. The balsamic phase just before the New Moon is the emptiest and the most inward.',
+  'The Moon moves about 13 degrees a day and changes sign every two to three days, which makes it the fastest-moving thing in the chart and the right instrument for daily and weekly scheduling.',
+  'Being the fastest also means the shallowest. A single lunar aspect passes in hours, so reading a hard Moon day as a crisis is the most common way to overweight the sky.',
+], ['astro:planet:moon', 'astro:transit']);
+add('astro:eclipse', 'Astrology', 'Eclipse', 'A New or Full Moon on the Moon’s nodes.', [
+  'An eclipse is a New Moon or Full Moon that happens close to one of the lunar nodes, which is why the light is blocked rather than merely waxing or waning.',
+  'They come in pairs about every six months, and the pairs belong to a series that works one axis of opposing houses for roughly eighteen months before moving on. So an eclipse is rarely a single event; it is one beat in a chapter that has been running for a year or more in the same two areas of your life.',
+  'Their effect is read over the following weeks and months rather than on the day, and it is strongest when the eclipse degree touches something in your own chart.',
+  'They are not disasters. What an eclipse disrupts is a routine that had stopped working, and the clearing is the function rather than a side effect.',
+], ['astro:planet:northNode', 'astro:phase']);
+add('astro:ingress', 'Astrology', 'Ingress', 'A planet moving into a new sign.', [
+  'The exact moment a planet crosses from 29 degrees and 59 minutes of one sign to 0 degrees of the next.',
+  'The planet keeps doing its own job and changes the style it does it in. The same function arrives wearing a different filter, and because T3D uses whole-sign houses, the planet changes house in the same instant — which is why an ingress is the clearest stoplight in the system.',
+  'The cadences set the rhythm of the sky: the Moon every two and a half days, the Sun and Mercury and Venus roughly every month, Mars about every six weeks when direct, Jupiter about once a year, Saturn every two and a half to three years.',
+  'An ingress shifts the environment, not you. Nothing in your natal chart or your design changes when a planet moves; the conditions around it do.',
+], ['astro:planet:sun', 'astro:wholesign']);
+add('astro:profection', 'Astrology', 'Lord of the Year', 'The planet in charge of your current year of life.', [
+  'Annual profections step one whole-sign house forward every birthday, starting from the 1st house in your first year of life. The planet that rules the sign of the house you land on becomes the Lord of the Year, and it holds that office from birthday to birthday.',
+  'Because there are twelve houses the cycle repeats every twelve years, so ages 0, 12, 24, 36, 48, 60 and 72 are all 1st-house years — years about you and your own body rather than about anything external.',
+  'Its real use is as a filter. Transits involving the Lord of the Year, and transits moving through the profected house, are the ones that land; everything else tends to pass in the background.',
+  'This is what explains the thing people find hardest about astrology — why a heavy Saturn transit rewrote one person’s life and barely registered for another. Not the transit. Whether it was activated that year.',
+], ['astro:wholesign', 'astro:transit']);
+add('astro:season', 'Astrology', 'Slow Transit', 'A long contact from a slow planet.', [
+  'A transit by one of the slow bodies — Jupiter out to Pluto — that stays within orb of a point in your chart for weeks or months, often arriving in several passes as the planet turns retrograde and comes back over the same degree.',
+  'These are the multi-year chapters rather than the daily weather. Saturn spends about two and a half to three years in a sign, Uranus about seven, Neptune about fourteen, Pluto anywhere from twelve to thirty.',
+  'Read them as developmental rather than eventful. A slow transit is a long process of structural change, and judging it by what happened on one day of it tells you almost nothing.',
+  'The usual mistake is expecting resolution on a schedule. These transits shape whole eras of a life, and they finish when they finish.',
+], ['astro:transit', 'astro:retrograde']);
 
 // Human Design
-add('hd:strategy', 'Human Design', 'Strategy', 'How your Type is built to meet life.', ['Strategy is the practical entry point to your design, such as responding, waiting for an invitation or informing others before you act. It is how you enter life in a way that creates less resistance.'], ['hd:authority', 'hd:notself']);
-add('hd:authority', 'Human Design', 'Authority', 'Where your best decisions come from.', ['Authority is the part of your design that is built to make decisions, such as the gut, the emotions or the spleen’s instinct. T3D puts it above everything else, including the sky.'], ['hd:strategy']);
-add('hd:notself', 'Human Design', 'Not-self', 'The signal that you are off track.', ['The not-self theme is a feeling, such as frustration, bitterness, anger or disappointment, that tends to show up when you are not following your Strategy and Authority. It is a signal to adjust, not a flaw.'], ['hd:strategy', 'hd:signature']);
-add('hd:signature', 'Human Design', 'Signature', 'The feeling of being aligned.', ['Your signature is the feeling that tends to show up when you are living by your Strategy and Authority, such as satisfaction, success, peace or surprise.'], ['hd:notself']);
-add('hd:bodygraph', 'Human Design', 'Bodygraph', 'The map of your design.', ['The bodygraph is the chart of nine Centers connected by channels and gates. Coloured Centers are defined; white Centers are open.'], ['hd:defined', 'hd:open']);
-add('hd:defined', 'Human Design', 'Defined Center', 'A Center that works the same way all the time.', ['A defined Center is a consistent, reliable source of its theme. People often lean on you for it.'], ['hd:open']);
-add('hd:open', 'Human Design', 'Open Center', 'A Center that takes in and amplifies.', ['An open Center is receptive and sensitive to the people around you. It is not a weakness, and over time it becomes a source of wisdom.'], ['hd:defined']);
-add('hd:hanging', 'Human Design', 'Hanging gate', 'A gate without its channel partner.', ['A hanging gate is one half of a channel. It is active in you but not connected, and it often shows up as a quality you seek in other people.'], ['hd:channel']);
-add('hd:channel', 'Human Design', 'Channel', 'Two gates that join two Centers.', ['A channel is formed when both gates at either end of a connecting line are active. It defines both Centers and creates a steady current in you.'], ['hd:hanging']);
-add('hd:personality', 'Human Design', 'Personality (conscious)', 'What you know about yourself.', ['Personality activations are calculated from your birth moment. They describe the part of you that you are aware of.'], ['hd:design']);
-add('hd:design', 'Human Design', 'Design (unconscious)', 'What your body carries.', ['Design activations are calculated from the moment about 88 days before birth. They describe your body’s unconscious wiring, which other people often notice before you do.'], ['hd:personality']);
-add('hd:line', 'Human Design', 'Line', 'A finer layer inside each gate.', ['Each gate has six lines. Lines 1 to 6 are traditionally called Investigator, Hermit, Experimenter, Opportunist, Heretic and Role Model. Your Profile is made from two of them.'], ['hd:profile']);
-add('hd:profile', 'Human Design', 'Profile', 'The two lines that describe your role.', ['Your Profile combines the line of your conscious Sun with the line of your unconscious Sun, for example 3/5. It describes how you learn and how you meet the world.'], ['hd:line']);
-add('hd:cross', 'Human Design', 'Incarnation Cross', 'The theme of your life’s purpose.', ['Your Incarnation Cross is made from the four gates of your Sun and Earth (conscious and unconscious). It describes a life theme more than a task.'], ['hd:godhead']);
+add('hd:strategy', 'Human Design', 'Strategy', 'How your Type is built to meet life.', [
+  'Strategy comes from your Type, and your Type comes from how your aura works. A Generator responds to what shows up rather than initiating. A Projector waits to be recognised and invited. A Manifestor informs the people affected before acting. A Reflector waits out a full lunar cycle before anything large.',
+  'It is not a rule imposed on you. It describes the way your particular energy field already engages the world correctly, so following it mostly removes friction rather than adding discipline.',
+  'The real work it does is move the decision out of your head and into your body. Your mind is excellent at analysis and was never built to run your life; Strategy is the handover.',
+  'If Strategy feels like a restriction, that is usually the mind objecting to losing the job. What it actually protects is the thing that makes you different from everyone else.',
+], ['hd:authority', 'hd:notself']);
+add('hd:authority', 'Human Design', 'Authority', 'Where your best decisions come from.', [
+  'Authority is the specific place in your body that is built to decide: the gut’s immediate response, the emotions needing time to come to clarity, the spleen’s instant and quiet knowing, or — where no Centre provides it — a process that works through conversation or through a lunar cycle.',
+  'It gives signals rather than reasons. A sacral sound, a settled feeling that was not there yesterday, an instinct that arrives once and does not repeat. None of that argues its case the way a pros-and-cons list does.',
+  'T3D puts Authority above everything else, including the sky, and the reason is structural rather than reverent. Transits are the conditions outside you; your Authority is inside the body that has to live with the decision. Keep that order and the sky stays what it is — information about the terrain. Reverse it and the weather starts making your choices.',
+  'Having no inner Authority is not having no way to decide. It means the process runs through your environment or through time rather than through a defined Centre, which is slower and no less reliable.',
+], ['hd:strategy', 'astro:transit']);
+add('hd:notself', 'Human Design', 'Not-self', 'The signal that you are off track.', [
+  'A specific feeling tied to your Type: frustration for a Generator, bitterness for a Projector, anger for a Manifestor, disappointment for a Reflector.',
+  'It tends to appear when the mind has taken over the decisions — usually through an open Centre, where the pressure to prove yourself, to avoid a confrontation or to end the discomfort quickly is strongest.',
+  'Read it as instrumentation. It is a light on the dashboard telling you which way you have drifted, and the response it asks for is returning to Strategy and Authority, not self-examination.',
+  'It is not a character flaw and not evidence that something is wrong with you. Everybody meets their not-self theme; it is the signal working.',
+], ['hd:strategy', 'hd:signature']);
+add('hd:signature', 'Human Design', 'Signature', 'The feeling of being aligned.', [
+  'The counterpart to the not-self: satisfaction for a Generator, success for a Projector, peace for a Manifestor, surprise for a Reflector.',
+  'It shows up as physical ease — the sense of things costing less than they used to — when your energy is being engaged the way it is built to be.',
+  'Treat it as confirmation rather than a target. Signature is what happens when the mechanics are right; it is the readout, not the goal.',
+  'Which is why it cannot be manufactured. Chasing the feeling directly is the surest way not to get it; the feeling follows the operation.',
+], ['hd:notself']);
+add('hd:bodygraph', 'Human Design', 'Bodygraph', 'The map of your design.', [
+  'The whole chart in one diagram: nine Centres, joined by 36 channels, built from 64 gates. It is drawn twice over — once from your birth moment and once from the design epoch — and the two sets of activations are laid on the same figure.',
+  'Coloured Centres are defined and run consistently. White Centres are open and take in what is around them. That single distinction carries most of what the bodygraph has to say.',
+  'In T3D terms it maps the Vehicle: the machinery you are driving, where it generates its own power and where it runs on what it picks up from outside.',
+  'It is not a personality test. It describes mechanics — how energy moves through a body — rather than traits, and it does not sort people into kinds of person.',
+], ['hd:defined', 'hd:open', 'hd:channel']);
+add('hd:defined', 'Human Design', 'Defined Center', 'A Center that works the same way all the time.', [
+  'A Centre is defined when a complete channel reaches it — both gates at either end of a connecting line active, closing the circuit. Define a channel and you define both Centres it touches.',
+  'It then runs the same way all the time, regardless of who you are with. It is reliable in you and, because an aura broadcasts, other people feel it coming off you consistently.',
+  'This is the part of you worth leaning on and the part worth watching. Fixed energy is dependable, and it is also the energy you are most likely to press onto someone whose Centre is open there.',
+  'Defined is not better than open. It means fixed, and fixed is useful for consistency and useless for flexibility. The open version of the same Centre has advantages this one does not.',
+], ['hd:open', 'hd:channel']);
+add('hd:open', 'Human Design', 'Open Center', 'A Center that takes in and amplifies.', [
+  'A Centre with no complete channel reaching it — whether it holds a hanging gate or nothing at all.',
+  'It takes in and amplifies whatever is around it rather than generating its own steady supply, so what you feel there is often not originally yours. In a crowded room an open Centre is reading the room.',
+  'Over time it is where you become wise in a way nobody with that Centre defined can be. Having sampled every version of that energy through hundreds of people, you end up able to recognise it in a way someone with it fixed never can.',
+  'It is not damage and there is nothing missing. An open Centre is a working sensor, and the trouble only starts when the mind treats what it picks up as a verdict on you.',
+], ['hd:defined', 'hd:hanging']);
+add('hd:hanging', 'Human Design', 'Hanging gate', 'A gate without its channel partner.', [
+  'One end of a channel activated and the other end not. The gate is live in you; the circuit is not closed.',
+  'It behaves like a magnet. A hanging gate reaches for the gate that would complete it, which is why certain people feel unusually compelling and why certain transits land harder than others — something that was half-open just closed.',
+  'It is a useful thing to know about yourself, because it explains a pattern in who you are drawn to that otherwise looks like coincidence.',
+  'It is not a deficiency waiting for another person to fix. The theme is available to you whenever the right connection or transit arrives, and it is not something to go hunting for in a relationship.',
+], ['hd:channel', 'hd:open']);
+add('hd:channel', 'Human Design', 'Channel', 'Two gates that join two Centers.', [
+  'A line between two Centres with both of its gates activated. Completing it defines both Centres at either end and establishes a permanent circuit.',
+  'What it produces is not the two gates added together. A channel makes a third thing — one consistent current with its own character, which is why channels have names of their own rather than being listed as pairs.',
+  'Your defined channels are where your energy reliably runs. Following Strategy and Authority is what lets them power what you do instead of being pushed.',
+  'There are 36 of them, and the ones you have define the shape of your bodygraph. Which Centres end up coloured is entirely a consequence of which channels are complete.',
+], ['hd:hanging', 'hd:defined']);
+add('hd:personality', 'Human Design', 'Personality (conscious)', 'What you know about yourself.', [
+  'The activations calculated from your exact birth moment, drawn in black on the bodygraph.',
+  'This is everything you experience as "me": your self-aware thinking, your perspective, the part you could describe if someone asked.',
+  'In T3D’s framing it is the passenger rather than the driver. It sees out of the window, and it is good at that — the conscious mind is built to notice and to share what it notices with other people. It is not built to steer.',
+  'Which is the correction most worth making: the part of you that feels most like you is not the part designed to make your decisions.',
+], ['hd:design']);
+add('hd:design', 'Human Design', 'Design (unconscious)', 'What your body carries.', [
+  'The activations calculated from the moment the Sun stood exactly 88 degrees of arc earlier than at your birth — roughly 88 to 89 days before, though it is the arc that is measured and not the days. Drawn in red.',
+  'That span is not arbitrary. It is the period in which the body is being built, and it ends as the third trimester begins, before the conscious part of you arrives.',
+  'It runs your physical intelligence: genetics, instinct, the behaviour people see in you clearly while you have no direct view of it yourself. Others often describe your Design side back to you and it sounds like a stranger.',
+  '"Unconscious" here means inaccessible, not damaged. It is the body’s operating system doing its job, and because you cannot reach it by thinking, the only way to work with it is to let it decide — which is what Strategy and Authority are for.',
+], ['hd:personality', 'hd:authority']);
+add('hd:line', 'Human Design', 'Line', 'A finer layer inside each gate.', [
+  'Every one of the 64 gates divides into six lines, numbered from the bottom up. Lines 1 to 6 are the Investigator, the Hermit, the Experimenter, the Opportunist, the Heretic and the Role Model.',
+  'The gate says what the energy is; the line says how it behaves. The same gate on a 1st line and on a 6th line will look like two different people using the same equipment.',
+  'Your Profile is built from two of them, and the lines that repeat across your activations are worth noticing — a line that keeps appearing is a style that keeps appearing.',
+  'A higher number is not a higher grade. The 6th line is not an advanced 1st line; they are different jobs in the same structure, and a hexagram needs all six.',
+], ['hd:profile', 'hd:gate:1']);
+add('hd:profile', 'Human Design', 'Profile', 'The two lines that describe your role.', [
+  'The line of your conscious Sun paired with the line of your unconscious Sun, written as a fraction: 1/3, 4/1, 6/2. There are twelve.',
+  'They fall into three geometries. Right Angle profiles live out a personal journey and are much the most common. Juxtaposition is a fixed fate and belongs to the 4/1 alone. Left Angle profiles are transpersonal — their lives turn on other people.',
+  'Profile is the costume the purpose wears: how your life unfolds and how other people meet you, rather than what you are here to do.',
+  'The 3rd line gets the worst press and deserves better. Trial and error is not failure repeated; it is the method by which anything gets found out to be true, and a 3rd line is the part of the system that does that work for everybody else.',
+], ['hd:line', 'hd:cross']);
+add('hd:cross', 'Human Design', 'Incarnation Cross', 'The theme of your life’s purpose.', [
+  'Four gates: your Sun and Earth in the conscious calculation and again in the unconscious one. Between them they account for the largest share of your imprint, which is why they are read as a theme for the whole life. There are 192 of them.',
+  'It sets a background frequency rather than a task — the story that tends to emerge from a life lived as itself, visible mostly in hindsight.',
+  'Its angle comes from your Profile, so the two always agree: a 4/1 carries a Juxtaposition cross and nothing else can.',
+  'The one thing not to do with it is try to perform it. A cross is not a job description, and deciding to go and fulfil it from the mind is precisely how it does not happen. It arrives as a by-product of living by Strategy and Authority.',
+], ['hd:godhead', 'hd:profile']);
 add('hd:godhead', 'Human Design', 'Godhead', 'The archetype your mind wears.', [GODHEAD_MECHANISM], ['hd:cross']);
 add('hd:variables', 'Human Design', 'Variables', 'Four Left or Right settings in your body.', [VARIABLES_MECHANISM], ['hd:design']);
 for (const [type, c] of Object.entries(TYPE_CONTENT)) {
@@ -227,11 +370,30 @@ for (const [key, m] of Object.entries(CIRCUIT_GROUP_MEANING)) {
 }
 
 // Numerology
-add('num:master', 'Numerology', 'Master numbers', '11, 22 and 33 keep their double digits.', ['When a calculation lands on 11, 22 or 33 it is not reduced further. It is written with its root (11/2, 22/4, 33/6) and read as a higher frequency working through a practical base.'], ['num:11', 'num:22', 'num:33']);
-add('num:lifepath', 'Numerology', 'Life Path', 'The direction your whole life leans toward.', ['Your Life Path comes from your full birth date and is the central number in your chart. It describes your lifelong curriculum.'], ['num:destiny', 'num:maturity']);
+add('num:master', 'Numerology', 'Master numbers', '11, 22 and 33 keep their double digits.', [
+  'When a total lands on 11, 22 or 33 it stops there instead of reducing. It is written with its root — 11/2, 22/4, 33/6 — because both halves are live: the master frequency and the ordinary number underneath it.',
+  'T3D keeps masters at every step of a calculation, not only at the end, so an 11 that appears partway through survives into the result rather than collapsing to a 2 on the way.',
+  'The root is not a footnote. A master number asks you to have built the plain version first: a 22 is asked to master the 4 — patience, structure, finishing things — before the larger building is available to it. Skipping that step is the usual way a master number goes wrong.',
+  'And it is not a prize. A master number raises what is being asked, not what is guaranteed. Having one means more friction and more accountability, which is a different thing from more success.',
+], ['num:11', 'num:22', 'num:33']);
+add('num:lifepath', 'Numerology', 'Life Path', 'The direction your whole life leans toward.', [
+  'Your birth month, day and year, each reduced and then added together, reduced once more. Master numbers are kept at every step. It is the only core number that comes from the date alone, and it never changes.',
+  'This is the Road itself: the trajectory you are walking and the curriculum you are enrolled in for the whole of a life. Every other number in your chart describes how you travel it.',
+  'The thing most people get backwards: your Life Path is not a list of talents you already have. It names what you are growing into, which means it is also where your hardest lessons sit. A 3 Life Path is here to develop expression — and will often meet the deepest blocks around exactly that. Expect your opportunities and your obstacles to cluster in the same place.',
+], ['num:destiny', 'num:maturity', 'num:master']);
 add('num:destiny', 'Numerology', 'Destiny (Expression)', 'What you are here to do and develop.', [INNER_DRIVERS_MECHANISM], ['num:soulurge', 'num:personality']);
-add('num:soulurge', 'Numerology', 'Soul Urge', 'What you want at your core.', ['The Soul Urge comes from the vowels in your full birth name and describes your inner motivations.'], ['num:destiny']);
-add('num:personality', 'Numerology', 'Personality Number', 'How others first experience you.', ['The Personality number comes from the consonants in your full birth name and describes the face you present.'], ['num:destiny']);
+add('num:soulurge', 'Numerology', 'Soul Urge', 'What you want at your core.', [
+  'The vowels of your full birth name, converted to their Pythagorean values and reduced. Vowels only — the consonants make your Personality number, and all the letters together make your Destiny.',
+  'It is the private motive underneath the visible life: what you actually want, as opposed to what you do or how you come across. People often recognise their Soul Urge as the thing they would do if nobody were watching.',
+  'It will not always agree with your Life Path, and that is ordinary rather than a fault. An independent 1 Life Path carrying a 2 Soul Urge is being asked to build something of their own and to do it in company. The work is making room for both rather than picking a side.',
+  'It must be the name on your birth certificate — not a married name, a shortened name or the one you go by. In Pythagorean numerology that original name is the record of what you arrived with, and a later name describes something else.',
+], ['num:destiny', 'num:personality']);
+add('num:personality', 'Numerology', 'Personality Number', 'How others first experience you.', [
+  'The consonants of your full birth name, converted and reduced — the mirror image of the Soul Urge, which uses the vowels.',
+  'It describes the first impression: the read a stranger gets in the opening minute, before anything deeper is visible. Think of it as the outer filter rather than the person behind it.',
+  'Useful precisely because it is not you. Knowing the impression you tend to make is what lets you work with it — leaning on it where it helps and correcting for it where it gives people the wrong idea.',
+  'It is the shallowest of the core numbers by design. If your Personality and your Soul Urge seem to describe two different people, that is the system working: one is the door and the other is the room.',
+], ['num:destiny', 'num:soulurge']);
 add('num:hiddenpassion', 'Numerology', 'Hidden Passion', 'The energy you use most.', [HIDDEN_PASSION_MECHANISM], ['num:karmic']);
 add('num:karmic', 'Numerology', 'Karmic Lessons', 'Numbers missing from your name.', [KARMIC_LESSONS_MECHANISM], ['num:hiddenpassion']);
 /** Reduce to one digit but keep 11, 22 and 33. */
@@ -268,18 +430,60 @@ add('num:maturity', 'Numerology', 'Maturity Number', 'Where your life is ripenin
   'Use it as a roadmap to experiment with, not as a verdict.',
 ], ['num:lifepath', 'num:destiny']);
 add('num:subconscious', 'Numerology', 'Subconscious Self', 'How steady you feel when things go wrong.', [
-  'The Subconscious Self starts at 9 and loses one for every digit from 1 to 9 that is missing from your full birth name (your Karmic Lessons). The fewer gaps, the higher the number.',
-  'It describes your instinctive trust in your own abilities when a situation catches you off guard.',
+  'Start at 9 and subtract one for every digit from 1 to 9 that never appears in your full birth name. Those gaps are your Karmic Lessons, so the two numbers are the same finding read two ways: the Lessons name which capacities are missing, and the Subconscious Self counts how many you have.',
+  'It describes your instinctive response when something catches you off guard — the degree to which you trust your own resources in the second before you have had time to think. A higher number is not a better character; it means more of the nine kinds of competence are already wired in, so fewer situations are unfamiliar.',
+  'A lower number does not mean you cope badly. It means the gaps are the places you have had to build a method for deliberately, and a built method holds under pressure just as well as an instinct does — it only takes longer to arrive.',
 ], ['num:karmic', 'num:hiddenpassion']);
-add('num:pinnacle', 'Numerology', 'Pinnacle', 'A long chapter of your life.', ['Your life has four Pinnacles, each a chapter of many years with its own theme. The one you are in now sets the main terrain.'], ['num:challenge']);
-add('num:challenge', 'Numerology', 'Challenge', 'The recurring lesson in each chapter.', ['Each Pinnacle has a matching Challenge, a skill that life keeps asking you to build during that chapter.'], ['num:pinnacle']);
-add('num:birthday', 'Numerology', 'Birthday Number', 'The day you were born.', ['The day of the month you were born adds a specific talent to your Life Path.'], ['num:lifepath']);
-add('num:attitude', 'Numerology', 'Attitude Number', 'Your first reaction to the world.', ['The Attitude number comes from your birth month and day and describes your instinctive stance.'], ['num:lifepath']);
-add('num:universalday', 'Numerology', 'Universal Day', 'The energy of today’s date for everyone.', ['The Universal Day is worked out from the calendar date alone, so the whole world shares it.'], ['num:personalday']);
-add('num:personalday', 'Numerology', 'Personal Day', 'The energy of today for you.', ['Your Personal Day comes from your Personal Month plus today’s date. It shades how today tends to feel for you.'], ['num:universalday', 'num:personalmonth']);
-add('num:personalmonth', 'Numerology', 'Personal Month', 'The theme of this month for you.', ['Your Personal Month is your Personal Year plus the calendar month.'], ['num:personalyear']);
-add('num:personalyear', 'Numerology', 'Personal Year', 'The theme of this year for you.', ['Your Personal Year is your birth month and day plus the Universal Year of your most recent birthday. It runs from birthday to birthday, so it changes on your birthday and not on January 1.'], ['num:personalmonth']);
-add('num:universalyear', 'Numerology', 'Universal Year', 'The energy of the calendar year.', ['The Universal Year is the digit sum of the calendar year. It is shared by everyone and is the base for every Personal Year.'], ['num:personalyear']);
+add('num:pinnacle', 'Numerology', 'Pinnacle', 'A long chapter of your life.', [
+  'Four long chapters, each built by addition from your birth date: the first from your birth month plus your birth day, the second from your day plus your year, the third from the first two added together, and the fourth from your month plus your year.',
+  'Their timing is set by your Life Path. The first Pinnacle runs from birth to the age of 36 minus your Life Path number. The second and third run nine years each. The fourth begins at the end of the third and lasts the rest of your life. A master Life Path uses its root — 11 as 2, 22 as 4, 33 as 6 — for the timing only.',
+  'So the first and last chapters are long, often around thirty years each, and the two in the middle are short and intense. That shape is the point: the middle of a life turns over faster than either end.',
+  'A Pinnacle describes the environment you are enrolled in rather than events that are going to happen. It explains the kind of terrain and the lessons that keep arriving in it; what you do there is still yours.',
+], ['num:challenge', 'num:lifepath']);
+add('num:challenge', 'Numerology', 'Challenge', 'The recurring lesson in each chapter.', [
+  'Challenges are the one place numerology subtracts instead of adding. The first is the gap between your birth month and birth day, the second the gap between your day and your year, the third the gap between those two, and the fourth the gap between your month and your year. There are no negative numbers, so the smaller always comes off the larger, and no master numbers survive the subtraction.',
+  'That makes a Challenge a single digit from 0 to 8. A zero is its own case, sometimes called the Challenge of Choice: nothing is imposed, which is its own kind of difficulty.',
+  'Where the Pinnacle describes the environment around you, the Challenge describes the work inside you. The third one is the main one and runs your whole life rather than a single chapter.',
+  'It is not a curse or a permanent weakness. A Challenge marks the skill you keep being handed opportunities to build, and the areas people tend to end up strongest in are usually the ones they had to work at.',
+], ['num:pinnacle', 'num:lifepath']);
+add('num:birthday', 'Numerology', 'Birthday Number', 'The day you were born.', [
+  'The day of the month you were born, reduced, unless it is 11 or 22 — those stand as they are.',
+  'It is the narrowest and most concrete number in the chart: a specific, ready-made ability you were handed at birth rather than a direction you are growing toward.',
+  'Its use is practical. When the Life Path gets difficult, the Birthday number is the tool already in your hand — the thing you are good at without having had to learn it, which can usually be applied to the problem in front of you.',
+  'It is one instrument, not the whole kit. It supports the Life Path; it never replaces or overrides it.',
+], ['num:lifepath', 'num:attitude']);
+add('num:attitude', 'Numerology', 'Attitude Number', 'Your first reaction to the world.', [
+  'Your birth month plus your birth day, reduced. It uses two thirds of what makes the Life Path and leaves out the year.',
+  'It describes your opening move — the reaction that arrives before you have decided anything. Not what you conclude about a situation, but what you do in the first few seconds of meeting one.',
+  'Worth knowing mainly so you can catch it. A reflex you can see coming stops being a reflex, which matters most when the first reaction and the considered one point different ways.',
+  'It is not your astrological Sun sign, despite sometimes being called the Sun number, and it is not a second Life Path. Its whole scope is the moment of first contact.',
+], ['num:lifepath', 'num:birthday']);
+add('num:universalday', 'Numerology', 'Universal Day', 'The energy of today’s date for everyone.', [
+  'Reduce the month, reduce the day, add the Universal Year, and reduce again. Nothing about you enters the calculation, so the whole world shares one Universal Day and it lasts twenty-four hours.',
+  'It is the collective tone of the date itself — the mood of the room before you walk in. T3D shows it beside your Personal Day so you can see the two separately: what the day is doing generally, and what it is doing for you.',
+  'A single Universal Day will not redirect your life. It is a background tone, and when it clashes with your Personal Day that is worth noticing rather than worrying about.',
+], ['num:personalday', 'num:universalyear']);
+add('num:personalday', 'Numerology', 'Personal Day', 'The energy of today for you.', [
+  'Add your Personal Month to today’s date and reduce. It is the narrowest ring of the Road: your year sets the terrain, your month sets the chapter, and the day shades the hours in front of you.',
+  'Used well it is a scheduling tool rather than a forecast. A 1 or 8 day suits decisions and the meeting you have been putting off; a 7 day suits research and thinking alone; a 9 day suits finishing and clearing.',
+  'No Personal Day is a bad day. The numbers describe a tilt, not a verdict, and reading too much into any single one is the fastest way to misuse the whole system.',
+], ['num:universalday', 'num:personalmonth']);
+add('num:personalmonth', 'Numerology', 'Personal Month', 'The theme of this month for you.', [
+  'Add your Personal Year to the number of the calendar month and reduce. A Personal Year 4 in May gives 4 + 5 = 9.',
+  'It breaks the year into twelve chapters, each with its own emphasis, and it always sits inside the Personal Year rather than beside it. A 9 month in a 4 year is still a building year; it is the part of that year where something finishes.',
+  'This is the layer most worth planning against. A year is too long to steer by and a day is too short, but a month is roughly the size of an actual project.',
+], ['num:personalyear', 'num:personalday']);
+add('num:personalyear', 'Numerology', 'Personal Year', 'The theme of this year for you.', [
+  'Reduce your birth month, reduce your birth day, add the Universal Year of your most recent birthday, and reduce the total. Master numbers are kept at every step, so an 11, 22 or 33 survives into the result rather than collapsing.',
+  'Your Personal Year runs birthday to birthday, not January to December. Until your birthday arrives you are still in the year that began on your last one — which is why T3D works it out from the Universal Year of your most recent birthday rather than from today’s calendar year.',
+  'It places you in a nine-year cycle that keeps turning over your whole life. A 1 year opens a new nine-year arc and favours starting; a 4 year is for building foundations; a 7 year pulls inward toward study and reassessment; a 9 year closes the cycle and clears what is finished.',
+  'The common mistake is treating every year as a year to push. Each number in the cycle has its own job, and forcing expansion during a year built for consolidation is where most of the friction comes from.',
+], ['num:personalmonth', 'num:universalyear']);
+add('num:universalyear', 'Numerology', 'Universal Year', 'The energy of the calendar year.', [
+  'Add the digits of the calendar year and reduce: 2026 becomes 2+0+2+6 = 10, then 1+0 = 1. That single digit is the Universal Year, and every person alive is in the same one at the same time.',
+  'It describes the collective weather — the background current the whole world is moving through for those twelve months — not anything about you specifically. A Universal 1 year tilts toward beginnings and new ventures; an 8 year pulls collective attention toward money, authority and structures.',
+  'Its practical job in your chart is to be the base your Personal Year is built from. Read it the way you read the season rather than the forecast: it sets what everyone is working with, and your Personal Year says what you are doing inside it.',
+], ['num:personalyear', 'num:universalday']);
 for (const [n, c] of Object.entries(DAY_NUMBER_CONTENT)) {
   const num = Number(n);
   const root = num === 11 ? 2 : num === 22 ? 4 : num === 33 ? 6 : null;
