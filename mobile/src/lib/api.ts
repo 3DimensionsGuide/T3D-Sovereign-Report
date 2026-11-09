@@ -31,7 +31,8 @@ export const API_BASE_URL: string =
 
 export interface BirthProfile {
   firstName: string;
-  /** Optional, but numerology uses the full birth name — enter it if you have one. */
+  /** Not optional so much as not universal: numerology reads the full birth name, so
+   *  send it whenever the person has one. Absent means they have none, not skipped. */
   middleName?: string;
   lastName: string;
   email: string;

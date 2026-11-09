@@ -209,15 +209,15 @@ function USelect({
 }
 
 // ─── FIELD WRAPPER ────────────────────────────────────────────────────────────
-function Field({ label, optional, error, touched, children }: {
-  label: string; optional?: boolean; error?: string; touched?: boolean; children: React.ReactNode;
+function Field({ label, note, error, touched, children }: {
+  label: string; note?: string; error?: string; touched?: boolean; children: React.ReactNode;
 }) {
   const hasErr = touched && error;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <label className="t3d-label" style={{ color: 'var(--parchment-40)' }}>
         {label}
-        {optional && <span style={{ color: 'var(--parchment-15)', textTransform: 'none', fontSize: 10, letterSpacing: '0.05em', marginLeft: 6 }}>optional</span>}
+        {note && <span style={{ color: 'var(--parchment-40)', textTransform: 'none', fontSize: 10, letterSpacing: '0.05em', marginLeft: 6 }}>{note}</span>}
       </label>
       {children}
       {hasErr && (
@@ -599,13 +599,15 @@ export default function CalculatorForm() {
               </Field>
             </div>
 
-            <Field label="MIDDLE NAME" optional>
+            <Field label="MIDDLE NAME" note="if you have one">
               <UInput id="middleName" name="middleName" placeholder="Your middle name" value={data.middleName}
                 onChange={v => set('middleName',v)} onBlur={() => {}} />
             </Field>
 
-            <p className="t3d-label" style={{ color:'var(--parchment-40)', marginTop:-12 }}>
-              Include middle name only if on your birth certificate — it affects numerology.
+            <p className="t3d-body" style={{ color:'var(--parchment-40)', fontSize:13, lineHeight:1.6, maxWidth:'46ch', marginTop:-12 }}>
+              Not everyone has a middle name. If you do, enter it as written on your birth
+              certificate — numerology reads every letter of the full name, so leaving it out
+              changes your Destiny, Soul Urge and Personality numbers.
             </p>
 
             {/* UPGRADE 5 — CTA: crimson, zero radius, 11px DM Sans ALL CAPS */}

@@ -339,7 +339,7 @@ export default function Onboarding() {
 
   const TITLES = ['What is your name?', 'Where can we reach you?', 'When were you born?', 'Where were you born?'];
   const LEDES = [
-    'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can.',
+    'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can. Not everyone has a middle name; include yours if you have one.',
     'Only used to find your chart again and to send your report if you buy one. We never sell it.',
     'Your birth date and time set your Life Path, Sun sign, Rising sign and Human Design.',
     'The place gives us the coordinates and time zone for the exact moment you were born.',
@@ -370,7 +370,7 @@ export default function Onboarding() {
           <>
             <Field shakeSignal={shake} label="First name" value={firstName} onChangeText={setFirstName} error={errors.firstName}
               autoCapitalize="words" autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
-            <Field shakeSignal={shake} label="Middle name (optional)" value={middleName} onChangeText={setMiddleName}
+            <Field shakeSignal={shake} label="Middle name (if you have one)" value={middleName} onChangeText={setMiddleName}
               autoCapitalize="words" autoComplete="additional-name" textContentType="middleName" returnKeyType="next"
               placeholder="As written on your birth certificate" />
             <Field shakeSignal={shake} label="Last name" value={lastName} onChangeText={setLastName} error={errors.lastName}

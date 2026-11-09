@@ -7,7 +7,8 @@
 
 export interface T3DCalculatorInput {
   firstName: string;          // Required — Pythagorean name valuation
-  middleName?: string;        // Optional (include if on birth certificate)
+  middleName?: string;        // Omitted only when the person has none — numerology
+                              // reads the full birth-certificate name
   lastName: string;           // Required — Pythagorean name valuation
   birthDate: string;          // Required — YYYY-MM-DD
   birthTime?: string;         // Optional — HH:MM (24-hour). Defaults to "12:00"
