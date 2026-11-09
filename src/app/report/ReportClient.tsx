@@ -17,6 +17,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
 import AdvancedReportUpsell from './AdvancedReportUpsell';
+import WalkthroughOffer from './WalkthroughOffer';
 
 // Display name per product slug — falls back to the generic "Sovereign
 // Report" copy for an unrecognized or missing slug (e.g. an old link from
@@ -175,6 +176,11 @@ export default function ReportClient() {
           {productSlug === 'base-report' && leadId && (
             <AdvancedReportUpsell leadId={leadId} />
           )}
+
+          {/* Offered after any report, unlike the Advanced upsell: whatever they bought, it is a
+              document they are about to read for the first time. Renders nothing until the offer
+              has a price — see src/lib/walkthrough.ts. */}
+          {leadId ? <WalkthroughOffer leadId={leadId} /> : null}
         </>
       )}
 
