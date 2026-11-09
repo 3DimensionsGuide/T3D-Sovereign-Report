@@ -68,9 +68,14 @@ test('the app writes no address out by hand either', () => {
  * and nowhere else. Everything a person would call support goes to the support address.
  */
 test('the privacy address is used only for data requests', () => {
+  // Each of these is about data, which is the only thing the privacy address is for. A file
+  // joins this list because its text is a data request — not because the test complained.
   const allowed = new Set([
     'src/app/privacy/page.tsx',
     'src/lib/report/section7/Page43DataNotes.tsx',
+    // Names both addresses: deleting your data and policy questions go to privacy, and
+    // everything about an order, a report or the app goes to support.
+    'src/app/terms/page.tsx',
   ]);
   const users: string[] = [];
   for (const file of filesUnder('src')) {
@@ -96,6 +101,9 @@ test('the places people actually ask for help point at support', () => {
     'src/components/home/FAQ.tsx',
     'src/components/navigation/Footer.tsx',
     'src/lib/email/sendReportEmail.ts',
+    // Uses both, so it has to be checked for the support one too — a terms page that sent
+    // order questions to the privacy address would be the original problem written down.
+    'src/app/terms/page.tsx',
   ]) {
     assert.match(readFileSync(join(root, file), 'utf8'), /SUPPORT_EMAIL/, file);
   }
