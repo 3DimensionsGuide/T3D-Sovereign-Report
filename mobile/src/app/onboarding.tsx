@@ -504,7 +504,7 @@ export default function Onboarding() {
         {step === 2 ? (
           <>
             <Field shakeSignal={shake} label="Birth city" value={city} onChangeText={setCity} error={errors.city}
-              autoCapitalize="words" placeholder="e.g. Harbor City" />
+              autoCapitalize="words" placeholder="e.g. Los Angeles" />
             <Field shakeSignal={shake} label="State or province" value={birthState} onChangeText={setBirthState}
               autoCapitalize="words" placeholder="e.g. California"
               why="Town names repeat across states. This is what tells Harbor City, California apart from Harbor Springs, Michigan." />
