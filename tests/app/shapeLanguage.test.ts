@@ -62,7 +62,12 @@ test('onboarding asks one question at a time, shows the calculation, and the wel
   assert.match(onboarding, /validateStep/);
   assert.match(onboarding, /<CalculatingView /);
   assert.match(onboarding, /Calculate my chart/);
-  assert.match(onboarding, /e\.g\. Los Angeles, California/);
+  // City and state are asked separately: a bare town name repeats across states.
+  assert.match(onboarding, /label="Birth city"/);
+  assert.match(onboarding, /label="State or province"/);
+  assert.match(onboarding, /label="Birth country"/);
+  // The escape hatch is labelled for the action, not for the state it is already in.
+  assert.match(onboarding, /don.{0,8}t know my birth time/);
   assert.match(read('mobile/src/app/welcome.tsx'), /logo-t3d-wordmark\.png/);
   assert.match(read('mobile/src/components/CalculatingView.tsx'), /isReduceMotionEnabled/);
 });

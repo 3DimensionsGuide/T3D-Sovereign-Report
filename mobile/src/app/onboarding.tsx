@@ -41,6 +41,7 @@ export default function Onboarding() {
   const [lastName, setLastName] = useState(saved?.lastName ?? '');
   const [email, setEmail] = useState(saved?.email ?? '');
   const [city, setCity] = useState(saved?.city ?? '');
+  const [birthState, setBirthState] = useState(saved?.state ?? '');
   const [country, setCountry] = useState(saved?.country ?? '');
   const [birthDate, setBirthDate] = useState<Date>(
     saved
@@ -115,7 +116,7 @@ export default function Onboarding() {
     if (!validateStep(3)) return;
     setLoading(true);
     try {
-      const found = await requestPlaceCheck(city.trim(), country.trim(), toDateString(birthDate));
+      const found = await requestPlaceCheck(city.trim(), country.trim(), toDateString(birthDate), birthState);
       setCandidates(found);
       setChosen(0);
     } catch (error) {
@@ -144,6 +145,7 @@ export default function Onboarding() {
       birthTimeKnown: timeKnown,
       emailOptIn,
       city: city.trim(),
+      state: birthState.trim() || undefined,
       country: country.trim(),
       placeLabel: place.label,
       latitude: place.latitude,
@@ -342,7 +344,7 @@ export default function Onboarding() {
     'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can. Not everyone has a middle name; include yours if you have one.',
     'Only used to find your chart again and to send your report if you buy one. We never sell it.',
     'Your birth date and time set your Life Path, Sun sign, Rising sign and Human Design.',
-    'The place gives us the coordinates and time zone for the exact moment you were born.',
+    'City and state, then the country. The place gives us the coordinates and time zone for the exact moment you were born.',
   ];
 
   return (
@@ -413,10 +415,10 @@ export default function Onboarding() {
               )}
             </View>
             <View style={styles.pickerRow}>
-              <Text style={styles.pickerLabel}>I know my birth time</Text>
-              <Switch value={timeKnown} onValueChange={setTimeKnown}
+              <Text style={styles.pickerLabel}>I don{'\u2019'}t know my birth time</Text>
+              <Switch value={!timeKnown} onValueChange={(unknown) => setTimeKnown(!unknown)}
                 trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
-                accessibilityLabel="I know my birth time" />
+                accessibilityLabel="I don't know my birth time" />
             </View>
             <Text style={styles.hint}>
               {timeKnown
@@ -429,7 +431,10 @@ export default function Onboarding() {
         {step === 3 ? (
           <>
             <Field shakeSignal={shake} label="Birth city" value={city} onChangeText={setCity} error={errors.city}
-              autoCapitalize="words" placeholder="e.g. Los Angeles, California" />
+              autoCapitalize="words" placeholder="e.g. Harbor City" />
+            <Field shakeSignal={shake} label="State or province" value={birthState} onChangeText={setBirthState}
+              autoCapitalize="words" placeholder="e.g. California"
+              why="Town names repeat across states. This is what tells Harbor City, California apart from Harbor Springs, Michigan." />
             <Field shakeSignal={shake} label="Birth country" value={country} onChangeText={setCountry} error={errors.country}
               autoCapitalize="words" placeholder="e.g. United States"
               why="Time zones and daylight saving rules differ by country and by year." />

@@ -45,6 +45,10 @@ export interface BirthProfile {
   /** False when the person doesn't know their birth time (12:00 is used). */
   birthTimeKnown: boolean;
   city: string;
+  /** State, province or region. Optional — plenty of places have none. It is kept apart from
+   *  the city here so re-editing never doubles it up, and folded into the city string by
+   *  placeQuery() at the API boundary, which is the form GeoNames is queried in. */
+  state?: string;
   country: string;
   /** Set when the person confirmed the place; the exact values the chart was built from. */
   placeLabel?: string;
@@ -131,7 +135,7 @@ export async function requestChart(profile: BirthProfile): Promise<{ chart: Char
         birthDate: profile.birthDate,
         birthTime: profile.birthTime,
         birthPlace: {
-          city: profile.city.trim(),
+          city: placeQuery(profile.city, profile.state),
           country: profile.country.trim(),
           latitude: profile.latitude,
           longitude: profile.longitude,
@@ -502,14 +506,25 @@ export interface PlaceCandidate {
 }
 
 /** Looking up a birth city happens during onboarding, before there is a session. */
+/**
+ * How a place is spelled for the lookup: "Harbor City, California", with the country sent
+ * separately. GeoNames searches `${city}, ${country}`, so the state has to ride along with
+ * the city or a name that repeats across states cannot be told apart — which is exactly the
+ * Harbor City case. The website calculator composes it the same way.
+ */
+export function placeQuery(city: string, state?: string): string {
+  return [city.trim(), state?.trim()].filter(Boolean).join(', ');
+}
+
 export async function requestPlaceCheck(
   city: string,
   country: string,
   birthDate: string,
+  state?: string,
 ): Promise<PlaceCandidate[]> {
   const data = await postPublic<{ candidates: PlaceCandidate[] }>(
     '/api/app/place-check',
-    { city, country, birthDate },
+    { city: placeQuery(city, state), country, birthDate },
     'Could not look up that place. Please try again.',
   );
   return data.candidates;
