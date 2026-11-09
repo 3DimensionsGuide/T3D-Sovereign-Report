@@ -15,7 +15,8 @@ import { CalculatingView } from '@/components/CalculatingView';
 import { RevealView } from '@/components/RevealView';
 import { TriadSeal } from '@/components/TriadSeal';
 import {
-  ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck, type BirthProfile, type PlaceCandidate,
+  attachEmail, ChartRequestError, confirmOptInCode, requestChart, requestOptInCode, requestPlaceCheck,
+  type BirthProfile, type PlaceCandidate,
 } from '@/lib/api';
 import { isFirstIntroduction } from '@/lib/firstTime';
 import { useCoachStore } from '@/store/useCoachStore';
@@ -55,7 +56,8 @@ export default function Onboarding() {
   );
   const [timeKnown, setTimeKnown] = useState(saved?.birthTimeKnown ?? true);
   const [emailOptIn, setEmailOptIn] = useState(saved?.emailOptIn ?? false);
-  /** 0 name, 1 email, 2 birth date and time, 3 birth place. */
+  /** 0 name, 1 birth date and time, 2 birth place. The address is asked for after the
+   *  reveal, not here: see askEmail below. */
   const [step, setStep] = useState(0);
   const [calculating, setCalculating] = useState(false);
   const [calcDone, setCalcDone] = useState(false);
@@ -66,6 +68,8 @@ export default function Onboarding() {
   const [codeStep, setCodeStep] = useState<{ leadId: number; email: string; notice: string | null } | null>(null);
   /** The chart is built and the reveal is on screen; the code step (if any) waits behind it. */
   const [revealing, setRevealing] = useState(false);
+  /** The chart has been seen, and now there is something to ask an address for. */
+  const [askEmail, setAskEmail] = useState(false);
   const [pendingCode, setPendingCode] = useState<{ leadId: number; email: string; notice: string | null } | null>(null);
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -88,14 +92,13 @@ export default function Onboarding() {
       if (!firstName.trim()) next.firstName = 'Please enter your first name.';
       if (!lastName.trim()) next.lastName = 'Please enter your last name.';
     }
-    if (which === 1 && !/^\S+@\S+\.\S+$/.test(email.trim())) next.email = 'Please enter a valid email address.';
-    if (which === 2) {
+    if (which === 1) {
       const cutoff = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
       if (birthDate > cutoff) {
         next.birthDate = 'T3D is for people 13 and older. We can\u2019t create a profile for this birth date.';
       }
     }
-    if (which === 3) {
+    if (which === 2) {
       if (!city.trim()) next.city = 'Please enter your birth city.';
       if (!country.trim()) next.country = 'Please enter your birth country.';
     }
@@ -107,13 +110,13 @@ export default function Onboarding() {
 
   function onContinue() {
     if (!validateStep(step)) return;
-    setStep((n) => Math.min(n + 1, 3));
+    setStep((n) => Math.min(n + 1, 2));
   }
 
   /** Step 1: look the place up and show it back before anything is calculated. */
   async function onCheckPlace() {
     setSubmitError(null);
-    if (!validateStep(3)) return;
+    if (!validateStep(2)) return;
     setLoading(true);
     try {
       const found = await requestPlaceCheck(city.trim(), country.trim(), toDateString(birthDate), birthState);
@@ -139,7 +142,9 @@ export default function Onboarding() {
       firstName: firstName.trim(),
       middleName: middleName.trim() || undefined,
       lastName: lastName.trim(),
-      email: email.trim().toLowerCase(),
+      // Absent on a first run. A returning person editing their chart still has theirs, and
+      // sending it keeps the recalculation on the same lead instead of starting a new one.
+      email: email.trim().toLowerCase() || undefined,
       birthDate: toDateString(birthDate),
       birthTime: timeKnown ? toTimeString(birthTime) : '12:00',
       birthTimeKnown: timeKnown,
@@ -167,11 +172,14 @@ export default function Onboarding() {
       }
       setCalcDone(true);
       await new Promise((resolve) => setTimeout(resolve, 900));
+      // Only a returning person reaches this: a first run has no address yet, so the server
+      // sends no code and the ask comes after the reveal instead.
+      const known = profile.email;
       setPendingCode(
-        profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')
+        known && profile.emailOptIn && (optInCode === 'sent' || optInCode === 'failed')
           ? {
               leadId: chart.leadId,
-              email: profile.email,
+              email: known,
               notice: optInCode === 'failed' ? 'We could not send the code just now. Tap "Send a new code" to try again.' : null,
             }
           : null,
@@ -221,11 +229,58 @@ export default function Onboarding() {
   }
 
   function leaveReveal() {
+    setRevealing(false);
     if (pendingCode) {
+      // A returning person who already had an address and had ticked the box.
       setCodeStep(pendingCode);
-      setRevealing(false);
+    } else if (!email.trim()) {
+      // The ordinary path. The chart has been seen, so the ask has something behind it.
+      setAskEmail(true);
     } else {
       router.replace('/today');
+    }
+  }
+
+  /** Hands the address to the lead this session already belongs to. */
+  async function onAttachEmail() {
+    const address = email.trim();
+    if (!/^\S+@\S+\.\S+$/.test(address)) {
+      setErrors({ email: 'Please enter a valid email address.' });
+      flagError();
+      return;
+    }
+    setErrors({});
+    setSubmitError(null);
+    setLoading(true);
+    try {
+      const { leadId, optInCode } = await attachEmail(address, emailOptIn);
+      // Kept on the stored profile so a later recalculation finds this lead by its address
+      // rather than writing a second one.
+      const store = useT3DStore.getState();
+      if (store.profile && store.chart) {
+        store.setChart({ ...store.profile, email: address.toLowerCase(), emailOptIn }, store.chart);
+      }
+      const id = leadId ?? store.chart?.leadId;
+      if (emailOptIn && id && (optInCode === 'sent' || optInCode === 'failed')) {
+        setAskEmail(false);
+        setCodeStep({
+          leadId: id,
+          email: address,
+          notice: optInCode === 'failed'
+            ? 'We could not send the code just now. Tap "Send a new code" to try again.'
+            : null,
+        });
+        return;
+      }
+      toast.success('Email saved');
+      router.replace('/today');
+    } catch (error) {
+      flagError();
+      setSubmitError(
+        error instanceof ChartRequestError ? error.message : 'Something went wrong. Please try again.',
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -244,10 +299,44 @@ export default function Onboarding() {
     );
   }
 
-  if (calculating && !codeStep) {
+  if (calculating && !codeStep && !askEmail) {
     return (
       <Screen>
         <CalculatingView done={calcDone} />
+      </Screen>
+    );
+  }
+
+  if (askEmail) {
+    return (
+      <Screen>
+        <FadeIn>
+          <View style={styles.hero}>
+            <Text style={styles.stepNote}>Keep your chart</Text>
+            <Text accessibilityRole="header" style={styles.title}>Where can we reach you?</Text>
+            <Text style={styles.lede}>
+              Your chart is already saved on this phone. An email address is how you get it back if you
+              change phones, and where your report goes if you buy one. We never sell it.
+            </Text>
+          </View>
+        </FadeIn>
+        <View style={styles.form}>
+          <Field shakeSignal={shake} label="Email" value={email} onChangeText={setEmail} error={errors.email}
+            autoCapitalize="none" autoCorrect={false} keyboardType="email-address"
+            autoComplete="email" textContentType="emailAddress" />
+          <View style={styles.pickerRow}>
+            <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
+            <Switch value={emailOptIn} onValueChange={setEmailOptIn}
+              trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
+              accessibilityLabel="Email me occasional T3D insights" />
+          </View>
+          {emailOptIn ? <Text style={styles.hint}>We will email a 6-digit code to confirm it is really you.</Text> : null}
+        </View>
+        <View style={styles.actions}>
+          {submitError ? <ErrorLine text={submitError} signal={shake} /> : null}
+          <GoldButton label="Save my email" onPress={onAttachEmail} loading={loading} />
+          <GoldButton label="Skip for now" variant="ghost" onPress={() => router.replace('/today')} disabled={loading} />
+        </View>
       </Screen>
     );
   }
@@ -339,10 +428,9 @@ export default function Onboarding() {
     );
   }
 
-  const TITLES = ['What is your name?', 'Where can we reach you?', 'When were you born?', 'Where were you born?'];
+  const TITLES = ['What is your name?', 'When were you born?', 'Where were you born?'];
   const LEDES = [
     'Numerology reads your full birth name, letter by letter, so use the name on your birth certificate if you can. Not everyone has a middle name; include yours if you have one.',
-    'Only used to find your chart again and to send your report if you buy one. We never sell it.',
     'Your birth date and time set your Life Path, Sun sign, Rising sign and Human Design.',
     'City and state, then the country. The place gives us the coordinates and time zone for the exact moment you were born.',
   ];
@@ -354,14 +442,14 @@ export default function Onboarding() {
           {step === 0 ? <TriadSeal size={64} /> : null}
           <View
             accessible
-            accessibilityLabel={`Step ${step + 1} of 4`}
+            accessibilityLabel={`Step ${step + 1} of 3`}
             style={styles.progress}
           >
-            {[0, 1, 2, 3].map((i) => (
+            {[0, 1, 2].map((i) => (
               <View key={i} style={[styles.progressBar, i <= step && styles.progressBarOn]} />
             ))}
           </View>
-          <Text style={styles.stepNote}>Step {step + 1} of 4</Text>
+          <Text style={styles.stepNote}>Step {step + 1} of 3</Text>
           <Text accessibilityRole="header" style={styles.title}>{TITLES[step]}</Text>
           <Text style={styles.lede}>{LEDES[step]}</Text>
         </View>
@@ -381,21 +469,6 @@ export default function Onboarding() {
         ) : null}
 
         {step === 1 ? (
-          <>
-            <Field shakeSignal={shake} label="Email" value={email} onChangeText={setEmail} error={errors.email}
-              autoCapitalize="none" autoCorrect={false} keyboardType="email-address"
-              autoComplete="email" textContentType="emailAddress" />
-            <View style={styles.pickerRow}>
-              <Text style={styles.pickerLabel}>Email me occasional T3D insights (optional)</Text>
-              <Switch value={emailOptIn} onValueChange={setEmailOptIn}
-                trackColor={{ false: colors.switchOff, true: colors.gold }} ios_backgroundColor="#6B6B73"
-                accessibilityLabel="Email me occasional T3D insights" />
-            </View>
-            {emailOptIn ? <Text style={styles.hint}>We will email a 6-digit code at the end to confirm it is really you.</Text> : null}
-          </>
-        ) : null}
-
-        {step === 2 ? (
           <>
             <View style={styles.pickerRow}>
               <Text style={styles.pickerLabel}>Birth date</Text>
@@ -428,7 +501,7 @@ export default function Onboarding() {
           </>
         ) : null}
 
-        {step === 3 ? (
+        {step === 2 ? (
           <>
             <Field shakeSignal={shake} label="Birth city" value={city} onChangeText={setCity} error={errors.city}
               autoCapitalize="words" placeholder="e.g. Harbor City" />
@@ -446,7 +519,7 @@ export default function Onboarding() {
         {submitError ? (
           <ErrorLine text={submitError} signal={shake} />
         ) : null}
-        {step < 3 ? (
+        {step < 2 ? (
           <GoldButton label="Continue" onPress={onContinue} />
         ) : (
           <GoldButton label="Check my birth place" onPress={onCheckPlace} loading={loading} />

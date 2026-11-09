@@ -35,7 +35,9 @@ export interface BirthProfile {
    *  send it whenever the person has one. Absent means they have none, not skipped. */
   middleName?: string;
   lastName: string;
-  email: string;
+  /** Absent until the person gives one. Onboarding shows the chart first and asks after, so
+   *  a profile with no address is the normal state of a first session, not an unfinished one. */
+  email?: string;
   /** True only if the person ticked the optional "email me insights" switch. */
   emailOptIn?: boolean;
   /** YYYY-MM-DD */
@@ -130,7 +132,10 @@ export async function requestChart(profile: BirthProfile): Promise<{ chart: Char
         firstName: profile.firstName.trim(),
         middleName: profile.middleName?.trim() || undefined,
         lastName: profile.lastName.trim(),
-        email: profile.email.trim(),
+        email: profile.email?.trim() || undefined,
+        // Tells the server an address is coming later, under a session token. Only the app may
+        // say this; the website calculator still has to give one. See the route's validateInput.
+        emailLater: !profile.email?.trim(),
         emailOptIn: profile.emailOptIn === true,
         birthDate: profile.birthDate,
         birthTime: profile.birthTime,
@@ -514,6 +519,26 @@ export interface PlaceCandidate {
  */
 export function placeQuery(city: string, state?: string): string {
   return [city.trim(), state?.trim()].filter(Boolean).join(', ');
+}
+
+/**
+ * Attaches an email address to the chart this phone already holds.
+ *
+ * Onboarding does not ask for one: the chart is shown first and the address given afterwards, if
+ * at all. The server writes it against this session's own lead, so an address is never a way in.
+ *
+ * Attaches rather than replaces — a second call with the same address is a harmless retry, and a
+ * different one is refused. `leadId` is absent on that retry, since nothing changed.
+ */
+export async function attachEmail(
+  email: string,
+  optIn: boolean,
+): Promise<{ leadId?: number; optInCode: OptInCodeStatus }> {
+  return postApp<{ leadId?: number; optInCode: OptInCodeStatus }>(
+    '/api/app/email',
+    { email: email.trim(), optIn },
+    'Could not save your email. Please try again.',
+  );
 }
 
 export async function requestPlaceCheck(

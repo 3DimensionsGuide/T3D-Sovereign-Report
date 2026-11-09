@@ -58,7 +58,6 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
 
   const currentId = trail[trail.length - 1] ?? null;
   const leadId = chart?.leadId;
-  const email = profile?.email.trim();
 
   const open = useCallback((id: string) => setTrail([id]), []);
   const goTo = useCallback((id: string) => setTrail((t) => [...t, id]), []);
@@ -66,7 +65,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
   const close = useCallback(() => setTrail([]), []);
 
   useEffect(() => {
-    if (!currentId || !leadId || !email) {
+    if (!currentId || !leadId) {
       setEntry(null);
       return;
     }
@@ -95,7 +94,7 @@ export function ExplainProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [currentId, leadId, email, premium]);
+  }, [currentId, leadId, premium]);
 
   const value = useMemo(() => ({ open }), [open]);
   const accent = entry ? GROUP_ACCENT[entry.group] : colors.gold;

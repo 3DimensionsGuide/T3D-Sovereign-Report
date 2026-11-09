@@ -58,7 +58,21 @@ test('small lens-coloured text uses the lighter AAA tints', () => {
 
 test('onboarding asks one question at a time, shows the calculation, and the welcome screen has the T3D logo', () => {
   const onboarding = read('mobile/src/app/onboarding.tsx');
-  assert.match(onboarding, /Step \$\{step \+ 1\} of 4/);
+  // Three steps: name, birth date and time, birth place. The address is not one of them.
+  assert.match(onboarding, /Step \$\{step \+ 1\} of 3/);
+  // Three steps and no fourth. The distinct set, because step 0 is tested twice — once for
+  // its fields and once for the fine print that only shows on the first screen.
+  assert.deepEqual(
+    [...new Set((onboarding.match(/step === (\d)/g) ?? []))].sort(),
+    ['step === 0', 'step === 1', 'step === 2'],
+  );
+  // The ask for an address comes after the reveal, so it is made of something already seen.
+  // leaveReveal is the only thing that opens it, and it is reached from the reveal alone.
+  assert.match(onboarding, /function leaveReveal\(\)[\s\S]{0,400}setAskEmail\(true\)/);
+  assert.match(onboarding, /if \(askEmail\) \{/);
+  assert.match(onboarding, /attachEmail\(address, emailOptIn\)/);
+  // Skipping it has to stay possible: the chart is already saved either way.
+  assert.match(onboarding, /label="Skip for now"[\s\S]{0,160}router\.replace\('\/today'\)/);
   assert.match(onboarding, /validateStep/);
   assert.match(onboarding, /<CalculatingView /);
   assert.match(onboarding, /Calculate my chart/);

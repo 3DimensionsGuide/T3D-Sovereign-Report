@@ -150,7 +150,16 @@ test('app auth: no signed app request carries an email address', () => {
   assert.ok(calls.length >= 14, `found ${calls.length} signed requests`);
   for (const call of calls) {
     const args = call.slice(0, call.indexOf(');'));
-    assert.ok(!/\bemail\b/.test(args), `a signed request carries an email address: ${args.slice(0, 90)}`);
+    if (!/\bemail\b/.test(args)) continue;
+    // Exactly one signed request may carry an address, and it is the one whose whole job is to
+    // store one: onboarding shows the chart before it asks. The token still says who the caller
+    // is — there the address is the payload, never the credential. Every other signed request
+    // sending one would mean the server had a second way to decide whose chart to open.
+    assert.match(
+      args,
+      /'\/api\/app\/email'/,
+      `a signed request carries an email address: ${args.slice(0, 90)}`,
+    );
   }
 });
 
@@ -161,9 +170,15 @@ test('app auth: an email address is sent only to write the lead and to verify th
     const at = src.indexOf(`'${path}'`);
     return /\bemail\b/.test(src.slice(at, src.indexOf(');', at)));
   });
-  assert.deepEqual([...new Set(withEmail)].sort(), ['/api/email-optin/confirm', '/api/email-optin/send']);
-  // The chart itself is written with a hand-rolled fetch, which is the one other place.
-  assert.match(src, /api\/calculate-t3d[\s\S]{0,900}email: profile\.email\.trim\(\)/);
+  assert.deepEqual(
+    [...new Set(withEmail)].sort(),
+    ['/api/app/email', '/api/email-optin/confirm', '/api/email-optin/send'],
+  );
+  // The chart itself is written with a hand-rolled fetch, which is the one other place. The
+  // address is optional there now, and emailLater is what tells the server it may be absent —
+  // without that flag the route rejects the request, so it has to be sent alongside.
+  assert.match(src, /api\/calculate-t3d[\s\S]{0,900}email: profile\.email\?\.trim\(\) \|\| undefined/);
+  assert.match(src, /api\/calculate-t3d[\s\S]{0,900}emailLater: !profile\.email\?\.trim\(\)/);
 });
 
 test('app auth: no screen or component handles a credential', () => {
