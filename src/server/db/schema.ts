@@ -92,8 +92,11 @@ export const leads = pgTable(
   (table) => ({
     emailIdx: index('leads_email_idx').on(table.email),
     // Bounds the identity search for a lead with no address, which cannot narrow on the
-    // email index. Partial, on email IS NULL — see drizzle/0005.
-    anonIdx: index('leads_anon_idx').on(table.lastName).where(sql`${table.email} IS NULL`),
+    // email index. Partial on email IS NULL, and on lower(last_name) because identity
+    // compares names case-insensitively — see drizzle/0005.
+    anonIdx: index('leads_anon_idx')
+      .on(sql`lower(${table.lastName})`)
+      .where(sql`${table.email} IS NULL`),
   }),
 );
 

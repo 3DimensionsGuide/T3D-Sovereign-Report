@@ -9,7 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { db }    from '@/server/db';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { leads } from '@/server/db/schema';
 import { findExistingLead, type StoredLead } from '@/server/leadMatch';
 import { issueOptInCode } from '@/server/optInCode';
@@ -27,7 +27,16 @@ import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 function validateInput(body: Partial<T3DCalculatorInput>): string | null {
   if (!body.firstName?.trim())  return 'firstName is required';
   if (!body.lastName?.trim())   return 'lastName is required';
-  if (!body.email?.includes('@')) return 'A valid email is required';
+  // An address given has to be a real one whoever is asking. An address left out is only
+  // allowed for a caller that says one is coming later under a session token — the app,
+  // which shows the chart first. The website calculator sends no such flag, so a form that
+  // loses its email field fails here rather than writing a lead nobody can be reached at.
+  const given = body.email?.trim();
+  if (given) {
+    if (!given.includes('@')) return 'A valid email is required';
+  } else if (body.emailLater !== true) {
+    return 'A valid email is required';
+  }
   if (!body.birthDate?.match(/^\d{4}-\d{2}-\d{2}$/))
     return 'birthDate must be in YYYY-MM-DD format';
   if (isUnderMinimumAge(body.birthDate)) return UNDER_AGE_MESSAGE;
@@ -116,7 +125,8 @@ export async function POST(
 
     // 5. Save the lead. The same person (same email, name, birth date, time and
     //    place) keeps one record; a calculation for them refreshes it.
-    const email = body.email.toLowerCase().trim();
+    //    Null when the address is coming later; see validateInput above.
+    const email = body.email?.trim().toLowerCase() || null;
     const birthData = {
       date:  body.birthDate,
       time:  birthTime,
@@ -134,8 +144,16 @@ export async function POST(
       humanDesign: humanDesignResults as unknown as Record<string, unknown>,
     };
 
-    const sameEmail = await db.select().from(leads).where(eq(leads.email, email));
-    const existing = findExistingLead(sameEmail as unknown as StoredLead[], {
+    // Narrowing before the full identity check, so the scan is small. With an address that is
+    // the indexed email column. Without one there is nothing to match on but the surname, which
+    // leads_anon_idx covers for exactly these rows — case-folded, because identity ignores case.
+    const candidates = email
+      ? await db.select().from(leads).where(eq(leads.email, email))
+      : await db.select().from(leads).where(and(
+          isNull(leads.email),
+          sql`lower(${leads.lastName}) = ${body.lastName.trim().toLowerCase()}`,
+        ));
+    const existing = findExistingLead(candidates as unknown as StoredLead[], {
       email,
       firstName:  body.firstName,
       middleName: body.middleName,
@@ -186,9 +204,10 @@ export async function POST(
     const sessionToken = body.wantSession === true ? makeAppSessionToken(leadId, sessionEpoch) : null;
 
     // 5b. Marketing opt-in is only recorded after the person types back an emailed code.
-    //     Ticking the box here just sends the code.
+    //     Ticking the box here just sends the code. With no address there is nowhere to send
+    //     it: the app ticks the box at the same moment it gives the address, one step later.
     let optInCode: 'not-requested' | 'sent' | 'failed' | 'already-opted-in' = 'not-requested';
-    if (body.emailOptIn === true) {
+    if (body.emailOptIn === true && email) {
       const issued = await issueOptInCode(leadId, email);
       optInCode = issued === 'sent' ? 'sent' : issued === 'already-opted-in' ? 'already-opted-in' : 'failed';
     }

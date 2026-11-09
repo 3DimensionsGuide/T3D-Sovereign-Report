@@ -13,7 +13,12 @@ export interface T3DCalculatorInput {
   birthDate: string;          // Required — YYYY-MM-DD
   birthTime?: string;         // Optional — HH:MM (24-hour). Defaults to "12:00"
   birthPlace: BirthPlace;
-  email: string;              // Required — lead capture + report delivery
+  email?: string;             // Required unless emailLater — lead capture + report delivery
+  // The T3D app shows the chart before it asks for an address, and attaches it afterwards
+  // through POST /api/app/email. Only that caller may omit the address; every other one,
+  // the website calculator above all, still has to give a valid one, or a mistyped form
+  // would quietly write a lead nobody can be reached at.
+  emailLater?: boolean;       // Optional — the address is coming later, under a session token
   emailOptIn?: boolean;       // Optional — true only when the person ticked the marketing box
   wantSession?: boolean;      // Optional — the T3D app asks for a session token back (src/server/appTokens.ts)
 }

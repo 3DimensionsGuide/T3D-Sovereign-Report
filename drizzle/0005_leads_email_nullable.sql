@@ -18,10 +18,14 @@
 -- it narrows on the surname instead, so the scan stays proportional to people sharing one
 -- rather than to every anonymous lead ever written.
 --
+-- On lower(last_name), not last_name: isSamePerson compares names case-insensitively, so a
+-- row stored as "smith" has to be found by an input of "Smith". An index on the raw column
+-- would be skipped by that query and the narrowing would silently become a full scan.
+--
 -- Run once against the database:
 --   node dev-tools/run-sql.mjs drizzle/0005_leads_email_nullable.sql
 --
 -- Safe to run more than once.
 ALTER TABLE leads ALTER COLUMN email DROP NOT NULL;
 
-CREATE INDEX IF NOT EXISTS leads_anon_idx ON leads (last_name) WHERE email IS NULL;
+CREATE INDEX IF NOT EXISTS leads_anon_idx ON leads (lower(last_name)) WHERE email IS NULL;

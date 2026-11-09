@@ -3,10 +3,16 @@
  * the same email AND the same name AND the same birth date, time and place.
  * Anything different (a corrected birth time, another person on the same email)
  * stays a separate lead, so nobody's saved chart is overwritten by mistake.
+ *
+ * An address can be absent on both sides: the app writes a lead before it asks for
+ * one. norm() maps null, undefined and '' to the same empty string, so two
+ * addressless records match each other and never match one that has an address —
+ * which is what keeps an anonymous lead findable on a recalculation, and keeps it
+ * from being mistaken for somebody else's.
  */
 
 export interface LeadIdentity {
-  email: string;
+  email?: string | null;
   firstName: string;
   middleName?: string | null;
   lastName: string;
@@ -18,7 +24,7 @@ export interface LeadIdentity {
 
 export interface StoredLead {
   id: number;
-  email: string;
+  email: string | null;
   firstName: string;
   middleName: string | null;
   lastName: string;

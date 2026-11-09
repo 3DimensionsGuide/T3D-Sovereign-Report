@@ -34,13 +34,34 @@ test('app auth: there are routes to check', () => {
   assert.ok(routes.length >= 14, `found ${routes.length} app routes`);
 });
 
+/**
+ * /api/app/email stores an address on the token's own lead, because the app shows a chart before
+ * it asks for one. It is the only route allowed to read an address from a body, and in exchange it
+ * is held to a stricter rule below: it may not look a lead up by one.
+ */
+const STORES_AN_EMAIL = new Set(['email']);
+
 test('app auth: no app route pairs a lead id with an email address any more', () => {
   for (const name of routes) {
     const src = read(`${APP_API}/${name}/route.ts`);
     assert.ok(!/lead\.email\.toLowerCase\(\)\.trim\(\) !== email/.test(src), `${name} still compares a body email`);
     assert.ok(!/leads\.id, leadId/.test(src), `${name} still looks a lead up by a body leadId`);
-    assert.ok(!/body\.email/.test(src), `${name} still reads an email from the body`);
     assert.ok(!/body\.leadId/.test(src), `${name} still reads a leadId from the body`);
+    if (STORES_AN_EMAIL.has(name)) continue;
+    assert.ok(!/body\.email/.test(src), `${name} still reads an email from the body`);
+  }
+});
+
+test('app auth: an address is still never a way in', () => {
+  // The whole point of the token is that no request trades an address for a chart. Moving the
+  // collection after the reveal must not have reopened that: the one route that takes an address
+  // writes it against the token's lead id and never selects by it.
+  for (const name of routes) {
+    const src = read(`${APP_API}/${name}/route.ts`);
+    if (!/body\.email/.test(src)) continue;
+    assert.ok(STORES_AN_EMAIL.has(name), `${name} reads a body email but is not allowed to`);
+    assert.ok(!/eq\(leads\.email/.test(src), `${name} looks a lead up by an address from the body`);
+    assert.match(src, /const auth = await authenticateApp\(request\);/, `${name} does not check the session`);
   }
 });
 

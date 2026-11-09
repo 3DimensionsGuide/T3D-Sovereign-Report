@@ -22,6 +22,18 @@ const routes = readdirSync(ROOT, { withFileTypes: true })
   .map((d) => ({ name: d.name, src: readFileSync(join(ROOT, d.name, 'route.ts'), 'utf8') }));
 const chartRoutes = routes.filter((r) => !PUBLIC_ROUTES.has(r.name) && !TOKEN_ROUTES.has(r.name));
 
+/**
+ * The rule is that nothing in the body may identify the caller, and `body.email` was banned
+ * outright as the readable way to enforce it. One route now has a reason to read an address
+ * from a body: /api/app/email stores one on a lead that has none, because the app shows a
+ * chart before it asks. Identity there still comes from the session token alone.
+ *
+ * So the ban is lifted for that route by name and replaced with a narrower, stricter pair of
+ * checks: it may not look a lead up by an address, and it must write to the token's own lead.
+ * Any other route reading a body email still fails outright.
+ */
+const STORES_AN_EMAIL = new Set(['email']);
+
 test('the app routes exist', () => assert.ok(routes.length >= 14));
 
 test('every app route is rate limited', () => {
@@ -32,8 +44,27 @@ test('every chart route checks the session token, and nothing else identifies th
   for (const r of chartRoutes) {
     assert.match(r.src, /import \{ authenticateApp \} from '@\/server\/appAuth'/, `${r.name}: imports the check`);
     assert.match(r.src, /const auth = await authenticateApp\(request\);/, `${r.name}: runs the check`);
-    assert.doesNotMatch(r.src, /body\.leadId|body\.email/, `${r.name}: still takes a credential from the body`);
+    // A lead id in a body can only ever be a credential, so it is banned everywhere.
+    assert.doesNotMatch(r.src, /body\.leadId/, `${r.name}: still takes a lead id from the body`);
+
+    if (STORES_AN_EMAIL.has(r.name)) {
+      assert.doesNotMatch(r.src, /eq\(leads\.email/, `${r.name}: looks a lead up by an address from the body`);
+      assert.match(r.src, /eq\(leads\.id, lead\.id\)/, `${r.name}: does not write to the token's own lead`);
+      continue;
+    }
+    assert.doesNotMatch(r.src, /body\.email/, `${r.name}: still takes a credential from the body`);
   }
+});
+
+test('the route that stores an address attaches one rather than replacing one', () => {
+  const src = routes.find((r) => r.name === 'email')?.src ?? '';
+  assert.ok(src, 'there is no /api/app/email route');
+  // The same address again is a retry and answers the same way; a different one is refused,
+  // because changing an address would move the chart out from under the dedupe rule.
+  assert.match(src, /lead\.email && lead\.email\.toLowerCase\(\) === email/);
+  assert.match(src, /status: 409/);
+  // Consent is still only recorded when the code comes back, so the box only sends it.
+  assert.match(src, /issueOptInCode\(lead\.id, email\)/);
 });
 
 test('the session check is the first thing every chart route does', () => {
