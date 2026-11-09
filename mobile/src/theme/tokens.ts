@@ -12,6 +12,8 @@
  *  Stoplight (Astrology)  = crimson
  */
 
+import type { TextStyle } from 'react-native';
+
 export const colors = {
   obsidian: '#0B0B0C',
   charcoal: '#121214',
@@ -72,8 +74,15 @@ export const guidance = {
   color: colors.parchmentMuted,
 } as const;
 
-/** Equal-width digits, so numbers that change (days, counts, scores) do not shift the text around them. */
-export const tabular = { fontVariant: ['tabular-nums', 'lining-nums'] } as const;
+/**
+ * Equal-width digits, so numbers that change (days, counts, scores) do not shift the text around
+ * them.
+ *
+ * Typed as the TextStyle fragment it is, rather than `as const`. A readonly tuple is not
+ * assignable to fontVariant, and one bad entry costs a style sheet its inferred type everywhere —
+ * which is how a single mistake here became thirteen errors in SignalRibbon.
+ */
+export const tabular: Pick<TextStyle, 'fontVariant'> = { fontVariant: ['tabular-nums', 'lining-nums'] };
 
 /** 4pt spacing scale. */
 export const space = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 } as const;

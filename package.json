@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit && npm --prefix mobile run typecheck",
+    "pretest": "npm run typecheck",
     "test": "node --import tsx --test tests/golden/*.test.ts tests/security/*.test.ts tests/app/*.test.ts",
     "golden:update": "tsx tests/golden/update-snapshot.ts",
     "audit:language": "python3 dev-tools/audit_language_guide.py . && python3 dev-tools/audit_app_strings.py ."
