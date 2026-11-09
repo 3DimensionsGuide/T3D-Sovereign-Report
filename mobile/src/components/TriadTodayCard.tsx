@@ -31,8 +31,15 @@ export function firstSentence(text: string): [string, string] {
 }
 
 export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isToday?: boolean }) {
-  // With the signal lamp and the Road strip above, the Road is covered by the day-number card below
-  // and the Moon by its own card, so this card keeps only what is new: Strategy and the sky contact.
+  // With the signal lamp, the detail below this card repeats what the lenses already say, so the
+  // compact form keeps each one to its headline: the Moon has its own card, the Road has the
+  // day-number card, and the sky has the transit list.
+  //
+  // All three lenses stay, whatever else is dropped. They did not always — the Road used to be
+  // left out here on the grounds that it appeared elsewhere on the screen, which was true and
+  // beside the point. A card titled "Today's Triad" showing two of three teaches the wrong thing
+  // about the product, daily, to the people most likely to be learning it. One repeated line is
+  // cheaper than that.
   const compact = !!data.signal;
   const [lead, restOfFrame] = compact ? firstSentence(data.frame) : [data.frame, ''];
   // With the signal lamp, Strategy and Authority are already written out above, so the checks that
@@ -62,13 +69,15 @@ export function TriadTodayCard({ data, isToday = true }: { data: TriadToday; isT
         glyph="◆" accent={colors.vehicle} label="THE VEHICLE" title={data.vehicle.heading}
         lines={[data.vehicle.strategy, data.vehicle.authority, compact ? null : data.vehicle.cue]}
       />
-      {compact ? null : (
-        <Lens
-          glyph="▲" accent={colors.road} label="THE ROAD"
-          title={`Personal Day ${data.road.numberText}: ${data.road.label}`}
-          lines={[data.road.theme, `Lean in: ${data.road.leanIn}`, `Watch for: ${data.road.watchFor}`]}
-        />
-      )}
+      <Lens
+        glyph="▲" accent={colors.road} label="THE ROAD"
+        title={`Personal Day ${data.road.numberText}: ${data.road.label}`}
+        // Compact takes the theme's first sentence, the same cut the frame above gets. The
+        // day-number card below carries it in full, along with lean-in and watch-for.
+        lines={compact
+          ? [firstSentence(data.road.theme)[0]]
+          : [data.road.theme, `Lean in: ${data.road.leanIn}`, `Watch for: ${data.road.watchFor}`]}
+      />
       <Lens
         glyph="●" accent={colors.stoplight} label="THE STOPLIGHT"
         title={data.stoplight.lead ? data.stoplight.lead.title : 'A quiet sky'}

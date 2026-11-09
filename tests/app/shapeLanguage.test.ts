@@ -198,6 +198,25 @@ test('the Road strip writes its numbers out, opens the Timeline and stays short'
   assert.match(today, /<RoadStrip /);
 });
 
+/**
+ * The Road was once dropped from this card when the signal lamp was present, on the grounds that
+ * it appeared elsewhere on the screen. It did — above in the lamp's lens rows, below in the Road
+ * strip and the day-number card — and it was still wrong: a card titled "Today's Triad" showing
+ * two of three teaches the wrong thing about the product, daily, to the people learning it.
+ */
+test('the triad card shows all three lenses, whatever else is condensed', () => {
+  const card = read('mobile/src/components/TriadTodayCard.tsx');
+  for (const label of ['THE VEHICLE', 'THE ROAD', 'THE STOPLIGHT']) {
+    assert.match(card, new RegExp(`label="${label}"`), `${label} is missing`);
+  }
+  // No lens behind a compact check. Condensing a lens to its headline is the point; removing
+  // one is what this guards against.
+  assert.doesNotMatch(card, /\{compact \? null : \(\s*<Lens/, 'a lens is dropped when compact');
+  // And in the order the brand names them.
+  const order = [...card.matchAll(/label="THE (VEHICLE|ROAD|STOPLIGHT)"/g)].map((m) => m[1]);
+  assert.deepEqual(order, ['VEHICLE', 'ROAD', 'STOPLIGHT']);
+});
+
 test('with the signal lamp, Today drops the cards that repeat it', () => {
   const today = read('mobile/src/app/(tabs)/today.tsx');
   assert.match(today, /<SkyTally today=\{today\} bare \/>/, 'the sky tally moves to the transits');
