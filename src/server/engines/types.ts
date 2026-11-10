@@ -19,6 +19,10 @@ export interface T3DCalculatorInput {
   // the website calculator above all, still has to give a valid one, or a mistyped form
   // would quietly write a lead nobody can be reached at.
   emailLater?: boolean;       // Optional — the address is coming later, under a session token
+  // Where they came from, worked out in the browser on the first page they landed on and sent
+  // with the calculation. Stored once per lead; see src/lib/firstTouch.ts.
+  source?: string;            // Optional — 'instagram', 'search', 'direct', or a utm_source
+  sourceDetail?: string;      // Optional — campaign, medium or referring host
   emailOptIn?: boolean;       // Optional — true only when the person ticked the marketing box
   wantSession?: boolean;      // Optional — the T3D app asks for a session token back (src/server/appTokens.ts)
 }

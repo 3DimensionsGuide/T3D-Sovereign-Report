@@ -105,6 +105,13 @@ export async function POST(
     //    place) keeps one record; a calculation for them refreshes it.
     //    Null when the address is coming later; see validateInput above.
     const email = body.email?.trim().toLowerCase() || null;
+
+    // Where they came from. Written once: an existing lead keeps the source it already has, and
+    // only a lead with none can gain one. Overwriting with the latest visit is how attribution
+    // becomes a lie — somebody found through a post who later types the address would lose the
+    // credit to 'direct'.
+    const source = body.source?.trim().slice(0, 120) || null;
+    const sourceDetail = body.sourceDetail?.trim().slice(0, 200) || null;
     const birthData = {
       date:  body.birthDate,
       time:  birthTime,
@@ -152,6 +159,10 @@ export async function POST(
         birthData,
         results,
         engineVersion: ENGINE_VERSION,
+        // COALESCE, not assignment: whatever is already there wins. A lead written before this
+        // column existed can still gain its first source; one that has a source never changes.
+        source: sql`COALESCE(${leads.source}, ${source})`,
+        sourceDetail: sql`COALESCE(${leads.sourceDetail}, ${sourceDetail})`,
         updatedAt:  new Date(),
       }).where(eq(leads.id, existing.id)).returning({ id: leads.id, sessionEpoch: leads.sessionEpoch });
       leadId = existing.id;
@@ -165,6 +176,8 @@ export async function POST(
         birthData,
         results,
         engineVersion: ENGINE_VERSION,
+        source,
+        sourceDetail,
       }).returning({ id: leads.id, sessionEpoch: leads.sessionEpoch });
       leadId = inserted[0]?.id;
       sessionEpoch = inserted[0]?.sessionEpoch ?? 1;

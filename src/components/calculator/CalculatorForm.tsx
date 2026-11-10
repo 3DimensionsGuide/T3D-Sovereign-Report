@@ -13,6 +13,7 @@
  */
 
 import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
+import { rememberFirstTouch } from '@/lib/firstTouch';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import ResultsDashboard from './ResultsDashboard';
@@ -518,6 +519,7 @@ export default function CalculatorForm() {
       return;
     }
     setIsCalculating(true); setError(null);
+    const firstTouch = rememberFirstTouch();
     const birthTime = data.birthHour ? buildTime(data.birthHour, data.birthMinute, data.birthPeriod) : undefined;
     try {
       const res  = await fetch('/api/calculate-t3d', {
@@ -528,6 +530,9 @@ export default function CalculatorForm() {
           birthDate: buildDate(data.birthMonth, data.birthDay, data.birthYear),
           birthTime,
           emailOptIn: data.emailOptIn,
+          // Where they came from, read from storage rather than from this page: by now they
+          // have clicked through three steps and the address bar says nothing useful.
+          ...(firstTouch ? { source: firstTouch.source, sourceDetail: firstTouch.detail } : {}),
           birthPlace: {
             city: [data.city, data.state].filter(Boolean).join(', '),
             country: data.country.trim(),

@@ -75,6 +75,12 @@ export const leads = pgTable(
     optInCodeAttempts:  integer('opt_in_code_attempts').default(0).notNull(),
     reportPurchased: boolean('report_purchased').default(false).notNull(),
 
+    // Where this lead came from, written once. Null means they arrived before this existed, or
+    // through a path that carries no source — honest about not knowing. Campaign tags and a
+    // referring host only, never anything identifying. See src/lib/firstTouch.ts, drizzle/0006.
+    source:       text('source'),
+    sourceDetail: text('source_detail'),
+
     // Which version of the calculation engines produced `results`. Null means the chart was
     // written before versions were recorded — not known to be wrong, but not verified either.
     // See src/server/engines/version.ts.
@@ -91,6 +97,8 @@ export const leads = pgTable(
   },
   (table) => ({
     emailIdx: index('leads_email_idx').on(table.email),
+    // The report this column exists for is a count per source, so the grouping is indexed.
+    sourceIdx: index('leads_source_idx').on(table.source),
     // Bounds the identity search for a lead with no address, which cannot narrow on the
     // email index. Partial on email IS NULL, and on lower(last_name) because identity
     // compares names case-insensitively — see drizzle/0005.

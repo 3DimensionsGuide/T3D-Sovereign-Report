@@ -1,15 +1,29 @@
 'use client';
 
 import { useEffect } from 'react';
+import { rememberFirstTouch } from '@/lib/firstTouch';
 
 /**
- * Counts a visit that arrives from a shared T3D card (a link ending in ?ref=card-profile or
- * ?ref=card-today). It sends only the card tag, once per browser session, with no cookies and
- * nothing about the visitor. Anything else in the address is ignored.
+ * Two things that both have to happen on the first page somebody lands on, and nothing else in
+ * common.
+ *
+ * One counts a visit from a shared T3D card (?ref=card-profile or ?ref=card-today), sending only
+ * the card tag, once per browser session, with no cookies and nothing about the visitor.
+ *
+ * The other records where this visit came from, so a purchase can later be traced to the post or
+ * link that produced it. Campaign tags and a referring host only — see src/lib/firstTouch.ts for
+ * what is kept and what is deliberately not. It has to run here rather than on the calculator,
+ * because somebody usually lands somewhere else first and the source would be lost by the time
+ * they reach it.
  */
 const CARD_REFS = ['card-profile', 'card-today'];
 
 export default function RefBeacon(): null {
+  useEffect(() => {
+    // Written once per browser, so a returning visitor keeps their original source.
+    rememberFirstTouch();
+  }, []);
+
   useEffect(() => {
     try {
       const ref = new URLSearchParams(window.location.search).get('ref');

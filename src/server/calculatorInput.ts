@@ -26,6 +26,11 @@ export function validateInput(body: Partial<T3DCalculatorInput>): string | null 
     return 'A valid email is required';
   }
 
+  // Bounded rather than rejected: a source is never worth failing a calculation over, so the
+  // route trims it instead. These limits only stop something absurd reaching the column.
+  if (body.source && body.source.length > 120) return 'source is too long';
+  if (body.sourceDetail && body.sourceDetail.length > 200) return 'sourceDetail is too long';
+
   if (!body.birthDate?.match(/^\d{4}-\d{2}-\d{2}$/))
     return 'birthDate must be in YYYY-MM-DD format';
   if (isUnderMinimumAge(body.birthDate)) return UNDER_AGE_MESSAGE;
