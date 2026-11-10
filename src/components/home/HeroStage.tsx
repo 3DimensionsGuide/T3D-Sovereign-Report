@@ -173,6 +173,9 @@ export default function HeroStage() {
           height={560}
           priority
           sizes="(max-width: 900px) 56vw, 34vw"
+          // The LCP element on the page everything funnels into. See the
+          // qualities list in next.config.ts for why 50 rather than the default.
+          quality={50}
         />
       </div>
 

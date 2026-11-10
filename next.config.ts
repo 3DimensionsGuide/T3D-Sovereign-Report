@@ -26,6 +26,12 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Next 16 refuses any quality that is not listed here, so a `quality` prop
+    // on its own silently 400s. 50 exists for the hero seal: a detailed gold
+    // engraving on alpha, which AVIF prices steeply. At 1080px it costs 321 KB
+    // against 555 KB at the default, and the two are indistinguishable on the
+    // lettering and gradients, which is where codec damage shows first.
+    qualities: [50, 75],
   },
   // One calculator: the one on the homepage. Old links to /calculator land there.
   async redirects() {
