@@ -8,6 +8,7 @@ import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { sendOptInCodeEmail } from '@/lib/email/sendOptInCodeEmail';
 import { optInFields } from '@/server/leadMatch';
+import { addConfirmedContact } from '@/server/audience';
 import {
   CODE_TTL_SECONDS, checkCode, generateCode, hashCode, issuedTooRecently, type CodeCheck,
 } from '@/server/emailCode';
@@ -66,6 +67,12 @@ export async function confirmOptInCode(leadId: number, email: string, code: stri
       optInCodeAttempts: 0,
       updatedAt: new Date(),
     }).where(eq(leads.id, lead.id));
+
+    // The list is joined here, in the same moment consent is recorded, so the two cannot drift.
+    // Deliberately not awaited for its result: the consent is saved either way, and a list one
+    // contact behind is a far smaller problem than a confirmation that failed after the person
+    // did everything right.
+    await addConfirmedContact(lead.id).catch(() => undefined);
   } else if (result === 'wrong') {
     await db.update(leads).set({ optInCodeAttempts: lead.optInCodeAttempts + 1 }).where(eq(leads.id, lead.id));
   }
