@@ -8,7 +8,7 @@ import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 import { sendOptInCodeEmail } from '@/lib/email/sendOptInCodeEmail';
 import { optInFields } from '@/server/leadMatch';
-import { addConfirmedContact } from '@/server/audience';
+import { addConfirmedContact } from '@/server/marketingList';
 import {
   CODE_TTL_SECONDS, checkCode, generateCode, hashCode, issuedTooRecently, type CodeCheck,
 } from '@/server/emailCode';

@@ -17,7 +17,7 @@
 import { NextResponse } from 'next/server';
 import { limitRequest } from '@/server/rateLimit';
 import { verifySvix } from '@/server/svix';
-import { recordUnsubscribe } from '@/server/audience';
+import { recordUnsubscribe } from '@/server/marketingList';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const limited = await limitRequest(request, 'app');

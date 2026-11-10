@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { verifySvix } from '../../src/server/svix';
 
 const read = (p: string) => readFileSync(new URL(`../../${p}`, import.meta.url), 'utf8');
-const audience = read('src/server/audience.ts');
+const audience = read('src/server/marketingList.ts');
 const webhook = read('src/app/api/resend/webhook/route.ts');
 const optIn = read('src/server/optInCode.ts');
 
@@ -103,6 +103,18 @@ test('the list is joined in the same moment consent is recorded', () => {
   assert.match(optIn, /addConfirmedContact\(lead\.id\)/);
   // And never at the cost of the confirmation itself.
   assert.match(optIn, /addConfirmedContact\(lead\.id\)\.catch\(\(\) => undefined\)/);
+});
+
+/**
+ * Resend renamed Audiences to Segments and moved to one contact per address across the team.
+ * The SDK still accepts the old audienceId and marks it deprecated, so the wrong call compiles
+ * and works until it does not.
+ */
+test('the list uses segments, not the deprecated audience', () => {
+  assert.ok(!/audienceId/.test(audience), 'the deprecated audienceId is back');
+  assert.match(audience, /segments: \[\{ id \}\]/);
+  assert.match(audience, /RESEND_SEGMENT_ID/);
+  assert.ok(!/RESEND_AUDIENCE_ID/.test(audience), 'the old variable name is still read');
 });
 
 test('with nothing configured, none of it runs', () => {

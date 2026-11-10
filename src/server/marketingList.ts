@@ -2,8 +2,13 @@
  * The marketing list, kept in step with the consent recorded on the lead.
  *
  * People confirmed, by typing a code back, that they want to hear from T3D, and until now nothing
- * sent to them. Resend's marketing side holds that list; this is the one place the two are
- * reconciled, so they cannot drift.
+ * sent to them. Resend holds that list; this is the one place the two are reconciled, so they
+ * cannot drift.
+ *
+ * Named for what it is rather than for what Resend calls it this year. They have just renamed
+ * Audiences to Segments and moved to a global contact model — one contact per address across the
+ * whole team, in any number of segments — and the next rename should not reach any further than
+ * this file.
  *
  * Four fields go out and no more:
  *
@@ -23,9 +28,9 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { leads } from '@/server/db/schema';
 
-/** Set to the Audience id from the Resend dashboard. Without it, none of this runs. */
-function audienceId(): string | undefined {
-  return process.env.RESEND_AUDIENCE_ID || undefined;
+/** The Segment id from Resend. Without it, none of this runs. */
+function segmentId(): string | undefined {
+  return process.env.RESEND_SEGMENT_ID || undefined;
 }
 
 function client(): Resend | null {
@@ -35,8 +40,8 @@ function client(): Resend | null {
 }
 
 /** True when the list is configured. Callers use it to stay quiet rather than to fail. */
-export function audienceConfigured(): boolean {
-  return !!audienceId() && !!process.env.RESEND_API_KEY;
+export function listConfigured(): boolean {
+  return !!segmentId() && !!process.env.RESEND_API_KEY;
 }
 
 export type SyncResult = 'added' | 'skipped' | 'failed' | 'not-configured';
@@ -50,7 +55,7 @@ export type SyncResult = 'added' | 'skipped' | 'failed' | 'not-configured';
  * smaller problem than a consent that was not saved.
  */
 export async function addConfirmedContact(leadId: number): Promise<SyncResult> {
-  const id = audienceId();
+  const id = segmentId();
   const resend = client();
   if (!id || !resend) return 'not-configured';
 
@@ -61,14 +66,14 @@ export async function addConfirmedContact(leadId: number): Promise<SyncResult> {
     if (!lead || !lead.email || !lead.emailOptIn) return 'skipped';
 
     await resend.contacts.create({
-      audienceId: id,
       email: lead.email,
       firstName: lead.firstName ?? '',
       unsubscribed: false,
+      segments: [{ id }],
     });
     return 'added';
   } catch (error) {
-    console.error('[T3D Audience] could not add a confirmed contact:', error instanceof Error ? error.message : 'unknown');
+    console.error('[T3D List] could not add a confirmed contact:', error instanceof Error ? error.message : 'unknown');
     return 'failed';
   }
 }
@@ -78,6 +83,10 @@ export async function addConfirmedContact(leadId: number): Promise<SyncResult> {
  *
  * Resend handles the unsubscribe link itself and tells us afterwards. Without this the database
  * would keep saying the person wants email, and the next list rebuild would put them back on it.
+ *
+ * Under Resend's global contact model `unsubscribed` means they are out of broadcasts from the
+ * whole team, not out of one list — which is exactly what emailOptIn means here, so the two still
+ * line up.
  *
  * Matched by address because that is all an unsubscribe event carries. Every lead sharing it is
  * turned off: one person may hold several charts, and they unsubscribed, not one of their rows.
