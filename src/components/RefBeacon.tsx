@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { rememberFirstTouch } from '@/lib/firstTouch';
+import { startAnalytics } from '@/lib/analytics';
 
 /**
  * Two things that both have to happen on the first page somebody lands on, and nothing else in
@@ -22,6 +23,8 @@ export default function RefBeacon(): null {
   useEffect(() => {
     // Written once per browser, so a returning visitor keeps their original source.
     rememberFirstTouch();
+    // Does nothing without a key set, which is how it behaves in development.
+    startAnalytics();
   }, []);
 
   useEffect(() => {

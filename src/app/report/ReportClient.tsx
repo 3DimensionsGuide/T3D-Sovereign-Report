@@ -11,8 +11,9 @@
  * "useSearchParams() should be wrapped in a suspense boundary" bailout.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SUPPORT_EMAIL } from '@/lib/contact';
+import { identifyLead, track } from '@/lib/analytics';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useT3DStore } from '@/store/useT3DStore';
@@ -64,6 +65,15 @@ export default function ReportClient() {
   const paymentIntentId = searchParams.get('payment_intent');
 
   const paymentLikelyFailed = redirectStatus === 'failed';
+
+  // The end of the funnel, and the only place a person becomes a person record: they have a
+  // lead id and a payment that went through. Identified by that id, never by their address.
+  const purchased = !!leadId && !paymentLikelyFailed && redirectStatus !== null;
+  useEffect(() => {
+    if (!purchased || !leadId) return;
+    identifyLead(leadId);
+    track('purchase_completed', { product: productSlug });
+  }, [purchased, leadId, productSlug]);
 
   async function handleDownload() {
     setLinkError('');

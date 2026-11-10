@@ -14,6 +14,7 @@
 
 import { isUnderMinimumAge, UNDER_AGE_MESSAGE } from '@/lib/ageGate';
 import { rememberFirstTouch } from '@/lib/firstTouch';
+import { track } from '@/lib/analytics';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useT3DStore } from '@/store/useT3DStore';
 import ResultsDashboard from './ResultsDashboard';
@@ -520,6 +521,8 @@ export default function CalculatorForm() {
     }
     setIsCalculating(true); setError(null);
     const firstTouch = rememberFirstTouch();
+    track('chart_shown', { optedIn: data.emailOptIn, source: firstTouch?.source });
+    if (data.emailOptIn) track('optin_ticked');
     const birthTime = data.birthHour ? buildTime(data.birthHour, data.birthMinute, data.birthPeriod) : undefined;
     try {
       const res  = await fetch('/api/calculate-t3d', {

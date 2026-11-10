@@ -43,6 +43,34 @@ export default function PrivacyPage() {
             <li style={S.li}>Your internet address (IP address), used briefly to limit abuse. It is kept in short-lived counters that expire within an hour, and it is not linked to your chart</li>
           </ul>
 
+          <h2 style={S.h2}>How You Found Us</h2>
+          <p style={S.p}>
+            When you first arrive, your browser records which link brought you here, so we can
+            tell which of our posts and pages actually help people find T3D. This is kept in your
+            own browser, not in a cookie, and it is two things only: any campaign tag that was
+            already in the web address you clicked, and the <em>name</em> of the site that linked
+            to you — <span style={{ whiteSpace: 'nowrap' }}>&ldquo;instagram.com&rdquo;</span>, not
+            the page or anything you searched for. If you later create a chart, that is saved
+            alongside it, once. It never changes afterwards, and it says nothing about you.
+          </p>
+
+          <h2 style={S.h2}>Website Analytics</h2>
+          <p style={S.p}>
+            We use PostHog to count how the website is used: pages opened, steps of the calculator
+            finished, and purchases completed. It tells us whether a change made things better or
+            worse, which is the only reason we run it.
+          </p>
+          <p style={S.p}>
+            Once you have created a chart, those counts are tied to the ID number of your record
+            in our database. They are never tied to your email address or your name, and no part
+            of your chart is sent — not your birth date, time or place, and none of your results.
+            If you read the site without creating a chart, no profile is created for you at all.
+          </p>
+          <p style={S.p}>
+            The T3D iPhone app does not use PostHog. Its counts stay as they always were: totals
+            per day with nobody attached to them.
+          </p>
+
           <h2 style={S.h2}>In the T3D App</h2>
           <p style={S.p}>
             The app asks for the same details as the website. When you create or update your
